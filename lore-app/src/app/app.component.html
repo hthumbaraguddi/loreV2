@@ -1,4 +1,4 @@
-<app-login *ngIf="!isLoggedIn"></app-login>
+<app-login *ngIf="!isLoggedIn" (tokenReady)="loadUserData()"></app-login>
 
 <ng-container *ngIf="isLoggedIn && (state$ | async) as state">
   <div id="app" [class.sb-collapsed]="state.sidebarCollapsed">

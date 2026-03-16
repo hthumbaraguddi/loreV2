@@ -22,7 +22,10 @@
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
             "styles": ["src/styles.scss"],
             "scripts": [],
             "baseHref": "/lore/"
@@ -30,8 +33,16 @@
           "configurations": {
             "production": {
               "budgets": [
-                {"type": "initial", "maximumWarning": "500kb", "maximumError": "1mb"},
-                {"type": "anyComponentStyle", "maximumWarning": "2kb", "maximumError": "4kb"}
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
               ],
               "outputHashing": "all"
             },
@@ -46,8 +57,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": {"buildTarget": "lore-app:build:production"},
-            "development": {"buildTarget": "lore-app:build:development"}
+            "production": {
+              "buildTarget": "lore-app:build:production"
+            },
+            "development": {
+              "buildTarget": "lore-app:build:development"
+            }
           },
           "defaultConfiguration": "development"
         },
@@ -56,7 +71,10 @@
           "options": {
             "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
             "styles": ["src/styles.scss"],
             "scripts": []
           }

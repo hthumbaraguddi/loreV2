@@ -81,6 +81,15 @@ export class AppComponent implements OnInit, OnDestroy {
   // Import context: 'shelf' | 'notebook' | 'template'
   private importContext: 'shelf' | 'notebook' | 'template' = 'template';
 
+  // Export format picker
+  showExportModal = false;
+  exportTarget: { type: 'shelf' | 'notebook'; shelf?: Shelf; notebook?: Notebook } | null = null;
+
+  // Shelf picker for notebook import
+  showShelfPickerModal = false;
+  shelfPickerShelves: Shelf[] = [];
+  private pendingNotebookImportJson: unknown = null;
+
   private sub!: Subscription;
 
   ngOnInit(): void {
@@ -96,6 +105,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.displayName = user.name;
           this.data.setCurrentUser(user.username);
           this.data.loadAll(user.username);
+          // Seed demo data for brand-new users (no shelves yet)
+          if (this.data.getState().shelves.length === 0) {
+            this.data.seedDemoData();
+          }
         }
       } else {
         this.displayName = '';
@@ -181,6 +194,64 @@ export class AppComponent implements OnInit, OnDestroy {
     this.importContext = 'template';
     this.showTemplateBrowserModal = false;
     setTimeout(() => this.importFileInput?.nativeElement.click(), 50);
+  }
+
+  onImportShelf(): void {
+    this.importContext = 'shelf';
+    setTimeout(() => this.importFileInput?.nativeElement.click(), 50);
+  }
+
+  onImportNotebook(): void {
+    this.importContext = 'notebook';
+    setTimeout(() => this.importFileInput?.nativeElement.click(), 50);
+  }
+
+  onExportShelf(shelf: Shelf): void {
+    this.exportTarget = { type: 'shelf', shelf };
+    this.showExportModal = true;
+  }
+
+  onExportNotebook(notebook: Notebook): void {
+    this.exportTarget = { type: 'notebook', notebook };
+    this.showExportModal = true;
+  }
+
+  onExportFormatSelected(format: 'json' | 'html'): void {
+    this.showExportModal = false;
+    if (!this.exportTarget) return;
+    if (this.exportTarget.type === 'shelf' && this.exportTarget.shelf) {
+      format === 'html'
+        ? this.exportImport.exportShelfAsHtml(this.exportTarget.shelf)
+        : this.exportImport.exportShelf(this.exportTarget.shelf);
+    } else if (this.exportTarget.type === 'notebook' && this.exportTarget.notebook) {
+      format === 'html'
+        ? this.exportImport.exportNotebookAsHtml(this.exportTarget.notebook)
+        : this.exportImport.exportNotebook(this.exportTarget.notebook);
+    }
+    this.exportTarget = null;
+  }
+
+  onExportModalCancelled(): void {
+    this.showExportModal = false;
+    this.exportTarget = null;
+  }
+
+  onShelfPickerSelected(shelfId: string): void {
+    this.showShelfPickerModal = false;
+    if (!this.pendingNotebookImportJson) return;
+    try {
+      const newNbId = this.exportImport.importNotebook(this.pendingNotebookImportJson, shelfId);
+      this.data.setActiveNotebook(newNbId);
+      this.data.showToast('Notebook imported successfully.');
+    } catch {
+      // toast already shown by service
+    }
+    this.pendingNotebookImportJson = null;
+  }
+
+  onShelfPickerCancelled(): void {
+    this.showShelfPickerModal = false;
+    this.pendingNotebookImportJson = null;
   }
 
   // ── Topbar events ─────────────────────────────────────────────────────────
@@ -419,19 +490,34 @@ export class AppComponent implements OnInit, OnDestroy {
         const json = JSON.parse(e.target?.result as string);
         if (this.importContext === 'template') {
           this.exportImport.importTemplate(json);
+          this.data.showToast('Template imported successfully.');
         } else if (this.importContext === 'shelf') {
-          this.exportImport.importShelf(json);
+          const newShelfId = this.exportImport.importShelf(json);
+          this.data.showToast('Shelf imported successfully.');
+          // Activate first notebook of the imported shelf
+          const state = this.data.getState();
+          const firstNb = state.notebooks.find(nb => nb.shelfId === newShelfId);
+          if (firstNb) this.data.setActiveNotebook(firstNb.id);
         } else if (this.importContext === 'notebook') {
           const state = this.data.getState();
-          const targetShelfId = state.shelves[0]?.id ?? '';
-          this.exportImport.importNotebook(json, targetShelfId);
+          if (state.shelves.length === 0) {
+            this.data.showToast('Create a shelf first before importing a notebook.');
+          } else if (state.shelves.length === 1) {
+            const newNbId = this.exportImport.importNotebook(json, state.shelves[0].id);
+            this.data.setActiveNotebook(newNbId);
+            this.data.showToast('Notebook imported successfully.');
+          } else {
+            // Show shelf picker
+            this.pendingNotebookImportJson = json;
+            this.shelfPickerShelves = state.shelves;
+            this.showShelfPickerModal = true;
+          }
         }
       } catch (err: any) {
         if (err?.message && !err.message.startsWith('Invalid')) {
           this.data.showToast('Import failed: invalid JSON file.');
         }
       }
-      // Reset input so same file can be re-selected
       input.value = '';
     };
     reader.readAsText(file);

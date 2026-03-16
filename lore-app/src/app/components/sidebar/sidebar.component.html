@@ -23,6 +23,12 @@
     <button class="sb-act" (click)="onOpenImportTemplate()">
       <span class="sai">📥</span><span>Import Template</span>
     </button>
+    <button class="sb-act" (click)="onImportShelf()">
+      <span class="sai">🗂️</span><span>Import Shelf</span>
+    </button>
+    <button class="sb-act" (click)="onImportNotebook()">
+      <span class="sai">📓</span><span>Import Notebook</span>
+    </button>
   </div>
 
   <div class="sb-div"></div>
@@ -43,6 +49,7 @@
         <span class="sh-nm">{{ shelf.name }}</span>
         <button class="sh-add" title="Add notebook" (click)="onAddNotebook(shelf, $event)">＋</button>
         <button class="sh-add" title="Edit shelf" (click)="onEditShelf(shelf, $event)" style="font-size:11px">✎</button>
+        <button class="sh-add" title="Export shelf" (click)="onExportShelf(shelf, $event)" style="font-size:11px">⬇</button>
       </div>
 
       <!-- Notebooks -->
@@ -58,6 +65,7 @@
           <span class="nb-itm-ct">{{ nb.sections.length }}</span>
           <span class="nb-itm-ed">
             <button class="btn-nbe" title="Edit notebook" (click)="onEditNotebook(nb, $event)">✎</button>
+            <button class="btn-nbe" title="Export notebook" (click)="onExportNotebook(nb, $event)">⬇</button>
           </span>
         </div>
       </div>

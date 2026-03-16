@@ -24,6 +24,10 @@ export class SidebarComponent {
   @Output() openTemplates = new EventEmitter<void>();
   @Output() openTemplateBuilder = new EventEmitter<void>();
   @Output() openImportTemplate = new EventEmitter<void>();
+  @Output() importShelf = new EventEmitter<void>();
+  @Output() importNotebook = new EventEmitter<void>();
+  @Output() exportShelf = new EventEmitter<Shelf>();
+  @Output() exportNotebook = new EventEmitter<Notebook>();
 
   private data = inject(DataService);
 
@@ -86,5 +90,23 @@ export class SidebarComponent {
 
   onOpenImportTemplate(): void {
     this.openImportTemplate.emit();
+  }
+
+  onImportShelf(): void {
+    this.importShelf.emit();
+  }
+
+  onImportNotebook(): void {
+    this.importNotebook.emit();
+  }
+
+  onExportShelf(shelf: Shelf, event: Event): void {
+    event.stopPropagation();
+    this.exportShelf.emit(shelf);
+  }
+
+  onExportNotebook(notebook: Notebook, event: Event): void {
+    event.stopPropagation();
+    this.exportNotebook.emit(notebook);
   }
 }

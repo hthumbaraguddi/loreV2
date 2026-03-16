@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AppState, Shelf, Notebook, Section, Note } from '../models';
+import { DriveService } from './drive.service';
 
 const USERS_KEY = 'lore_users';
 
@@ -20,6 +21,8 @@ export class DataService {
 
   private currentUsername = '';
 
+  constructor(private drive: DriveService) {}
+
   uid(): string {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
@@ -30,6 +33,19 @@ export class DataService {
 
   getState(): AppState {
     return this.state$.getValue();
+  }
+
+  /** Load state directly from a plain object (e.g. from Drive) */
+  loadFromObject(obj: Partial<AppState>): void {
+    const restored: AppState = {
+      shelves: Array.isArray(obj.shelves) ? obj.shelves : [],
+      notebooks: Array.isArray(obj.notebooks) ? obj.notebooks : [],
+      activeNotebookId: obj.activeNotebookId ?? null,
+      sidebarCollapsed: typeof obj.sidebarCollapsed === 'boolean' ? obj.sidebarCollapsed : false,
+      theme: typeof obj.theme === 'string' ? obj.theme : 'default',
+      fontSize: typeof obj.fontSize === 'number' ? obj.fontSize : 14,
+    };
+    this.state$.next(restored);
   }
 
   loadAll(username: string): void {
@@ -87,6 +103,12 @@ export class DataService {
 
       users[username].data = this.state$.getValue();
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+      // Mirror to Google Drive (debounced)
+      this.drive.scheduleSave({
+        state: this.state$.getValue(),
+        customTemplates: this.getCustomTemplatesRaw(),
+      });
     } catch (e: any) {
       if (e && e.name === 'QuotaExceededError') {
         this.showToast('Storage quota exceeded — changes not saved.');
@@ -94,6 +116,12 @@ export class DataService {
         this.showToast('Failed to save data.');
       }
     }
+  }
+
+  private getCustomTemplatesRaw(): any[] {
+    try {
+      return JSON.parse(localStorage.getItem('lore_custom_templates') || '[]');
+    } catch { return []; }
   }
 
   // ── User context ──────────────────────────────────────────────────────────

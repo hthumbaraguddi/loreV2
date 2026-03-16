@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <svg [attr.width]="size || 16" [attr.height]="size || 16">
-      <use [attr.href]="'/lore/assets/icons.svg#' + name"></use>
+      <use [attr.href]="'/assets/icons.svg#' + name"></use>
     </svg>
   `,
   styles: [`

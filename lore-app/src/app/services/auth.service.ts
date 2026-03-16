@@ -37,6 +37,48 @@ export class AuthService {
     }
   }
 
+  /** Decode a Google JWT credential (no signature verification needed — GSI already verified it) */
+  private decodeJwt(token: string): Record<string, any> {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    } catch {
+      return {};
+    }
+  }
+
+  loginWithGoogle(credential: string): string | null {
+    const payload = this.decodeJwt(credential);
+    const sub: string = payload['sub'];
+    const name: string = payload['name'] || payload['email'] || 'Google User';
+    const email: string = payload['email'] || '';
+
+    if (!sub) return 'Invalid Google credential';
+
+    const googleKey = `google_${sub}`;
+    const users = this.getUsers();
+
+    if (!users[googleKey]) {
+      // First-time Google sign-in — create account
+      users[googleKey] = {
+        username: googleKey,
+        password: '',       // no password for Google accounts
+        name,
+        data: {}
+      };
+      this.saveUsers(users);
+    } else {
+      // Update name in case it changed
+      users[googleKey].name = name;
+      this.saveUsers(users);
+    }
+
+    localStorage.setItem(CU_KEY, googleKey);
+    this.currentUser$.next(users[googleKey]);
+    this.isLoggedIn$.next(true);
+    return null;
+  }
+
   register(name: string, username: string, password: string): string | null {
     if (!name.trim() || !username.trim() || !password.trim()) {
       return 'Fill all fields';

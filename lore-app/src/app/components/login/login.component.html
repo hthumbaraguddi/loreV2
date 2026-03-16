@@ -98,6 +98,13 @@
           <button class="ltab" [class.on]="activeTab === 'register'" (click)="switchTab('register')">Register</button>
         </div>
 
+        <!-- Google Sign-In -->
+        <div class="lg-google">
+          <div id="google-btn"></div>
+        </div>
+
+        <div class="lg-divider"><span>or</span></div>
+
         @if (activeTab === 'signin') {
           <div>
             <div class="lg-field">

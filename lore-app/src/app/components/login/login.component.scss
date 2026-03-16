@@ -301,3 +301,28 @@
   .land-right { width: 100%; padding: 28px; }
   .land-headline { font-size: 28px; }
 }
+
+// ── Google Sign-In ────────────────────────────────────────────────────────────
+.lg-google {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.lg-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  span { white-space: nowrap; }
+}

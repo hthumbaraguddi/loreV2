@@ -20,6 +20,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Output() searchChanged = new EventEmitter<string>();
   @Output() addSection = new EventEmitter<void>();
   @Output() addNote = new EventEmitter<void>();
+  @Output() openTemplates = new EventEmitter<void>();
 
   searchValue: string = '';
 
@@ -54,5 +55,9 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   onAddNote(): void {
     this.addNote.emit();
+  }
+
+  onOpenTemplates(): void {
+    this.openTemplates.emit();
   }
 }

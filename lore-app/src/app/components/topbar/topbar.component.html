@@ -32,4 +32,9 @@
   <button class="btn-pr" *ngIf="hasActiveNotebook" (click)="onAddNote()">
     <lore-icon name="note-plus" [size]="12"></lore-icon> Note
   </button>
+
+  <!-- Templates icon button -->
+  <button class="btn-tb-icon" (click)="onOpenTemplates()" title="Browse Templates">
+    <lore-icon name="template" [size]="15"></lore-icon>
+  </button>
 </div>

@@ -13,11 +13,32 @@
   background: var(--card);
   border-radius: 14px;
   width: 100%;
-  max-width: 540px;
+  max-width: 560px;
   max-height: 92vh;
-  overflow-y: auto;
-  padding: 22px;
+  display: flex;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: max-width 0.25s ease;
+
+  &.has-preview {
+    max-width: 960px;
+  }
+}
+
+// ── Left column ──────────────────────────────────────
+.mod-left {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 540px;
+  padding: 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .has-preview & {
+    width: 380px;
+    border-right: 1px solid var(--border);
+  }
 }
 
 .mod-ttl {
@@ -48,11 +69,14 @@
   border: 1.5px solid;
   cursor: pointer;
   transition: all 0.15s;
-  position: relative;
 
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    box-shadow: 0 0 0 2px var(--acc);
   }
 }
 
@@ -69,11 +93,12 @@
 .tpl-browser-new {
   border-top: 1px solid var(--border);
   padding-top: 12px;
-  margin-top: 4px;
+  margin-top: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .tpl-browser-new-lbl {
@@ -90,11 +115,79 @@
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  margin-top: 16px;
-  padding-top: 13px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
+// ── Right column: preview ────────────────────────────
+.mod-preview {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.prev-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.prev-ttl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tt);
+}
+
+.prev-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--tt);
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--inp);
+    color: var(--tp);
+  }
+}
+
+.prev-note-card {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+
+  .card-hdr {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 15px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--card);
+    border-radius: 10px 10px 0 0;
+    border: 0.5px solid var(--border);
+  }
+
+  .card-body {
+    padding: 12px 15px 15px;
+    border: 0.5px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    background: var(--card);
+  }
+}
+
+// ── Shared buttons ───────────────────────────────────
 .btn-prim {
   background: var(--acc);
   color: #fff;

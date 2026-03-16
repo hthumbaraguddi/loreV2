@@ -31,7 +31,8 @@
         [hasActiveNotebook]="!!state.activeNotebookId"
         (searchChanged)="onSearchChanged($event)"
         (addSection)="onAddSection()"
-        (addNote)="onAddNote(null)">
+        (addNote)="onAddNote(null)"
+        (openTemplates)="onOpenTemplates()">
       </app-topbar>
 
       <app-content-area

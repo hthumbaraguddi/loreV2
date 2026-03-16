@@ -1,0 +1,357 @@
+.ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mod {
+  background: var(--card);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 22px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+}
+
+.mod-ttl {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tp);
+  margin-bottom: 17px;
+}
+
+.mod-fld {
+  margin-bottom: 11px;
+}
+
+.g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.mod-act {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border);
+}
+
+.tpl-builder-body {
+  max-height: 62vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+// Icon + color row
+.icon-color-row {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.icon-sel {
+  flex: 0 0 auto;
+  width: 80px;
+}
+
+.c-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.c-opt {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+
+  &:hover { transform: scale(1.15); }
+  &.sel { border-color: var(--tp); }
+}
+
+// Fields hint
+.fields-hint {
+  font-size: 10px;
+  color: var(--ts);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+// Field rows
+.field-list {
+  margin-bottom: 5px;
+}
+
+.tb-field-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--inp);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 11px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--bh); }
+
+  &.type-opt {
+    cursor: pointer;
+    margin-bottom: 4px;
+
+    &.selected {
+      border-color: var(--acc);
+      background: var(--accl);
+    }
+  }
+}
+
+.tb-field-drag {
+  color: var(--tt);
+  cursor: grab;
+  font-size: 13px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.tb-field-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tb-field-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--tp);
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tb-field-meta {
+  font-size: 11px;
+  color: var(--ts);
+}
+
+.tb-field-acts {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.tb-ftype-badge {
+  font-size: 9.5px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--card2);
+  border: 0.5px solid var(--border);
+  color: var(--ts);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.tb-req-badge {
+  font-size: 9.5px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--accl);
+  color: var(--acc);
+  flex-shrink: 0;
+}
+
+.tb-locked-badge {
+  font-size: 9.5px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--card2);
+  color: var(--tt);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.btn-tpl-act {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ts);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+
+  &:hover { background: var(--inp); color: var(--tp); border-color: var(--bh); }
+  &.del:hover { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
+  &:disabled { opacity: 0.3; cursor: default; }
+}
+
+.tb-add-field-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 9px;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--tt);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 5px;
+
+  &:hover { border-color: var(--acc); color: var(--acc); background: var(--accl); }
+}
+
+// Inline add/edit form
+.tb-inline-form {
+  background: var(--card2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 7px;
+}
+
+.tb-inline-form-ttl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tt);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.field-type-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.type-icon {
+  font-size: 16px;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.type-check {
+  color: var(--acc);
+  font-size: 14px;
+}
+
+// Options
+.irows {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.irow {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  .fin { flex: 1; padding: 6px 9px; }
+}
+
+.add-option-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 6px;
+
+  .fin { flex: 1; }
+}
+
+.btn-rm {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--tt);
+  border-radius: 6px;
+  padding: 4px 7px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
+}
+
+.btn-ar-sm {
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  color: var(--tt);
+  border-radius: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  &:hover { color: var(--acc); border-color: var(--acc); background: var(--accl); }
+}
+
+// Required toggle
+.required-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.required-lbl {
+  font-size: 12.5px;
+  color: var(--ts);
+}
+
+.form-actions {
+  display: flex;
+  gap: 7px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+// Buttons
+.btn-prim {
+  background: var(--acc);
+  color: #fff;
+  border: none;
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.88; }
+}
+
+.btn-sec {
+  background: transparent;
+  color: var(--ts);
+  border: 1px solid var(--border);
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: var(--inp); color: var(--tp); }
+}

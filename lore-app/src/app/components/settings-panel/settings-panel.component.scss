@@ -1,0 +1,283 @@
+// Settings Panel — slide-in from right
+.spanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 370px;
+  background: var(--card);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.18);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+// Header
+.sp-hdr {
+  display: flex;
+  align-items: center;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sp-title {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  color: var(--tp);
+}
+
+.btn-sp-close {
+  background: var(--inp);
+  border: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ts);
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--bh);
+    color: var(--tp);
+  }
+}
+
+// Scrollable body
+.sp-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+// Section header
+.sp-sec {
+  padding: 16px 19px 4px;
+}
+
+.sp-sec-ttl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--tt);
+  margin-bottom: 11px;
+}
+
+// Generic row
+.sp-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 19px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  transition: background 0.15s;
+  cursor: default;
+
+  &:hover {
+    background: var(--inp);
+  }
+}
+
+.sp-row-ico {
+  font-size: 15px;
+  width: 21px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sp-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-row-lbl {
+  font-size: 13px;
+  color: var(--tp);
+}
+
+.sp-row-desc {
+  font-size: 11px;
+  color: var(--ts);
+  margin-top: 1px;
+}
+
+// Select dropdown
+.sp-sel {
+  background: var(--inp);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 28px 5px 9px;
+  font-size: 12px;
+  color: var(--tp);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-color: var(--inp);
+
+  &:focus {
+    border-color: var(--acc);
+  }
+}
+
+// Theme grid
+.sp-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+  padding: 12px 19px 18px;
+}
+
+.sp-topt {
+  padding: 9px 8px 7px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--acc);
+  }
+
+  &.on {
+    border-color: var(--acc);
+    background: var(--accl);
+
+    .sp-tnm {
+      color: var(--acc);
+      font-weight: 500;
+    }
+  }
+}
+
+.sp-tdot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin: 0 auto 5px;
+}
+
+.sp-tnm {
+  font-size: 11px;
+  color: var(--ts);
+}
+
+// Profile section
+.sp-prof {
+  padding: 13px 19px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.sp-pf {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sp-pl {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ts);
+}
+
+.sp-pin {
+  background: var(--inp);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--tp);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+
+  &:focus {
+    border-color: var(--acc);
+  }
+}
+
+// Custom templates list
+.sp-no-templates {
+  padding: 10px 0;
+  font-size: 12.5px;
+  color: var(--ts);
+  opacity: 0.7;
+}
+
+// Confirm delete label
+.sp-del-confirm-lbl {
+  font-size: 11px;
+  color: #DC2626;
+  align-self: center;
+  margin-right: 2px;
+}
+
+// Sign out button
+.sp-danger {
+  background: transparent;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: #DC2626;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+
+  &:hover {
+    background: #FEE2E2;
+  }
+}
+
+// About section
+.sp-about {
+  padding: 16px 19px 24px;
+  text-align: center;
+}
+
+.sp-about-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  justify-content: center;
+  margin-bottom: 8px;
+
+  h3 {
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    color: var(--tp);
+  }
+}
+
+.sp-about p {
+  font-size: 12px;
+  color: var(--ts);
+  margin-top: 5px;
+  line-height: 1.55;
+}
+
+.sp-ver {
+  font-size: 11px;
+  color: var(--tt);
+  margin-top: 7px;
+}

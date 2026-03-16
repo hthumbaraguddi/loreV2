@@ -1,0 +1,29 @@
+<div id="topbar">
+  <!-- Breadcrumb -->
+  <div class="tb-crumb">
+    <span class="crumb-sh">{{ activeShelfName }}</span>
+    <span class="crumb-sep" *ngIf="activeShelfName && activeNotebookName">›</span>
+    <span class="crumb-nb">
+      <span *ngIf="activeNotebookIcon">{{ activeNotebookIcon }}&nbsp;</span>{{ activeNotebookName || 'Select a notebook' }}
+    </span>
+  </div>
+
+  <!-- Search -->
+  <div class="sr-wrap">
+    <span class="sr-ico">
+      <lore-icon name="search" [size]="12"></lore-icon>
+    </span>
+    <input
+      class="sr-in"
+      type="text"
+      placeholder="Search notes…"
+      [value]="searchValue"
+      (input)="onSearchInput($any($event.target).value)"
+    />
+    <button class="sr-clear" *ngIf="searchValue" (click)="clearSearch()" title="Clear search">×</button>
+  </div>
+
+  <!-- Action buttons (only when a notebook is active) -->
+  <button class="btn-gh" *ngIf="hasActiveNotebook" (click)="onAddSection()">＋ Section</button>
+  <button class="btn-pr" *ngIf="hasActiveNotebook" (click)="onAddNote()">＋ Note</button>
+</div>

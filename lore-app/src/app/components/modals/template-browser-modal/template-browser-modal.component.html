@@ -1,0 +1,30 @@
+<div class="ov show">
+  <div class="mod">
+    <h2 class="mod-ttl">📋 Note Templates</h2>
+    <p class="mod-desc">Each template gives you bespoke fields built for that exact use case. Switch any time in the editor.</p>
+
+    <div class="tpl-grid">
+      <div
+        *ngFor="let tpl of templates"
+        class="tpl-card"
+        [style.border-color]="getColor(tpl.color).border"
+        [style.background]="getColor(tpl.color).bg + '44'"
+        (click)="select(tpl.id)">
+        <div class="tpl-icon">{{ tpl.icon }}</div>
+        <div class="tpl-name" [style.color]="getColor(tpl.color).text">{{ tpl.name }}</div>
+      </div>
+    </div>
+
+    <div class="tpl-browser-new">
+      <span class="tpl-browser-new-lbl">Want something custom?</span>
+      <div class="tpl-browser-new-acts">
+        <button class="btn-sec" (click)="onImportTemplate()">📥 Import</button>
+        <button class="btn-prim" (click)="onBuildTemplate()">🧩 Build Template</button>
+      </div>
+    </div>
+
+    <div class="mod-act" style="border-top: none; padding-top: 0; margin-top: 8px;">
+      <button class="btn-sec" (click)="cancel()">Close</button>
+    </div>
+  </div>
+</div>

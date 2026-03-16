@@ -1,0 +1,55 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node / Angular
+node_modules/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+
+# Angular cache
+.angular/
+
+# Angular build artifacts
+lore-app/dist/
+lore-app/tmp/
+lore-app/out-tsc/
+lore-app/.angular/
+
+# npm / yarn
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Environment files (keep .example versions)
+.env
+.env.*
+!.env.example
+
+# IDE / Editor
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Kiro IDE internals (keep specs — they're useful docs)
+.kiro/settings/
+.kiro/steering/
+
+# Test coverage
+coverage/
+lore-app/coverage/
+
+# Misc
+*.log
+*.pid
+*.seed
+*.pid.lock

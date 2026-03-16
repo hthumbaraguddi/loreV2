@@ -1,0 +1,35 @@
+// The sidebar styles are defined globally in styles.scss.
+// Component-specific overrides only.
+
+:host {
+  display: contents;
+}
+
+// Ensure the toggle button is always visible even when sidebar is collapsed
+.btn-tsb {
+  position: fixed;
+  top: 13px;
+  left: calc(var(--sbw) + 5px);
+  z-index: 50;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--ts);
+  transition: left 0.25s, box-shadow 0.2s;
+  box-shadow: var(--sh);
+
+  &.closed {
+    left: 7px;
+  }
+
+  &:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+  }
+}

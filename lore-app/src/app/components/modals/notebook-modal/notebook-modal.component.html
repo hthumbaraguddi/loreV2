@@ -1,0 +1,35 @@
+<div class="ov show">
+  <div class="mod">
+    <h2 class="mod-ttl">{{ title }}</h2>
+
+    <div class="mod-fld">
+      <label class="flbl">Name</label>
+      <input class="fin" [(ngModel)]="name" placeholder="e.g. Q1 Research" (keyup.enter)="save()" autofocus>
+    </div>
+
+    <div class="mod-fld">
+      <label class="flbl">Icon</label>
+      <div class="ico-grid">
+        <div
+          *ngFor="let icon of icons"
+          class="ic"
+          [class.sel]="icon === selectedIcon"
+          (click)="pickIcon(icon)">{{ icon }}</div>
+      </div>
+    </div>
+
+    <div class="mod-fld">
+      <label class="flbl">Shelf</label>
+      <select class="fsel" [(ngModel)]="selectedShelfId">
+        <option *ngFor="let shelf of shelves" [value]="shelf.id">{{ shelf.icon }} {{ shelf.name }}</option>
+        <option value="">— No shelf —</option>
+      </select>
+    </div>
+
+    <div class="mod-act">
+      <button *ngIf="isEdit" class="btn-dng" (click)="delete()">Delete</button>
+      <button class="btn-sec" (click)="cancel()">Cancel</button>
+      <button class="btn-prim" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>

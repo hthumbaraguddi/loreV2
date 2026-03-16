@@ -1,0 +1,13 @@
+{
+  "navigationFallback": {
+    "rewrite": "/lore/index.html",
+    "exclude": ["/lore/assets/*", "*.{css,scss,js,ico,png,svg,jpg,jpeg,gif,woff,woff2,ttf,eot}"]
+  },
+  "routes": [
+    {
+      "route": "/lore/*",
+      "serve": "/lore/index.html",
+      "statusCode": 200
+    }
+  ]
+}

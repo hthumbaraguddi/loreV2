@@ -1,0 +1,36 @@
+<div class="ov show">
+  <div class="mod">
+    <h2 class="mod-ttl">{{ modalTitle }}</h2>
+
+    <div class="g2">
+      <div class="mod-fld">
+        <label class="flbl">Title</label>
+        <input class="fin" [(ngModel)]="title" placeholder="e.g. Sprint 12" (keyup.enter)="save()" autofocus>
+      </div>
+      <div class="mod-fld">
+        <label class="flbl">Subtitle</label>
+        <input class="fin" [(ngModel)]="subtitle" placeholder="e.g. Mar 10–21">
+      </div>
+    </div>
+
+    <div class="mod-fld">
+      <label class="flbl">Colour</label>
+      <div class="c-row">
+        <div
+          *ngFor="let key of colorKeys"
+          class="c-opt"
+          [class.sel]="key === selectedColor"
+          [style.background]="colors[key].dot"
+          [title]="key"
+          (click)="pickColor(key)">
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-act">
+      <button *ngIf="isEdit" class="btn-dng" (click)="delete()">Delete</button>
+      <button class="btn-sec" (click)="cancel()">Cancel</button>
+      <button class="btn-prim" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>

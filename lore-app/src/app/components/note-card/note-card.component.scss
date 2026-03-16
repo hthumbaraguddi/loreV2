@@ -1,0 +1,8 @@
+// NoteCardComponent styles are handled globally via styles.scss
+// (.note-card, .card-hdr, .card-sec-badge, .card-title, .card-tpl-pill,
+//  .card-acts, .btn-ca, .chev, .card-body, .tag-row, .tag, .hl)
+// Component-specific overrides only:
+
+:host {
+  display: block;
+}

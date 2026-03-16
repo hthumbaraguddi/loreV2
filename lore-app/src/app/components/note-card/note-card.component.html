@@ -1,0 +1,25 @@
+<div class="note-card">
+  <div class="card-hdr" (click)="onToggle()">
+    <span
+      class="card-sec-badge"
+      [style.background]="color.bg"
+      [style.color]="color.text"
+      [style.border-color]="color.border"
+    >{{ badgeText }}</span>
+
+    <span class="card-title">{{ note.title }}</span>
+
+    <span class="card-tpl-pill" *ngIf="template">
+      {{ template.icon }} {{ template.name }}
+    </span>
+
+    <div class="card-acts">
+      <button class="btn-ca" (click)="onEdit($event)">✎ Edit</button>
+      <button class="btn-ca del" (click)="onDelete($event)">✕</button>
+    </div>
+
+    <span class="chev" [class.open]="isOpen">▾</span>
+  </div>
+
+  <div class="card-body" [class.open]="isOpen" [innerHTML]="cardBodyHtml"></div>
+</div>

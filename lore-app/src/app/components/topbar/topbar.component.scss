@@ -1,0 +1,32 @@
+// TopbarComponent styles
+// Most styles are global (from styles.scss): #topbar, .tb-crumb, .crumb-sh, .crumb-sep,
+// .crumb-nb, .sr-wrap, .sr-ico, .sr-in, .btn-gh, .btn-pr
+
+:host {
+  display: contents;
+}
+
+// Clear button inside search wrapper
+.sr-clear {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--tt);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--tp);
+  }
+}
+
+// Adjust search input right padding when clear button is visible
+.sr-in {
+  padding-right: 26px;
+}

@@ -1,0 +1,85 @@
+<!-- No notebook selected -->
+<ng-container *ngIf="!notebook">
+  <div class="empty-state">
+    <div class="empty-ico">📖</div>
+    <h2>No notebook selected</h2>
+    <p>Choose a notebook from the sidebar to get started.</p>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="notebook">
+  <!-- Search results banner -->
+  <div class="sbanner" [class.show]="!!searchQuery">
+    <span>{{ matchCount }} note{{ matchCount !== 1 ? 's' : '' }} found for "<strong>{{ searchQuery }}</strong>"</span>
+    <button class="btn-cls" (click)="onClearSearch()">Clear</button>
+  </div>
+
+  <div class="main-content">
+    <!-- Progress bar -->
+    <div class="nb-prog" *ngIf="totalNotes > 0">
+      <div
+        *ngFor="let seg of progressSegments"
+        class="prog-seg"
+        [style.background]="seg.color"
+        [style.flex]="seg.flex"
+      ></div>
+    </div>
+
+    <!-- No notes found (search active, zero results) -->
+    <ng-container *ngIf="searchQuery && matchCount === 0">
+      <div class="empty-state">
+        <div class="empty-ico">🔍</div>
+        <h2>No notes found</h2>
+        <p>No notes match "<strong>{{ searchQuery }}</strong>". Try a different search.</p>
+      </div>
+    </ng-container>
+
+    <!-- Sections -->
+    <ng-container *ngFor="let section of notebook.sections">
+      <ng-container *ngIf="isSectionVisible(section)">
+        <!-- Section divider -->
+        <div class="sec-div">
+          <span class="sec-dot" [style.background]="getColor(section).dot"></span>
+          <div class="sec-text">
+            <span class="sec-title">{{ section.title }}</span>
+            <span class="sec-sub" *ngIf="section.subtitle"> — {{ section.subtitle }}</span>
+          </div>
+          <div class="sec-line"></div>
+          <div class="sec-acts">
+            <button class="btn-sda" (click)="onEditSection(section)">✎ Edit</button>
+            <button class="btn-sda" (click)="onDeleteSection(section)">✕ Delete</button>
+            <button class="btn-sda" (click)="onAddNote(section)">＋ Note</button>
+          </div>
+        </div>
+
+        <!-- Note cards -->
+        <app-note-card
+          *ngFor="let note of getVisibleNotes(section)"
+          [note]="note"
+          [section]="section"
+          [color]="getColor(section)"
+          [searchQuery]="searchQuery"
+          [notebookId]="notebook.id"
+          (edit)="onEditNote($event, section)"
+          (delete)="onDeleteNote($event, section)"
+        ></app-note-card>
+
+        <!-- Add note button (only when not searching) -->
+        <button
+          *ngIf="!searchQuery"
+          class="btn-addnote"
+          (click)="onAddNote(section)"
+        >＋ Add note</button>
+      </ng-container>
+    </ng-container>
+
+    <!-- Empty notebook (no sections or no notes, no search active) -->
+    <ng-container *ngIf="!searchQuery && totalNotes === 0 && notebook.sections.length === 0">
+      <div class="empty-state">
+        <div class="empty-ico">✨</div>
+        <h2>Empty notebook</h2>
+        <p>Add a section to start organising your notes.</p>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

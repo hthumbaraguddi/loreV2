@@ -1,0 +1,138 @@
+<div class="ov show">
+  <div class="mod">
+    <h2 class="mod-ttl">{{ modalTitle }}</h2>
+
+    <div class="tpl-builder-body">
+      <!-- Template meta: name, icon, color -->
+      <div class="g2" style="margin-bottom: 16px;">
+        <div class="mod-fld" style="margin-bottom: 0;">
+          <label class="flbl">Template Name *</label>
+          <input class="fin" [(ngModel)]="templateName" placeholder="e.g. Book Review, Meeting Notes…">
+        </div>
+        <div class="mod-fld" style="margin-bottom: 0;">
+          <label class="flbl">Icon &amp; Colour</label>
+          <div class="icon-color-row">
+            <select class="fsel icon-sel" [(ngModel)]="templateIcon">
+              <option *ngFor="let ico of builderIcons" [value]="ico">{{ ico }}</option>
+            </select>
+            <div class="c-row">
+              <div
+                *ngFor="let key of colorKeys"
+                class="c-opt"
+                [class.sel]="key === templateColor"
+                [style.background]="colors[key].dot"
+                [title]="key"
+                (click)="pickColor(key)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fields label -->
+      <label class="flbl" style="margin-bottom: 8px; display: block;">
+        📐 Fields
+        <span class="fields-hint">(use ↑↓ to reorder)</span>
+      </label>
+
+      <!-- Field list -->
+      <div class="field-list">
+        <div
+          *ngFor="let field of fields; let i = index"
+          class="tb-field-row">
+          <span class="tb-field-drag">{{ isFieldLocked(field) ? '🔒' : '⠿' }}</span>
+          <div class="tb-field-info">
+            <div class="tb-field-label">
+              {{ field.label }}
+              <span class="tb-ftype-badge">{{ getFieldTypeMeta(field.type).icon }} {{ getFieldTypeMeta(field.type).label }}</span>
+              <span *ngIf="field.required" class="tb-req-badge">Required</span>
+              <span *ngIf="isFieldLocked(field)" class="tb-locked-badge">Built-in</span>
+            </div>
+            <div *ngIf="field.placeholder" class="tb-field-meta">Placeholder: "{{ field.placeholder }}"</div>
+            <div *ngIf="field.type === 'select' && field.options?.length" class="tb-field-meta">
+              Options: {{ field.options!.join(' · ') }}
+            </div>
+          </div>
+          <div *ngIf="!isFieldLocked(field)" class="tb-field-acts">
+            <button class="btn-tpl-act" (click)="startEditField(i)" title="Edit">✎</button>
+            <button class="btn-tpl-act" (click)="moveField(i, -1)" [disabled]="i <= 1" title="Move up">↑</button>
+            <button class="btn-tpl-act" (click)="moveField(i, 1)" [disabled]="i >= fields.length - 1" title="Move down">↓</button>
+            <button class="btn-tpl-act del" (click)="removeField(i)" title="Remove">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add field button -->
+      <button *ngIf="!isAddFormOpen" class="tb-add-field-btn" (click)="startAddField()">
+        ＋ Add Field
+      </button>
+
+      <!-- Add / Edit field inline form -->
+      <div *ngIf="isAddFormOpen" class="tb-inline-form">
+        <div class="tb-inline-form-ttl">{{ addFormTitle }}</div>
+
+        <div class="g2" style="margin-bottom: 12px;">
+          <div>
+            <label class="flbl">Field Label *</label>
+            <input class="fin" [(ngModel)]="newFieldLabel" placeholder="e.g. Key Takeaways">
+          </div>
+          <div>
+            <label class="flbl">Placeholder Text</label>
+            <input class="fin" [(ngModel)]="newFieldPlaceholder" placeholder="e.g. Enter your notes…">
+          </div>
+        </div>
+
+        <label class="flbl" style="margin-bottom: 8px; display: block;">Field Type</label>
+        <div class="field-type-list">
+          <div
+            *ngFor="let ft of fieldTypes"
+            class="tb-field-row type-opt"
+            [class.selected]="newFieldType === ft.type"
+            (click)="newFieldType = $any(ft.type)">
+            <span class="type-icon">{{ ft.icon }}</span>
+            <div class="tb-field-info">
+              <div class="tb-field-label" style="font-size: 12px;">{{ ft.label }}</div>
+              <div class="tb-field-meta">{{ ft.desc }}</div>
+            </div>
+            <span *ngIf="newFieldType === ft.type" class="type-check">✓</span>
+          </div>
+        </div>
+
+        <!-- Select options -->
+        <div *ngIf="newFieldType === 'select'" style="margin-top: 12px;">
+          <label class="flbl" style="margin-bottom: 6px; display: block;">Dropdown Options</label>
+          <div class="irows">
+            <div *ngFor="let opt of newFieldOptions; let oi = index" class="irow">
+              <input class="fin" [(ngModel)]="newFieldOptions[oi]" placeholder="Option…">
+              <button class="btn-rm" (click)="removeOption(oi)">✕</button>
+            </div>
+          </div>
+          <div class="add-option-row">
+            <input class="fin" [(ngModel)]="newOptionText" placeholder="Option…" (keyup.enter)="addOption()">
+            <button class="btn-ar-sm" (click)="addOption()">＋ Add</button>
+          </div>
+        </div>
+
+        <!-- Required toggle -->
+        <div class="required-row">
+          <label class="tog">
+            <input type="checkbox" [(ngModel)]="newFieldRequired">
+            <span class="tog-tr"></span>
+          </label>
+          <span class="required-lbl">Required field</span>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-sec" (click)="cancelField()">Cancel</button>
+          <button class="btn-prim" (click)="confirmField()">{{ addFormButtonLabel }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="mod-act">
+      <button class="btn-sec" (click)="cancel()">Cancel</button>
+      <button class="btn-prim" (click)="save()">💾 Save Template</button>
+    </div>
+  </div>
+</div>

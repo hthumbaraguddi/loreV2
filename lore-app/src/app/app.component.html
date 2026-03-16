@@ -151,7 +151,9 @@
       <div class="modal" (click)="$event.stopPropagation()">
         <div class="mod-hdr">
           <span class="mod-ttl">Export Format</span>
-          <button class="btn-cls" (click)="onExportModalCancelled()">✕</button>
+          <button class="btn-cls" (click)="onExportModalCancelled()">
+            <lore-icon name="close" [size]="12"></lore-icon>
+          </button>
         </div>
         <div class="mod-body" style="padding:16px;display:flex;flex-direction:column;gap:10px">
           <p style="font-size:13px;opacity:.7;margin:0 0 4px">Choose how to export <strong>{{ exportTarget?.shelf?.name || exportTarget?.notebook?.name }}</strong>:</p>
@@ -178,7 +180,9 @@
       <div class="modal" (click)="$event.stopPropagation()">
         <div class="mod-hdr">
           <span class="mod-ttl">Select Target Shelf</span>
-          <button class="btn-cls" (click)="onShelfPickerCancelled()">✕</button>
+          <button class="btn-cls" (click)="onShelfPickerCancelled()">
+            <lore-icon name="close" [size]="12"></lore-icon>
+          </button>
         </div>
         <div class="mod-body" style="padding:16px;display:flex;flex-direction:column;gap:8px">
           <p style="font-size:13px;opacity:.7;margin:0 0 8px">Choose which shelf to import the notebook into:</p>

@@ -15,19 +15,19 @@
   <!-- Quick actions -->
   <div class="sb-acts">
     <button class="sb-act" (click)="onOpenTemplates()">
-      <span class="sai">📋</span><span>Templates</span>
+      <lore-icon name="template" [size]="14" class="sai"></lore-icon><span>Templates</span>
     </button>
     <button class="sb-act" (click)="onOpenTemplateBuilder()">
-      <span class="sai">🧩</span><span>Build Template</span>
+      <lore-icon name="template-plus" [size]="14" class="sai"></lore-icon><span>Build Template</span>
     </button>
     <button class="sb-act" (click)="onOpenImportTemplate()">
-      <span class="sai">📥</span><span>Import Template</span>
+      <lore-icon name="import" [size]="14" class="sai"></lore-icon><span>Import Template</span>
     </button>
     <button class="sb-act" (click)="onImportShelf()">
-      <span class="sai">🗂️</span><span>Import Shelf</span>
+      <lore-icon name="shelf" [size]="14" class="sai"></lore-icon><span>Import Shelf</span>
     </button>
     <button class="sb-act" (click)="onImportNotebook()">
-      <span class="sai">📓</span><span>Import Notebook</span>
+      <lore-icon name="notebook" [size]="14" class="sai"></lore-icon><span>Import Notebook</span>
     </button>
   </div>
 
@@ -38,18 +38,25 @@
 
     <!-- Add shelf button -->
     <div class="shelf-hdr" (click)="onAddShelf()" style="margin-bottom:4px">
-      <span class="sh-nm" style="text-transform:none;letter-spacing:0;font-size:12px;opacity:.6">＋ Add Shelf</span>
+      <lore-icon name="plus" [size]="10" style="opacity:.6;margin-right:4px"></lore-icon>
+      <span class="sh-nm" style="text-transform:none;letter-spacing:0;font-size:12px;opacity:.6">Add Shelf</span>
     </div>
 
     <!-- Shelves -->
     <div class="shelf-grp" *ngFor="let shelf of state?.shelves">
       <div class="shelf-hdr" (click)="onToggleShelf(shelf, $event)">
-        <span class="sh-caret" [class.open]="shelf.open">▶</span>
+        <lore-icon class="sh-caret" [name]="shelf.open ? 'chevron-down' : 'chevron-right'" [size]="10"></lore-icon>
         <span class="sh-ico">{{ shelf.icon }}</span>
         <span class="sh-nm">{{ shelf.name }}</span>
-        <button class="sh-add" title="Add notebook" (click)="onAddNotebook(shelf, $event)">＋</button>
-        <button class="sh-add" title="Edit shelf" (click)="onEditShelf(shelf, $event)" style="font-size:11px">✎</button>
-        <button class="sh-add" title="Export shelf" (click)="onExportShelf(shelf, $event)" style="font-size:11px">⬇</button>
+        <button class="sh-add" title="Add notebook" (click)="onAddNotebook(shelf, $event)">
+          <lore-icon name="plus" [size]="11"></lore-icon>
+        </button>
+        <button class="sh-add" title="Edit shelf" (click)="onEditShelf(shelf, $event)">
+          <lore-icon name="edit" [size]="11"></lore-icon>
+        </button>
+        <button class="sh-add" title="Export shelf" (click)="onExportShelf(shelf, $event)">
+          <lore-icon name="export" [size]="11"></lore-icon>
+        </button>
       </div>
 
       <!-- Notebooks -->
@@ -64,8 +71,12 @@
           <span class="nb-itm-nm">{{ nb.name }}</span>
           <span class="nb-itm-ct">{{ nb.sections.length }}</span>
           <span class="nb-itm-ed">
-            <button class="btn-nbe" title="Edit notebook" (click)="onEditNotebook(nb, $event)">✎</button>
-            <button class="btn-nbe" title="Export notebook" (click)="onExportNotebook(nb, $event)">⬇</button>
+            <button class="btn-nbe" title="Edit notebook" (click)="onEditNotebook(nb, $event)">
+              <lore-icon name="edit" [size]="11"></lore-icon>
+            </button>
+            <button class="btn-nbe" title="Export notebook" (click)="onExportNotebook(nb, $event)">
+              <lore-icon name="export" [size]="11"></lore-icon>
+            </button>
           </span>
         </div>
       </div>
@@ -81,7 +92,9 @@
         <div class="usr-nm">{{ displayName || 'User' }}</div>
         <div class="usr-role">Free plan</div>
       </div>
-      <button class="btn-cog" title="Settings">⚙</button>
+      <button class="btn-cog" title="Settings">
+        <lore-icon name="settings" [size]="14"></lore-icon>
+      </button>
     </div>
   </div>
 

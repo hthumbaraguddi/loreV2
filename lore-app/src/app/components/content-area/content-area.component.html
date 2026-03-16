@@ -46,9 +46,15 @@
           </div>
           <div class="sec-line"></div>
           <div class="sec-acts">
-            <button class="btn-sda" (click)="onEditSection(section)">✎ Edit</button>
-            <button class="btn-sda" (click)="onDeleteSection(section)">✕ Delete</button>
-            <button class="btn-sda" (click)="onAddNote(section)">＋ Note</button>
+            <button class="btn-sda" (click)="onEditSection(section)">
+              <lore-icon name="edit" [size]="12"></lore-icon> Edit
+            </button>
+            <button class="btn-sda" (click)="onDeleteSection(section)">
+              <lore-icon name="trash" [size]="12"></lore-icon> Delete
+            </button>
+            <button class="btn-sda" (click)="onAddNote(section)">
+              <lore-icon name="note-plus" [size]="12"></lore-icon> Note
+            </button>
           </div>
         </div>
 
@@ -69,7 +75,7 @@
           *ngIf="!searchQuery"
           class="btn-addnote"
           (click)="onAddNote(section)"
-        >＋ Add note</button>
+        ><lore-icon name="plus" [size]="12"></lore-icon> Add note</button>
       </ng-container>
     </ng-container>
 

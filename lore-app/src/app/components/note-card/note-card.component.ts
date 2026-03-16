@@ -67,10 +67,6 @@ export class NoteCardComponent implements OnChanges {
     } else {
       html = this.templateService.renderFallbackCard(this.note, this.highlightFn);
     }
-    const tags: string[] = this.note.data?.['tags'] || [];
-    if (tags.length) {
-      html += `<div class="tag-row">${tags.map(t => `<span class="tag">${escHtml(t)}</span>`).join('')}</div>`;
-    }
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 

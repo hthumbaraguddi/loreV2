@@ -18,6 +18,7 @@ import { SectionModalComponent } from './components/modals/section-modal/section
 import { TemplateBrowserModalComponent } from './components/modals/template-browser-modal/template-browser-modal.component';
 import { TemplateBuilderModalComponent } from './components/modals/template-builder-modal/template-builder-modal.component';
 import { TemplateDefinition } from './services/template.service';
+import { LoreIconComponent } from './components/lore-icon/lore-icon.component';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +36,7 @@ import { TemplateDefinition } from './services/template.service';
     SectionModalComponent,
     TemplateBrowserModalComponent,
     TemplateBuilderModalComponent,
+    LoreIconComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { Notebook, Section, Note, SectionColorMap, SectionColor, SECTION_COLORS } from '../../models';
 import { NoteCardComponent } from '../note-card/note-card.component';
+import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 /** Pure function: returns true if a note matches the query (case-insensitive). */
 export function noteMatchesQuery(note: Note, query: string): boolean {
@@ -23,7 +24,7 @@ export function filterNotes(notebook: Notebook, query: string): Note[] {
 @Component({
   selector: 'app-content-area',
   standalone: true,
-  imports: [CommonModule, NoteCardComponent],
+  imports: [CommonModule, NoteCardComponent, LoreIconComponent],
   templateUrl: './content-area.component.html',
   styleUrls: ['./content-area.component.scss'],
 })

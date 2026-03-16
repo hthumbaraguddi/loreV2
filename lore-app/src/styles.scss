@@ -306,7 +306,7 @@ a { color: inherit; text-decoration: none; }
   &:hover .sh-add { opacity: 1; }
 }
 
-.sh-caret { font-size: 9px; color: var(--sb-tx); transition: transform 0.2s; width: 13px; text-align: center; &.open { transform: rotate(90deg); } }
+.sh-caret { color: var(--sb-tx); width: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sh-ico { font-size: 13px; }
 .sh-nm { font-size: 11px; font-weight: 500; color: var(--sb-tx); flex: 1; text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sh-add { opacity: 0; background: transparent; border: none; cursor: pointer; color: var(--sb-tx); font-size: 13px; padding: 2px 4px; border-radius: 4px; transition: all 0.15s; &:hover { background: rgba(255,255,255,0.1); color: var(--sb-act); } }

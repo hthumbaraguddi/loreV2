@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <div class="land-badge"><lore-icon name="lock" [size]="12" style="margin-right:6px;opacity:.6"></lore-icon>All data stored locally on your device. No cloud, no tracking.</div>
+      <div class="land-badge"><lore-icon name="lock" [size]="12" style="margin-right:6px;opacity:.6"></lore-icon>Your data syncs privately to your Google Drive</div>
     </div>
 
     <!-- Divider -->
@@ -95,11 +95,15 @@
         <p class="lg-welcome">Sign in to continue</p>
 
         <div class="lg-google">
-          <div id="google-btn"></div>
+          <div class="lg-google-wrap">
+            <div class="lg-google-inner">
+              <div id="google-btn"></div>
+            </div>
+            <div class="lg-google-hint">Continue with your Google account</div>
+          </div>
         </div>
 
         <div class="lg-err">{{ errorMessage }}</div>
-        <div class="lg-foot">Your data is stored locally on this device</div>
       </div>
     </div>
 

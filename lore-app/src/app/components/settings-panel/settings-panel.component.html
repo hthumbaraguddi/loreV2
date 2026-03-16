@@ -104,8 +104,23 @@
     <div class="sp-sec" style="margin-top: 4px">
       <div class="sp-sec-ttl">Account</div>
     </div>
-    <div style="padding: 10px 19px 6px">
-      <button class="sp-danger" (click)="onLogout()">Sign out of Lore</button>
+    <div class="sp-account">
+      <div class="sp-acct-row">
+        <div class="sp-acct-avatar">{{ displayName ? displayName[0].toUpperCase() : 'G' }}</div>
+        <div class="sp-acct-info">
+          <div class="sp-acct-name">{{ displayName || 'Google User' }}</div>
+          <div class="sp-acct-email">{{ userEmail || 'Signed in with Google' }}</div>
+        </div>
+      </div>
+      <div class="sp-sync-row" [class]="'sync-' + syncStatus">
+        <span class="sp-sync-dot"></span>
+        <span *ngIf="syncStatus === 'syncing'">Syncing to Google Drive…</span>
+        <span *ngIf="syncStatus === 'saved'">Saved to Google Drive</span>
+        <span *ngIf="syncStatus === 'error'">Drive sync failed — check connection</span>
+        <span *ngIf="syncStatus === 'idle'">Google Drive ready</span>
+        <span *ngIf="syncStatus === 'offline'">Offline — saved locally</span>
+      </div>
+      <button class="sp-danger" (click)="onLogout()">Sign out</button>
     </div>
 
     <!-- ── About ── -->
@@ -127,13 +142,6 @@
       <p>Your knowledge, beautifully organised.</p>
       <div class="sp-ver">
         Version 2.1 · {{ totalTemplateCount }} templates · {{ customTemplates.length }} custom
-      </div>
-      <div class="sp-sync" [class]="'sync-' + syncStatus">
-        <span *ngIf="syncStatus === 'syncing'">⟳ Syncing to Drive…</span>
-        <span *ngIf="syncStatus === 'saved'">✓ Saved to Google Drive</span>
-        <span *ngIf="syncStatus === 'error'">⚠ Drive sync failed</span>
-        <span *ngIf="syncStatus === 'idle'">○ Drive sync ready</span>
-        <span *ngIf="syncStatus === 'offline'">○ Offline — local only</span>
       </div>
     </div>
 

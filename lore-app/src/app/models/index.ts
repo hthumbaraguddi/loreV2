@@ -70,6 +70,7 @@ export interface UserRecord {
   username: string;
   password: string;
   name: string;
+  email?: string;
   data: Partial<AppState>;
 }
 

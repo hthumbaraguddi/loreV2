@@ -30,3 +30,25 @@
 .sr-in {
   padding-right: 26px;
 }
+
+// Template icon button in topbar
+.btn-tb-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ts);
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--inp);
+    color: var(--tp);
+    border-color: var(--bh);
+  }
+}

@@ -102,36 +102,24 @@ export class AppComponent implements OnInit, OnDestroy {
     this.registerWindowHelpers();
     this.state$ = this.data.state$;
 
-    this.sub = this.auth.isLoggedIn$.subscribe(async loggedIn => {
+    this.sub = this.auth.isLoggedIn$.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
-      if (loggedIn) {
+      if (!loggedIn) {
+        this.displayName = '';
+        this.drive.clearToken();
+      } else if (!this.drive.hasToken()) {
+        // Session restored from localStorage (page reload) — load local data immediately
         const user = this.auth.getCurrentUser();
         if (user) {
           this.displayName = user.name;
           this.data.setCurrentUser(user.username);
-
-          // Try loading from Drive first
-          const driveData = await this.drive.load();
-          if (driveData?.state) {
-            // Restore state from Drive
-            this.data.loadFromObject(driveData.state);
-            // Restore custom templates from Drive
-            if (Array.isArray(driveData.customTemplates)) {
-              localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
-            }
-          } else {
-            // Fall back to localStorage
-            this.data.loadAll(user.username);
-          }
-
+          this.data.loadAll(user.username);
           if (this.data.getState().shelves.length === 0) {
             this.data.seedDemoData();
           }
         }
-      } else {
-        this.displayName = '';
-        this.drive.clearToken();
       }
+      // Fresh login: data loading is handled by loadUserData() called after Drive token is ready
     });
 
     this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
@@ -139,6 +127,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+  }
+
+  /** Called by LoginComponent after Drive token is obtained. */
+  async loadUserData(): Promise<void> {
+    const user = this.auth.getCurrentUser();
+    if (!user) return;
+    this.displayName = user.name;
+    this.data.setCurrentUser(user.username);
+
+    const driveData = await this.drive.load();
+    if (driveData?.state) {
+      this.data.loadFromObject(driveData.state);
+      if (Array.isArray(driveData.customTemplates)) {
+        localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+      }
+    } else {
+      this.data.loadAll(user.username);
+    }
+
+    if (this.data.getState().shelves.length === 0) {
+      this.data.seedDemoData();
+    }
   }
 
   // ── State helpers ─────────────────────────────────────────────────────────

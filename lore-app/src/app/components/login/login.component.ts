@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { DriveService } from '../../services/drive.service';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 declare const google: any;
 
-const GOOGLE_CLIENT_ID = '957655849309-1hbcnadm5kebdr56o34nbosc81n1alau.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '20077195169-sookf9svl2i34t2lvbb2td9p01a4j05l.apps.googleusercontent.com';
 
 @Component({
   selector: 'app-login',
@@ -16,11 +17,13 @@ const GOOGLE_CLIENT_ID = '957655849309-1hbcnadm5kebdr56o34nbosc81n1alau.apps.goo
 })
 export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
+  private drive = inject(DriveService);
   private zone = inject(NgZone);
 
   errorMessage = '';
 
   ngOnInit(): void {
+    this.drive.init();
     this.initGoogleSignIn();
   }
 
@@ -30,9 +33,14 @@ export class LoginComponent implements OnInit {
         google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
           callback: (response: any) => {
-            this.zone.run(() => {
+            this.zone.run(async () => {
               const err = this.auth.loginWithGoogle(response.credential);
-              this.errorMessage = err ?? '';
+              if (err) { this.errorMessage = err; return; }
+              try {
+                await this.drive.requestToken();
+              } catch {
+                // Drive access denied — app still works without sync
+              }
             });
           }
         });

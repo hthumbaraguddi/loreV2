@@ -50,6 +50,7 @@ export class AuthService {
     const payload = this.decodeJwt(credential);
     const sub: string = payload['sub'];
     const name: string = payload['name'] || payload['email'] || 'Google User';
+    const email: string = payload['email'] || '';
 
     if (!sub) return 'Invalid Google credential';
 
@@ -57,9 +58,10 @@ export class AuthService {
     const users = this.getUsers();
 
     if (!users[googleKey]) {
-      users[googleKey] = { username: googleKey, password: '', name, data: {} };
+      users[googleKey] = { username: googleKey, password: '', name, email, data: {} };
     } else {
       users[googleKey].name = name;
+      users[googleKey].email = email;
     }
     this.saveUsers(users);
 

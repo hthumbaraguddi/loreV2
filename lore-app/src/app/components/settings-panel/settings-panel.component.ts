@@ -70,6 +70,7 @@ export class SettingsPanelComponent implements OnChanges {
   ];
 
   displayName: string = '';
+  userEmail: string = '';
 
   /** Track which template rows are in "confirm delete" state */
   confirmDeleteId: string | null = null;
@@ -79,6 +80,7 @@ export class SettingsPanelComponent implements OnChanges {
       this.confirmDeleteId = null;
       const user = this.authService.getCurrentUser();
       this.displayName = user?.name ?? '';
+      this.userEmail = user?.email ?? '';
     }
   }
 

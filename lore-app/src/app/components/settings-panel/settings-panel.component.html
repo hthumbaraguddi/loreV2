@@ -128,6 +128,13 @@
       <div class="sp-ver">
         Version 2.1 · {{ totalTemplateCount }} templates · {{ customTemplates.length }} custom
       </div>
+      <div class="sp-sync" [class]="'sync-' + syncStatus">
+        <span *ngIf="syncStatus === 'syncing'">⟳ Syncing to Drive…</span>
+        <span *ngIf="syncStatus === 'saved'">✓ Saved to Google Drive</span>
+        <span *ngIf="syncStatus === 'error'">⚠ Drive sync failed</span>
+        <span *ngIf="syncStatus === 'idle'">○ Drive sync ready</span>
+        <span *ngIf="syncStatus === 'offline'">○ Offline — local only</span>
+      </div>
     </div>
 
   </div><!-- /sp-body -->

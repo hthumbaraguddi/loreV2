@@ -48,6 +48,7 @@ export class SettingsPanelComponent implements OnChanges {
   @Input() isOpen: boolean = false;
   @Input() state!: AppState;
   @Input() customTemplates: CustomTemplate[] = [];
+  @Input() syncStatus: string = 'idle';
 
   @Output() closed = new EventEmitter<void>();
   @Output() themeChanged = new EventEmitter<string>();

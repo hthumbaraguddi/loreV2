@@ -5,6 +5,7 @@ import { AuthService } from './services/auth.service';
 import { DataService } from './services/data.service';
 import { TemplateService } from './services/template.service';
 import { ExportImportService } from './services/export-import.service';
+import { DriveService, SyncStatus } from './services/drive.service';
 import { AppState, Shelf, Notebook, Section, Note, CustomTemplate, SECTION_COLORS, SectionColorMap } from './models';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -46,11 +47,13 @@ export class AppComponent implements OnInit, OnDestroy {
   private data = inject(DataService);
   private templateService = inject(TemplateService);
   private exportImport = inject(ExportImportService);
+  private drive = inject(DriveService);
 
   @ViewChild('importFileInput') importFileInput!: ElementRef<HTMLInputElement>;
 
   isLoggedIn = false;
   displayName = '';
+  syncStatus: SyncStatus = 'idle';
   state$!: Observable<AppState>;
   readonly sectionColors: SectionColorMap = SECTION_COLORS;
 
@@ -99,23 +102,39 @@ export class AppComponent implements OnInit, OnDestroy {
     this.registerWindowHelpers();
     this.state$ = this.data.state$;
 
-    this.sub = this.auth.isLoggedIn$.subscribe(loggedIn => {
+    this.sub = this.auth.isLoggedIn$.subscribe(async loggedIn => {
       this.isLoggedIn = loggedIn;
       if (loggedIn) {
         const user = this.auth.getCurrentUser();
         if (user) {
           this.displayName = user.name;
           this.data.setCurrentUser(user.username);
-          this.data.loadAll(user.username);
-          // Seed demo data for brand-new users (no shelves yet)
+
+          // Try loading from Drive first
+          const driveData = await this.drive.load();
+          if (driveData?.state) {
+            // Restore state from Drive
+            this.data.loadFromObject(driveData.state);
+            // Restore custom templates from Drive
+            if (Array.isArray(driveData.customTemplates)) {
+              localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+            }
+          } else {
+            // Fall back to localStorage
+            this.data.loadAll(user.username);
+          }
+
           if (this.data.getState().shelves.length === 0) {
             this.data.seedDemoData();
           }
         }
       } else {
         this.displayName = '';
+        this.drive.clearToken();
       }
     });
+
+    this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
   }
 
   ngOnDestroy(): void {

@@ -2,7 +2,6 @@
   <div class="lg-glow"></div>
   <div class="lg-glow lg-glow2"></div>
 
-  <!-- Centered two-column card -->
   <div class="land-card">
 
     <!-- Left column: marketing -->
@@ -42,7 +41,7 @@
           <span class="feat-ico"><lore-icon name="template-plus" [size]="18"></lore-icon></span>
           <div>
             <div class="feat-ttl">8 Built-in Templates</div>
-            <div class="feat-desc">Research, Journal, Finance, Scrum, Watchlist, Investing — and more. Build your own too.</div>
+            <div class="feat-desc">Research, Journal, Finance, Scrum, Watchlist, Investing — and more.</div>
           </div>
         </div>
         <div class="feat-item">
@@ -67,7 +66,7 @@
     <!-- Divider -->
     <div class="land-divider"></div>
 
-    <!-- Right column: auth box -->
+    <!-- Right column: sign-in -->
     <div class="land-right">
       <div class="lg-box">
 
@@ -93,49 +92,11 @@
           </div>
         </div>
 
-        <div class="lg-tabs">
-          <button class="ltab" [class.on]="activeTab === 'signin'" (click)="switchTab('signin')">Sign In</button>
-          <button class="ltab" [class.on]="activeTab === 'register'" (click)="switchTab('register')">Register</button>
-        </div>
+        <p class="lg-welcome">Sign in to continue</p>
 
-        <!-- Google Sign-In -->
         <div class="lg-google">
           <div id="google-btn"></div>
         </div>
-
-        <div class="lg-divider"><span>or</span></div>
-
-        @if (activeTab === 'signin') {
-          <div>
-            <div class="lg-field">
-              <label>Username</label>
-              <input type="text" placeholder="your username" autocomplete="username" [(ngModel)]="loginUsername" (keyup.enter)="doLogin()">
-            </div>
-            <div class="lg-field">
-              <label>Password</label>
-              <input type="password" placeholder="••••••••" [(ngModel)]="loginPassword" (keyup.enter)="doLogin()">
-            </div>
-            <button class="lg-btn" (click)="doLogin()">Sign in to Lore →</button>
-          </div>
-        }
-
-        @if (activeTab === 'register') {
-          <div>
-            <div class="lg-field">
-              <label>Full Name</label>
-              <input type="text" placeholder="e.g. Harsha Kumar" [(ngModel)]="registerName" (keyup.enter)="doRegister()">
-            </div>
-            <div class="lg-field">
-              <label>Username</label>
-              <input type="text" placeholder="choose a username" [(ngModel)]="registerUsername" (keyup.enter)="doRegister()">
-            </div>
-            <div class="lg-field">
-              <label>Password</label>
-              <input type="password" placeholder="create a password" [(ngModel)]="registerPassword" (keyup.enter)="doRegister()">
-            </div>
-            <button class="lg-btn" (click)="doRegister()">Create Account →</button>
-          </div>
-        }
 
         <div class="lg-err">{{ errorMessage }}</div>
         <div class="lg-foot">Your data is stored locally on this device</div>

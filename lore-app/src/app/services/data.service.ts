@@ -383,4 +383,154 @@ export class DataService {
     this.state$.next({ ...s, fontSize });
     this.saveAll(this.currentUsername);
   }
+
+  /** Append an already-constructed shelf + notebooks (used by import) */
+  appendShelfWithNotebooks(shelf: Shelf, notebooks: Notebook[]): void {
+    const s = this.getState();
+    this.state$.next({
+      ...s,
+      shelves: [...s.shelves, shelf],
+      notebooks: [...s.notebooks, ...notebooks],
+    });
+    this.saveAll(this.currentUsername);
+  }
+
+  /** Append an already-constructed notebook (used by import) */
+  appendNotebook(notebook: Notebook): void {
+    const s = this.getState();
+    this.state$.next({ ...s, notebooks: [...s.notebooks, notebook] });
+    this.saveAll(this.currentUsername);
+  }
+
+  /** Seed a demo shelf/notebook so new users see the app in action. */
+  seedDemoData(): void {
+    const shelf = this.addShelf('🌟 Demo Workspace', '🌟');
+    const notebook = this.addNotebook('Lore Showcase', '📓', shelf.id);
+    const nbId = notebook.id;
+
+    // ── Section 1: Research Notes (purple) ───────────────────────────────
+    const sec1 = this.addSection(nbId, 'Research', 'AI & Machine Learning', 'purple');
+    this.addNote(nbId, sec1.id, 'Transformer Architecture Deep Dive', 'research', {
+      domain: 'Machine Learning',
+      status: 'in-progress',
+      hypothesis: 'Attention mechanisms can replace recurrence entirely for sequence modelling tasks.',
+      methodology: 'Literature review of "Attention Is All You Need" (Vaswani et al., 2017) and follow-up papers. Implemented a mini transformer on a toy dataset.',
+      findings: [
+        'Self-attention scales quadratically with sequence length — a key bottleneck.',
+        'Positional encodings are critical; learned vs sinusoidal encodings perform similarly.',
+        'Multi-head attention allows the model to attend to different representation subspaces simultaneously.',
+      ],
+      references: [
+        { text: 'Attention Is All You Need — Vaswani et al.', url: 'https://arxiv.org/abs/1706.03762' },
+        { text: 'The Illustrated Transformer — Jay Alammar', url: 'https://jalammar.github.io/illustrated-transformer/' },
+      ],
+      conclusion: 'Transformers are now the dominant architecture for NLP and increasingly for vision tasks. Worth investing time in understanding the internals.',
+      tags: ['transformers', 'attention', 'NLP', 'deep-learning'],
+    });
+
+    // ── Section 2: Daily Journal (teal) ──────────────────────────────────
+    const sec2 = this.addSection(nbId, 'Journal', 'Daily reflections', 'teal');
+    this.addNote(nbId, sec2.id, 'Monday — Deep Work Session', 'journal', {
+      date: '2026-03-16',
+      mood: 'Focused 🎯',
+      energy: 4,
+      intention: 'Ship the Lore demo data and get the app deployed to Azure.',
+      gratitude: [
+        'Great coffee this morning',
+        'Quiet uninterrupted morning block',
+        'The Angular build finally compiled cleanly',
+      ],
+      wins: 'Finished the seed data feature and wired all six templates into the showcase notebook.',
+      challenges: 'Spent too long debugging a CSS z-index issue on the edit panel overlay.',
+      tomorrowFocus: 'Write the Azure Static Web Apps deployment workflow and test the /lore base href.',
+      tags: ['productivity', 'angular', 'lore'],
+    });
+
+    // ── Section 3: Financial Log (amber) ─────────────────────────────────
+    const sec3 = this.addSection(nbId, 'Finance', 'Monthly tracking', 'amber');
+    this.addNote(nbId, sec3.id, 'March 2026 — Monthly Review', 'finance', {
+      period: 'March 2026',
+      periodType: 'Monthly',
+      insight: 'Subscription costs crept up again. Time to audit and cancel unused services.',
+      income: [
+        { label: 'Salary', amount: 8500 },
+        { label: 'Freelance', amount: 1200 },
+      ],
+      expenses: [
+        { label: 'Rent', amount: 2200 },
+        { label: 'Groceries', amount: 480 },
+        { label: 'Subscriptions', amount: 320 },
+        { label: 'Transport', amount: 150 },
+        { label: 'Dining out', amount: 290 },
+      ],
+      savingsGoal: 2000,
+      tags: ['budget', 'march', 'review'],
+    });
+
+    // ── Section 4: Scrum Standup (blue) ──────────────────────────────────
+    const sec4 = this.addSection(nbId, 'Standups', 'Sprint 12', 'blue');
+    this.addNote(nbId, sec4.id, 'Sprint 12 — Day 3 Standup', 'scrum', {
+      sprint: 'Sprint 12',
+      date: '2026-03-16',
+      attendees: 'Alice, Bob, Carol, Dave',
+      sprintGoal: 'Ship Lore v1.0 to production with all six templates and export/import.',
+      yesterday: [
+        'Completed seed data implementation',
+        'Fixed edit panel z-index bug',
+        'Reviewed PR for export service',
+      ],
+      today: [
+        'Deploy to Azure Static Web Apps',
+        'Write end-to-end smoke test',
+        'Update README with setup instructions',
+      ],
+      blockers: [],
+      actionItems: [
+        { task: 'Set up GitHub Actions CI pipeline', owner: 'Alice' },
+        { task: 'Configure custom domain on Azure', owner: 'Dave' },
+      ],
+      tags: ['sprint-12', 'lore', 'deployment'],
+    });
+
+    // ── Section 5: What to Watch (coral) ─────────────────────────────────
+    const sec5 = this.addSection(nbId, 'Watchlist', 'Weekend picks', 'coral');
+    this.addNote(nbId, sec5.id, 'Weekend of March 21', 'watchlist', {
+      weekend: 'March 21–22, 2026',
+      mood: 'Chill & cerebral 🧠',
+      items: [
+        { title: 'Dune: Part Two', type: 'Movie', platform: 'Max', rating: '9/10', watched: true },
+        { title: 'Severance S2', type: 'Series', platform: 'Apple TV+', rating: '10/10', watched: true },
+        { title: 'The Brutalist', type: 'Movie', platform: 'Cinema', rating: '', watched: false },
+        { title: 'Shogun', type: 'Series', platform: 'Disney+', rating: '', watched: false },
+      ],
+      pick: 'Severance S2 — absolutely unmissable.',
+      notes: 'Avoid reading any Dune Part Two reviews before watching — spoilers everywhere.',
+      tags: ['movies', 'series', 'weekend'],
+    });
+
+    // ── Section 6: Investing (green) ─────────────────────────────────────
+    const sec6 = this.addSection(nbId, 'Investing', 'Week of Mar 16', 'green');
+    this.addNote(nbId, sec6.id, 'Week of March 16, 2026', 'investing', {
+      weekOf: '2026-03-16',
+      sentiment: 'bull',
+      watchlist: [
+        { ticker: 'NVDA', price: '875.40', dir: 'up', thesis: 'AI infrastructure spend continues to accelerate; data centre backlog strong.' },
+        { ticker: 'MSFT', price: '412.10', dir: 'flat', thesis: 'Copilot monetisation still early; Azure growth solid at 28% YoY.' },
+        { ticker: 'INTC', price: '31.20', dir: 'down', thesis: 'Foundry turnaround taking longer than expected; watching for Q1 guidance.' },
+      ],
+      trades: [
+        { ticker: 'NVDA', action: 'BUY', price: '868.00', qty: '5', notes: 'Added on the dip after earnings volatility settled.' },
+      ],
+      catalysts: [
+        'Fed rate decision on March 19 — market pricing in a hold.',
+        'NVDA GTC conference keynote — potential new GPU announcement.',
+      ],
+      portfolioNotes: 'Tech-heavy allocation at 62%. Consider trimming if NVDA runs another 15%.',
+      nextWeekFocus: 'Watch Fed statement language closely. Review INTC thesis if it breaks below $30.',
+      tags: ['tech', 'AI', 'fed', 'march'],
+    });
+
+    // Set the demo notebook as active
+    this.setActiveNotebook(nbId);
+  }
 }

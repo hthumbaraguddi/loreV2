@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Career — 9-Month Roadmap</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f5f3;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary: #888780;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-hover: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #242422;
+        --color-text-primary: #e8e6de;
+        --color-text-secondary: #9c9a92;
+        --color-text-tertiary: #6a6864;
+        --color-border: rgba(255,255,255,0.1);
+        --color-border-hover: rgba(255,255,255,0.2);
+      }
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      padding: 2rem 1rem;
+      max-width: 780px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .seg {
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    .phase {
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .phase:hover { border-color: var(--color-border-hover); }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .phase-badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      border: 0.5px solid;
+    }
+
+    .phase-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      flex: 1;
+    }
+
+    .phase-months {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .chevron {
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      transition: transform 0.25s;
+    }
+
+    .chevron.open { transform: rotate(180deg); }
+
+    .phase-body {
+      display: none;
+      padding: 0 18px 18px;
+    }
+
+    .phase-body.open { display: block; }
+
+    .col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 540px) { .col-grid { grid-template-columns: 1fr; } }
+
+    .col-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .topic {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .resource-chip {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 3px 3px 3px 0;
+      border: 0.5px solid;
+    }
+
+    .milestone {
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-left: 3px solid;
+      margin-top: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .tip-box {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    .tip-box strong {
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+
+    .resource-chip a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .resource-chip a:hover {
+      text-decoration: underline;
+    }
+
+    .resource-chip.linked {
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .resource-chip.linked:hover {
+      opacity: 0.75;
+    }
+
+    /* Phase 1 — Purple */
+    .p1 .phase-badge { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+    .p1 .dot { background: #7F77DD; }
+    .p1 .resource-chip { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+    .p1 .milestone { background: #EEEDFE; border-color: #7F77DD; }
+
+    /* Phase 2 — Teal */
+    .p2 .phase-badge { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+    .p2 .dot { background: #1D9E75; }
+    .p2 .resource-chip { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+    .p2 .milestone { background: #E1F5EE; border-color: #1D9E75; }
+
+    /* Phase 3 — Blue */
+    .p3 .phase-badge { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+    .p3 .dot { background: #378ADD; }
+    .p3 .resource-chip { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+    .p3 .milestone { background: #E6F1FB; border-color: #378ADD; }
+
+    /* Phase 4 — Amber */
+    .p4 .phase-badge { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+    .p4 .dot { background: #BA7517; }
+    .p4 .resource-chip { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+    .p4 .milestone { background: #FAEEDA; border-color: #BA7517; }
+
+    /* Phase 5 — Coral */
+    .p5 .phase-badge { background: #FAECE7; color: #4A1B0C; border-color: #F0997B; }
+    .p5 .dot { background: #D85A30; }
+    .p5 .resource-chip { background: #FAECE7; color: #4A1B0C; border-color: #F0997B; }
+    .p5 .milestone { background: #FAECE7; border-color: #D85A30; }
+
+    @media (prefers-color-scheme: dark) {
+      .p1 .phase-badge { background: #26215C; color: #CECBF6; border-color: #534AB7; }
+      .p1 .resource-chip { background: #26215C; color: #CECBF6; border-color: #534AB7; }
+      .p1 .milestone { background: #26215C; border-color: #7F77DD; }
+      .p2 .phase-badge { background: #04342C; color: #9FE1CB; border-color: #0F6E56; }
+      .p2 .resource-chip { background: #04342C; color: #9FE1CB; border-color: #0F6E56; }
+      .p2 .milestone { background: #04342C; border-color: #1D9E75; }
+      .p3 .phase-badge { background: #042C53; color: #B5D4F4; border-color: #185FA5; }
+      .p3 .resource-chip { background: #042C53; color: #B5D4F4; border-color: #185FA5; }
+      .p3 .milestone { background: #042C53; border-color: #378ADD; }
+      .p4 .phase-badge { background: #412402; color: #FAC775; border-color: #854F0B; }
+      .p4 .resource-chip { background: #412402; color: #FAC775; border-color: #854F0B; }
+      .p4 .milestone { background: #412402; border-color: #BA7517; }
+      .p5 .phase-badge { background: #4A1B0C; color: #F5C4B3; border-color: #993C1D; }
+      .p5 .resource-chip { background: #4A1B0C; color: #F5C4B3; border-color: #993C1D; }
+      .p5 .milestone { background: #4A1B0C; border-color: #D85A30; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AI Career — 9-Month Roadmap</h1>
+  <p class="subtitle">A structured learning path for experienced software engineers transitioning into AI/LLM engineering</p>
+
+  <div class="progress-bar">
+    <div class="seg" style="background:#7F77DD; flex:2;"></div>
+    <div class="seg" style="background:#1D9E75; flex:2;"></div>
+    <div class="seg" style="background:#378ADD; flex:2;"></div>
+    <div class="seg" style="background:#BA7517; flex:2;"></div>
+    <div class="seg" style="background:#D85A30; flex:1;"></div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="phase p1">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge">Phase 1</span>
+      <span class="phase-title">Foundations — Math & Python</span>
+      <span class="phase-months">Months 1 – 2</span>
+      <span class="chevron open">▾</span>
+    </div>
+    <div class="phase-body open">
+      <div class="tip-box"><strong>Mentor tip:</strong> Don't try to finish all math before coding. Learn linear algebra and basic stats now. Calculus intuition is enough — you don't need to hand-derive gradients.</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">What to learn</div>
+          <div class="topic"><span class="dot"></span><span>Linear algebra — vectors, matrices, dot products, eigenvectors (intuition, not proofs)</span></div>
+          <div class="topic"><span class="dot"></span><span>Statistics & probability — distributions, Bayes, hypothesis testing</span></div>
+          <div class="topic"><span class="dot"></span><span>Calculus — derivatives, chain rule, gradient intuition only</span></div>
+          <div class="topic"><span class="dot"></span><span>Python for data — NumPy, Pandas, Matplotlib, Jupyter</span></div>
+          <div class="topic"><span class="dot"></span><span>Python advanced — decorators, generators, OOP, typing</span></div>
+        </div>
+        <div>
+          <div class="col-label">Best resources</div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab" target="_blank">3Blue1Brown — Essence of Linear Algebra</a></div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" target="_blank">3Blue1Brown — Essence of Calculus</a></div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest with Josh Starmer (YouTube)</a></div>
+          <div class="resource-chip linked"><a href="https://course.fast.ai" target="_blank">fast.ai Practical Deep Learning (Ch. 1-2)</a></div>
+          <div class="resource-chip linked"><a href="https://realpython.com" target="_blank">Real Python</a></div>
+        </div>
+      </div>
+      <div class="milestone">🎯 Milestone: Build a Jupyter notebook that loads a CSV dataset, cleans it, runs descriptive stats, and plots 3 meaningful visualizations.</div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase p2">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge">Phase 2</span>
+      <span class="phase-title">Classical Machine Learning</span>
+      <span class="phase-months">Months 3 – 4</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="tip-box"><strong>Mentor tip:</strong> Don't skip classical ML to jump straight to deep learning. Interviewers ask about it. More importantly, many real-world problems are best solved with XGBoost, not a transformer.</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">What to learn</div>
+          <div class="topic"><span class="dot"></span><span>Supervised learning — regression, classification, decision trees, random forests, XGBoost</span></div>
+          <div class="topic"><span class="dot"></span><span>Unsupervised — clustering, PCA, dimensionality reduction</span></div>
+          <div class="topic"><span class="dot"></span><span>Model evaluation — train/val/test splits, cross-validation, ROC, precision/recall</span></div>
+          <div class="topic"><span class="dot"></span><span>scikit-learn end to end — pipelines, preprocessing, hyperparameter tuning</span></div>
+          <div class="topic"><span class="dot"></span><span>MLflow basics — experiment tracking</span></div>
+        </div>
+        <div>
+          <div class="col-label">Best resources</div>
+          <div class="resource-chip linked"><a href="https://www.coursera.org/specializations/machine-learning-introduction" target="_blank">Andrew Ng's ML Specialization (Coursera)</a></div>
+          <div class="resource-chip linked"><a href="https://www.kaggle.com/learn" target="_blank">Kaggle Learn</a></div>
+          <div class="resource-chip linked"><a href="https://www.kaggle.com/competitions" target="_blank">Kaggle Competitions</a></div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/@statquest" target="_blank">StatQuest ML playlist</a></div>
+        </div>
+      </div>
+      <div class="milestone">🎯 Milestone: Complete 2 Kaggle competitions. Place in top 50% on at least one. Push code to GitHub.</div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase p3">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge">Phase 3</span>
+      <span class="phase-title">Deep Learning & How LLMs Work</span>
+      <span class="phase-months">Months 5 – 6</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="tip-box"><strong>Mentor tip:</strong> Karpathy's "Neural Networks: Zero to Hero" series is genuinely the best resource on the internet for understanding LLMs from first principles. Watch it. Code along. Don't just watch — type every line.</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">What to learn</div>
+          <div class="topic"><span class="dot"></span><span>Neural networks from scratch — forward pass, backprop, gradient descent</span></div>
+          <div class="topic"><span class="dot"></span><span>CNNs, RNNs — understand the progression to transformers</span></div>
+          <div class="topic"><span class="dot"></span><span>Transformers & attention — the "Attention is All You Need" paper (read alongside Karpathy)</span></div>
+          <div class="topic"><span class="dot"></span><span>PyTorch fundamentals — tensors, autograd, training loops</span></div>
+          <div class="topic"><span class="dot"></span><span>Hugging Face ecosystem — models, tokenizers, datasets, pipelines</span></div>
+        </div>
+        <div>
+          <div class="col-label">Best resources</div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ" target="_blank">★ Karpathy — Neural Networks: Zero to Hero</a></div>
+          <div class="resource-chip linked"><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">★ Jay Alammar — The Illustrated Transformer</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/mlabonne/llm-course" target="_blank">★ mlabonne/llm-course — LLM Fundamentals track (73k ⭐)</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/ashishps1/learn-ai-engineering" target="_blank">★ ashishps1/learn-ai-engineering (you're here ✓)</a></div>
+          <div class="resource-chip linked"><a href="https://magazine.sebastianraschka.com/" target="_blank">Sebastian Raschka's Magazine — follow throughout</a></div>
+          <div class="resource-chip linked"><a href="https://course.fast.ai" target="_blank">fast.ai Part 1 & 2</a></div>
+          <div class="resource-chip linked"><a href="https://huggingface.co/learn/nlp-course" target="_blank">Hugging Face NLP Course (free)</a></div>
+          <div class="resource-chip linked"><a href="https://pytorch.org/tutorials/" target="_blank">PyTorch official tutorials</a></div>
+          <div class="resource-chip linked"><a href="https://arxiv.org/abs/1706.03762" target="_blank">"Attention is All You Need" (paper)</a></div>
+        </div>
+      </div>
+      <div class="milestone">🎯 Milestone: Build a character-level language model from scratch (following Karpathy). Fine-tune a Hugging Face model on a custom classification task.</div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase p4">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge">Phase 4</span>
+      <span class="phase-title">Building LLM Applications + Fine-tuning</span>
+      <span class="phase-months">Months 7 – 8</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="tip-box"><strong>Mentor tip:</strong> This phase is your highest-leverage career investment right now. The job market is flooded with people who understand ML theory — it's starved for engineers who can ship RAG systems, agents, and LLM-powered products to production.</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">What to learn</div>
+          <div class="topic"><span class="dot"></span><span>Prompt engineering — system prompts, few-shot, chain-of-thought, structured outputs</span></div>
+          <div class="topic"><span class="dot"></span><span>RAG (Retrieval Augmented Generation) — vector databases, embeddings, chunking strategies</span></div>
+          <div class="topic"><span class="dot"></span><span>LLM Agents & tool use — function calling, ReAct, planning patterns</span></div>
+          <div class="topic"><span class="dot"></span><span>Fine-tuning — LoRA, QLoRA with Unsloth/PEFT (parameter-efficient methods)</span></div>
+          <div class="topic"><span class="dot"></span><span>Production deployment — FastAPI, Docker, LLM observability (LangSmith/Langfuse)</span></div>
+          <div class="topic"><span class="dot"></span><span>Evaluation — LLM-as-judge, RAGAS, building eval pipelines</span></div>
+        </div>
+        <div>
+          <div class="col-label">Best resources</div>
+          <div class="resource-chip linked"><a href="https://github.com/mlabonne/llm-course" target="_blank">★ mlabonne/llm-course — LLM Engineer & Scientist tracks</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/KalyanKS-NLP/llm-engineer-toolkit" target="_blank">★ KalyanKS — LLM Engineer Toolkit (120+ libraries)</a></div>
+          <div class="resource-chip linked"><a href="https://magazine.sebastianraschka.com/" target="_blank">Sebastian Raschka's Magazine — fine-tuning deep dives</a></div>
+          <div class="resource-chip linked"><a href="https://www.deeplearning.ai/short-courses/" target="_blank">DeepLearning.AI short courses (free)</a></div>
+          <div class="resource-chip linked"><a href="https://python.langchain.com/docs/introduction/" target="_blank">LangChain Docs</a></div>
+          <div class="resource-chip linked"><a href="https://docs.llamaindex.ai" target="_blank">LlamaIndex Docs</a></div>
+          <div class="resource-chip linked"><a href="https://huggingface.co/docs/peft" target="_blank">Hugging Face PEFT</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/unslothai/unsloth" target="_blank">Unsloth (fast fine-tuning)</a></div>
+          <div class="resource-chip linked"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank">Anthropic Prompt Engineering Guide</a></div>
+          <div class="resource-chip linked"><a href="https://platform.openai.com/docs/guides/prompt-engineering" target="_blank">OpenAI Prompt Engineering Guide</a></div>
+          <div class="resource-chip linked"><a href="https://www.youtube.com/playlist?list=PL1T8fO7ArWleMMI8KPJ_5D5XSlovTW_Ur" target="_blank">Full Stack LLM Bootcamp (YouTube)</a></div>
+          <div class="resource-chip linked"><a href="https://langfuse.com" target="_blank">Langfuse — LLM observability</a></div>
+          <div class="resource-chip linked"><a href="https://docs.ragas.io" target="_blank">RAGAS — RAG evaluation</a></div>
+        </div>
+      </div>
+      <div class="milestone">🎯 Milestone: Ship a complete RAG application over a real document set. Deploy it with a simple UI. Host on GitHub with a README.</div>
+    </div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase p5">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge">Phase 5</span>
+      <span class="phase-title">Portfolio, Job Search & Interview Prep</span>
+      <span class="phase-months">Month 9</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="tip-box"><strong>Mentor tip:</strong> A working GitHub project beats a certificate every time. Two strong end-to-end projects will open more doors than 10 course completions. Start applying from month 7 — don't wait until you feel "ready".</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">Actions</div>
+          <div class="topic"><span class="dot"></span><span>Polish 2–3 portfolio projects with clean READMEs and demos</span></div>
+          <div class="topic"><span class="dot"></span><span>Write 2–3 blog posts on what you built (Medium, Substack, or LinkedIn)</span></div>
+          <div class="topic"><span class="dot"></span><span>Update LinkedIn — "AI/ML Engineer" or "LLM Engineer" in headline</span></div>
+          <div class="topic"><span class="dot"></span><span>Mock interviews — LeetCode (medium), ML system design, LLM architecture questions</span></div>
+          <div class="topic"><span class="dot"></span><span>Target roles: LLM Engineer, ML Engineer, AI Product Engineer, AI Consultant</span></div>
+        </div>
+        <div>
+          <div class="col-label">Job search tactics</div>
+          <div class="resource-chip linked"><a href="https://www.linkedin.com/jobs/search/?keywords=AI%20Engineer" target="_blank">LinkedIn — AI Engineer jobs</a></div>
+          <div class="resource-chip linked"><a href="https://wellfound.com/jobs" target="_blank">Wellfound / AngelList</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/fastai/fastbook" target="_blank">fast.ai Deep Learning for Coders (free book)</a></div>
+          <div class="resource-chip">Contribute to 1 open source AI project</div>
+          <div class="resource-chip">Attend local AI/ML meetups</div>
+        </div>
+      </div>
+      <div class="milestone">🎯 Target: 3 portfolio projects on GitHub, 2 blog posts published, 10+ applications sent, 3+ interviews scheduled.</div>
+    </div>
+  </div>
+
+  <!-- Bonus -->
+  <div class="phase" style="border-color: var(--color-border);">
+    <div class="phase-header" onclick="toggle(this)">
+      <span class="phase-badge" style="background:var(--color-bg-secondary);color:var(--color-text-secondary);border-color:var(--color-border);">Ongoing</span>
+      <span class="phase-title">Bookmark & Read Throughout All 9 Months</span>
+      <span class="phase-months">All phases</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="tip-box"><strong>Mentor tip:</strong> These aren't courses — they're reference hubs you return to constantly. Bookmark all of them on Day 1. The Illustrated Transformer alone will click differently at Month 1 vs Month 5.</div>
+      <div class="col-grid">
+        <div>
+          <div class="col-label">What they cover</div>
+          <div class="topic"><span class="dot" style="background:#D85A30;"></span><span><strong>Jay Alammar's blog</strong> — the best visual explanations of ML concepts on the internet (attention, GPT, BERT, embeddings)</span></div>
+          <div class="topic"><span class="dot" style="background:#D85A30;"></span><span><strong>Sebastian Raschka</strong> — deep technical articles on LLM training, fine-tuning methods, research papers explained clearly</span></div>
+          <div class="topic"><span class="dot" style="background:#D85A30;"></span><span><strong>mlabonne/llm-course</strong> — structured roadmap + Colab notebooks spanning fundamentals → scientist → engineer tracks</span></div>
+          <div class="topic"><span class="dot" style="background:#D85A30;"></span><span><strong>KalyanKS toolkit</strong> — your reference when building: 120+ LLM libraries organized by category (RAG, agents, eval, infra)</span></div>
+          <div class="topic"><span class="dot" style="background:#D85A30;"></span><span><strong>ashishps1/learn-ai-engineering</strong> — free structured curriculum; good daily progress tracker</span></div>
+        </div>
+        <div>
+          <div class="col-label">Links</div>
+          <div class="resource-chip linked"><a href="https://jalammar.github.io/" target="_blank">Jay Alammar's Blog (all posts)</a></div>
+          <div class="resource-chip linked"><a href="https://magazine.sebastianraschka.com/" target="_blank">Sebastian Raschka's Magazine</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/mlabonne/llm-course" target="_blank">mlabonne/llm-course</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/KalyanKS-NLP/llm-engineer-toolkit" target="_blank">KalyanKS/llm-engineer-toolkit</a></div>
+          <div class="resource-chip linked"><a href="https://github.com/ashishps1/learn-ai-engineering" target="_blank">ashishps1/learn-ai-engineering</a></div>
+          <div class="resource-chip linked"><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">The Illustrated Transformer (must-read)</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.chevron');
+      const open = body.classList.toggle('open');
+      chevron.classList.toggle('open', open);
+    }
+  </script>
+</body>
+</html>

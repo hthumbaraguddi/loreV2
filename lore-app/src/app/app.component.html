@@ -15,7 +15,11 @@
       (openSettings)="onOpenSettings()"
       (openTemplates)="onOpenTemplates()"
       (openTemplateBuilder)="onOpenTemplateBuilder()"
-      (openImportTemplate)="onOpenImportTemplate()">
+      (openImportTemplate)="onOpenImportTemplate()"
+      (importShelf)="onImportShelf()"
+      (importNotebook)="onImportNotebook()"
+      (exportShelf)="onExportShelf($event)"
+      (exportNotebook)="onExportNotebook($event)">
     </app-sidebar>
 
     <!-- Main area -->
@@ -141,6 +145,55 @@
       accept=".json"
       style="display:none"
       (change)="onImportFileSelected($event)">
+
+    <!-- Export format picker modal -->
+    <div class="ov" [class.show]="showExportModal" (click)="onExportModalCancelled()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="mod-hdr">
+          <span class="mod-ttl">Export Format</span>
+          <button class="btn-cls" (click)="onExportModalCancelled()">✕</button>
+        </div>
+        <div class="mod-body" style="padding:16px;display:flex;flex-direction:column;gap:10px">
+          <p style="font-size:13px;opacity:.7;margin:0 0 4px">Choose how to export <strong>{{ exportTarget?.shelf?.name || exportTarget?.notebook?.name }}</strong>:</p>
+          <button class="sb-act" style="justify-content:flex-start;gap:10px;padding:12px 14px" (click)="onExportFormatSelected('json')">
+            <span style="font-size:18px">📦</span>
+            <div style="text-align:left">
+              <div style="font-size:13px;font-weight:600">JSON (Lore format)</div>
+              <div style="font-size:11px;opacity:.6">Re-importable into Lore. Preserves all data.</div>
+            </div>
+          </button>
+          <button class="sb-act" style="justify-content:flex-start;gap:10px;padding:12px 14px" (click)="onExportFormatSelected('html')">
+            <span style="font-size:18px">🌐</span>
+            <div style="text-align:left">
+              <div style="font-size:13px;font-weight:600">HTML (Readable)</div>
+              <div style="font-size:11px;opacity:.6">Standalone file. Open in any browser, share with anyone.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shelf picker modal for notebook import -->
+    <div class="ov" [class.show]="showShelfPickerModal" (click)="onShelfPickerCancelled()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="mod-hdr">
+          <span class="mod-ttl">Select Target Shelf</span>
+          <button class="btn-cls" (click)="onShelfPickerCancelled()">✕</button>
+        </div>
+        <div class="mod-body" style="padding:16px;display:flex;flex-direction:column;gap:8px">
+          <p style="font-size:13px;opacity:.7;margin:0 0 8px">Choose which shelf to import the notebook into:</p>
+          <button
+            *ngFor="let shelf of shelfPickerShelves"
+            class="sb-act"
+            style="justify-content:flex-start;gap:8px;padding:10px 12px"
+            (click)="onShelfPickerSelected(shelf.id)">
+            <span>{{ shelf.icon }}</span>
+            <span>{{ shelf.name }}</span>
+          </button>
+          <p *ngIf="shelfPickerShelves.length === 0" style="font-size:13px;opacity:.5">No shelves yet — create a shelf first.</p>
+        </div>
+      </div>
+    </div>
 
   </div>
 </ng-container>

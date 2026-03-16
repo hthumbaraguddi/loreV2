@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
-import { Shelf, Notebook, Section, Note, CustomTemplate } from '../models';
+import { TemplateService } from './template.service';
+import { Shelf, Notebook, Section, Note, CustomTemplate, SECTION_COLORS } from '../models';
 
 // ── Serialised shapes ─────────────────────────────────────────────────────────
 
@@ -42,12 +43,152 @@ function triggerDownload(json: unknown, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+function triggerHtmlDownload(html: string, filename: string): void {
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function esc(s: string): string {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Build a standalone HTML document from a list of notebooks */
+function buildHtmlDocument(title: string, notebooks: Notebook[], templateService: TemplateService): string {
+  const noHighlight = (s: string) => esc(s);
+
+  const notebookSections = notebooks.map(nb => {
+    const sectionsHtml = nb.sections.map(sec => {
+      const color = SECTION_COLORS[sec.color] || SECTION_COLORS['gray'];
+      const notesHtml = sec.notes.map(note => {
+        const tpl = templateService.getTemplate(note.templateId);
+        const cardBody = tpl
+          ? tpl.renderCard(note, color, noHighlight)
+          : templateService.renderFallbackCard(note, noHighlight);
+        return `
+        <div class="note-card" style="border-left:3px solid ${color.border};background:var(--card-bg);border-radius:8px;padding:14px 16px;margin-bottom:12px">
+          <div class="note-header" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(note.title)}</span>
+            ${tpl ? `<span style="font-size:10px;background:${color.bg};color:${color.text};border:0.5px solid ${color.border};padding:2px 7px;border-radius:4px">${esc(tpl.icon)} ${esc(tpl.name)}</span>` : ''}
+          </div>
+          <div class="note-body" style="font-size:13px;color:var(--text-secondary)">${cardBody}</div>
+        </div>`;
+      }).join('');
+
+      return `
+      <div class="section" style="margin-bottom:28px">
+        <div class="section-header" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:12px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color.dot};display:inline-block;flex-shrink:0"></span>
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${esc(sec.title)}</span>
+          ${sec.subtitle ? `<span style="font-size:12px;color:var(--text-muted)">${esc(sec.subtitle)}</span>` : ''}
+        </div>
+        ${notesHtml || '<p style="font-size:12px;color:var(--text-muted);padding:8px 0">No notes in this section.</p>'}
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="notebook" style="margin-bottom:40px">
+      <h2 style="font-size:18px;font-weight:700;color:var(--text);margin:0 0 20px;display:flex;align-items:center;gap:8px">
+        <span>${esc(nb.icon)}</span><span>${esc(nb.name)}</span>
+      </h2>
+      ${sectionsHtml || '<p style="color:var(--text-muted)">No sections.</p>'}
+    </div>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${esc(title)}</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card-bg: #1a1d27;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8eaf0;
+      --text-secondary: #b0b4c4;
+      --text-muted: #6b7280;
+      --accent: #7C6AF6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 32px 24px; line-height: 1.6; }
+    .container { max-width: 860px; margin: 0 auto; }
+    .page-header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .page-title { font-size: 26px; font-weight: 700; color: var(--text); }
+    .page-meta { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .lore-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); background: rgba(124,106,246,0.1); border: 0.5px solid rgba(124,106,246,0.3); padding: 3px 10px; border-radius: 20px; margin-top: 10px; }
+    /* Note card inner styles */
+    .rs-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .rs-domain { font-size: 11px; background: rgba(255,255,255,0.06); color: var(--text-secondary); padding: 2px 8px; border-radius: 4px; }
+    .rs-status { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+    .rs-ip { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .rs-done { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .rs-hold { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .cb-insight { padding: 8px 12px; border-left: 3px solid; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .cb-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .cb-body { font-size: 13px; color: var(--text-secondary); }
+    .cb-footer { padding: 8px 12px; border-left: 3px solid; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text-secondary); margin-top: 12px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+    .col-box { display: flex; flex-direction: column; gap: 6px; }
+    .bl-list { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+    .bl-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-secondary); align-items: flex-start; }
+    .rs-num { font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.08); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .link-chip { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 5px; border: 0.5px solid; text-decoration: none; margin: 3px 3px 0 0; }
+    .link-chip:hover { opacity: 0.8; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+    .tag { font-size: 11px; background: rgba(255,255,255,0.06); color: var(--text-muted); padding: 2px 8px; border-radius: 4px; }
+    /* Finance */
+    .fin-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); padding: 4px 0; border-bottom: 0.5px solid var(--border); }
+    .fin-net-pos { color: #4ade80; font-weight: 700; }
+    .fin-net-neg { color: #f87171; font-weight: 700; }
+    .fin-net-zero { color: var(--text-muted); font-weight: 700; }
+    /* Watchlist */
+    .wl-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); padding: 5px 0; }
+    .wl-item.seen { opacity: 0.45; text-decoration: line-through; }
+    .wl-chk { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+    .wl-chk.ticked { background: #4ade80; border-color: #4ade80; color: #000; }
+    /* Journal pips */
+    .pip { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 3px; }
+    .pip.filled { background: var(--accent); }
+    .pip.empty { background: rgba(255,255,255,0.12); }
+    /* Scrum */
+    .scrum-col { display: flex; flex-direction: column; gap: 4px; }
+    .scrum-item { font-size: 13px; color: var(--text-secondary); padding: 3px 0; }
+    /* Investing */
+    .tk-up { color: #4ade80; }
+    .tk-down { color: #f87171; }
+    .tk-flat { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">${esc(title)}</div>
+      <div class="page-meta">Exported on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      <div class="lore-badge">📓 Exported from Lore Notes</div>
+    </div>
+    ${notebookSections}
+  </div>
+</body>
+</html>`;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
 export class ExportImportService {
 
-  constructor(private data: DataService) {}
+  constructor(private data: DataService, private templateService: TemplateService) {}
 
   // ── Export ──────────────────────────────────────────────────────────────────
 
@@ -75,6 +216,20 @@ export class ExportImportService {
     const payload: TemplateExport = { _type: 'template', template };
     const filename = `template-${slugify(template.name)}-${todayStr()}.json`;
     triggerDownload(payload, filename);
+  }
+
+  /** Export shelf as standalone HTML */
+  exportShelfAsHtml(shelf: Shelf): void {
+    const state = this.data.getState();
+    const notebooks = state.notebooks.filter(nb => nb.shelfId === shelf.id);
+    const html = buildHtmlDocument(shelf.name, notebooks, this.templateService);
+    triggerHtmlDownload(html, `shelf-${slugify(shelf.name)}-${todayStr()}.html`);
+  }
+
+  /** Export notebook as standalone HTML */
+  exportNotebookAsHtml(notebook: Notebook): void {
+    const html = buildHtmlDocument(notebook.name, [notebook], this.templateService);
+    triggerHtmlDownload(html, `notebook-${slugify(notebook.name)}-${todayStr()}.html`);
   }
 
   // ── Import ──────────────────────────────────────────────────────────────────
@@ -110,15 +265,7 @@ export class ExportImportService {
       return { ...srcNb, id: newNbId, shelfId: newShelfId, sections: newSections };
     });
 
-    // Append to state
-    const state = this.data.getState();
-    this.data['state$'].next({
-      ...state,
-      shelves: [...state.shelves, newShelf],
-      notebooks: [...state.notebooks, ...newNotebooks],
-    });
-    this.data.saveAll(this.data['currentUsername']);
-
+    this.data.appendShelfWithNotebooks(newShelf, newNotebooks);
     return newShelfId;
   }
 
@@ -150,13 +297,7 @@ export class ExportImportService {
       sections: newSections,
     };
 
-    const state = this.data.getState();
-    this.data['state$'].next({
-      ...state,
-      notebooks: [...state.notebooks, newNotebook],
-    });
-    this.data.saveAll(this.data['currentUsername']);
-
+    this.data.appendNotebook(newNotebook);
     return newNbId;
   }
 

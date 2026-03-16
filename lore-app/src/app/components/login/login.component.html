@@ -1,77 +1,139 @@
-<div class="login-screen">
+<div class="landing">
   <div class="lg-glow"></div>
-  <div class="lg-box">
+  <div class="lg-glow lg-glow2"></div>
 
-    <!-- Logo -->
-    <div class="lg-logo">
-      <svg viewBox="0 0 36 36" fill="none">
-        <rect width="36" height="36" rx="9" fill="url(#l1)"/>
-        <path d="M10 10h4v13h7v3H10V10z" fill="white" opacity=".95"/>
-        <path d="M22 10c2.5 0 4.5 2 4.5 4.5S24.5 19 22 19h-1v-3h1c.83 0 1.5-.67 1.5-1.5S22.83 13 22 13h-1v-3h1z" fill="white" opacity=".6"/>
-        <circle cx="26" cy="24" r="4" fill="url(#l2)" opacity=".9"/>
-        <path d="M24.5 24l1 1.2 2-2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <defs>
-          <linearGradient id="l1" x1="0" y1="0" x2="36" y2="36">
-            <stop stop-color="#7C6AF6"/>
-            <stop offset="1" stop-color="#4F3FCC"/>
-          </linearGradient>
-          <linearGradient id="l2" x1="22" y1="20" x2="30" y2="28">
-            <stop stop-color="#A78BFA"/>
-            <stop offset="1" stop-color="#7C6AF6"/>
-          </linearGradient>
-        </defs>
-      </svg>
-      <div>
-        <h1>Lore</h1>
-        <p>Your knowledge, organised</p>
+  <!-- Centered two-column card -->
+  <div class="land-card">
+
+    <!-- Left column: marketing -->
+    <div class="land-left">
+      <div class="land-brand">
+        <svg viewBox="0 0 36 36" fill="none" class="brand-svg">
+          <rect width="36" height="36" rx="9" fill="url(#ll1)"/>
+          <path d="M10 10h4v13h7v3H10V10z" fill="white" opacity=".95"/>
+          <path d="M22 10c2.5 0 4.5 2 4.5 4.5S24.5 19 22 19h-1v-3h1c.83 0 1.5-.67 1.5-1.5S22.83 13 22 13h-1v-3h1z" fill="white" opacity=".6"/>
+          <circle cx="26" cy="24" r="4" fill="url(#ll2)" opacity=".9"/>
+          <path d="M24.5 24l1 1.2 2-2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="ll1" x1="0" y1="0" x2="36" y2="36">
+              <stop stop-color="#7C6AF6"/><stop offset="1" stop-color="#4F3FCC"/>
+            </linearGradient>
+            <linearGradient id="ll2" x1="22" y1="20" x2="30" y2="28">
+              <stop stop-color="#A78BFA"/><stop offset="1" stop-color="#7C6AF6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="brand-name">Lore</span>
+        <span class="brand-ver">v1.0</span>
       </div>
+
+      <h1 class="land-headline">Your knowledge,<br><span class="hl-grad">beautifully organised</span></h1>
+      <p class="land-sub">A personal knowledge base built for thinkers, researchers, and builders. Capture ideas, track progress, and connect the dots — all in one place.</p>
+
+      <div class="feat-list">
+        <div class="feat-item">
+          <span class="feat-ico"><lore-icon name="shelf" [size]="18"></lore-icon></span>
+          <div>
+            <div class="feat-ttl">Shelves &amp; Notebooks</div>
+            <div class="feat-desc">Organise everything into shelves, notebooks, and sections — your way.</div>
+          </div>
+        </div>
+        <div class="feat-item">
+          <span class="feat-ico"><lore-icon name="template-plus" [size]="18"></lore-icon></span>
+          <div>
+            <div class="feat-ttl">8 Built-in Templates</div>
+            <div class="feat-desc">Research, Journal, Finance, Scrum, Watchlist, Investing — and more. Build your own too.</div>
+          </div>
+        </div>
+        <div class="feat-item">
+          <span class="feat-ico"><lore-icon name="search" [size]="18"></lore-icon></span>
+          <div>
+            <div class="feat-ttl">Instant Search</div>
+            <div class="feat-desc">Find any note across all notebooks in milliseconds with live highlighting.</div>
+          </div>
+        </div>
+        <div class="feat-item">
+          <span class="feat-ico"><lore-icon name="export" [size]="18"></lore-icon></span>
+          <div>
+            <div class="feat-ttl">Export &amp; Import</div>
+            <div class="feat-desc">Share notebooks as readable HTML or portable JSON. Import them back anytime.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="land-badge"><lore-icon name="lock" [size]="12" style="margin-right:6px;opacity:.6"></lore-icon>All data stored locally on your device. No cloud, no tracking.</div>
     </div>
 
-    <!-- Tabs -->
-    <div class="lg-tabs">
-      <button class="ltab" [class.on]="activeTab === 'signin'" (click)="switchTab('signin')">Sign In</button>
-      <button class="ltab" [class.on]="activeTab === 'register'" (click)="switchTab('register')">Register</button>
+    <!-- Divider -->
+    <div class="land-divider"></div>
+
+    <!-- Right column: auth box -->
+    <div class="land-right">
+      <div class="lg-box">
+
+        <div class="lg-logo">
+          <svg viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="9" fill="url(#lr1)"/>
+            <path d="M10 10h4v13h7v3H10V10z" fill="white" opacity=".95"/>
+            <path d="M22 10c2.5 0 4.5 2 4.5 4.5S24.5 19 22 19h-1v-3h1c.83 0 1.5-.67 1.5-1.5S22.83 13 22 13h-1v-3h1z" fill="white" opacity=".6"/>
+            <circle cx="26" cy="24" r="4" fill="url(#lr2)" opacity=".9"/>
+            <path d="M24.5 24l1 1.2 2-2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="lr1" x1="0" y1="0" x2="36" y2="36">
+                <stop stop-color="#7C6AF6"/><stop offset="1" stop-color="#4F3FCC"/>
+              </linearGradient>
+              <linearGradient id="lr2" x1="22" y1="20" x2="30" y2="28">
+                <stop stop-color="#A78BFA"/><stop offset="1" stop-color="#7C6AF6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div>
+            <h1>Lore</h1>
+            <p>Your knowledge, organised</p>
+          </div>
+        </div>
+
+        <div class="lg-tabs">
+          <button class="ltab" [class.on]="activeTab === 'signin'" (click)="switchTab('signin')">Sign In</button>
+          <button class="ltab" [class.on]="activeTab === 'register'" (click)="switchTab('register')">Register</button>
+        </div>
+
+        @if (activeTab === 'signin') {
+          <div>
+            <div class="lg-field">
+              <label>Username</label>
+              <input type="text" placeholder="your username" autocomplete="username" [(ngModel)]="loginUsername" (keyup.enter)="doLogin()">
+            </div>
+            <div class="lg-field">
+              <label>Password</label>
+              <input type="password" placeholder="••••••••" [(ngModel)]="loginPassword" (keyup.enter)="doLogin()">
+            </div>
+            <button class="lg-btn" (click)="doLogin()">Sign in to Lore →</button>
+          </div>
+        }
+
+        @if (activeTab === 'register') {
+          <div>
+            <div class="lg-field">
+              <label>Full Name</label>
+              <input type="text" placeholder="e.g. Harsha Kumar" [(ngModel)]="registerName" (keyup.enter)="doRegister()">
+            </div>
+            <div class="lg-field">
+              <label>Username</label>
+              <input type="text" placeholder="choose a username" [(ngModel)]="registerUsername" (keyup.enter)="doRegister()">
+            </div>
+            <div class="lg-field">
+              <label>Password</label>
+              <input type="password" placeholder="create a password" [(ngModel)]="registerPassword" (keyup.enter)="doRegister()">
+            </div>
+            <button class="lg-btn" (click)="doRegister()">Create Account →</button>
+          </div>
+        }
+
+        <div class="lg-err">{{ errorMessage }}</div>
+        <div class="lg-foot">Your data is stored locally on this device</div>
+      </div>
     </div>
-
-    <!-- Sign In Form -->
-    @if (activeTab === 'signin') {
-      <div>
-        <div class="lg-field">
-          <label>Username</label>
-          <input type="text" placeholder="your username" autocomplete="username" [(ngModel)]="loginUsername" (keyup.enter)="doLogin()">
-        </div>
-        <div class="lg-field">
-          <label>Password</label>
-          <input type="password" placeholder="••••••••" [(ngModel)]="loginPassword" (keyup.enter)="doLogin()">
-        </div>
-        <button class="lg-btn" (click)="doLogin()">Sign in to Lore →</button>
-      </div>
-    }
-
-    <!-- Register Form -->
-    @if (activeTab === 'register') {
-      <div>
-        <div class="lg-field">
-          <label>Full Name</label>
-          <input type="text" placeholder="e.g. Harsha Kumar" [(ngModel)]="registerName" (keyup.enter)="doRegister()">
-        </div>
-        <div class="lg-field">
-          <label>Username</label>
-          <input type="text" placeholder="choose a username" [(ngModel)]="registerUsername" (keyup.enter)="doRegister()">
-        </div>
-        <div class="lg-field">
-          <label>Password</label>
-          <input type="password" placeholder="create a password" [(ngModel)]="registerPassword" (keyup.enter)="doRegister()">
-        </div>
-        <button class="lg-btn" (click)="doRegister()">Create Account →</button>
-      </div>
-    }
-
-    <!-- Error -->
-    <div class="lg-err">{{ errorMessage }}</div>
-
-    <!-- Footer -->
-    <div class="lg-foot">Your data is stored locally on this device</div>
 
   </div>
 </div>

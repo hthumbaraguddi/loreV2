@@ -30,6 +30,7 @@
         [activeNotebookIcon]="getActiveNotebookIcon(state)"
         [hasActiveNotebook]="!!state.activeNotebookId"
         [syncStatus]="syncStatus"
+        [isLocalMode]="isLocalMode"
         (searchChanged)="onSearchChanged($event)"
         (addSection)="onAddSection()"
         (addNote)="onAddNote(null)"

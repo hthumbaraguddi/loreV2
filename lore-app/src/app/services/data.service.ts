@@ -104,11 +104,13 @@ export class DataService {
       users[username].data = this.state$.getValue();
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-      // Mirror to Google Drive (debounced)
-      this.drive.scheduleSave({
-        state: this.state$.getValue(),
-        customTemplates: this.getCustomTemplatesRaw(),
-      });
+      // Mirror to Google Drive (debounced) — only when Drive token is available
+      if (this.drive.hasToken()) {
+        this.drive.scheduleSave({
+          state: this.state$.getValue(),
+          customTemplates: this.getCustomTemplatesRaw(),
+        });
+      }
     } catch (e: any) {
       if (e && e.name === 'QuotaExceededError') {
         this.showToast('Storage quota exceeded — changes not saved.');

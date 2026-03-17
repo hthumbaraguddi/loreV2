@@ -18,6 +18,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Input() activeNotebookIcon: string = '';
   @Input() hasActiveNotebook: boolean = false;
   @Input() syncStatus: SyncStatus = 'idle';
+  @Input() isLocalMode: boolean = false;
 
   @Output() searchChanged = new EventEmitter<string>();
   @Output() addSection = new EventEmitter<void>();
@@ -68,16 +69,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
     this.saveNow.emit();
   }
 
-  get syncIcon(): string {
-    switch (this.syncStatus) {
-      case 'syncing': return '↻';
-      case 'saved':   return '✓';
-      case 'error':   return '⚠';
-      default:        return '☁';
-    }
-  }
-
   get syncLabel(): string {
+    if (this.isLocalMode) return 'Saved locally';
     switch (this.syncStatus) {
       case 'syncing': return 'Saving…';
       case 'saved':   return 'Saved';

@@ -21,6 +21,17 @@ export interface TemplateExport {
   template: CustomTemplate;
 }
 
+export interface WorkspaceExport {
+  _type: 'workspace';
+  version: 1;
+  exportedAt: string;
+  state: {
+    shelves: Shelf[];
+    notebooks: Notebook[];
+  };
+  customTemplates: CustomTemplate[];
+}
+
 const CUSTOM_TEMPLATES_KEY = 'lore_custom_templates';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -230,6 +241,27 @@ export class ExportImportService {
   exportNotebookAsHtml(notebook: Notebook): void {
     const html = buildHtmlDocument(notebook.name, [notebook], this.templateService);
     triggerHtmlDownload(html, `notebook-${slugify(notebook.name)}-${todayStr()}.html`);
+  }
+
+  /** Export entire workspace (all shelves, notebooks, custom templates) as a single JSON */
+  exportWorkspace(): void {
+    const state = this.data.getState();
+    let customTemplates: CustomTemplate[] = [];
+    try {
+      customTemplates = JSON.parse(localStorage.getItem('lore_custom_templates') || '[]');
+    } catch { /* ignore */ }
+
+    const payload: WorkspaceExport = {
+      _type: 'workspace',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      state: {
+        shelves: state.shelves,
+        notebooks: state.notebooks,
+      },
+      customTemplates,
+    };
+    triggerDownload(payload, `lore-workspace-${todayStr()}.json`);
   }
 
   // ── Import ──────────────────────────────────────────────────────────────────

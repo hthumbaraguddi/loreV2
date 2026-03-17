@@ -137,8 +137,10 @@ export class DriveService {
         this.fileId = created.id;
       }
       this.zone.run(() => this.syncStatus$.next('saved'));
+      window.dispatchEvent(new CustomEvent('lore-toast', { detail: '✓ Saved to Google Drive' }));
     } catch {
       this.zone.run(() => this.syncStatus$.next('error'));
+      window.dispatchEvent(new CustomEvent('lore-toast', { detail: '⚠ Drive sync failed — check connection' }));
     }
   }
 

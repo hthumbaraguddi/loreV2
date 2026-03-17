@@ -382,3 +382,9 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
+
+@media (max-width: 768px) {
+  .spanel {
+    width: 100% !important;
+  }
+}

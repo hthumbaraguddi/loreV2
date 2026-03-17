@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppState, Shelf, Notebook } from '../../models';
 import { DataService } from '../../services/data.service';
@@ -31,6 +31,19 @@ export class SidebarComponent {
 
   private data = inject(DataService);
 
+  isMobileOpen = false;
+
+  get isMobile(): boolean {
+    return window.innerWidth <= 768;
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    if (!this.isMobile) {
+      this.isMobileOpen = false;
+    }
+  }
+
   get userInitial(): string {
     return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
   }
@@ -44,7 +57,15 @@ export class SidebarComponent {
   }
 
   onToggleSidebar(): void {
-    this.data.toggleSidebar();
+    if (this.isMobile) {
+      this.isMobileOpen = !this.isMobileOpen;
+    } else {
+      this.data.toggleSidebar();
+    }
+  }
+
+  closeMobileSidebar(): void {
+    this.isMobileOpen = false;
   }
 
   onToggleShelf(shelf: Shelf, event: Event): void {
@@ -55,6 +76,10 @@ export class SidebarComponent {
   onSelectNotebook(notebook: Notebook): void {
     this.data.setActiveNotebook(notebook.id);
     this.notebookSelected.emit(notebook);
+    // Close drawer on mobile after selecting a notebook
+    if (this.isMobile) {
+      this.isMobileOpen = false;
+    }
   }
 
   onAddShelf(): void {

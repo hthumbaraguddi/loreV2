@@ -795,3 +795,117 @@ a { color: inherit; text-decoration: none; }
 .sp-ctpl-acts { display: flex; gap: 4px; flex-shrink: 0; }
 .tpl-browser-new { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .tpl-browser-new-lbl { font-size: 12.5px; color: var(--ts); }
+
+// ══ MOBILE ════════════════════════════════════════════
+@media (max-width: 768px) {
+
+  // App shell — sidebar hidden by default, main takes full width
+  #app {
+    position: relative;
+  }
+
+  // Sidebar becomes a fixed overlay drawer
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 120;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), width 0.25s;
+    width: var(--sbw) !important;
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+
+    &.collapsed {
+      transform: translateX(-100%);
+      width: var(--sbw) !important;
+    }
+  }
+
+  // Overlay backdrop behind sidebar on mobile
+  .sb-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 115;
+
+    &.show {
+      display: block;
+    }
+  }
+
+  // Toggle button — always top-left on mobile
+  .btn-tsb {
+    left: 10px !important;
+    top: 10px;
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  // Topbar — compact, leave room for toggle button
+  #topbar {
+    padding: 8px 12px 8px 54px;
+    gap: 6px;
+  }
+
+  // Hide shelf breadcrumb on mobile (save space)
+  .crumb-sh,
+  .crumb-sep {
+    display: none;
+  }
+
+  // Search input — smaller default, still expands on focus
+  .sr-in {
+    width: 120px;
+    &:focus { width: 150px; }
+  }
+
+  // Hide "New Note" text label, keep icon
+  .btn-pr span.btn-label {
+    display: none;
+  }
+
+  // Content area — full width, less padding
+  #content {
+    padding: 14px 12px 60px;
+  }
+
+  // Edit panel — full width on mobile
+  #ep {
+    width: 100% !important;
+  }
+
+  // Settings panel — full width on mobile
+  #spanel {
+    width: 100% !important;
+  }
+
+  // Modals — full width with small margin
+  .modal {
+    max-width: 100%;
+    margin: 0 4px;
+    border-radius: 12px;
+  }
+
+  // Two/three col grids already collapse at 640px — also handle fin-cols
+  .fin-cols {
+    grid-template-columns: 1fr;
+  }
+
+  // Toast — full width on mobile
+  #toast {
+    left: 12px;
+    right: 12px;
+    transform: translateY(80px);
+    text-align: center;
+
+    &.show {
+      transform: translateY(0);
+    }
+  }
+}

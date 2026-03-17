@@ -1,10 +1,13 @@
+<!-- Mobile backdrop — tap to close sidebar -->
+<div class="sb-backdrop" [class.show]="isMobileOpen" (click)="closeMobileSidebar()"></div>
+
 <!-- Toggle sidebar button (outside sidebar, fixed position) -->
-<button class="btn-tsb" [class.closed]="state.sidebarCollapsed" (click)="onToggleSidebar()" title="Toggle sidebar">
-  <lore-icon [name]="state.sidebarCollapsed ? 'chevron-right' : 'chevron-left'" [size]="10"></lore-icon>
+<button class="btn-tsb" [class.closed]="state.sidebarCollapsed && !isMobileOpen" (click)="onToggleSidebar()" title="Toggle sidebar">
+  <lore-icon [name]="isMobileOpen || (!isMobile && !state.sidebarCollapsed) ? 'chevron-left' : 'chevron-right'" [size]="10"></lore-icon>
 </button>
 
 <!-- Sidebar -->
-<div id="sidebar" [class.collapsed]="state.sidebarCollapsed">
+<div id="sidebar" [class.collapsed]="state.sidebarCollapsed && !isMobileOpen" [class.mobile-open]="isMobileOpen">
 
   <!-- Workspace header -->
   <div class="ws-hdr">

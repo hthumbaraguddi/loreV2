@@ -23,6 +23,8 @@ export class LoginComponent implements OnInit {
   @Output() tokenReady = new EventEmitter<void>();
 
   errorMessage = '';
+  driveConnecting = false;
+  showDriveConnect = false;
 
   ngOnInit(): void {
     this.drive.init();
@@ -31,6 +33,19 @@ export class LoginComponent implements OnInit {
 
   loginLocally(): void {
     this.auth.loginLocal();
+    this.tokenReady.emit();
+  }
+
+  /** Called when user manually clicks "Connect Drive" after popup was blocked */
+  async connectDrive(): Promise<void> {
+    this.driveConnecting = true;
+    this.showDriveConnect = false;
+    try {
+      await this.drive.requestToken();
+    } catch (e) {
+      console.warn('Drive connect failed:', e);
+    }
+    this.driveConnecting = false;
     this.tokenReady.emit();
   }
 
@@ -45,11 +60,12 @@ export class LoginComponent implements OnInit {
               if (err) { this.errorMessage = err; return; }
               try {
                 await this.drive.requestToken();
+                this.tokenReady.emit();
               } catch (e) {
-                // Drive token failed — user will see sync error in topbar
                 console.warn('Drive token request failed:', e);
+                // Show manual connect button instead of blocking login
+                this.showDriveConnect = true;
               }
-              this.tokenReady.emit();
             });
           }
         });

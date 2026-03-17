@@ -46,20 +46,31 @@ export class DriveService {
     tryInit();
   }
 
-  /** Request an access token (shows Google consent popup if needed). */
+  /** Request an access token. Tries silent first, falls back to consent popup. */
   requestToken(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.tokenClient) { reject('Token client not ready'); return; }
-      const original = this.tokenClient.callback;
-      this.tokenClient.callback = (resp: any) => {
-        this.zone.run(() => {
-          if (resp.error) { reject(resp.error); return; }
-          this.accessToken = resp.access_token;
-          this.tokenClient.callback = original;
-          resolve();
-        });
+
+      const attempt = (prompt: string) => {
+        this.tokenClient.callback = (resp: any) => {
+          this.zone.run(() => {
+            if (resp.error) {
+              if (prompt === '' && resp.error === 'interaction_required') {
+                // Silent failed — retry with explicit consent popup
+                attempt('consent');
+              } else {
+                reject(resp.error);
+              }
+              return;
+            }
+            this.accessToken = resp.access_token;
+            resolve();
+          });
+        };
+        this.tokenClient.requestAccessToken({ prompt });
       };
-      this.tokenClient.requestAccessToken({ prompt: '' });
+
+      attempt('');
     });
   }
 

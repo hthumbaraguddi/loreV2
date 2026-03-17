@@ -45,8 +45,9 @@ export class LoginComponent implements OnInit {
               if (err) { this.errorMessage = err; return; }
               try {
                 await this.drive.requestToken();
-              } catch {
-                // Drive access denied — app still works without sync
+              } catch (e) {
+                // Drive token failed — user will see sync error in topbar
+                console.warn('Drive token request failed:', e);
               }
               this.tokenReady.emit();
             });

@@ -150,3 +150,9 @@
 }
 
 // .btn-save inherits .btn-pr styles from global styles.scss
+
+@media (max-width: 768px) {
+  .ep {
+    width: 100% !important;
+  }
+}

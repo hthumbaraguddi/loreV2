@@ -5,6 +5,19 @@
   display: contents;
 }
 
+// Mobile backdrop — rendered by this component
+.sb-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 115;
+
+  &.show {
+    display: block;
+  }
+}
+
 // Ensure the toggle button is always visible even when sidebar is collapsed
 .btn-tsb {
   position: fixed;

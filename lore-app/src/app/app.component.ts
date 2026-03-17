@@ -116,7 +116,8 @@ export class AppComponent implements OnInit, OnDestroy {
         this.drive.clearToken();
         this.sessionRestored = false;
       } else if (this.sessionRestored) {
-        // Page reload with existing session — load data immediately
+        // Page reload with existing session — load from localStorage immediately
+        // so the UI isn't blank, then sync from Drive in background
         const user = this.auth.getCurrentUser();
         if (user) {
           this.displayName = user.name;
@@ -125,12 +126,25 @@ export class AppComponent implements OnInit, OnDestroy {
           if (this.data.getState().shelves.length === 0) {
             this.data.seedDemoData();
           }
+          // For Google users: re-acquire Drive token silently and sync from Drive
+          if (!this.auth.isLocalMode) {
+            this.drive.requestToken()
+              .then(() => this.drive.load())
+              .then(driveData => {
+                if (driveData?.state) {
+                  console.log('[App] session restore: loaded from Drive');
+                  this.data.loadFromObject(driveData.state);
+                  if (Array.isArray(driveData.customTemplates)) {
+                    localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+                  }
+                }
+              })
+              .catch(e => console.warn('[App] session restore: Drive sync skipped:', e));
+          }
         }
       }
       // Fresh login: loadUserData() is called via (tokenReady) output after token is ready
-    });
-
-    this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
+    });    this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
   }
 
   ngOnDestroy(): void {

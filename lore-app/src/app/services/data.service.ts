@@ -106,10 +106,13 @@ export class DataService {
 
       // Mirror to Google Drive (debounced) — only when Drive token is available
       if (this.drive.hasToken()) {
+        console.log('[Data] scheduling Drive save for user:', username);
         this.drive.scheduleSave({
           state: this.state$.getValue(),
           customTemplates: this.getCustomTemplatesRaw(),
         });
+      } else {
+        console.log('[Data] no Drive token — saved to localStorage only');
       }
     } catch (e: any) {
       if (e && e.name === 'QuotaExceededError') {

@@ -37,4 +37,18 @@
   <button class="btn-tb-icon" (click)="onOpenTemplates()" title="Browse Templates">
     <lore-icon name="template" [size]="15"></lore-icon>
   </button>
+
+  <!-- Manual save to Drive -->
+  <button
+    class="btn-save-drive"
+    [class.saving]="syncStatus === 'syncing'"
+    [class.saved]="syncStatus === 'saved'"
+    [class.error]="syncStatus === 'error'"
+    [disabled]="syncStatus === 'syncing'"
+    (click)="onSaveNow()"
+    [title]="syncLabel"
+  >
+    <span class="save-icon">{{ syncIcon }}</span>
+    <span class="save-lbl">{{ syncLabel }}</span>
+  </button>
 </div>

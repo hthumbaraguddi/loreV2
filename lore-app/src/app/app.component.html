@@ -29,10 +29,12 @@
         [activeNotebookName]="getActiveNotebookName(state)"
         [activeNotebookIcon]="getActiveNotebookIcon(state)"
         [hasActiveNotebook]="!!state.activeNotebookId"
+        [syncStatus]="syncStatus"
         (searchChanged)="onSearchChanged($event)"
         (addSection)="onAddSection()"
         (addNote)="onAddNote(null)"
-        (openTemplates)="onOpenTemplates()">
+        (openTemplates)="onOpenTemplates()"
+        (saveNow)="onSaveNow()">
       </app-topbar>
 
       <app-content-area

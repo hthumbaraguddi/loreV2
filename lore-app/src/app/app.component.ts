@@ -291,6 +291,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.searchQuery = query;
   }
 
+  onSaveNow(): void {
+    this.drive.save({
+      state: this.data.getState(),
+      customTemplates: JSON.parse(localStorage.getItem('lore_custom_templates') || '[]'),
+    });
+  }
+
   onAddSection(): void {
     this.editingSection = null;
     this.showSectionModal = true;

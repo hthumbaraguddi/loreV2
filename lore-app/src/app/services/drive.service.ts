@@ -46,31 +46,34 @@ export class DriveService {
     tryInit();
   }
 
-  /** Request an access token. Tries silent first, falls back to consent popup. */
+  /** Request an access token silently (no popup). Rejects if interaction required. */
+  requestTokenSilent(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.tokenClient) { reject('Token client not ready'); return; }
+      this.tokenClient.callback = (resp: any) => {
+        this.zone.run(() => {
+          if (resp.error) { reject(resp.error); return; }
+          this.accessToken = resp.access_token;
+          resolve();
+        });
+      };
+      this.tokenClient.requestAccessToken({ prompt: '' });
+    });
+  }
+
+  /** Request an access token with a user-gesture popup (call from a click handler). */
   requestToken(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.tokenClient) { reject('Token client not ready'); return; }
-
-      const attempt = (prompt: string) => {
-        this.tokenClient.callback = (resp: any) => {
-          this.zone.run(() => {
-            if (resp.error) {
-              if (prompt === '' && (resp.error === 'interaction_required' || resp.error === 'access_denied')) {
-                // Silent failed — retry with select_account (avoids full popup on Safari)
-                attempt('select_account');
-              } else {
-                reject(resp.error);
-              }
-              return;
-            }
-            this.accessToken = resp.access_token;
-            resolve();
-          });
-        };
-        this.tokenClient.requestAccessToken({ prompt });
+      this.tokenClient.callback = (resp: any) => {
+        this.zone.run(() => {
+          if (resp.error) { reject(resp.error); return; }
+          this.accessToken = resp.access_token;
+          resolve();
+        });
       };
-
-      attempt('');
+      // Use 'select_account' so the user can pick their account in the popup
+      this.tokenClient.requestAccessToken({ prompt: 'select_account' });
     });
   }
 

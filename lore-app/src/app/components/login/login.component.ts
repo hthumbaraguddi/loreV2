@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, NgZone } from '@angular/core';
+import { Component, inject, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
@@ -20,11 +20,18 @@ export class LoginComponent implements OnInit {
   private drive = inject(DriveService);
   private zone = inject(NgZone);
 
+  @Output() tokenReady = new EventEmitter<void>();
+
   errorMessage = '';
 
   ngOnInit(): void {
     this.drive.init();
     this.initGoogleSignIn();
+  }
+
+  loginLocally(): void {
+    this.auth.loginLocal();
+    this.tokenReady.emit();
   }
 
   private initGoogleSignIn(): void {
@@ -41,6 +48,7 @@ export class LoginComponent implements OnInit {
               } catch {
                 // Drive access denied — app still works without sync
               }
+              this.tokenReady.emit();
             });
           }
         });

@@ -71,6 +71,7 @@ export interface UserRecord {
   password: string;
   name: string;
   email?: string;
+  isLocal?: boolean;
   data: Partial<AppState>;
 }
 

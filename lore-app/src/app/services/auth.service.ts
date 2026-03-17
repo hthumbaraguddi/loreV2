@@ -4,6 +4,8 @@ import { UserRecord } from '../models';
 
 const USERS_KEY = 'lore_users';
 const CU_KEY = 'lore_cu';
+const MODE_KEY = 'lore_mode';
+const LOCAL_USER_KEY = 'local_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,6 +29,15 @@ export class AuthService {
   }
 
   private restoreSession(): void {
+    // Restore local mode session
+    if (localStorage.getItem(MODE_KEY) === 'local') {
+      const localUser = this.getLocalUser();
+      if (localUser) {
+        this.currentUser$.next(localUser);
+        this.isLoggedIn$.next(true);
+        return;
+      }
+    }
     const cu = localStorage.getItem(CU_KEY) || '';
     if (!cu) return;
     const users = this.getUsers();
@@ -35,6 +46,13 @@ export class AuthService {
       this.currentUser$.next(user);
       this.isLoggedIn$.next(true);
     }
+  }
+
+  private getLocalUser(): UserRecord | null {
+    try {
+      const raw = localStorage.getItem(LOCAL_USER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
   }
 
   private decodeJwt(token: string): Record<string, any> {
@@ -71,8 +89,27 @@ export class AuthService {
     return null;
   }
 
+  loginLocal(): void {
+    const localUser: UserRecord = {
+      username: 'local',
+      password: '',
+      name: 'Local User',
+      isLocal: true,
+      data: {},
+    };
+    localStorage.setItem(MODE_KEY, 'local');
+    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(localUser));
+    this.currentUser$.next(localUser);
+    this.isLoggedIn$.next(true);
+  }
+
+  get isLocalMode(): boolean {
+    return localStorage.getItem(MODE_KEY) === 'local';
+  }
+
   logout(): void {
     localStorage.setItem(CU_KEY, '');
+    localStorage.removeItem(MODE_KEY);
     this.currentUser$.next(null);
     this.isLoggedIn$.next(false);
   }

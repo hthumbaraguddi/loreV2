@@ -58,6 +58,7 @@ export class SettingsPanelComponent implements OnChanges {
   @Output() templateEdited = new EventEmitter<CustomTemplate>();
   @Output() templateExported = new EventEmitter<CustomTemplate>();
   @Output() logout = new EventEmitter<void>();
+  @Output() exportWorkspace = new EventEmitter<void>();
 
   private authService = inject(AuthService);
   private exportImportService = inject(ExportImportService);
@@ -136,6 +137,11 @@ export class SettingsPanelComponent implements OnChanges {
     this.authService.logout();
   }
 
+  onExportWorkspace(): void {
+    this.exportWorkspace.emit();
+    this.exportImportService.exportWorkspace();
+  }
+
   getTemplateColorStyle(tpl: CustomTemplate): { background: string; border: string } {
     const c = SECTION_COLOR_MAP[tpl.color] ?? SECTION_COLOR_MAP['gray'];
     return { background: c.bg, border: `1px solid ${c.border}` };
@@ -153,6 +159,10 @@ export class SettingsPanelComponent implements OnChanges {
 
   get currentFontSize(): number {
     return this.state?.fontSize ?? 14;
+  }
+
+  get isLocalMode(): boolean {
+    return this.authService.isLocalMode;
   }
 
   get totalTemplateCount(): number {

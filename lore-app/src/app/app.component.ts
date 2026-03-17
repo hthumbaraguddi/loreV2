@@ -54,6 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   displayName = '';
   syncStatus: SyncStatus = 'idle';
+  get isLocalMode(): boolean { return this.auth.isLocalMode; }
   state$!: Observable<AppState>;
   readonly sectionColors: SectionColorMap = SECTION_COLORS;
 
@@ -107,8 +108,8 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!loggedIn) {
         this.displayName = '';
         this.drive.clearToken();
-      } else if (!this.drive.hasToken()) {
-        // Session restored from localStorage (page reload) — load local data immediately
+      } else if (this.auth.isLocalMode || !this.drive.hasToken()) {
+        // Session restored from localStorage (page reload) or local mode — load local data immediately
         const user = this.auth.getCurrentUser();
         if (user) {
           this.displayName = user.name;
@@ -119,7 +120,7 @@ export class AppComponent implements OnInit, OnDestroy {
           }
         }
       }
-      // Fresh login: data loading is handled by loadUserData() called after Drive token is ready
+      // Fresh Google login: data loading is handled by loadUserData() called after Drive token is ready
     });
 
     this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
@@ -129,12 +130,21 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  /** Called by LoginComponent after Drive token is obtained. */
+  /** Called by LoginComponent after Drive token is obtained (or local login). */
   async loadUserData(): Promise<void> {
     const user = this.auth.getCurrentUser();
     if (!user) return;
     this.displayName = user.name;
     this.data.setCurrentUser(user.username);
+
+    if (this.auth.isLocalMode) {
+      // Local mode: load from localStorage only, skip Drive
+      this.data.loadAll(user.username);
+      if (this.data.getState().shelves.length === 0) {
+        this.data.seedDemoData();
+      }
+      return;
+    }
 
     const driveData = await this.drive.load();
     if (driveData?.state) {
@@ -292,6 +302,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onSaveNow(): void {
+    if (this.auth.isLocalMode) {
+      // Local mode: data is already saved to localStorage on every mutation
+      this.data.showToast('✓ Saved locally');
+      return;
+    }
     this.drive.save({
       state: this.data.getState(),
       customTemplates: JSON.parse(localStorage.getItem('lore_custom_templates') || '[]'),

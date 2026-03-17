@@ -106,21 +106,32 @@
     </div>
     <div class="sp-account">
       <div class="sp-acct-row">
-        <div class="sp-acct-avatar">{{ displayName ? displayName[0].toUpperCase() : 'G' }}</div>
+        <div class="sp-acct-avatar">{{ displayName ? displayName[0].toUpperCase() : (isLocalMode ? 'L' : 'G') }}</div>
         <div class="sp-acct-info">
-          <div class="sp-acct-name">{{ displayName || 'Google User' }}</div>
-          <div class="sp-acct-email">{{ userEmail || 'Signed in with Google' }}</div>
+          <div class="sp-acct-name">{{ displayName || (isLocalMode ? 'Local User' : 'Google User') }}</div>
+          <div class="sp-acct-email">{{ isLocalMode ? 'Local storage mode' : (userEmail || 'Signed in with Google') }}</div>
         </div>
       </div>
-      <div class="sp-sync-row" [class]="'sync-' + syncStatus">
-        <span class="sp-sync-dot"></span>
-        <span *ngIf="syncStatus === 'syncing'">Syncing to Google Drive…</span>
-        <span *ngIf="syncStatus === 'saved'">Saved to Google Drive</span>
-        <span *ngIf="syncStatus === 'error'">Drive sync failed — check connection</span>
-        <span *ngIf="syncStatus === 'idle'">Google Drive ready</span>
-        <span *ngIf="syncStatus === 'offline'">Offline — saved locally</span>
-      </div>
-      <button class="sp-danger" (click)="onLogout()">Sign out</button>
+      <ng-container *ngIf="isLocalMode; else driveSync">
+        <div class="sp-sync-row sync-saved">
+          <span class="sp-sync-dot"></span>
+          <span>Saved locally in this browser</span>
+        </div>
+      </ng-container>
+      <ng-template #driveSync>
+        <div class="sp-sync-row" [class]="'sync-' + syncStatus">
+          <span class="sp-sync-dot"></span>
+          <span *ngIf="syncStatus === 'syncing'">Syncing to Google Drive…</span>
+          <span *ngIf="syncStatus === 'saved'">Saved to Google Drive</span>
+          <span *ngIf="syncStatus === 'error'">Drive sync failed — check connection</span>
+          <span *ngIf="syncStatus === 'idle'">Google Drive ready</span>
+          <span *ngIf="syncStatus === 'offline'">Offline — saved locally</span>
+        </div>
+      </ng-template>
+      <button class="sp-export-ws" (click)="onExportWorkspace()">
+        <span>⬇</span> Export Workspace
+      </button>
+      <button class="sp-danger" (click)="onLogout()">{{ isLocalMode ? 'Clear & Sign out' : 'Sign out' }}</button>
     </div>
 
     <!-- ── About ── -->

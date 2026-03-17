@@ -214,3 +214,48 @@
 
   &:hover { background: var(--inp); color: var(--tp); }
 }
+
+// ── Mobile ───────────────────────────────────────────
+@media (max-width: 768px) {
+  .ov {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .mod {
+    max-width: 100% !important;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 88vh;
+    flex-direction: column;
+
+    // Hide preview panel on mobile — not enough space
+    &.has-preview {
+      max-width: 100% !important;
+    }
+  }
+
+  // On mobile, left column takes full width
+  .mod-left {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+  }
+
+  // Hide the preview panel entirely on mobile
+  .mod-preview {
+    display: none !important;
+  }
+
+  // Template grid — 2 columns still works on mobile
+  .tpl-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  // Stack the "Want something custom?" row
+  .tpl-browser-new {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

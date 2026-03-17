@@ -48,7 +48,7 @@
     (click)="onSaveNow()"
     [title]="syncLabel"
   >
-    <span class="save-icon">{{ syncIcon }}</span>
+    <lore-icon class="save-icon" [name]="syncStatus === 'error' ? 'warning' : syncStatus === 'saved' ? 'check' : 'save'" [size]="14"></lore-icon>
     <span class="save-lbl">{{ syncLabel }}</span>
   </button>
 </div>

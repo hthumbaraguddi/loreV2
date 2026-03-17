@@ -55,9 +55,9 @@ export class DriveService {
         this.tokenClient.callback = (resp: any) => {
           this.zone.run(() => {
             if (resp.error) {
-              if (prompt === '' && resp.error === 'interaction_required') {
-                // Silent failed — retry with explicit consent popup
-                attempt('consent');
+              if (prompt === '' && (resp.error === 'interaction_required' || resp.error === 'access_denied')) {
+                // Silent failed — retry with select_account (avoids full popup on Safari)
+                attempt('select_account');
               } else {
                 reject(resp.error);
               }

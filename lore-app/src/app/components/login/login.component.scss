@@ -316,3 +316,35 @@
   margin-top: 7px;
   letter-spacing: 0.02em;
 }
+
+// ── Drive connect fallback (Safari popup blocked) ─────────────────────────────
+.lg-drive-connect {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(124, 106, 246, 0.08);
+  border: 1px solid rgba(124, 106, 246, 0.2);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
+.lg-skip-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  padding: 2px;
+
+  &:hover { color: rgba(255, 255, 255, 0.5); }
+}

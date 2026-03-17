@@ -78,32 +78,59 @@ export class DriveService {
     return !!this.accessToken;
   }
 
+  /** Find the Drive file ID, resolving duplicates by keeping only the newest. */
+  private async resolveFileId(): Promise<string> {
+    if (this.fileId) return this.fileId;
+
+    const res = await fetch(
+      `${DRIVE_API}/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id,createdTime)&orderBy=createdTime+desc`,
+      { headers: { Authorization: `Bearer ${this.accessToken}` } }
+    );
+    const list = await res.json();
+    const files: Array<{ id: string; createdTime: string }> = list.files ?? [];
+
+    if (!files.length) return '';
+
+    // Keep the newest, delete any duplicates
+    this.fileId = files[0].id;
+    for (let i = 1; i < files.length; i++) {
+      fetch(`${DRIVE_API}/files/${files[i].id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${this.accessToken}` },
+      }).catch(() => {});
+    }
+
+    return this.fileId;
+  }
+
   /** Load data from Drive. Returns null if no file exists yet. */
   async load(): Promise<any | null> {
     if (!this.accessToken) return null;
     this.syncStatus$.next('syncing');
     try {
-      // Find the file
-      const listRes = await fetch(
-        `${DRIVE_API}/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id)`,
-        { headers: { Authorization: `Bearer ${this.accessToken}` } }
-      );
-      const list = await listRes.json();
-      if (!list.files?.length) {
+      const fileId = await this.resolveFileId();
+      if (!fileId) {
         this.syncStatus$.next('idle');
         return null;
       }
-      this.fileId = list.files[0].id;
 
-      // Download content
       const dlRes = await fetch(
-        `${DRIVE_API}/files/${this.fileId}?alt=media`,
+        `${DRIVE_API}/files/${fileId}?alt=media`,
         { headers: { Authorization: `Bearer ${this.accessToken}` } }
       );
+
+      if (!dlRes.ok) {
+        console.error('[Drive] load failed, status:', dlRes.status);
+        this.syncStatus$.next('error');
+        return null;
+      }
+
       const data = await dlRes.json();
+      console.log('[Drive] loaded successfully, shelves:', data?.state?.shelves?.length ?? 0);
       this.syncStatus$.next('saved');
       return data;
-    } catch {
+    } catch (e) {
+      console.error('[Drive] load error:', e);
       this.syncStatus$.next('error');
       return null;
     }
@@ -123,9 +150,13 @@ export class DriveService {
       const body = JSON.stringify(data);
       const blob = new Blob([body], { type: 'application/json' });
 
-      if (this.fileId) {
+      // Always resolve fileId before saving — handles fresh browser sessions
+      const existingId = await this.resolveFileId();
+
+      let res: Response;
+      if (existingId) {
         // Update existing file
-        await fetch(`${UPLOAD_API}/files/${this.fileId}?uploadType=media`, {
+        res = await fetch(`${UPLOAD_API}/files/${existingId}?uploadType=media`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${this.accessToken}`,
@@ -139,17 +170,27 @@ export class DriveService {
         const form = new FormData();
         form.append('metadata', new Blob([meta], { type: 'application/json' }));
         form.append('file', blob);
-        const res = await fetch(`${UPLOAD_API}/files?uploadType=multipart&fields=id`, {
+        res = await fetch(`${UPLOAD_API}/files?uploadType=multipart&fields=id`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${this.accessToken}` },
           body: form,
         });
-        const created = await res.json();
-        this.fileId = created.id;
+        if (res.ok) {
+          const created = await res.json();
+          this.fileId = created.id;
+        }
       }
+
+      if (!res.ok) {
+        console.error('[Drive] save failed, status:', res.status, await res.text());
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      console.log('[Drive] saved successfully');
       this.zone.run(() => this.syncStatus$.next('saved'));
       window.dispatchEvent(new CustomEvent('lore-toast', { detail: '✓ Saved to Google Drive' }));
-    } catch {
+    } catch (e) {
+      console.error('[Drive] save error:', e);
       this.zone.run(() => this.syncStatus$.next('error'));
       window.dispatchEvent(new CustomEvent('lore-toast', { detail: '⚠ Drive sync failed — check connection' }));
     }

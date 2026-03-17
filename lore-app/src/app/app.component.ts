@@ -98,18 +98,25 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private sub!: Subscription;
 
+  private sessionRestored = false;
+
   ngOnInit(): void {
     this.applyStoredAppearance();
     this.registerWindowHelpers();
     this.state$ = this.data.state$;
+
+    // Check if there's already a session before subscribing
+    // (isLoggedIn$ fires synchronously from BehaviorSubject)
+    this.sessionRestored = this.auth.isLoggedIn$.getValue();
 
     this.sub = this.auth.isLoggedIn$.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
       if (!loggedIn) {
         this.displayName = '';
         this.drive.clearToken();
-      } else if (this.auth.isLocalMode || !this.drive.hasToken()) {
-        // Session restored from localStorage (page reload) or local mode — load local data immediately
+        this.sessionRestored = false;
+      } else if (this.sessionRestored) {
+        // Page reload with existing session — load data immediately
         const user = this.auth.getCurrentUser();
         if (user) {
           this.displayName = user.name;
@@ -120,7 +127,7 @@ export class AppComponent implements OnInit, OnDestroy {
           }
         }
       }
-      // Fresh Google login: data loading is handled by loadUserData() called after Drive token is ready
+      // Fresh login: loadUserData() is called via (tokenReady) output after token is ready
     });
 
     this.drive.syncStatus$.subscribe(s => this.syncStatus = s);

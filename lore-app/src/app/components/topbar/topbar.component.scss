@@ -52,3 +52,74 @@
     border-color: var(--bh);
   }
 }
+
+// Manual save to Drive button
+.btn-save-drive {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--inp);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 12px;
+  color: var(--ts);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  .save-icon {
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--card2);
+    border-color: var(--bh);
+    color: var(--tp);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  &.saving {
+    color: var(--acc);
+    border-color: var(--acc);
+    background: var(--accl);
+
+    .save-icon {
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+
+  &.saved {
+    color: #16A34A;
+    border-color: #86EFAC;
+    background: #F0FDF4;
+  }
+
+  &.error {
+    color: #DC2626;
+    border-color: #FCA5A5;
+    background: #FFF1F2;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .btn-save-drive .save-lbl {
+    display: none;
+  }
+
+  .btn-save-drive {
+    padding: 5px 8px;
+  }
+}

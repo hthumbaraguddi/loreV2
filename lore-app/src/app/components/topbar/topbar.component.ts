@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
+import { SyncStatus } from '../../services/drive.service';
 
 @Component({
   selector: 'app-topbar',
@@ -16,11 +17,13 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Input() activeNotebookName: string = '';
   @Input() activeNotebookIcon: string = '';
   @Input() hasActiveNotebook: boolean = false;
+  @Input() syncStatus: SyncStatus = 'idle';
 
   @Output() searchChanged = new EventEmitter<string>();
   @Output() addSection = new EventEmitter<void>();
   @Output() addNote = new EventEmitter<void>();
   @Output() openTemplates = new EventEmitter<void>();
+  @Output() saveNow = new EventEmitter<void>();
 
   searchValue: string = '';
 
@@ -59,5 +62,27 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   onOpenTemplates(): void {
     this.openTemplates.emit();
+  }
+
+  onSaveNow(): void {
+    this.saveNow.emit();
+  }
+
+  get syncIcon(): string {
+    switch (this.syncStatus) {
+      case 'syncing': return '↻';
+      case 'saved':   return '✓';
+      case 'error':   return '⚠';
+      default:        return '☁';
+    }
+  }
+
+  get syncLabel(): string {
+    switch (this.syncStatus) {
+      case 'syncing': return 'Saving…';
+      case 'saved':   return 'Saved';
+      case 'error':   return 'Retry save';
+      default:        return 'Save';
+    }
   }
 }

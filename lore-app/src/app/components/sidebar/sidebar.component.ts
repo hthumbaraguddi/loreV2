@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, HostListener } from '@a
 import { CommonModule } from '@angular/common';
 import { AppState, Shelf, Notebook } from '../../models';
 import { DataService } from '../../services/data.service';
+import { AuthService } from '../../services/auth.service';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 @Component({
@@ -30,6 +31,7 @@ export class SidebarComponent {
   @Output() exportNotebook = new EventEmitter<Notebook>();
 
   private data = inject(DataService);
+  private auth = inject(AuthService);
 
   isMobileOpen = false;
 
@@ -45,7 +47,12 @@ export class SidebarComponent {
   }
 
   get userInitial(): string {
-    return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
+    const name = this.displayName || this.auth.getCurrentUser()?.name || '';
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
+
+  get resolvedDisplayName(): string {
+    return this.displayName || this.auth.getCurrentUser()?.name || 'User';
   }
 
   getNotebooksForShelf(shelfId: string): Notebook[] {

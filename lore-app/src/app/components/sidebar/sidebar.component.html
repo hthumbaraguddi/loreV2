@@ -83,7 +83,7 @@
     <div class="usr-pill" (click)="onOpenSettings()">
       <div class="usr-av">{{ userInitial }}</div>
       <div class="usr-info">
-        <div class="usr-nm">{{ displayName || 'User' }}</div>
+        <div class="usr-nm">{{ resolvedDisplayName }}</div>
         <div class="usr-role">Free plan</div>
       </div>
       <button class="btn-cog" title="Settings">

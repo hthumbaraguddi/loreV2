@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppState, CustomTemplate } from '../../models';
 import { AuthService } from '../../services/auth.service';
+import { DriveService } from '../../services/drive.service';
 import { ExportImportService } from '../../services/export-import.service';
 
 interface ThemeOption {
@@ -60,8 +61,13 @@ export class SettingsPanelComponent implements OnChanges {
   @Output() logout = new EventEmitter<void>();
   @Output() exportWorkspace = new EventEmitter<void>();
 
+  @Output() driveReconnected = new EventEmitter<void>();
+
   private authService = inject(AuthService);
+  private driveService = inject(DriveService);
   private exportImportService = inject(ExportImportService);
+
+  driveConnecting = false;
 
   themes = THEMES;
   fontSizes = [
@@ -163,6 +169,22 @@ export class SettingsPanelComponent implements OnChanges {
 
   get isLocalMode(): boolean {
     return this.authService.isLocalMode;
+  }
+
+  get driveConnected(): boolean {
+    return this.driveService.hasToken();
+  }
+
+  async onReconnectDrive(): Promise<void> {
+    this.driveConnecting = true;
+    try {
+      await this.driveService.requestToken();
+      this.driveConnecting = false;
+      this.driveReconnected.emit();
+    } catch (e) {
+      console.warn('Drive reconnect failed:', e);
+      this.driveConnecting = false;
+    }
   }
 
   get totalTemplateCount(): number {

@@ -128,7 +128,7 @@ export class AppComponent implements OnInit, OnDestroy {
           }
           // For Google users: re-acquire Drive token silently and sync from Drive
           if (!this.auth.isLocalMode) {
-            this.drive.requestToken()
+            this.drive.requestTokenSilent()
               .then(() => this.drive.load())
               .then(driveData => {
                 if (driveData?.state) {
@@ -139,7 +139,7 @@ export class AppComponent implements OnInit, OnDestroy {
                   }
                 }
               })
-              .catch(e => console.warn('[App] session restore: Drive sync skipped:', e));
+              .catch(e => console.warn('[App] session restore: Drive sync skipped (silent token failed):', e));
           }
         }
       }
@@ -413,6 +413,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onSettingsClosed(): void {
     this.isSettingsPanelOpen = false;
+  }
+
+  async onDriveReconnected(): Promise<void> {
+    // User reconnected Drive from settings — load latest data from Drive
+    const driveData = await this.drive.load();
+    if (driveData?.state) {
+      this.data.loadFromObject(driveData.state);
+      if (Array.isArray(driveData.customTemplates)) {
+        localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+      }
+      this.data.showToast('✓ Synced from Google Drive');
+    }
   }
 
   onThemeChanged(theme: string): void {

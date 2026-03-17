@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   errorMessage = '';
   driveConnecting = false;
-  showDriveConnect = false;
+  showDriveConnect = false;  // shown after Google sign-in if Drive token fails
 
   ngOnInit(): void {
     this.drive.init();
@@ -36,16 +36,22 @@ export class LoginComponent implements OnInit {
     this.tokenReady.emit();
   }
 
-  /** Called when user manually clicks "Connect Drive" after popup was blocked */
+  /** User explicitly clicks to authorize Drive — user gesture bypasses Safari popup block */
   async connectDrive(): Promise<void> {
     this.driveConnecting = true;
-    this.showDriveConnect = false;
     try {
       await this.drive.requestToken();
+      this.showDriveConnect = false;
+      this.tokenReady.emit();
     } catch (e) {
       console.warn('Drive connect failed:', e);
+      this.errorMessage = 'Drive access denied. You can still use the app without sync.';
+      this.driveConnecting = false;
     }
-    this.driveConnecting = false;
+  }
+
+  skipDrive(): void {
+    this.showDriveConnect = false;
     this.tokenReady.emit();
   }
 
@@ -58,12 +64,14 @@ export class LoginComponent implements OnInit {
             this.zone.run(async () => {
               const err = this.auth.loginWithGoogle(response.credential);
               if (err) { this.errorMessage = err; return; }
+
+              // Try silent token first (no popup — works if already authorized on this browser)
               try {
-                await this.drive.requestToken();
+                await this.drive.requestTokenSilent();
                 this.tokenReady.emit();
               } catch (e) {
-                console.warn('Drive token request failed:', e);
-                // Show manual connect button instead of blocking login
+                // Silent failed — show explicit authorize button (user gesture needed for popup)
+                console.warn('Silent Drive token failed, showing authorize button:', e);
                 this.showDriveConnect = true;
               }
             });

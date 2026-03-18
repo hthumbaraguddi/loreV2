@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SECTION_COLORS } from '../../../models';
 import { TemplateDefinition } from '../../../services/template.service';
+import { LoreIconComponent } from '../../lore-icon/lore-icon.component';
 
 /** Sample note data keyed by template id for preview */
 const SAMPLE_DATA: Record<string, Record<string, any>> = {
@@ -69,7 +70,7 @@ const SAMPLE_DATA: Record<string, Record<string, any>> = {
 @Component({
   selector: 'app-template-browser-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoreIconComponent],
   templateUrl: './template-browser-modal.component.html',
   styleUrls: ['./template-browser-modal.component.scss']
 })

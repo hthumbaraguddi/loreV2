@@ -13,6 +13,7 @@ import { AppState, CustomTemplate } from '../../models';
 import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
 import { ExportImportService } from '../../services/export-import.service';
+import { AnthropicService } from '../../services/anthropic.service';
 
 interface ThemeOption {
   id: string;
@@ -66,8 +67,13 @@ export class SettingsPanelComponent implements OnChanges {
   private authService = inject(AuthService);
   private driveService = inject(DriveService);
   private exportImportService = inject(ExportImportService);
+  private anthropicService = inject(AnthropicService);
 
   driveConnecting = false;
+
+  apiKey: string = '';
+  apiKeySyncDrive: boolean = false;
+  apiKeyStatus: 'idle' | 'validating' | 'valid' | 'invalid' = 'idle';
 
   themes = THEMES;
   fontSizes = [
@@ -88,6 +94,9 @@ export class SettingsPanelComponent implements OnChanges {
       const user = this.authService.getCurrentUser();
       this.displayName = user?.name ?? '';
       this.userEmail = user?.email ?? '';
+      this.apiKey = this.anthropicService.getApiKey() ?? '';
+      this.apiKeySyncDrive = localStorage.getItem('lore_anthropic_key_sync_drive') === 'true';
+      this.apiKeyStatus = 'idle';
     }
   }
 
@@ -189,5 +198,35 @@ export class SettingsPanelComponent implements OnChanges {
 
   get totalTemplateCount(): number {
     return 6 + (this.customTemplates?.length ?? 0);
+  }
+
+  async onSaveApiKey(): Promise<void> {
+    if (!this.apiKey.trim()) return;
+    this.apiKeyStatus = 'validating';
+    const valid = await this.anthropicService.validateApiKey(this.apiKey.trim());
+    if (valid) {
+      this.anthropicService.setApiKey(this.apiKey.trim());
+      this.apiKeyStatus = 'valid';
+    } else {
+      this.apiKeyStatus = 'invalid';
+    }
+  }
+
+  onRemoveApiKey(): void {
+    this.anthropicService.clearApiKey();
+    this.apiKey = '';
+    this.apiKeyStatus = 'idle';
+  }
+
+  onApiKeySyncChange(): void {
+    if (this.apiKeySyncDrive) {
+      localStorage.setItem('lore_anthropic_key_sync_drive', 'true');
+    } else {
+      localStorage.removeItem('lore_anthropic_key_sync_drive');
+    }
+  }
+
+  get hasApiKey(): boolean {
+    return !!this.anthropicService.getApiKey();
   }
 }

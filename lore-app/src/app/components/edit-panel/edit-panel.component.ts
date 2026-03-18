@@ -12,17 +12,20 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Note } from '../../models';
 import { TemplateService, TemplateDefinition } from '../../services/template.service';
+import { PasteAiResponseModalComponent } from '../modals/paste-ai-response-modal/paste-ai-response-modal.component';
+import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 @Component({
   selector: 'app-edit-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PasteAiResponseModalComponent, LoreIconComponent],
   templateUrl: './edit-panel.component.html',
   styleUrls: ['./edit-panel.component.scss'],
 })
 export class EditPanelComponent implements OnChanges {
   @Input() note: Note | null = null;
   @Input() sectionId: string | null = null;
+  @Input() notebookId: string | null = null;
   @Input() isOpen: boolean = false;
 
   @Output() saved = new EventEmitter<{ title: string; templateId: string; data: Record<string, any> }>();
@@ -36,6 +39,13 @@ export class EditPanelComponent implements OnChanges {
   selectedTemplate: TemplateDefinition | null = null;
   noteTitle: string = '';
   formHtml: SafeHtml = '';
+  pasteModalOpen = false;
+
+  get pasteTarget(): { notebookId: string; sectionId: string } | null {
+    return this.notebookId && this.sectionId
+      ? { notebookId: this.notebookId, sectionId: this.sectionId }
+      : null;
+  }
 
   get isEdit(): boolean {
     return !!this.note;
@@ -85,8 +95,10 @@ export class EditPanelComponent implements OnChanges {
 
   onSave(): void {
     if (!this.selectedTemplate) return;
-    const title = this.noteTitle.trim();
     const data = this.selectedTemplate.readForm();
+    const title = this.selectedTemplate.id === 'rich'
+      ? (data['title'] as string || 'Untitled Note')
+      : this.noteTitle.trim();
     this.saved.emit({ title, templateId: this.selectedTemplate.id, data });
   }
 
@@ -95,6 +107,32 @@ export class EditPanelComponent implements OnChanges {
   }
 
   onClose(): void {
+    this.closed.emit();
+  }
+
+  openPasteModal(): void {
+    this.pasteModalOpen = true;
+  }
+
+  templateIcon(tpl: TemplateDefinition): string {
+    const map: Record<string, string> = {
+      rich:       'note',
+      research:   'lightbulb',
+      finance:    'chart-bar',
+      watchlist:  'bookmark',
+      journal:    'calendar',
+      scrum:      'milestone',
+      investing:  'inv-chart',
+    };
+    return map[tpl.id] ?? 'template';
+  }
+
+  onPasteModalClosed(): void {
+    this.pasteModalOpen = false;
+  }
+
+  onPasteNoteSaved(): void {
+    this.pasteModalOpen = false;
     this.closed.emit();
   }
 }

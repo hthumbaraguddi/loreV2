@@ -86,8 +86,11 @@
   max-width: 84px;
 
   .tc-ico {
-    font-size: 18px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
   }
 
   .tc-nm {
@@ -134,6 +137,9 @@
 }
 
 .btn-del {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: transparent;
   border: 1px solid rgba(220, 38, 38, 0.4);
   color: #DC2626;
@@ -154,5 +160,24 @@
 @media (max-width: 768px) {
   .ep {
     width: 100% !important;
+  }
+}
+
+.btn-paste-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px dashed var(--acc);
+  color: var(--acc);
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--accl, rgba(99,102,241,0.08));
   }
 }

@@ -47,6 +47,14 @@
   font-weight: 600;
   color: var(--tp);
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mod-ttl-ico {
+  opacity: 0.6;
+  flex-shrink: 0;
 }
 
 .mod-desc {
@@ -198,6 +206,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 
   &:hover { opacity: 0.88; }
 }
@@ -211,6 +222,9 @@
   font-size: 12.5px;
   cursor: pointer;
   transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 
   &:hover { background: var(--inp); color: var(--tp); }
 }

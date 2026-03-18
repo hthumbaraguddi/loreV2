@@ -35,7 +35,8 @@
         (addSection)="onAddSection()"
         (addNote)="onAddNote(null)"
         (openTemplates)="onOpenTemplates()"
-        (saveNow)="onSaveNow()">
+        (saveNow)="onSaveNow()"
+        (openChat)="onOpenChat()">
       </app-topbar>
 
       <app-content-area
@@ -55,6 +56,7 @@
     <app-edit-panel
       [note]="editingNote"
       [sectionId]="editingNoteSection?.id ?? null"
+      [notebookId]="getActiveNotebook(state)?.id ?? null"
       [isOpen]="isEditPanelOpen"
       (saved)="onNoteSaved($event, state)"
       (deleted)="onNoteDeleted(state)"
@@ -76,6 +78,13 @@
       (driveReconnected)="onDriveReconnected()"
       (logout)="onLogout()">
     </app-settings-panel>
+
+    <!-- Chat Panel -->
+    <app-chat-panel
+      [isOpen]="isChatPanelOpen"
+      [activeNotebookId]="state.activeNotebookId"
+      (closed)="isChatPanelOpen = false">
+    </app-chat-panel>
 
     <!-- Shelf Modal -->
     <div class="ov" [class.show]="showShelfModal" (click)="onShelfCancelled()">

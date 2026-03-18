@@ -3,7 +3,10 @@
 
     <!-- Left: template list -->
     <div class="mod-left">
-      <h2 class="mod-ttl">📋 Note Templates</h2>
+      <h2 class="mod-ttl">
+        <lore-icon name="template" [size]="16" class="mod-ttl-ico"></lore-icon>
+        Note Templates
+      </h2>
       <p class="mod-desc">Pick a template to preview it, then click Use to apply.</p>
 
       <div class="tpl-grid">
@@ -22,14 +25,20 @@
       <div class="tpl-browser-new">
         <span class="tpl-browser-new-lbl">Want something custom?</span>
         <div class="tpl-browser-new-acts">
-          <button class="btn-sec" (click)="onImportTemplate()">📥 Import</button>
-          <button class="btn-prim" (click)="onBuildTemplate()">🧩 Build Template</button>
+          <button class="btn-sec" (click)="onImportTemplate()">
+            <lore-icon name="import" [size]="13"></lore-icon> Import
+          </button>
+          <button class="btn-prim" (click)="onBuildTemplate()">
+            <lore-icon name="template-plus" [size]="13"></lore-icon> Build Template
+          </button>
         </div>
       </div>
 
       <div class="mod-act">
         <button class="btn-sec" (click)="cancel()">Close</button>
-        <button class="btn-prim" *ngIf="selectedId" (click)="select(selectedId)">Use Template</button>
+        <button class="btn-prim" *ngIf="selectedId" (click)="select(selectedId)">
+          <lore-icon name="check" [size]="13"></lore-icon> Use Template
+        </button>
       </div>
     </div>
 
@@ -37,7 +46,9 @@
     <div class="mod-preview" *ngIf="previewHtml !== null">
       <div class="prev-hdr">
         <span class="prev-ttl">Preview</span>
-        <button class="prev-close" (click)="clearPreview()">✕</button>
+        <button class="prev-close" (click)="clearPreview()">
+          <lore-icon name="close" [size]="11"></lore-icon>
+        </button>
       </div>
       <div class="prev-note-card">
         <div class="card-hdr" style="cursor:default">

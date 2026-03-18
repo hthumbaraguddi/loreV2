@@ -6,6 +6,7 @@
 
     <!-- Left column: marketing -->
     <div class="land-left">
+
       <div class="land-brand">
         <svg viewBox="0 0 36 36" fill="none" class="brand-svg">
           <rect width="36" height="36" rx="9" fill="url(#ll1)"/>
@@ -23,44 +24,81 @@
           </defs>
         </svg>
         <span class="brand-name">Lore</span>
-        <span class="brand-ver">v1.0</span>
+        <span class="brand-ver">v2.1</span>
+        <span class="brand-ai-pill">AI-Powered</span>
       </div>
 
-      <h1 class="land-headline">Your knowledge,<br><span class="hl-grad">beautifully organised</span></h1>
-      <p class="land-sub">A personal knowledge base built for thinkers, researchers, and builders. Capture ideas, track progress, and connect the dots — all in one place.</p>
+      <h1 class="land-headline">Your knowledge,<br><span class="hl-grad">supercharged by AI</span></h1>
+      <p class="land-sub">Capture ideas, let AI track patterns, organise your notes, and generate insights — all in one place.</p>
 
-      <div class="feat-list">
+      <!-- AI section label -->
+      <div class="section-label">
+        <span class="section-label-dot ai-dot"></span>
+        AI Features
+      </div>
+
+      <!-- AI feature cards — horizontal 3-col grid -->
+      <div class="ai-cards">
+        <div class="ai-card">
+          <div class="ai-card-ico"><lore-icon name="pulse" [size]="15"></lore-icon></div>
+          <div class="ai-card-ttl">Track &amp; Surface</div>
+          <div class="ai-card-desc">Surfaces connections and patterns across all your notebooks.</div>
+        </div>
+        <div class="ai-card">
+          <div class="ai-card-ico"><lore-icon name="layers" [size]="15"></lore-icon></div>
+          <div class="ai-card-ttl">Organise Smarter</div>
+          <div class="ai-card-desc">Ask AI to summarise, tag, or restructure notes in plain English.</div>
+        </div>
+        <div class="ai-card">
+          <div class="ai-card-ico"><lore-icon name="note-plus" [size]="15"></lore-icon></div>
+          <div class="ai-card-ttl">Generate Notes</div>
+          <div class="ai-card-desc">Run prompts on a schedule — weekly digests, summaries, journals.</div>
+        </div>
+      </div>
+
+      <!-- Core features label -->
+      <div class="section-label" style="margin-top: 16px">
+        <span class="section-label-dot"></span>
+        Core Features
+      </div>
+
+      <!-- Core features — 2-col grid -->
+      <div class="feat-grid">
         <div class="feat-item">
-          <span class="feat-ico"><lore-icon name="shelf" [size]="18"></lore-icon></span>
+          <span class="feat-ico"><lore-icon name="shelf" [size]="14"></lore-icon></span>
           <div>
             <div class="feat-ttl">Shelves &amp; Notebooks</div>
-            <div class="feat-desc">Organise everything into shelves, notebooks, and sections — your way.</div>
+            <div class="feat-desc">Organise into shelves, notebooks, and sections.</div>
           </div>
         </div>
         <div class="feat-item">
-          <span class="feat-ico"><lore-icon name="template-plus" [size]="18"></lore-icon></span>
+          <span class="feat-ico"><lore-icon name="template-plus" [size]="14"></lore-icon></span>
           <div>
             <div class="feat-ttl">8 Built-in Templates</div>
-            <div class="feat-desc">Research, Journal, Finance, Scrum, Watchlist, Investing — and more.</div>
+            <div class="feat-desc">Research, Journal, Finance, Scrum &amp; more.</div>
           </div>
         </div>
         <div class="feat-item">
-          <span class="feat-ico"><lore-icon name="search" [size]="18"></lore-icon></span>
+          <span class="feat-ico"><lore-icon name="search" [size]="14"></lore-icon></span>
           <div>
             <div class="feat-ttl">Instant Search</div>
-            <div class="feat-desc">Find any note across all notebooks in milliseconds with live highlighting.</div>
+            <div class="feat-desc">Find any note across all notebooks instantly.</div>
           </div>
         </div>
         <div class="feat-item">
-          <span class="feat-ico"><lore-icon name="export" [size]="18"></lore-icon></span>
+          <span class="feat-ico"><lore-icon name="export" [size]="14"></lore-icon></span>
           <div>
-            <div class="feat-ttl">Export &amp; Import</div>
-            <div class="feat-desc">Share notebooks as readable HTML or portable JSON. Import them back anytime.</div>
+            <div class="feat-ttl">Export &amp; Sync</div>
+            <div class="feat-desc">HTML/JSON export. Sync to Google Drive.</div>
           </div>
         </div>
       </div>
 
-      <div class="land-badge"><lore-icon name="lock" [size]="12" style="margin-right:6px;opacity:.6"></lore-icon>Sync to Google Drive or use locally — your choice</div>
+      <div class="land-badge">
+        <lore-icon name="lock" [size]="11" style="margin-right:5px;opacity:.5"></lore-icon>
+        Your API key, your data — AI runs on your own key
+      </div>
+
     </div>
 
     <!-- Divider -->
@@ -99,7 +137,7 @@
             <div class="lg-google-inner">
               <div id="google-btn"></div>
             </div>
-            <div class="lg-google-hint">Continue with your Google account — syncs to Drive</div>
+            <div class="lg-google-hint">Sign in with Google — syncs your notes to Drive</div>
           </div>
         </div>
 
@@ -114,9 +152,20 @@
         </button>
         <div class="lg-local-hint">No account needed · Saved in this browser</div>
 
+        <!-- AI providers hint -->
+        <div class="lg-ai-hint">
+          <div class="lg-ai-hint-ttl">Works with any AI provider</div>
+          <div class="lg-ai-hint-providers">
+            <span>Claude</span>
+            <span>Gemini</span>
+            <span>Groq</span>
+            <span>OpenRouter</span>
+            <span>+ more</span>
+          </div>
+        </div>
+
         <div class="lg-err">{{ errorMessage }}</div>
 
-        <!-- Shown when Drive popup was blocked (e.g. Safari) -->
         <div *ngIf="showDriveConnect" class="lg-drive-connect">
           <p>To sync your notes across devices, allow Drive access.</p>
           <button class="lg-local-btn" (click)="connectDrive()" [disabled]="driveConnecting">
@@ -128,6 +177,7 @@
           </button>
           <button class="lg-skip-btn" (click)="skipDrive()">Skip — continue without sync</button>
         </div>
+
       </div>
     </div>
 

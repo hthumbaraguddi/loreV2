@@ -371,3 +371,152 @@ Variable type is inferred by name:
 | 4 | Prompts shareable/exportable? | **Yes** — prompts can be exported as `.json` and imported, same pattern as notebooks |
 | 5 | Variable values pre-filled from last run? | **Yes** — last-used values are persisted per prompt and pre-filled on next run |
 | 6 | Built-in starter prompts? | **Yes** — ship with at least: Research Summary, Weekly Stock Analysis, Monthly Portfolio Review, Monthly Budget Review |
+
+
+---
+
+## Phase 5 — AI Intelligence Features
+
+*Added March 2026. These features make Lore actively useful rather than just a storage layer.*
+
+---
+
+### US-11: Track & Surface — Cross-Notebook Connections
+> As a user, I want Lore to surface connections and recurring themes across all my notebooks, so I can discover patterns I didn't notice myself.
+
+**How it works:**
+- User clicks "Surface Connections" from the topbar or sidebar AI menu
+- Lore collects all note titles + content (or a truncated summary per note to stay within token limits)
+- Sends to AI with a prompt: *"Analyse these notes and identify: recurring themes, related ideas across different notebooks, knowledge gaps, and any contradictions."*
+- Result is shown in a read-only panel (not saved automatically)
+- User can save the result as a Rich Note with one click
+
+**Acceptance criteria:**
+- Works across all shelves and notebooks the user has
+- Respects token limits — if total content exceeds ~80k tokens, uses note titles + first 200 chars per note
+- Shows a loading state while AI processes
+- Result is formatted as markdown (themes as headings, notes referenced by title)
+- "Save as note" saves to a user-selected section
+- Requires API key — shows settings prompt if not configured
+- Works with any configured AI provider (not just Anthropic)
+
+**Scope constraint:** No embeddings, no vector DB, no backend. Pure prompt-based analysis using the user's own API key.
+
+---
+
+### US-12: Organise Smarter — AI Note Actions
+> As a user, I want to select a note and ask AI to summarise, tag, or restructure it in plain English, so I can improve my notes without manual effort.
+
+**How it works:**
+- A small "AI" button (sparkle icon) appears on each note card on hover
+- Clicking it opens a compact action menu with preset actions + a free-text input
+- User picks an action or types their own instruction
+- AI processes the note content and returns a result
+- User can preview the result and choose to: replace the note content, append to it, or save as a new note
+
+**Preset actions (one-click):**
+- Summarise — condense to key points
+- Extract tags — suggest 3–5 relevant tags
+- Expand — add more detail and context
+- Simplify — rewrite in plain language
+- Action items — extract a to-do list from the note
+
+**Free-text instruction examples:**
+- "Rewrite this as a formal report"
+- "Translate to bullet points"
+- "Add a TL;DR at the top"
+
+**Acceptance criteria:**
+- AI button visible on hover on note cards (not cluttering the default view)
+- Preset actions shown as quick-tap chips
+- Free-text input for custom instructions
+- Preview panel shows AI result before applying
+- Three apply options: Replace / Append / Save as new note
+- Requires API key — shows settings prompt if not configured
+- Works on Rich Notes and structured template notes (content extracted from all fields)
+- Undo is supported — original content preserved until user explicitly confirms replace
+
+---
+
+### US-13: Smart Search — Ask Your Notes
+> As a user, I want to ask a question in plain English and get an answer drawn from my notes, so I can find information without remembering exact keywords.
+
+**How it works:**
+- Search bar gets an "Ask AI" toggle
+- When toggled on, the query is sent to AI along with all note content (same truncation strategy as US-11)
+- AI returns a direct answer with references to which notes it drew from
+- Clicking a reference opens that note
+
+**Acceptance criteria:**
+- Toggle between keyword search and AI search in the existing search bar
+- AI search shows a "Searching your notes…" loading state
+- Response includes the answer + "Sources: [Note Title], [Note Title]" links
+- Falls back to keyword search if no API key configured
+- Works within a single notebook or across all notebooks (scope selector)
+
+**Scope constraint:** No embeddings. Prompt-based only. For large note collections, uses titles + summaries to stay within token limits.
+
+---
+
+### US-14: Daily Digest — Scheduled AI Summary
+> As a user, I want Lore to generate a brief daily or weekly digest of my recent notes, so I stay on top of what I've captured without re-reading everything.
+
+**How it works:**
+- User enables "Daily Digest" in Settings → AI
+- Chooses frequency: daily or weekly
+- On next app open after the scheduled time, Lore auto-generates a digest
+- Digest covers notes created/modified in the last 24h (daily) or 7 days (weekly)
+- Saved automatically as a Rich Note in a user-configured "Digest" section
+
+**Acceptance criteria:**
+- Opt-in only — off by default
+- Frequency: daily or weekly
+- Target section configurable (defaults to first notebook's first section)
+- Digest format: brief summary per notebook with key points from recent notes
+- Generated on app open if schedule has elapsed (no background service needed)
+- Requires API key
+- User can manually trigger a digest at any time ("Generate digest now" button)
+
+---
+
+### US-15: Note Linking — AI-Suggested Related Notes
+> As a user, I want to see AI-suggested related notes when I'm viewing or editing a note, so I can connect ideas across my knowledge base.
+
+**How it works:**
+- When a note is open in the edit panel, a "Related" section appears at the bottom
+- Shows 2–3 notes that the AI considers related based on content similarity
+- Clicking a related note opens it
+
+**Acceptance criteria:**
+- Related notes shown in edit panel footer (collapsed by default, expandable)
+- Computed on demand (button: "Find related notes") — not automatic on every open
+- Uses AI to compare current note content against other notes (same truncation strategy)
+- Shows note title + notebook path for each suggestion
+- Requires API key
+
+---
+
+## Technical Notes for Phase 5
+
+### Token budget strategy
+All cross-note AI features use the same truncation approach:
+1. Collect all notes as `{ title, notebookName, content }`
+2. If total chars > 200,000 (~50k tokens): use title + first 300 chars per note
+3. If total chars > 600,000 (~150k tokens): use title only
+4. Always include the full content of the currently active note (for US-12, US-15)
+
+### Shared AI context builder
+A new `AiContextService` handles note collection and truncation:
+```typescript
+buildNotesContext(notes: Note[], maxChars: number): string
+```
+Used by US-11, US-13, US-14, US-15 to avoid duplicating truncation logic.
+
+### No new storage required
+- US-11, US-13: results are transient (shown in panel, optionally saved as Rich Note)
+- US-12: modifies existing note in place (with undo buffer in memory)
+- US-14: saves as Rich Note via existing `DataService.addNote`
+- US-15: suggestions are transient (not persisted)
+
+### Provider compatibility
+All Phase 5 features use `AnthropicService.sendMessage` which already supports multiple providers (Anthropic, OpenAI-compatible, Gemini). No provider-specific code needed in Phase 5 features.

@@ -14,7 +14,9 @@
           *ngFor="let icon of icons"
           class="ic"
           [class.sel]="icon === selectedIcon"
-          (click)="pickIcon(icon)">{{ icon }}</div>
+          (click)="pickIcon(icon)">
+          <lore-icon [name]="icon" [size]="18"></lore-icon>
+        </div>
       </div>
     </div>
 

@@ -41,7 +41,7 @@
           [ngModel]="currentFontSize"
           (ngModelChange)="onFontSizeChange($event)"
         >
-          <option *ngFor="let fs of fontSizes" [value]="fs.value">{{ fs.label }}</option>
+          <option *ngFor="let fs of fontSizes" [ngValue]="fs.value">{{ fs.label }}</option>
         </select>
       </div>
 

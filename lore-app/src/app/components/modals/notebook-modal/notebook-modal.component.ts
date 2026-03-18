@@ -2,17 +2,19 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Shelf, Notebook } from '../../../models';
+import { LoreIconComponent } from '../../lore-icon/lore-icon.component';
 
 const NOTEBOOK_ICONS = [
-  '📓', '📚', '🧠', '💡', '🚀', '🎯', '🛠️', '⚙️', '🔬', '💼',
-  '🎨', '📊', '🌍', '🌱', '🔐', '🤖', '✨', '🎓', '💻', '📝',
-  '🔭', '🏗️', '📐', '🧩', '📈', '💰', '🎬', '🏃', '🌅', '📋'
+  'notebook', 'shelf', 'folder', 'note', 'lightbulb', 'star', 'bookmark',
+  'layers', 'archive', 'calendar', 'chart-bar', 'database', 'image', 'video',
+  'audio', 'lock', 'settings', 'user', 'users', 'filter', 'search', 'link',
+  'pin', 'milestone', 'pulse', 'quote', 'draft', 'badge', 'inbox', 'template'
 ];
 
 @Component({
   selector: 'app-notebook-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoreIconComponent],
   templateUrl: './notebook-modal.component.html',
   styleUrls: ['./notebook-modal.component.scss']
 })

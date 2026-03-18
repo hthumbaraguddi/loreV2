@@ -96,18 +96,58 @@
 
       <!-- ── AI (Claude) ── -->
       <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">AI (Claude)</div>
+        <div class="sp-sec-ttl">AI Provider</div>
       </div>
       <div class="sp-ai-section">
-        <div class="sp-pf">
-          <label class="sp-pl">Anthropic API Key</label>
+
+        <!-- Provider cards -->
+        <div class="sp-ai-providers">
+          <div
+            *ngFor="let p of providers"
+            class="sp-ai-prov"
+            [class.sel]="selectedProviderId === p.id"
+            (click)="onSelectProvider(p.id)"
+          >
+            <div class="sp-ai-prov-top">
+              <span class="sp-ai-prov-name">{{ p.name }}</span>
+              <span class="sp-ai-badge" [class.free]="p.free" [class.paid]="!p.free">
+                {{ p.free ? 'Free' : 'Paid' }}
+              </span>
+            </div>
+            <div class="sp-ai-prov-label">{{ p.label }}</div>
+          </div>
+        </div>
+
+        <!-- Selected provider note + link -->
+        <div class="sp-ai-prov-note" *ngIf="selectedProvider.note">
+          {{ selectedProvider.note }}
+          <a *ngIf="selectedProvider.url" [href]="selectedProvider.url" target="_blank" rel="noopener" class="sp-ai-link">
+            Get key →
+          </a>
+        </div>
+
+        <!-- API Key input -->
+        <div class="sp-pf" style="margin-top: 10px">
+          <label class="sp-pl">API Key</label>
           <input
             class="sp-pin sp-api-key-input"
             type="password"
             [(ngModel)]="apiKey"
-            placeholder="sk-ant-…"
+            [placeholder]="selectedProvider.keyPlaceholder"
           />
         </div>
+
+        <!-- Custom endpoint (only for providers that support it) -->
+        <div class="sp-pf" style="margin-top: 8px" *ngIf="selectedProvider.supportsCustomEndpoint">
+          <label class="sp-pl">API Endpoint URL</label>
+          <input
+            class="sp-pin"
+            type="text"
+            [(ngModel)]="apiEndpoint"
+            [placeholder]="selectedProvider.defaultEndpoint || 'https://your-endpoint/v1/messages'"
+          />
+        </div>
+
         <div class="sp-ai-actions">
           <button class="sp-ai-save" (click)="onSaveApiKey()" [disabled]="!apiKey.trim() || apiKeyStatus === 'validating'">
             {{ apiKeyStatus === 'validating' ? 'Validating…' : 'Save & Validate' }}
@@ -115,14 +155,13 @@
           <button *ngIf="hasApiKey" class="sp-ai-remove" (click)="onRemoveApiKey()">Remove</button>
         </div>
         <div *ngIf="apiKeyStatus === 'valid'" class="sp-ai-status valid">✓ API key is valid</div>
-        <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check and try again</div>
+        <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check key and endpoint</div>
         <div class="sp-ai-sync-row">
           <label class="sp-ai-sync-label">
             <input type="checkbox" [(ngModel)]="apiKeySyncDrive" (ngModelChange)="onApiKeySyncChange()" />
             Sync API key to Google Drive
           </label>
         </div>
-        <a class="sp-ai-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get your API key →</a>
       </div>
 
       <!-- ── Account ── -->

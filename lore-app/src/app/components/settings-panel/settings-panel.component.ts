@@ -13,7 +13,7 @@ import { AppState, CustomTemplate } from '../../models';
 import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
 import { ExportImportService } from '../../services/export-import.service';
-import { AnthropicService } from '../../services/anthropic.service';
+import { AnthropicService, AI_PROVIDERS, AiProvider } from '../../services/anthropic.service';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 interface ThemeOption {
@@ -73,8 +73,16 @@ export class SettingsPanelComponent implements OnChanges {
   driveConnecting = false;
 
   apiKey: string = '';
+  apiEndpoint: string = '';
   apiKeySyncDrive: boolean = false;
   apiKeyStatus: 'idle' | 'validating' | 'valid' | 'invalid' = 'idle';
+
+  providers = AI_PROVIDERS;
+  selectedProviderId: string = 'anthropic';
+
+  get selectedProvider(): AiProvider {
+    return this.providers.find(p => p.id === this.selectedProviderId) ?? this.providers[0];
+  }
 
   themes = THEMES;
   fontSizes = [
@@ -96,6 +104,8 @@ export class SettingsPanelComponent implements OnChanges {
       this.displayName = user?.name ?? '';
       this.userEmail = user?.email ?? '';
       this.apiKey = this.anthropicService.getApiKey() ?? '';
+      this.selectedProviderId = this.anthropicService.getProviderId();
+      this.apiEndpoint = this.anthropicService.getEndpoint();
       this.apiKeySyncDrive = localStorage.getItem('lore_anthropic_key_sync_drive') === 'true';
       this.apiKeyStatus = 'idle';
     }
@@ -201,12 +211,28 @@ export class SettingsPanelComponent implements OnChanges {
     return 6 + (this.customTemplates?.length ?? 0);
   }
 
+  onSelectProvider(id: string): void {
+    this.selectedProviderId = id;
+    this.apiKeyStatus = 'idle';
+    const p = this.selectedProvider;
+    // Pre-fill endpoint with provider default if it's a custom-endpoint provider
+    if (p.supportsCustomEndpoint) {
+      this.apiEndpoint = p.defaultEndpoint;
+    }
+  }
+
   async onSaveApiKey(): Promise<void> {
     if (!this.apiKey.trim()) return;
     this.apiKeyStatus = 'validating';
-    const valid = await this.anthropicService.validateApiKey(this.apiKey.trim());
+    const p = this.selectedProvider;
+    const endpoint = p.supportsCustomEndpoint && this.apiEndpoint.trim()
+      ? this.apiEndpoint.trim()
+      : p.defaultEndpoint;
+    const valid = await this.anthropicService.validateApiKey(this.apiKey.trim(), p.id, endpoint);
     if (valid) {
       this.anthropicService.setApiKey(this.apiKey.trim());
+      this.anthropicService.setProviderId(p.id);
+      this.anthropicService.setEndpoint(endpoint);
       this.apiKeyStatus = 'valid';
     } else {
       this.apiKeyStatus = 'invalid';

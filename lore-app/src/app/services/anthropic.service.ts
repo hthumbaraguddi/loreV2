@@ -1,11 +1,108 @@
 import { Injectable } from '@angular/core';
 import { ChatMessage } from '../models';
 
+export interface AiProvider {
+  id: string;
+  name: string;
+  label: string;
+  free: boolean;
+  url: string;
+  keyPlaceholder: string;
+  defaultEndpoint: string;
+  supportsCustomEndpoint: boolean;
+  note?: string;
+}
+
+export const AI_PROVIDERS: AiProvider[] = [
+  {
+    id: 'anthropic',
+    name: 'Anthropic (Official)',
+    label: 'Claude 3.5 Sonnet',
+    free: false,
+    url: 'https://console.anthropic.com/settings/keys',
+    keyPlaceholder: 'sk-ant-…',
+    defaultEndpoint: 'https://api.anthropic.com/v1/messages',
+    supportsCustomEndpoint: false,
+    note: 'Paid — $5 free credit on signup',
+  },
+  {
+    id: 'clod',
+    name: 'Clod.io',
+    label: 'Claude-compatible · Free tier',
+    free: true,
+    url: 'https://app.clod.io/',
+    keyPlaceholder: 'Paste your Clod.io API key',
+    defaultEndpoint: 'https://api.clod.io/v1/messages',
+    supportsCustomEndpoint: true,
+    note: 'Free tier available — Claude-compatible API',
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    label: 'Multi-model · Free models available',
+    free: true,
+    url: 'https://openrouter.ai/keys',
+    keyPlaceholder: 'sk-or-…',
+    defaultEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    supportsCustomEndpoint: false,
+    note: 'Free models like Llama, Mistral, Gemma',
+  },
+  {
+    id: 'groq',
+    name: 'Groq',
+    label: 'Ultra-fast inference · Free tier',
+    free: true,
+    url: 'https://console.groq.com/keys',
+    keyPlaceholder: 'gsk_…',
+    defaultEndpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    supportsCustomEndpoint: false,
+    note: 'Free tier — Llama 3, Mixtral, Gemma',
+  },
+  {
+    id: 'together',
+    name: 'Together AI',
+    label: 'Open-source models · $1 free credit',
+    free: true,
+    url: 'https://api.together.xyz/settings/api-keys',
+    keyPlaceholder: 'Paste your Together AI key',
+    defaultEndpoint: 'https://api.together.xyz/v1/chat/completions',
+    supportsCustomEndpoint: false,
+    note: '$1 free credit on signup',
+  },
+  {
+    id: 'gemini',
+    name: 'Google Gemini',
+    label: 'Gemini 1.5 Flash · Free tier',
+    free: true,
+    url: 'https://aistudio.google.com/app/apikey',
+    keyPlaceholder: 'AIza…',
+    defaultEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent',
+    supportsCustomEndpoint: false,
+    note: 'Free tier via Google AI Studio — generous limits',
+  },
+  {
+    id: 'custom',
+    name: 'Custom Endpoint',
+    label: 'Any OpenAI-compatible API',
+    free: false,
+    url: '',
+    keyPlaceholder: 'Your API key',
+    defaultEndpoint: '',
+    supportsCustomEndpoint: true,
+    note: 'Bring your own OpenAI-compatible endpoint',
+  },
+];
+
 @Injectable({ providedIn: 'root' })
 export class AnthropicService {
   readonly API_KEY_STORAGE = 'lore_anthropic_key';
+  readonly ENDPOINT_STORAGE = 'lore_ai_endpoint';
+  readonly PROVIDER_STORAGE = 'lore_ai_provider';
   readonly MODEL = 'claude-3-5-sonnet-20241022';
-  private readonly API_URL = 'https://api.anthropic.com/v1/messages';
+
+  private get apiUrl(): string {
+    return localStorage.getItem(this.ENDPOINT_STORAGE) || 'https://api.anthropic.com/v1/messages';
+  }
 
   getApiKey(): string | null {
     return localStorage.getItem(this.API_KEY_STORAGE);
@@ -19,23 +116,91 @@ export class AnthropicService {
     localStorage.removeItem(this.API_KEY_STORAGE);
   }
 
-  async validateApiKey(key: string): Promise<boolean> {
+  getEndpoint(): string {
+    return localStorage.getItem(this.ENDPOINT_STORAGE) || 'https://api.anthropic.com/v1/messages';
+  }
+
+  setEndpoint(url: string): void {
+    if (url.trim()) {
+      localStorage.setItem(this.ENDPOINT_STORAGE, url.trim());
+    } else {
+      localStorage.removeItem(this.ENDPOINT_STORAGE);
+    }
+  }
+
+  getProviderId(): string {
+    return localStorage.getItem(this.PROVIDER_STORAGE) || 'anthropic';
+  }
+
+  setProviderId(id: string): void {
+    localStorage.setItem(this.PROVIDER_STORAGE, id);
+  }
+
+  private buildHeaders(key: string, providerId: string): Record<string, string> {
+    const base: Record<string, string> = { 'content-type': 'application/json' };
+    if (providerId === 'anthropic' || providerId === 'clod') {
+      return {
+        ...base,
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      };
+    }
+    // OpenAI-compatible (OpenRouter, Groq, Together, custom)
+    return { ...base, 'Authorization': `Bearer ${key}` };
+  }
+
+  private buildBody(messages: ChatMessage[], providerId: string, stream: boolean): object {
+    if (providerId === 'anthropic' || providerId === 'clod') {
+      return { model: this.MODEL, max_tokens: stream ? 4096 : 1, stream, messages };
+    }
+    if (providerId === 'gemini') {
+      // Gemini uses its own format — handled separately in sendMessage
+      return {};
+    }
+    // OpenAI-compatible format
+    const model = providerId === 'groq' ? 'llama3-70b-8192'
+      : providerId === 'together' ? 'meta-llama/Llama-3-70b-chat-hf'
+      : providerId === 'openrouter' ? 'meta-llama/llama-3.1-8b-instruct:free'
+      : 'gpt-3.5-turbo';
+    return {
+      model,
+      max_tokens: stream ? 4096 : 1,
+      stream,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+    };
+  }
+
+  private buildGeminiBody(messages: ChatMessage[]): object {
+    return {
+      contents: messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+      generationConfig: { maxOutputTokens: 4096 },
+    };
+  }
+
+  async validateApiKey(key: string, providerId?: string, endpoint?: string): Promise<boolean> {
+    const pid = providerId || this.getProviderId();
+    const url = endpoint || this.apiUrl;
     try {
-      const response = await fetch(this.API_URL, {
+      if (pid === 'gemini') {
+        // Gemini validation: use generateContent (non-streaming) with ?key= param
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: 'hi' }] }], generationConfig: { maxOutputTokens: 1 } }),
+        });
+        return response.ok || response.status === 400;
+      }
+      const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: this.MODEL,
-          max_tokens: 1,
-          messages: [{ role: 'user', content: 'hi' }],
-        }),
+        headers: this.buildHeaders(key, pid),
+        body: JSON.stringify(this.buildBody([{ role: 'user', content: 'hi' }], pid, false)),
       });
-      return response.ok || response.status === 400;
+      return response.ok || response.status === 400 || response.status === 422;
     } catch {
       return false;
     }
@@ -45,22 +210,63 @@ export class AnthropicService {
     const key = this.getApiKey();
     if (!key) throw new Error('NO_KEY');
 
+    const pid = this.getProviderId();
+
+    // ── Gemini path ──────────────────────────────────────────────────────────
+    if (pid === 'gemini') {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${key}`;
+      let response: Response;
+      try {
+        response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(this.buildGeminiBody(messages)),
+        });
+      } catch {
+        throw new Error('NETWORK_ERROR');
+      }
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) throw new Error('INVALID_KEY');
+        if (response.status === 429) throw new Error('RATE_LIMITED');
+        throw new Error('API_ERROR');
+      }
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('STREAM_ERROR');
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') return;
+            try {
+              const parsed = JSON.parse(data);
+              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) onChunk(text);
+            } catch { /* skip */ }
+          }
+        }
+      } catch {
+        throw new Error('STREAM_INTERRUPTED');
+      }
+      return;
+    }
+
+    // ── Anthropic / OpenAI-compatible path ───────────────────────────────────
+    const isAnthropicStyle = pid === 'anthropic' || pid === 'clod';
+
     let response: Response;
     try {
-      response = await fetch(this.API_URL, {
+      response = await fetch(this.apiUrl, {
         method: 'POST',
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: this.MODEL,
-          max_tokens: 4096,
-          stream: true,
-          messages,
-        }),
+        headers: this.buildHeaders(key, pid),
+        body: JSON.stringify(this.buildBody(messages, pid, true)),
       });
     } catch {
       throw new Error('NETWORK_ERROR');
@@ -91,8 +297,13 @@ export class AnthropicService {
           if (data === '[DONE]') return;
           try {
             const parsed = JSON.parse(data);
-            if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-              onChunk(parsed.delta.text);
+            if (isAnthropicStyle) {
+              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                onChunk(parsed.delta.text);
+              }
+            } else {
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) onChunk(delta);
             }
           } catch {
             // skip malformed SSE lines

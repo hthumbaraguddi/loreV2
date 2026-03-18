@@ -2,17 +2,19 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Shelf } from '../../../models';
+import { LoreIconComponent } from '../../lore-icon/lore-icon.component';
 
 const SHELF_ICONS = [
-  '📚', '💼', '🏠', '🔬', '🎨', '💡', '🌍', '🎯', '📓', '📔',
-  '📒', '📕', '📗', '📘', '📙', '🗒️', '📋', '📌', '🔖', '🏷️',
-  '💰', '📈', '🎬', '🌅', '🏃', '🔭', '🧪', '🎵', '🍕', '✈️'
+  'shelf', 'notebook', 'folder', 'star', 'bookmark', 'home', 'lightbulb',
+  'layers', 'archive', 'calendar', 'chart-bar', 'database', 'image', 'video',
+  'audio', 'lock', 'settings', 'user', 'users', 'filter', 'search', 'link',
+  'pin', 'milestone', 'pulse', 'quote', 'draft', 'badge', 'inbox', 'save'
 ];
 
 @Component({
   selector: 'app-shelf-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoreIconComponent],
   templateUrl: './shelf-modal.component.html',
   styleUrls: ['./shelf-modal.component.scss']
 })

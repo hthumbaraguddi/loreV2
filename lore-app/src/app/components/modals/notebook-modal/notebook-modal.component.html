@@ -14,14 +14,16 @@
           *ngFor="let icon of icons"
           class="ic"
           [class.sel]="icon === selectedIcon"
-          (click)="pickIcon(icon)">{{ icon }}</div>
+          (click)="pickIcon(icon)">
+          <lore-icon [name]="icon" [size]="18"></lore-icon>
+        </div>
       </div>
     </div>
 
     <div class="mod-fld">
       <label class="flbl">Shelf</label>
       <select class="fsel" [(ngModel)]="selectedShelfId">
-        <option *ngFor="let shelf of shelves" [value]="shelf.id">{{ shelf.icon }} {{ shelf.name }}</option>
+        <option *ngFor="let shelf of shelves" [value]="shelf.id">{{ shelf.name }}</option>
         <option value="">— No shelf —</option>
       </select>
     </div>

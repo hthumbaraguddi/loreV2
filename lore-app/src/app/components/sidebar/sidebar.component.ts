@@ -132,6 +132,11 @@ export class SidebarComponent {
     this.importNotebook.emit();
   }
 
+  isSvgIcon(icon: string): boolean {
+    // SVG icon names are lowercase ASCII with hyphens; emoji contain non-ASCII chars
+    return /^[a-z0-9-]+$/.test(icon);
+  }
+
   onExportShelf(shelf: Shelf, event: Event): void {
     event.stopPropagation();
     this.exportShelf.emit(shelf);

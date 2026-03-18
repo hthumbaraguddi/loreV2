@@ -40,7 +40,10 @@
     <div class="shelf-grp" *ngFor="let shelf of state?.shelves">
       <div class="shelf-hdr" (click)="onToggleShelf(shelf, $event)">
         <lore-icon class="sh-caret" [name]="shelf.open ? 'chevron-down' : 'chevron-right'" [size]="10"></lore-icon>
-        <span class="sh-ico">{{ shelf.icon }}</span>
+        <span class="sh-ico">
+          <lore-icon *ngIf="isSvgIcon(shelf.icon)" [name]="shelf.icon" [size]="14"></lore-icon>
+          <ng-container *ngIf="!isSvgIcon(shelf.icon)">{{ shelf.icon }}</ng-container>
+        </span>
         <span class="sh-nm">{{ shelf.name }}</span>
         <button class="sh-add" title="Add notebook" (click)="onAddNotebook(shelf, $event)">
           <lore-icon name="plus" [size]="11"></lore-icon>
@@ -61,7 +64,10 @@
           [class.active]="isActiveNotebook(nb.id)"
           (click)="onSelectNotebook(nb)"
         >
-          <span class="nb-itm-ico">{{ nb.icon }}</span>
+          <span class="nb-itm-ico">
+            <lore-icon *ngIf="isSvgIcon(nb.icon)" [name]="nb.icon" [size]="13"></lore-icon>
+            <ng-container *ngIf="!isSvgIcon(nb.icon)">{{ nb.icon }}</ng-container>
+          </span>
           <span class="nb-itm-nm">{{ nb.name }}</span>
           <span class="nb-itm-ct">{{ nb.sections.length }}</span>
           <span class="nb-itm-ed">

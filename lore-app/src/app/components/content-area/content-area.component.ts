@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Notebook, Section, Note, SectionColorMap, SectionColor, SECTION_COLORS } from '../../models';
 import { NoteCardComponent } from '../note-card/note-card.component';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
@@ -24,11 +25,11 @@ export function filterNotes(notebook: Notebook, query: string): Note[] {
 @Component({
   selector: 'app-content-area',
   standalone: true,
-  imports: [CommonModule, NoteCardComponent, LoreIconComponent],
+  imports: [CommonModule, NoteCardComponent, LoreIconComponent, FormsModule],
   templateUrl: './content-area.component.html',
   styleUrls: ['./content-area.component.scss'],
 })
-export class ContentAreaComponent implements OnChanges {
+export class ContentAreaComponent implements OnChanges, AfterViewChecked {
   @Input() notebook: Notebook | null = null;
   @Input() searchQuery: string = '';
   @Input() colors: SectionColorMap = SECTION_COLORS;
@@ -36,12 +37,92 @@ export class ContentAreaComponent implements OnChanges {
   @Output() editNote = new EventEmitter<{ note: Note; section: Section }>();
   @Output() deleteNote = new EventEmitter<{ note: Note; section: Section }>();
   @Output() addNote = new EventEmitter<Section>();
+  @Output() addPageNote = new EventEmitter<Section>();
   @Output() editSection = new EventEmitter<Section>();
   @Output() deleteSection = new EventEmitter<Section>();
   @Output() searchCleared = new EventEmitter<void>();
+  @Output() addSectionInline = new EventEmitter<string>();
+  @Output() renameSectionInline = new EventEmitter<{ section: Section; title: string }>();
+
+  newSectionTitle = '';
+  showNewSectionInput = false;
+
+  // Inline section title editing
+  editingSectionId: string | null = null;
+  editingSectionTitle = '';
+  private focusSecTitleInput = false;
+
+  @ViewChild('secTitleInput') secTitleInputRef?: ElementRef<HTMLInputElement>;
+
+  onNewSectionKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && this.newSectionTitle.trim()) {
+      this.addSectionInline.emit(this.newSectionTitle.trim());
+      this.newSectionTitle = '';
+      this.showNewSectionInput = false;
+    }
+    if (event.key === 'Escape') {
+      this.newSectionTitle = '';
+      this.showNewSectionInput = false;
+    }
+  }
+
+  onNewSectionBlur(): void {
+    if (this.newSectionTitle.trim()) {
+      this.addSectionInline.emit(this.newSectionTitle.trim());
+    }
+    this.newSectionTitle = '';
+    this.showNewSectionInput = false;
+  }
 
   matchCount = 0;
   totalNotes = 0;
+  // Plain object so Angular detects changes on mutation
+  collapsedSections: Record<string, boolean> = {};
+
+  startEditSectionTitle(section: Section): void {
+    this.editingSectionId = section.id;
+    this.editingSectionTitle = section.title;
+    this.focusSecTitleInput = true;
+  }
+
+  onSecTitleKeydown(event: KeyboardEvent, section: Section): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitSectionTitle(section);
+    }
+    if (event.key === 'Escape') {
+      this.editingSectionId = null;
+      this.editingSectionTitle = '';
+    }
+  }
+
+  commitSectionTitle(section: Section): void {
+    const title = this.editingSectionTitle.trim();
+    if (title && title !== section.title) {
+      this.renameSectionInline.emit({ section, title });
+    }
+    this.editingSectionId = null;
+    this.editingSectionTitle = '';
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.focusSecTitleInput && this.secTitleInputRef) {
+      this.secTitleInputRef.nativeElement.focus();
+      this.secTitleInputRef.nativeElement.select();
+      this.focusSecTitleInput = false;
+    }
+  }
+
+  toggleCollapse(sectionId: string): void {
+    this.collapsedSections = {
+      ...this.collapsedSections,
+      [sectionId]: !this.collapsedSections[sectionId],
+    };
+  }
+
+  isCollapsed(sectionId: string): boolean {
+    return !!this.collapsedSections[sectionId];
+  }
 
   ngOnChanges(): void {
     this.totalNotes = this.notebook
@@ -85,6 +166,10 @@ export class ContentAreaComponent implements OnChanges {
 
   onAddNote(section: Section): void {
     this.addNote.emit(section);
+  }
+
+  onAddPageNote(section: Section): void {
+    this.addPageNote.emit(section);
   }
 
   onEditSection(section: Section): void {

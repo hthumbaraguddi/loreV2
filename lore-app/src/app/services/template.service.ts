@@ -7,6 +7,7 @@ import { watchlistTemplate } from '../templates/watchlist.template';
 import { journalTemplate } from '../templates/journal.template';
 import { scrumTemplate } from '../templates/scrum.template';
 import { investingTemplate } from '../templates/investing.template';
+import { pageTemplate } from '../templates/page.template';
 
 export interface TemplateDefinition {
   id: string;
@@ -40,6 +41,7 @@ export class TemplateService {
     this.registerTemplate(journalTemplate);
     this.registerTemplate(scrumTemplate);
     this.registerTemplate(investingTemplate);
+    this.registerTemplate(pageTemplate);
   }
 
   registerTemplate(t: TemplateDefinition): void {

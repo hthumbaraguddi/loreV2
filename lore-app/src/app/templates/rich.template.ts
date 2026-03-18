@@ -98,9 +98,12 @@ export const richTemplate: TemplateDefinition = {
   renderCard(note: Note, color: SectionColor, highlightFn: (text: string) => string): string {
     const contentType = note.data['contentType'] || 'markdown';
     if (contentType === 'html') {
-      // Render HTML content in a sandboxed iframe-like container
+      // Use a data-html-note attribute — the note-card component will swap this for an iframe
       const raw = note.data['markdown'] || '';
-      return `<div class="rich-html-frame">${raw}</div>`;
+      const encoded = encodeURIComponent(raw);
+      return `<div class="rich-html-placeholder" data-html-content="${esc(encoded)}">
+        <div class="rich-html-preview-hint">📄 HTML Note — click to expand</div>
+      </div>`;
     }
     const html = marked.parse(note.data['markdown'] || '') as string;
     return `<div class="rich-card-body">${html}</div>`;

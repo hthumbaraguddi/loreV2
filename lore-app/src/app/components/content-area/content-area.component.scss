@@ -46,6 +46,21 @@
   margin: 4px 0 8px;
 }
 
+.btn-sec-collapse {
+  background: transparent;
+  border: none;
+  color: var(--tt);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  &:hover { color: var(--tp); background: var(--inp); }
+}
+
 .sec-dot {
   width: 8px;
   height: 8px;
@@ -58,6 +73,12 @@
   align-items: baseline;
   gap: 0;
   white-space: nowrap;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 4px;
+  transition: background 0.12s;
+  &:hover { background: var(--inp); }
+  &:hover .sec-title { color: var(--tp); }
 }
 
 .sec-title {
@@ -66,6 +87,7 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--tt);
+  transition: color 0.12s;
 }
 
 .sec-sub {
@@ -114,4 +136,74 @@
     line-height: 1.6;
     max-width: 300px;
   }
+}
+
+.sec-title-input {
+  background: var(--inp);
+  border: 1.5px solid var(--acc);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tp);
+  outline: none;
+  min-width: 100px;
+  max-width: 200px;
+  &::placeholder { color: var(--tt); opacity: 0.5; }
+}
+
+.sec-new-row {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-new-sec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  color: var(--tt);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+    background: var(--accl);
+  }
+}
+
+.sec-new-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.sec-new-input {
+  background: var(--inp);
+  border: 1.5px solid var(--acc);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: var(--tp);
+  outline: none;
+  min-width: 180px;
+  font-weight: 500;
+  &::placeholder { color: var(--tt); opacity: 0.6; }
+}
+
+.sec-new-hint {
+  font-size: 11px;
+  color: var(--tt);
+  opacity: 0.6;
 }

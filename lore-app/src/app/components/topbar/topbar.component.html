@@ -56,4 +56,14 @@
     <lore-icon class="save-icon" [name]="syncStatus === 'error' ? 'warning' : syncStatus === 'saved' ? 'check' : 'save'" [size]="14"></lore-icon>
     <span class="save-lbl">{{ syncLabel }}</span>
   </button>
+
+  <!-- Logout button -->
+  <button class="btn-tb-icon btn-logout" (click)="onLogout()" title="Sign out">
+    <lore-icon name="logout" [size]="15"></lore-icon>
+  </button>
+
+  <!-- Settings button -->
+  <button class="btn-tb-icon btn-settings" (click)="onOpenSettings()" title="Settings">
+    <lore-icon name="settings" [size]="15"></lore-icon>
+  </button>
 </div>

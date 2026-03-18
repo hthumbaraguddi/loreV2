@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
 import { ExportImportService } from '../../services/export-import.service';
 import { AnthropicService } from '../../services/anthropic.service';
+import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 
 interface ThemeOption {
   id: string;
@@ -42,7 +43,7 @@ const SECTION_COLOR_MAP: Record<string, { bg: string; border: string }> = {
 @Component({
   selector: 'app-settings-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoreIconComponent],
   templateUrl: './settings-panel.component.html',
   styleUrls: ['./settings-panel.component.scss'],
 })

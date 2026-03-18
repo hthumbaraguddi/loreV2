@@ -123,6 +123,7 @@ export class EditPanelComponent implements OnChanges {
       journal:    'calendar',
       scrum:      'milestone',
       investing:  'inv-chart',
+      page:       'note',
     };
     return map[tpl.id] ?? 'template';
   }

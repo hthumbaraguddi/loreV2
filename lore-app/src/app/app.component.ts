@@ -21,6 +21,7 @@ import { TemplateBuilderModalComponent } from './components/modals/template-buil
 import { TemplateDefinition } from './services/template.service';
 import { LoreIconComponent } from './components/lore-icon/lore-icon.component';
 import { ChatPanelComponent } from './components/chat-panel/chat-panel.component';
+import { PageEditorComponent } from './components/page-editor/page-editor.component';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,7 @@ import { ChatPanelComponent } from './components/chat-panel/chat-panel.component
     TemplateBuilderModalComponent,
     LoreIconComponent,
     ChatPanelComponent,
+    PageEditorComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -84,6 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isSettingsPanelOpen = false;
 
   isChatPanelOpen = false;
+  isPageEditorOpen = false;
 
   // Search
   searchQuery = '';
@@ -347,10 +350,23 @@ export class AppComponent implements OnInit, OnDestroy {
     this.showSectionModal = true;
   }
 
+  onAddSectionInline(title: string, state: AppState): void {
+    const nb = this.getActiveNotebook(state);
+    if (!nb) return;
+    this.data.addSection(nb.id, title, '', 'purple');
+  }
+
+  onRenameSectionInline(event: { section: Section; title: string }, state: AppState): void {
+    const nb = this.getActiveNotebook(state);
+    if (!nb) return;
+    this.data.updateSection(nb.id, event.section.id, event.title, event.section.subtitle ?? '', event.section.color);
+  }
+
   onAddNote(section: Section | null): void {
     this.editingNote = null;
     this.editingNoteSection = section;
     this.isEditPanelOpen = true;
+    this.isPageEditorOpen = false;
   }
 
   // ── ContentArea events ────────────────────────────────────────────────────
@@ -358,7 +374,13 @@ export class AppComponent implements OnInit, OnDestroy {
   onEditNote(event: { note: Note; section: Section }): void {
     this.editingNote = event.note;
     this.editingNoteSection = event.section;
-    this.isEditPanelOpen = true;
+    if (event.note.templateId === 'page') {
+      this.isPageEditorOpen = true;
+      this.isEditPanelOpen = false;
+    } else {
+      this.isEditPanelOpen = true;
+      this.isPageEditorOpen = false;
+    }
   }
 
   onDeleteNote(event: { note: Note; section: Section }, state: AppState): void {
@@ -415,6 +437,31 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isEditPanelOpen = false;
     this.editingNote = null;
     this.editingNoteSection = null;
+  }
+
+  onPageEditorClosed(): void {
+    this.isPageEditorOpen = false;
+    this.editingNote = null;
+    this.editingNoteSection = null;
+  }
+
+  onNewPageNote(section: Section | null, state: AppState): void {
+    const nb = this.getActiveNotebook(state);
+    if (!nb) return;
+    const targetSection = section ?? nb.sections[0] ?? null;
+    if (!targetSection) return;
+    // Create a blank page note immediately, then open the editor
+    this.data.addNote(nb.id, targetSection.id, 'Untitled', 'page', { icon: '📄', blocks: [], tags: [] });
+    // Find the newly created note (last in section)
+    const updatedState = this.data.getState();
+    const updatedNb = updatedState.notebooks.find(n => n.id === nb.id);
+    const updatedSection = updatedNb?.sections.find(s => s.id === targetSection.id);
+    const newNote = updatedSection?.notes[updatedSection.notes.length - 1];
+    if (newNote) {
+      this.editingNote = newNote;
+      this.editingNoteSection = updatedSection!;
+      this.isPageEditorOpen = true;
+    }
   }
 
   // ── SettingsPanel events ──────────────────────────────────────────────────
@@ -706,6 +753,32 @@ export class AppComponent implements OnInit, OnDestroy {
       d.innerHTML = `<label class="tog"><input type="checkbox"><span class="tog-tr"></span></label><input class="fin" placeholder="${ph}" style="flex:1"><button class="btn-rm" onclick="this.parentElement.remove()">✕</button>`;
       document.getElementById(cId)?.appendChild(d);
       (d.querySelector('input.fin') as HTMLInputElement)?.focus();
+    };
+
+    w.pgAddBlock = (type: string) => {
+      const container = document.getElementById('f_blocks');
+      if (!container) return;
+      const div = document.createElement('div');
+      const placeholders: Record<string, string> = {
+        text: 'Write something…',
+        heading: 'Heading text…',
+        callout: 'Callout message…',
+        todo: 'To-do item…',
+        quote: 'Quote or excerpt…',
+      };
+      if (type === 'divider') {
+        div.className = 'pg-block-row';
+        div.dataset['type'] = 'divider';
+        div.innerHTML = `<div class="pg-divider-preview">──────────────────</div><button class="pg-block-del" onclick="this.parentElement.remove()">✕</button>`;
+      } else {
+        const ph = placeholders[type] || 'Content…';
+        const todoCheck = type === 'todo' ? `<input type="checkbox" class="pg-todo-check">` : '';
+        div.className = `pg-block-row pg-block-${type}`;
+        div.dataset['type'] = type;
+        div.innerHTML = `${todoCheck}<textarea class="pg-block-ta" placeholder="${ph}"></textarea><button class="pg-block-del" onclick="this.parentElement.remove()">✕</button>`;
+      }
+      container.appendChild(div);
+      (div.querySelector('textarea') as HTMLTextAreaElement)?.focus();
     };
   }
 }

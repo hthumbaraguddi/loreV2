@@ -38,12 +38,27 @@
     <ng-container *ngFor="let section of notebook.sections">
       <ng-container *ngIf="isSectionVisible(section)">
         <!-- Section divider -->
-        <div class="sec-div">
+        <div class="sec-div" [class.sec-collapsed]="isCollapsed(section.id)">
+          <button class="btn-sec-collapse" (click)="toggleCollapse(section.id)" [title]="isCollapsed(section.id) ? 'Expand section' : 'Collapse section'">
+            <lore-icon [name]="isCollapsed(section.id) ? 'chevron-right' : 'chevron-down'" [size]="13"></lore-icon>
+          </button>
           <span class="sec-dot" [style.background]="getColor(section).dot"></span>
-          <div class="sec-text">
-            <span class="sec-title">{{ section.title }}</span>
-            <span class="sec-sub" *ngIf="section.subtitle"> — {{ section.subtitle }}</span>
-          </div>
+          <!-- Inline editable section title -->
+          <ng-container *ngIf="editingSectionId !== section.id; else secEditTpl">
+            <div class="sec-text" (dblclick)="startEditSectionTitle(section)" title="Double-click to rename">
+              <span class="sec-title">{{ section.title }}</span>
+              <span class="sec-sub" *ngIf="section.subtitle"> — {{ section.subtitle }}</span>
+            </div>
+          </ng-container>
+          <ng-template #secEditTpl>
+            <input
+              class="sec-title-input"
+              [(ngModel)]="editingSectionTitle"
+              (keydown)="onSecTitleKeydown($event, section)"
+              (blur)="commitSectionTitle(section)"
+              #secTitleInput
+            >
+          </ng-template>
           <div class="sec-line"></div>
           <div class="sec-acts">
             <button class="btn-sda" (click)="onEditSection(section)">
@@ -52,30 +67,35 @@
             <button class="btn-sda" (click)="onDeleteSection(section)">
               <lore-icon name="trash" [size]="12"></lore-icon> Delete
             </button>
-            <button class="btn-sda" (click)="onAddNote(section)">
+            <button class="btn-sda" (click)="onAddPageNote(section)">
               <lore-icon name="note-plus" [size]="12"></lore-icon> Note
+            </button>
+            <button class="btn-sda" (click)="onAddNote(section)">
+              <lore-icon name="grid-view" [size]="12"></lore-icon> Structured
             </button>
           </div>
         </div>
 
-        <!-- Note cards -->
-        <app-note-card
-          *ngFor="let note of getVisibleNotes(section)"
-          [note]="note"
-          [section]="section"
-          [color]="getColor(section)"
-          [searchQuery]="searchQuery"
-          [notebookId]="notebook.id"
-          (edit)="onEditNote($event, section)"
-          (delete)="onDeleteNote($event, section)"
-        ></app-note-card>
+        <!-- Note cards (hidden when collapsed) -->
+        <ng-container *ngIf="!isCollapsed(section.id)">
+          <app-note-card
+            *ngFor="let note of getVisibleNotes(section)"
+            [note]="note"
+            [section]="section"
+            [color]="getColor(section)"
+            [searchQuery]="searchQuery"
+            [notebookId]="notebook.id"
+            (edit)="onEditNote($event, section)"
+            (delete)="onDeleteNote($event, section)"
+          ></app-note-card>
 
-        <!-- Add note button (only when not searching) -->
-        <button
-          *ngIf="!searchQuery"
-          class="btn-addnote"
-          (click)="onAddNote(section)"
-        ><lore-icon name="plus" [size]="12"></lore-icon> Add note</button>
+          <!-- Add note button (only when not searching) -->
+          <button
+            *ngIf="!searchQuery"
+            class="btn-addnote"
+            (click)="onAddPageNote(section)"
+          ><lore-icon name="plus" [size]="12"></lore-icon> Add note</button>
+        </ng-container>
       </ng-container>
     </ng-container>
 
@@ -87,5 +107,28 @@
         <p>Add a section to start organising your notes.</p>
       </div>
     </ng-container>
+
+    <!-- Inline new section pill -->
+    <div class="sec-new-row" *ngIf="!searchQuery">
+      <ng-container *ngIf="!showNewSectionInput">
+        <button class="btn-new-sec-pill" (click)="showNewSectionInput = true">
+          <lore-icon name="plus" [size]="11"></lore-icon> New Section
+        </button>
+      </ng-container>
+      <ng-container *ngIf="showNewSectionInput">
+        <div class="sec-new-input-wrap">
+          <input
+            class="sec-new-input"
+            [(ngModel)]="newSectionTitle"
+            placeholder="Section name…"
+            (keydown)="onNewSectionKeydown($event)"
+            (blur)="onNewSectionBlur()"
+            autofocus
+            #newSecInput
+          >
+          <span class="sec-new-hint">Enter to add · Esc to cancel</span>
+        </div>
+      </ng-container>
+    </div>
   </div>
 </ng-container>

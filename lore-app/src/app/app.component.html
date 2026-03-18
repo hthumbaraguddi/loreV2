@@ -33,23 +33,38 @@
         [isLocalMode]="isLocalMode"
         (searchChanged)="onSearchChanged($event)"
         (addSection)="onAddSection()"
-        (addNote)="onAddNote(null)"
+        (addNote)="onNewPageNote(null, state)"
         (openTemplates)="onOpenTemplates()"
         (saveNow)="onSaveNow()"
         (openChat)="onOpenChat()">
       </app-topbar>
 
       <app-content-area
+        *ngIf="!isPageEditorOpen"
         [notebook]="getActiveNotebook(state)"
         [searchQuery]="searchQuery"
         [colors]="sectionColors"
         (editNote)="onEditNote($event)"
         (deleteNote)="onDeleteNote($event, state)"
         (addNote)="onAddNote($event)"
+        (addPageNote)="onNewPageNote($event, state)"
         (editSection)="onEditSection($event)"
         (deleteSection)="onDeleteSection($event, state)"
+        (addSectionInline)="onAddSectionInline($event, state)"
+        (renameSectionInline)="onRenameSectionInline($event, state)"
         (searchCleared)="onSearchCleared()">
       </app-content-area>
+
+      <!-- Page Editor — full-width inline editor for 'page' template notes -->
+      <app-page-editor
+        *ngIf="isPageEditorOpen && editingNote"
+        [note]="editingNote"
+        [section]="editingNoteSection!"
+        [notebookId]="getActiveNotebook(state)?.id ?? ''"
+        (saved)="onNoteSaved($event, state); onPageEditorClosed()"
+        (deleted)="onNoteDeleted(state); isPageEditorOpen = false"
+        (closed)="onPageEditorClosed()">
+      </app-page-editor>
     </div>
 
     <!-- Edit Panel -->

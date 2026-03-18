@@ -51,6 +51,12 @@
     color: var(--tp);
     border-color: var(--bh);
   }
+
+  &.btn-logout:hover {
+    background: rgba(220, 38, 38, 0.08);
+    color: #DC2626;
+    border-color: rgba(220, 38, 38, 0.3);
+  }
 }
 
 // Manual save to Drive button

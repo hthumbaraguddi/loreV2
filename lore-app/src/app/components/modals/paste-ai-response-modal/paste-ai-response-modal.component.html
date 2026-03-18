@@ -5,18 +5,44 @@
     <p *ngIf="!targetSection" class="no-section-msg">Please select a section first</p>
 
     <div class="mod-fld">
-      <label class="flbl">Markdown Content</label>
+      <div class="fld-header">
+        <label class="flbl">Content</label>
+        <div class="type-toggle" *ngIf="content.trim()">
+          <button
+            class="type-btn"
+            [class.active]="contentType === 'markdown'"
+            (click)="setContentType('markdown')">
+            Markdown
+          </button>
+          <button
+            class="type-btn"
+            [class.active]="contentType === 'html'"
+            (click)="setContentType('html')">
+            HTML
+          </button>
+          <span class="auto-badge" *ngIf="!forcedType">auto-detected</span>
+        </div>
+      </div>
       <textarea
         class="ai-textarea"
         [(ngModel)]="content"
-        placeholder="Paste your AI-generated markdown here..."
+        (ngModelChange)="onContentChange()"
+        placeholder="Paste your AI-generated markdown or HTML here…"
         [disabled]="!targetSection">
       </textarea>
+      <div class="type-hint" *ngIf="content.trim()">
+        <span *ngIf="contentType === 'html'" class="hint-html">
+          HTML detected — will render with full styling
+        </span>
+        <span *ngIf="contentType === 'markdown'" class="hint-md">
+          Markdown detected — will render via markdown parser
+        </span>
+      </div>
     </div>
 
     <div class="mod-act">
       <button class="btn-sec" (click)="cancel()">Cancel</button>
-      <button class="btn-prim" (click)="save()" [disabled]="isSaveDisabled">Save</button>
+      <button class="btn-prim" (click)="save()" [disabled]="isSaveDisabled">Save as Note</button>
     </div>
   </div>
 </div>

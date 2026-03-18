@@ -1040,3 +1040,43 @@ a { color: inherit; text-decoration: none; }
   strong { font-weight: 600; }
   em { font-style: italic; }
 }
+
+// ══ RICH NOTE — HTML FRAME ═══════════════════════════
+// Renders full HTML AI outputs (newsletters, reports) inside a card
+.rich-html-frame {
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-height: 600px;
+  overflow-y: auto;
+
+  // Reset inner HTML styles to avoid bleeding into app chrome
+  all: initial;
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-height: 600px;
+  overflow-y: auto;
+
+  // Allow inner HTML to use its own fonts/styles
+  * { box-sizing: border-box; }
+  img { max-width: 100%; height: auto; }
+  a { color: inherit; }
+}
+
+// Badge shown in edit form for HTML notes
+.rich-html-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 3px 9px;
+  margin-bottom: 8px;
+}

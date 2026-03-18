@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit {
         });
         google.accounts.id.renderButton(
           document.getElementById('google-btn'),
-          { theme: 'outline', size: 'medium', width: 280, text: 'Lets' }
+          { theme: 'outline', size: 'large', width: 220, text: 'signin' }
         );
       } else {
         setTimeout(tryInit, 300);

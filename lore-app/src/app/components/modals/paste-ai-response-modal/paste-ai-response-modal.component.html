@@ -1,0 +1,22 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
+  <div class="modal-box">
+    <h2 class="mod-ttl">Paste AI Response</h2>
+
+    <p *ngIf="!targetSection" class="no-section-msg">Please select a section first</p>
+
+    <div class="mod-fld">
+      <label class="flbl">Markdown Content</label>
+      <textarea
+        class="ai-textarea"
+        [(ngModel)]="content"
+        placeholder="Paste your AI-generated markdown here..."
+        [disabled]="!targetSection">
+      </textarea>
+    </div>
+
+    <div class="mod-act">
+      <button class="btn-sec" (click)="cancel()">Cancel</button>
+      <button class="btn-prim" (click)="save()" [disabled]="isSaveDisabled">Save</button>
+    </div>
+  </div>
+</div>

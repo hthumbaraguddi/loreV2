@@ -20,6 +20,7 @@ import { TemplateBrowserModalComponent } from './components/modals/template-brow
 import { TemplateBuilderModalComponent } from './components/modals/template-builder-modal/template-builder-modal.component';
 import { TemplateDefinition } from './services/template.service';
 import { LoreIconComponent } from './components/lore-icon/lore-icon.component';
+import { ChatPanelComponent } from './components/chat-panel/chat-panel.component';
 
 @Component({
   selector: 'app-root',
@@ -38,6 +39,7 @@ import { LoreIconComponent } from './components/lore-icon/lore-icon.component';
     TemplateBrowserModalComponent,
     TemplateBuilderModalComponent,
     LoreIconComponent,
+    ChatPanelComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -80,6 +82,8 @@ export class AppComponent implements OnInit, OnDestroy {
   editingNoteSection: Section | null = null;
 
   isSettingsPanelOpen = false;
+
+  isChatPanelOpen = false;
 
   // Search
   searchQuery = '';
@@ -241,6 +245,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onOpenSettings(): void {
     this.isSettingsPanelOpen = true;
+  }
+
+  onOpenChat(): void {
+    this.isChatPanelOpen = true;
   }
 
   onOpenTemplates(): void {

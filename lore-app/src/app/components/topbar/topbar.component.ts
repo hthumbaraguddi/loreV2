@@ -25,6 +25,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Output() addNote = new EventEmitter<void>();
   @Output() openTemplates = new EventEmitter<void>();
   @Output() saveNow = new EventEmitter<void>();
+  @Output() openChat = new EventEmitter<void>();
 
   searchValue: string = '';
 
@@ -67,6 +68,10 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   onSaveNow(): void {
     this.saveNow.emit();
+  }
+
+  onOpenChat(): void {
+    this.openChat.emit();
   }
 
   get syncLabel(): string {

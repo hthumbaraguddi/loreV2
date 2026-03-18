@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Note, SectionColor, CustomTemplate, TemplateField } from '../models';
+import { richTemplate } from '../templates/rich.template';
 import { researchTemplate } from '../templates/research.template';
 import { financeTemplate } from '../templates/finance.template';
 import { watchlistTemplate } from '../templates/watchlist.template';
@@ -32,6 +33,7 @@ export class TemplateService {
   private builtInTemplates: TemplateDefinition[] = [];
 
   constructor() {
+    this.registerTemplate(richTemplate);
     this.registerTemplate(researchTemplate);
     this.registerTemplate(financeTemplate);
     this.registerTemplate(watchlistTemplate);

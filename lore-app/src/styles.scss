@@ -922,3 +922,121 @@ a { color: inherit; text-decoration: none; }
     }
   }
 }
+
+// ══ TEMPLATE: RICH NOTE ══════════════════════════════
+.rich-mode-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.btn-mode {
+  background: var(--inp);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 13px;
+  font-size: 12px;
+  color: var(--ts);
+  cursor: pointer;
+  transition: all 0.15s;
+  &.active {
+    background: var(--acc);
+    border-color: var(--acc);
+    color: #fff;
+    font-weight: 500;
+  }
+  &:hover:not(.active) {
+    background: var(--card2);
+    border-color: var(--bh);
+    color: var(--tp);
+  }
+}
+
+.rich-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-bottom: 7px;
+  button {
+    background: var(--inp);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-size: 12px;
+    color: var(--ts);
+    cursor: pointer;
+    transition: all 0.15s;
+    &:hover {
+      background: var(--card2);
+      border-color: var(--bh);
+      color: var(--tp);
+    }
+  }
+}
+
+.rich-ta {
+  min-height: 200px;
+  font-family: 'DM Mono', 'Fira Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.rich-card-body {
+  font-size: 13px;
+  color: var(--ts);
+  line-height: 1.7;
+  margin-top: 10px;
+
+  h1 { font-size: 18px; font-weight: 700; margin: 14px 0 6px; color: var(--tp); }
+  h2 { font-size: 15px; font-weight: 600; margin: 12px 0 5px; color: var(--tp); }
+  h3 { font-size: 13.5px; font-weight: 600; margin: 10px 0 4px; color: var(--tp); }
+
+  p { margin: 6px 0; line-height: 1.7; }
+
+  ul, ol { padding-left: 20px; margin: 6px 0; }
+  li { margin-bottom: 3px; }
+
+  code {
+    background: var(--inp);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    font-size: 12px;
+  }
+
+  pre {
+    background: var(--inp);
+    padding: 10px 13px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 8px 0;
+    code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid var(--acc);
+    padding-left: 12px;
+    color: var(--ts);
+    margin: 8px 0;
+    opacity: 0.85;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 5px 9px;
+    font-size: 12px;
+  }
+  th { background: var(--card2); font-weight: 600; color: var(--tp); }
+
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+}

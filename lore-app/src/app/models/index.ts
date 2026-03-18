@@ -85,3 +85,32 @@ export const SECTION_COLORS: SectionColorMap = {
   pink:   { bg: 'rgba(236,72,153,0.1)',  text: '#DB2777', border: 'rgba(236,72,153,0.3)',  dot: '#EC4899' },
   gray:   { bg: 'rgba(107,114,128,0.1)', text: '#4B5563', border: 'rgba(107,114,128,0.3)', dot: '#6B7280' },
 };
+
+export interface SavedPrompt {
+  id: string;
+  name: string;
+  category: string;
+  body: string;
+  variables: string[];
+  lastRunValues: Record<string, string>;
+  defaultTarget: {
+    shelfId: string;
+    notebookId: string;
+    sectionId: string;
+  };
+  lastRunAt: number | null;
+  isBuiltIn: boolean;
+  createdAt: number;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface DriveSyncPayload {
+  state: AppState;
+  customTemplates: CustomTemplate[];
+  prompts?: SavedPrompt[];
+  anthropicKey?: string;
+}

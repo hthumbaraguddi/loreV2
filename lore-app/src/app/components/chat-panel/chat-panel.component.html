@@ -1,0 +1,87 @@
+<div class="cp" [class.open]="isOpen">
+
+  <!-- Header -->
+  <div class="cp-hd">
+    <button class="btn-cp-close" (click)="onClose()">✕</button>
+    <span class="cp-title">✦ Ask Claude</span>
+    <button class="btn-cp-clear" *ngIf="entries.length" (click)="clearChat()" title="Clear chat">Clear</button>
+  </div>
+
+  <!-- No API key state -->
+  <div class="cp-no-key" *ngIf="!hasApiKey">
+    <div class="cp-no-key-ico">🔑</div>
+    <p>Add your Anthropic API key in Settings to start chatting with Claude.</p>
+    <p class="cp-no-key-sub">Your key is stored locally and never shared.</p>
+  </div>
+
+  <!-- Chat messages -->
+  <div class="cp-msgs" *ngIf="hasApiKey" #msgContainer>
+    <div class="cp-empty" *ngIf="!entries.length">
+      <div class="cp-empty-ico">✦</div>
+      <p>Ask Claude anything. Responses can be saved as notes.</p>
+    </div>
+
+    <div
+      *ngFor="let entry of entries; let i = index"
+      class="cp-msg"
+      [class.user]="entry.role === 'user'"
+      [class.assistant]="entry.role === 'assistant'"
+    >
+      <div class="cp-msg-label">{{ entry.role === 'user' ? 'You' : 'Claude' }}</div>
+      <div class="cp-msg-body" *ngIf="entry.role === 'user'">{{ entry.content }}</div>
+      <div class="cp-msg-body rich-card-body" *ngIf="entry.role === 'assistant'" [innerHTML]="entry.renderedHtml || entry.content"></div>
+      <div class="cp-msg-streaming" *ngIf="entry.streaming">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <button
+        class="btn-save-msg"
+        *ngIf="entry.role === 'assistant' && !entry.streaming && entry.content"
+        (click)="onSaveResponse(i)"
+        title="Save as note"
+      >💾 Save as note</button>
+    </div>
+
+    <!-- Error message -->
+    <div class="cp-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+  </div>
+
+  <!-- Input area -->
+  <div class="cp-input-area" *ngIf="hasApiKey">
+    <textarea
+      class="cp-input"
+      [(ngModel)]="inputText"
+      placeholder="Ask Claude…"
+      rows="3"
+      [disabled]="isStreaming"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <button
+      class="btn-send"
+      [disabled]="!inputText.trim() || isStreaming"
+      (click)="onSend()"
+    >{{ isStreaming ? '…' : '↑' }}</button>
+  </div>
+
+  <!-- Footer actions -->
+  <div class="cp-ft" *ngIf="hasApiKey && entries.length">
+    <button class="btn-save-conv" (click)="onSaveConversation()">💾 Save conversation</button>
+  </div>
+
+</div>
+
+<!-- Section picker overlay -->
+<div class="sp-overlay" *ngIf="showSectionPicker" (click)="onSectionPickerCancelled()">
+  <div class="sp-box" (click)="$event.stopPropagation()">
+    <div class="sp-box-ttl">Save to section</div>
+    <ng-container *ngFor="let nb of notebooks">
+      <div class="sp-nb-name">{{ nb.icon }} {{ nb.name }}</div>
+      <button
+        *ngFor="let sec of nb.sections"
+        class="sp-sec-btn"
+        (click)="onSectionSelected(nb.id, sec.id)"
+      >{{ sec.title }}</button>
+      <div *ngIf="!nb.sections.length" class="sp-no-sec">No sections in this notebook</div>
+    </ng-container>
+    <button class="sp-cancel" (click)="onSectionPickerCancelled()">Cancel</button>
+  </div>
+</div>

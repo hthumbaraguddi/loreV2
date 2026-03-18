@@ -1,7 +1,9 @@
 <div class="ep" [class.open]="isOpen">
   <!-- Header -->
   <div class="ep-hd">
-    <button class="btn-ep-close" (click)="onClose()">✕</button>
+    <button class="btn-ep-close" (click)="onClose()">
+      <lore-icon name="close" [size]="12"></lore-icon>
+    </button>
     <span class="ep-title">{{ panelTitle }}</span>
   </div>
 
@@ -13,15 +15,17 @@
       [class.sel]="selectedTemplate?.id === tpl.id"
       (click)="onChipClick(tpl)"
     >
-      <span class="tc-ico">{{ tpl.icon }}</span>
+      <span class="tc-ico">
+        <lore-icon [name]="templateIcon(tpl)" [size]="14"></lore-icon>
+      </span>
       <span class="tc-nm">{{ tpl.name }}</span>
     </div>
   </div>
 
   <!-- Form body -->
   <div class="ep-form">
-    <!-- Title field (always shown) -->
-    <div class="frow">
+    <!-- Title field (hidden for rich template — title extracted from markdown) -->
+    <div class="frow" *ngIf="selectedTemplate?.id !== 'rich'">
       <label class="flbl">Title</label>
       <input
         class="fin"
@@ -33,6 +37,13 @@
 
     <!-- Template-specific fields -->
     <div [innerHTML]="formHtml"></div>
+
+    <!-- Paste AI Response button (rich template only) -->
+    <div *ngIf="selectedTemplate?.id === 'rich'" style="margin-top: 12px;">
+      <button class="btn-paste-ai" (click)="openPasteModal()">
+        <lore-icon name="copy" [size]="13"></lore-icon> Paste AI Response
+      </button>
+    </div>
   </div>
 
   <!-- Footer -->
@@ -41,8 +52,19 @@
       *ngIf="isEdit"
       class="btn-del"
       (click)="onDelete()"
-    >Delete</button>
+    >
+      <lore-icon name="trash" [size]="13"></lore-icon> Delete
+    </button>
     <button class="btn-gh" (click)="onClose()">Cancel</button>
-    <button class="btn-save btn-pr" (click)="onSave()">💾 Save</button>
+    <button class="btn-save btn-pr" (click)="onSave()">
+      <lore-icon name="save" [size]="13"></lore-icon> Save
+    </button>
   </div>
 </div>
+
+<app-paste-ai-response-modal
+  [isOpen]="pasteModalOpen"
+  [targetSection]="pasteTarget"
+  (closed)="onPasteModalClosed()"
+  (noteSaved)="onPasteNoteSaved()">
+</app-paste-ai-response-modal>

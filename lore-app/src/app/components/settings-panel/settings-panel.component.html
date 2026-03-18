@@ -100,6 +100,37 @@
       </ng-template>
     </div>
 
+    <!-- ── AI (Claude) ── -->
+    <div class="sp-sec" style="margin-top: 4px">
+      <div class="sp-sec-ttl">AI (Claude)</div>
+    </div>
+    <div class="sp-ai-section">
+      <div class="sp-pf">
+        <label class="sp-pl">Anthropic API Key</label>
+        <input
+          class="sp-pin sp-api-key-input"
+          type="password"
+          [(ngModel)]="apiKey"
+          placeholder="sk-ant-…"
+        />
+      </div>
+      <div class="sp-ai-actions">
+        <button class="sp-ai-save" (click)="onSaveApiKey()" [disabled]="!apiKey.trim() || apiKeyStatus === 'validating'">
+          {{ apiKeyStatus === 'validating' ? 'Validating…' : 'Save & Validate' }}
+        </button>
+        <button *ngIf="hasApiKey" class="sp-ai-remove" (click)="onRemoveApiKey()">Remove</button>
+      </div>
+      <div *ngIf="apiKeyStatus === 'valid'" class="sp-ai-status valid">✓ API key is valid</div>
+      <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check and try again</div>
+      <div class="sp-ai-sync-row">
+        <label class="sp-ai-sync-label">
+          <input type="checkbox" [(ngModel)]="apiKeySyncDrive" (ngModelChange)="onApiKeySyncChange()" />
+          Sync API key to Google Drive
+        </label>
+      </div>
+      <a class="sp-ai-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get your API key →</a>
+    </div>
+
     <!-- ── Account ── -->
     <div class="sp-sec" style="margin-top: 4px">
       <div class="sp-sec-ttl">Account</div>

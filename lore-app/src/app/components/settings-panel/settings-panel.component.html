@@ -156,6 +156,26 @@
         </div>
         <div *ngIf="apiKeyStatus === 'valid'" class="sp-ai-status valid">✓ API key is valid</div>
         <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check key and endpoint</div>
+
+        <!-- Model selector -->
+        <div class="sp-pf sp-model-row" *ngIf="hasApiKey">
+          <label class="sp-pl">Model</label>
+          <div class="sp-model-sel-wrap">
+            <select
+              class="sp-sel sp-model-sel"
+              [ngModel]="selectedModel"
+              (ngModelChange)="onModelChange($event)"
+              [disabled]="modelsLoading || !availableModels.length"
+            >
+              <option *ngIf="modelsLoading" value="">Loading models…</option>
+              <option *ngIf="!modelsLoading && !availableModels.length" value="">No models found</option>
+              <option *ngFor="let m of availableModels" [value]="m">{{ m }}</option>
+            </select>
+            <button class="sp-model-refresh" (click)="loadModels()" [disabled]="modelsLoading" title="Refresh models">
+              {{ modelsLoading ? '…' : '↻' }}
+            </button>
+          </div>
+        </div>
         <div class="sp-ai-sync-row">
           <label class="sp-ai-sync-label">
             <input type="checkbox" [(ngModel)]="apiKeySyncDrive" (ngModelChange)="onApiKeySyncChange()" />

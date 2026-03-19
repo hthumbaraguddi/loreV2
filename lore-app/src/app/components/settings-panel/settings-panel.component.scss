@@ -615,3 +615,45 @@
 
   &:hover { text-decoration: underline; }
 }
+
+// Model selector row
+.sp-model-row {
+  margin-top: 10px;
+}
+
+.sp-model-sel-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sp-model-sel {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 12px;
+  padding: 6px 28px 6px 9px;
+}
+
+.sp-model-refresh {
+  background: var(--inp);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--ts);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--acc);
+    color: var(--acc);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}

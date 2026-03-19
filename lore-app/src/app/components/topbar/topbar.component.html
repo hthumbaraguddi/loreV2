@@ -38,9 +38,14 @@
     <lore-icon name="template" [size]="15"></lore-icon>
   </button>
 
-  <!-- Chat button -->
-  <button class="btn-tb-icon btn-chat" (click)="onOpenChat()" title="Ask Claude">
+  <!-- Prompt Library button -->
+  <button class="btn-tb-icon btn-prompts" (click)="onOpenPrompts()" title="Prompt Library">
     ✦
+  </button>
+
+  <!-- Chat button -->
+  <button class="btn-tb-icon btn-chat" (click)="onOpenChat()" title="Ask AI">
+    <span class="btn-ai-lbl">AI</span>
   </button>
 
   <!-- Manual save to Drive -->

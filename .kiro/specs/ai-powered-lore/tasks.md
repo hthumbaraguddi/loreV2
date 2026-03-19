@@ -73,6 +73,11 @@
   - [ ] 10.4 Unit: `sendMessage` — mock ReadableStream SSE, assert `onChunk` called with correct text deltas
   - [ ] 10.5 Unit: `ChatPanelComponent` — assert "no API key" state renders settings prompt
 
+- [ ] 10.6 Fix chat panel to show active provider name dynamically (US-16)
+  - [ ] 10.6.1 Add a `providerLabel` getter to `ChatPanelComponent` that reads `AnthropicService.getProviderId()`, looks it up in `AI_PROVIDERS`, and returns `"Ask {provider.name}"` (e.g. "Ask Groq", "Ask Gemini")
+  - [ ] 10.6.2 Update `chat-panel.component.html` to replace the hardcoded "Ask Claude" title with `{{ providerLabel }}`
+  - [ ] 10.6.3 IF the provider id is not found in `AI_PROVIDERS`, THEN display "Ask AI" as the fallback label
+
 ---
 
 ## Phase 3: Prompt Library
@@ -129,3 +134,37 @@
   - [ ] 16.10 Unit: generated note title matches `{promptName} — {date}` pattern
   - [ ] 16.11 Integration: `DataService.saveAll` includes prompts in Drive payload
   - [ ] 16.12 Integration: API key sync checkbox controls key presence in Drive payload
+
+---
+
+## Phase 5: AI Note Actions & Smart Search
+
+- [ ] 17. Create `AiContextService`
+  - [ ] 17.1 Scaffold `lore-app/src/app/services/ai-context.service.ts`
+  - [ ] 17.2 Implement `buildNotesContext(notes, maxChars)` — collects `{ title, notebookName, content }` per note; truncates to title + first 300 chars per note if total > 200,000 chars; truncates to title only if total > 600,000 chars
+  - [ ] 17.3 Always include full content of the currently active note when provided
+
+- [ ] 18. AI Note Actions — sparkle button on note cards (US-12)
+  - [ ] 18.1 Add a sparkle (✦) button to `note-card.component.html` that is visible on hover
+  - [ ] 18.2 Create `AiNoteActionsMenuComponent` — compact overlay with preset action chips (Summarise, Extract tags, Expand, Simplify, Action items) and a free-text instruction input
+  - [ ] 18.3 WHEN an action or free-text instruction is submitted, call `AnthropicService.sendMessage` with the note content and instruction, streaming the result into a preview panel
+  - [ ] 18.4 Create `AiNotePreviewPanelComponent` — shows streamed AI result with three apply buttons: "Replace", "Append", "Save as new note"
+  - [ ] 18.5 WHEN "Replace" is chosen, store the original note content in an in-memory undo buffer before overwriting; expose an "Undo" action until the panel is closed
+  - [ ] 18.6 WHEN "Append" is chosen, append the AI result to the existing note content via `DataService`
+  - [ ] 18.7 WHEN "Save as new note" is chosen, open a section picker and call `DataService.addNote` with `templateId: 'rich'`
+  - [ ] 18.8 Extract content from both Rich Notes (`data.markdown`) and structured template notes (all string fields joined)
+  - [ ] 18.9 IF no API key is configured, THEN display a prompt directing the user to Settings instead of the action menu
+
+- [ ] 19. Smart Search — Ask Your Notes (US-13)
+  - [ ] 19.1 Add an "Ask AI" toggle button to the existing search bar in `content-area.component.html` (or topbar search)
+  - [ ] 19.2 WHEN the toggle is active and the user submits a query, call `AiContextService.buildNotesContext` to assemble note content, then call `AnthropicService.sendMessage` with the query and context
+  - [ ] 19.3 Display a "Searching your notes…" loading state while the AI processes
+  - [ ] 19.4 Render the AI answer followed by source note references as clickable links; clicking a reference opens that note
+  - [ ] 19.5 Add a scope selector (current notebook / all notebooks) to the Ask AI search UI
+  - [ ] 19.6 IF no API key is configured, THEN fall back to the existing keyword search and show a tooltip explaining why AI search is unavailable
+
+- [ ] 20. Write tests for Phase 5
+  - [ ] 20.1 Unit: `AiContextService.buildNotesContext` — assert truncation thresholds are applied correctly
+  - [ ] 20.2 Unit: AI Note Actions — assert "Replace" stores original content in undo buffer before overwriting
+  - [ ] 20.3 Unit: Smart Search — assert fallback to keyword search when no API key is set
+  - [ ] 20.4 Unit: sparkle button — assert it is not rendered when no API key is configured (shows settings prompt instead)

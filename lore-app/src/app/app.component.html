@@ -37,6 +37,7 @@
         (openTemplates)="onOpenTemplates()"
         (saveNow)="onSaveNow()"
         (openChat)="onOpenChat()"
+        (openPrompts)="onOpenPrompts()"
         (openSettings)="onOpenSettings()"
         (logout)="onLogout()">
       </app-topbar>
@@ -100,8 +101,24 @@
     <app-chat-panel
       [isOpen]="isChatPanelOpen"
       [activeNotebookId]="state.activeNotebookId"
+      [initialPrompt]="chatInitialPrompt"
       (closed)="isChatPanelOpen = false">
     </app-chat-panel>
+
+    <!-- Prompt Library Modal -->
+    <app-prompt-library-modal
+      [isOpen]="showPromptLibrary"
+      (closed)="showPromptLibrary = false"
+      (runPrompt)="onRunPrompt($event)">
+    </app-prompt-library-modal>
+
+    <!-- Prompt Run Modal -->
+    <app-prompt-run-modal
+      [isOpen]="!!runningPrompt"
+      [prompt]="runningPrompt"
+      (closed)="runningPrompt = null"
+      (sendToChat)="onSendToChat($event)">
+    </app-prompt-run-modal>
 
     <!-- Shelf Modal -->
     <div class="ov" [class.show]="showShelfModal" (click)="onShelfCancelled()">

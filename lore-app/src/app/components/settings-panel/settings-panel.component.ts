@@ -79,6 +79,10 @@ export class SettingsPanelComponent implements OnChanges {
   apiKeySyncDrive: boolean = false;
   apiKeyStatus: 'idle' | 'validating' | 'valid' | 'invalid' = 'idle';
 
+  availableModels: string[] = [];
+  selectedModel: string = '';
+  modelsLoading = false;
+
   providers = AI_PROVIDERS;
   selectedProviderId: string = 'anthropic';
 
@@ -110,6 +114,12 @@ export class SettingsPanelComponent implements OnChanges {
       this.apiEndpoint = this.anthropicService.getEndpoint();
       this.apiKeySyncDrive = localStorage.getItem('lore_anthropic_key_sync_drive') === 'true';
       this.apiKeyStatus = 'idle';
+      this.selectedModel = this.anthropicService.getModel();
+      this.availableModels = [];
+      // If key already exists, load models for current provider
+      if (this.apiKey) {
+        this.loadModels();
+      }
     }
   }
 
@@ -216,11 +226,33 @@ export class SettingsPanelComponent implements OnChanges {
   onSelectProvider(id: string): void {
     this.selectedProviderId = id;
     this.apiKeyStatus = 'idle';
+    this.availableModels = [];
+    this.selectedModel = '';
     const p = this.selectedProvider;
-    // Pre-fill endpoint with provider default if it's a custom-endpoint provider
     if (p.supportsCustomEndpoint) {
       this.apiEndpoint = p.defaultEndpoint;
     }
+  }
+
+  async loadModels(): Promise<void> {
+    if (!this.apiKey.trim()) return;
+    this.modelsLoading = true;
+    const p = this.selectedProvider;
+    const endpoint = p.supportsCustomEndpoint && this.apiEndpoint.trim()
+      ? this.apiEndpoint.trim() : p.defaultEndpoint;
+    this.availableModels = await this.anthropicService.fetchModels(this.apiKey.trim(), p.id, endpoint);
+    this.modelsLoading = false;
+    // Keep current selection if still valid, otherwise pick first
+    if (this.selectedModel && this.availableModels.includes(this.selectedModel)) return;
+    if (this.availableModels.length) {
+      this.selectedModel = this.availableModels[0];
+      this.anthropicService.setModel(this.selectedModel);
+    }
+  }
+
+  onModelChange(model: string): void {
+    this.selectedModel = model;
+    this.anthropicService.setModel(model);
   }
 
   async onSaveApiKey(): Promise<void> {
@@ -236,6 +268,7 @@ export class SettingsPanelComponent implements OnChanges {
       this.anthropicService.setProviderId(p.id);
       this.anthropicService.setEndpoint(endpoint);
       this.apiKeyStatus = 'valid';
+      await this.loadModels();
     } else {
       this.apiKeyStatus = 'invalid';
     }
@@ -245,6 +278,8 @@ export class SettingsPanelComponent implements OnChanges {
     this.anthropicService.clearApiKey();
     this.apiKey = '';
     this.apiKeyStatus = 'idle';
+    this.availableModels = [];
+    this.selectedModel = '';
   }
 
   onApiKeySyncChange(): void {

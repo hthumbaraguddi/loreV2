@@ -22,6 +22,9 @@ import { TemplateDefinition } from './services/template.service';
 import { LoreIconComponent } from './components/lore-icon/lore-icon.component';
 import { ChatPanelComponent } from './components/chat-panel/chat-panel.component';
 import { PageEditorComponent } from './components/page-editor/page-editor.component';
+import { PromptLibraryModalComponent } from './components/modals/prompt-library-modal/prompt-library-modal.component';
+import { PromptRunModalComponent } from './components/modals/prompt-run-modal/prompt-run-modal.component';
+import { SavedPrompt } from './models';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +45,8 @@ import { PageEditorComponent } from './components/page-editor/page-editor.compon
     LoreIconComponent,
     ChatPanelComponent,
     PageEditorComponent,
+    PromptLibraryModalComponent,
+    PromptRunModalComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -86,7 +91,11 @@ export class AppComponent implements OnInit, OnDestroy {
   isSettingsPanelOpen = false;
 
   isChatPanelOpen = false;
+  chatInitialPrompt = '';
   isPageEditorOpen = false;
+
+  showPromptLibrary = false;
+  runningPrompt: SavedPrompt | null = null;
 
   // Search
   searchQuery = '';
@@ -252,6 +261,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onOpenChat(): void {
     this.isChatPanelOpen = true;
+  }
+
+  onOpenPrompts(): void {
+    this.showPromptLibrary = true;
+  }
+
+  onRunPrompt(prompt: SavedPrompt): void {
+    this.showPromptLibrary = false;
+    this.runningPrompt = prompt;
+  }
+
+  onSendToChat(assembledPrompt: string): void {
+    this.runningPrompt = null;
+    this.chatInitialPrompt = assembledPrompt;
+    this.isChatPanelOpen = true;
+    // Reset after a tick so ngOnChanges fires again next time
+    setTimeout(() => { this.chatInitialPrompt = ''; }, 100);
   }
 
   onOpenTemplates(): void {

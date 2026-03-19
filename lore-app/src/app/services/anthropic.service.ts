@@ -100,6 +100,7 @@ export class AnthropicService {
   readonly API_KEY_STORAGE = 'lore_anthropic_key';
   readonly ENDPOINT_STORAGE = 'lore_ai_endpoint';
   readonly PROVIDER_STORAGE = 'lore_ai_provider';
+  readonly MODEL_STORAGE = 'lore_ai_model';
   readonly MODEL = 'claude-3-5-sonnet-20241022';
 
   private get apiUrl(): string {
@@ -138,6 +139,62 @@ export class AnthropicService {
     localStorage.setItem(this.PROVIDER_STORAGE, id);
   }
 
+  getModel(): string {
+    return localStorage.getItem(this.MODEL_STORAGE) || '';
+  }
+
+  setModel(model: string): void {
+    if (model.trim()) {
+      localStorage.setItem(this.MODEL_STORAGE, model.trim());
+    } else {
+      localStorage.removeItem(this.MODEL_STORAGE);
+    }
+  }
+
+  /** Fetch available models from the provider's /models endpoint. Returns [] on failure. */
+  async fetchModels(key: string, providerId: string, endpoint?: string): Promise<string[]> {
+    try {
+      if (providerId === 'gemini') {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const json = await res.json();
+        return (json.models ?? [])
+          .map((m: any) => m.name?.replace('models/', '') ?? '')
+          .filter((n: string) => n.includes('gemini') && n.includes('flash') || n.includes('pro'))
+          .sort();
+      }
+      if (providerId === 'anthropic') {
+        // Anthropic doesn't have a public /models list endpoint — return known models
+        return [
+          'claude-opus-4-5',
+          'claude-sonnet-4-5',
+          'claude-3-5-sonnet-20241022',
+          'claude-3-5-haiku-20241022',
+          'claude-3-opus-20240229',
+          'claude-3-haiku-20240307',
+        ];
+      }
+      // OpenAI-compatible providers: GET /models
+      const base = endpoint
+        ? endpoint.replace(/\/chat\/completions$/, '')
+        : this.getEndpoint().replace(/\/chat\/completions$/, '');
+      const modelsUrl = `${base}/models`;
+      const res = await fetch(modelsUrl, {
+        headers: { 'Authorization': `Bearer ${key}` },
+      });
+      if (!res.ok) return [];
+      const json = await res.json();
+      const models: string[] = (json.data ?? json.models ?? [])
+        .map((m: any) => m.id ?? m.name ?? '')
+        .filter(Boolean)
+        .sort();
+      return models;
+    } catch {
+      return [];
+    }
+  }
+
   private buildHeaders(key: string, providerId: string): Record<string, string> {
     const base: Record<string, string> = { 'content-type': 'application/json' };
     if (providerId === 'anthropic') {
@@ -154,18 +211,19 @@ export class AnthropicService {
 
   private buildBody(messages: ChatMessage[], providerId: string, stream: boolean): object {
     if (providerId === 'anthropic') {
-      return { model: this.MODEL, max_tokens: stream ? 4096 : 1, stream, messages };
+      const model = this.getModel() || this.MODEL;
+      return { model, max_tokens: stream ? 4096 : 1, stream, messages };
     }
     if (providerId === 'gemini') {
-      // Gemini uses its own format — handled separately in sendMessage
       return {};
     }
-    // OpenAI-compatible format
-    const model = providerId === 'groq' ? 'llama3-70b-8192'
+    // OpenAI-compatible format — use stored model or sensible defaults
+    const defaultModel = providerId === 'groq' ? 'llama-3.3-70b-versatile'
       : providerId === 'together' ? 'meta-llama/Llama-3-70b-chat-hf'
       : providerId === 'openrouter' ? 'meta-llama/llama-3.1-8b-instruct:free'
       : providerId === 'clod' ? 'DeepSeek V3'
       : 'gpt-3.5-turbo';
+    const model = this.getModel() || defaultModel;
     return {
       model,
       max_tokens: stream ? 4096 : 1,
@@ -225,7 +283,8 @@ export class AnthropicService {
 
     // ── Gemini path ──────────────────────────────────────────────────────────
     if (pid === 'gemini') {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${key}`;
+      const geminiModel = this.getModel() || 'gemini-2.0-flash';
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${key}`;
       let response: Response;
       try {
         response = await fetch(geminiUrl, {
@@ -239,7 +298,9 @@ export class AnthropicService {
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) throw new Error('INVALID_KEY');
         if (response.status === 429) throw new Error('RATE_LIMITED');
-        throw new Error('API_ERROR');
+        const body = await response.text().catch(() => '');
+        console.error(`[AI sendMessage] gemini HTTP ${response.status}:`, body);
+        throw new Error(`API_ERROR:${response.status}`);
       }
       const reader = response.body?.getReader();
       if (!reader) throw new Error('STREAM_ERROR');
@@ -286,7 +347,9 @@ export class AnthropicService {
     if (!response.ok) {
       if (response.status === 401) throw new Error('INVALID_KEY');
       if (response.status === 429) throw new Error('RATE_LIMITED');
-      throw new Error('API_ERROR');
+      const body = await response.text().catch(() => '');
+      console.error(`[AI sendMessage] ${pid} HTTP ${response.status}:`, body);
+      throw new Error(`API_ERROR:${response.status}`);
     }
 
     const reader = response.body?.getReader();

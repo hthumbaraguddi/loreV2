@@ -23,10 +23,12 @@ interface ThemeOption {
 }
 
 const THEMES: ThemeOption[] = [
-  { id: 'default', name: 'Default',    dot: 'linear-gradient(135deg,#191919,#7C6AF6)' },
-  { id: 'light',   name: 'Light',      dot: 'linear-gradient(135deg,#fff,#7C6AF6)' },
-  { id: 'dark',    name: 'Dark',       dot: 'linear-gradient(135deg,#111,#9D8FF8)' },
-  { id: 'warm',    name: 'Warm Paper', dot: 'linear-gradient(135deg,#1C1510,#A0886A)' },
+  { id: 'default',      name: 'Default',       dot: 'linear-gradient(135deg,#191919,#7C6AF6)' },
+  { id: 'light',        name: 'Light',         dot: 'linear-gradient(135deg,#fff,#7C6AF6)' },
+  { id: 'dark',         name: 'Dark',          dot: 'linear-gradient(135deg,#111,#9D8FF8)' },
+  { id: 'warm',         name: 'Warm Paper',    dot: 'linear-gradient(135deg,#1C1510,#A0886A)' },
+  { id: 'purple-light', name: 'Purple Light',  dot: 'linear-gradient(135deg,#EAE5FF,#7C6AF6)' },
+  { id: 'purple-dark',  name: 'Purple Dark',   dot: 'linear-gradient(135deg,#0E0A1F,#A78BFA)' },
 ];
 
 const SECTION_COLOR_MAP: Record<string, { bg: string; border: string }> = {

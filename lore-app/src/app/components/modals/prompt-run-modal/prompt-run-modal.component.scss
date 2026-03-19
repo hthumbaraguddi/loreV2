@@ -178,7 +178,7 @@
   cursor: pointer;
 
   &:first-child {
-    flex: 0 0 110px; // Frequency — fixed narrow width
+    flex: 0 0 100px; // Frequency — fixed narrow width
   }
 
   &:last-child {
@@ -201,9 +201,11 @@
 
 .pr-sched-hh,
 .pr-sched-mm {
-  width: 68px;
+  width: 72px;
+  min-width: 72px;
+  padding-left: 8px;
+  padding-right: 4px;
   cursor: pointer;
-  text-align: center;
 }
 
 .pr-sched-note {

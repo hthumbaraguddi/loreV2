@@ -86,6 +86,16 @@ export const SECTION_COLORS: SectionColorMap = {
   gray:   { bg: 'rgba(107,114,128,0.1)', text: '#4B5563', border: 'rgba(107,114,128,0.3)', dot: '#6B7280' },
 };
 
+export type ScheduleFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface PromptSchedule {
+  frequency: ScheduleFrequency;
+  targetSectionId: string;
+  targetNotebookId: string;
+  scheduleTime: string; // "HH:MM" in local time
+  lastScheduledRunAt: number | null;
+}
+
 export interface SavedPrompt {
   id: string;
   name: string;
@@ -101,6 +111,7 @@ export interface SavedPrompt {
   lastRunAt: number | null;
   isBuiltIn: boolean;
   createdAt: number;
+  schedule?: PromptSchedule | null;
 }
 
 export interface ChatMessage {

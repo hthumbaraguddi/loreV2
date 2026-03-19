@@ -48,6 +48,45 @@
           ↗ Send to Chat
         </button>
         <button class="btn-gh" (click)="onCopyPrompt()">Copy Prompt</button>
+        <button class="btn-gh pr-sched-toggle" (click)="showSchedule = !showSchedule" [class.active]="showSchedule || schedFrequency" title="Schedule">
+          <lore-icon name="pulse" [size]="13"></lore-icon>
+        </button>
+      </div>
+
+      <!-- Schedule config -->
+      <div class="pr-schedule" *ngIf="showSchedule">
+        <div class="pr-sched-hdr">
+          <lore-icon name="pulse" [size]="12"></lore-icon>
+          <span>Auto-run schedule</span>
+          <button class="pr-sched-clear" *ngIf="schedFrequency" (click)="onClearSchedule()" title="Remove schedule">Remove</button>
+        </div>
+        <div class="pr-sched-row">
+          <select class="pr-input pr-sched-sel" [(ngModel)]="schedFrequency">
+            <option value="">Frequency…</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <div class="pr-sched-time-wrap">
+            <select class="pr-input pr-sched-hh" [(ngModel)]="schedHour">
+              <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+            </select>
+            <span class="pr-sched-colon">:</span>
+            <select class="pr-input pr-sched-mm" [(ngModel)]="schedMinute">
+              <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+            </select>
+          </div>
+          <select class="pr-input pr-sched-sel" [(ngModel)]="schedSectionId">
+            <option value="">Save to section…</option>
+            <option *ngFor="let s of sections" [value]="s.id">{{ s.label }}</option>
+          </select>
+        </div>
+        <div class="pr-sched-note">
+          AI output will be saved as a new note each time the schedule fires (on app open if overdue).
+        </div>
+        <button class="btn-pr pr-sched-save" [disabled]="!canSaveSchedule" (click)="onSaveSchedule()">
+          {{ schedSaved ? '✓ Saved' : 'Save Schedule' }}
+        </button>
       </div>
     </div>
 

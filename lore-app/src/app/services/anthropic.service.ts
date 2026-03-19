@@ -74,11 +74,11 @@ export const AI_PROVIDERS: AiProvider[] = [
   {
     id: 'gemini',
     name: 'Google Gemini',
-    label: 'Gemini 1.5 Flash · Free tier',
+    label: 'Gemini 2.0 Flash · Free tier',
     free: true,
     url: 'https://aistudio.google.com/app/apikey',
     keyPlaceholder: 'AIza…',
-    defaultEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent',
+    defaultEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent',
     supportsCustomEndpoint: false,
     note: 'Free tier via Google AI Studio — generous limits',
   },
@@ -189,7 +189,7 @@ export class AnthropicService {
     const url = endpoint || this.apiUrl;
     try {
       if (pid === 'gemini') {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -225,7 +225,7 @@ export class AnthropicService {
 
     // ── Gemini path ──────────────────────────────────────────────────────────
     if (pid === 'gemini') {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${key}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${key}`;
       let response: Response;
       try {
         response = await fetch(geminiUrl, {

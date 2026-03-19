@@ -1,0 +1,9 @@
+{
+  "/clod-proxy": {
+    "target": "https://api.clod.io",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/clod-proxy": "" },
+    "logLevel": "debug"
+  }
+}

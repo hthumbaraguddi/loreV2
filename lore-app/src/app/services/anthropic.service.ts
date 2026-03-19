@@ -28,13 +28,15 @@ export const AI_PROVIDERS: AiProvider[] = [
   {
     id: 'clod',
     name: 'Clod.io',
-    label: 'Claude-compatible · Free tier',
+    label: 'OpenAI-compatible · Free tier',
     free: true,
     url: 'https://app.clod.io/',
     keyPlaceholder: 'Paste your Clod.io API key',
-    defaultEndpoint: 'https://api.clod.io/v1/messages',
+    defaultEndpoint: typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? '/clod-proxy/v1/chat/completions'
+      : 'https://api.clod.io/v1/chat/completions',
     supportsCustomEndpoint: true,
-    note: 'Free tier available — Claude-compatible API',
+    note: 'Free tier available — OpenAI-compatible API',
   },
   {
     id: 'openrouter',
@@ -138,7 +140,7 @@ export class AnthropicService {
 
   private buildHeaders(key: string, providerId: string): Record<string, string> {
     const base: Record<string, string> = { 'content-type': 'application/json' };
-    if (providerId === 'anthropic' || providerId === 'clod') {
+    if (providerId === 'anthropic') {
       return {
         ...base,
         'x-api-key': key,
@@ -146,12 +148,12 @@ export class AnthropicService {
         'anthropic-dangerous-direct-browser-access': 'true',
       };
     }
-    // OpenAI-compatible (OpenRouter, Groq, Together, custom)
+    // OpenAI-compatible (clod, OpenRouter, Groq, Together, custom)
     return { ...base, 'Authorization': `Bearer ${key}` };
   }
 
   private buildBody(messages: ChatMessage[], providerId: string, stream: boolean): object {
-    if (providerId === 'anthropic' || providerId === 'clod') {
+    if (providerId === 'anthropic') {
       return { model: this.MODEL, max_tokens: stream ? 4096 : 1, stream, messages };
     }
     if (providerId === 'gemini') {
@@ -162,6 +164,7 @@ export class AnthropicService {
     const model = providerId === 'groq' ? 'llama3-70b-8192'
       : providerId === 'together' ? 'meta-llama/Llama-3-70b-chat-hf'
       : providerId === 'openrouter' ? 'meta-llama/llama-3.1-8b-instruct:free'
+      : providerId === 'clod' ? 'DeepSeek V3'
       : 'gpt-3.5-turbo';
     return {
       model,
@@ -186,13 +189,16 @@ export class AnthropicService {
     const url = endpoint || this.apiUrl;
     try {
       if (pid === 'gemini') {
-        // Gemini validation: use generateContent (non-streaming) with ?key= param
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: 'hi' }] }], generationConfig: { maxOutputTokens: 1 } }),
         });
+        if (!response.ok && response.status !== 400) {
+          const body = await response.text().catch(() => '');
+          console.warn(`[AI validate] Gemini ${response.status}:`, body);
+        }
         return response.ok || response.status === 400;
       }
       const response = await fetch(url, {
@@ -200,8 +206,13 @@ export class AnthropicService {
         headers: this.buildHeaders(key, pid),
         body: JSON.stringify(this.buildBody([{ role: 'user', content: 'hi' }], pid, false)),
       });
+      if (!response.ok && response.status !== 400 && response.status !== 422) {
+        const body = await response.text().catch(() => '');
+        console.warn(`[AI validate] ${pid} ${response.status}:`, body);
+      }
       return response.ok || response.status === 400 || response.status === 422;
-    } catch {
+    } catch (e) {
+      console.warn('[AI validate] fetch error:', e);
       return false;
     }
   }
@@ -259,7 +270,7 @@ export class AnthropicService {
     }
 
     // ── Anthropic / OpenAI-compatible path ───────────────────────────────────
-    const isAnthropicStyle = pid === 'anthropic' || pid === 'clod';
+    const isAnthropicStyle = pid === 'anthropic';
 
     let response: Response;
     try {

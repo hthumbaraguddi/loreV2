@@ -66,6 +66,18 @@
   color: var(--acc);
 }
 
+// AI + Prompts buttons use accent (purple) color
+.btn-chat,
+.btn-prompts {
+  color: var(--acc);
+
+  &:hover {
+    color: var(--acc);
+    background: var(--accl);
+    border-color: rgba(124, 106, 246, 0.35);
+  }
+}
+
 // Manual save to Drive button
 .btn-save-drive {
   display: flex;

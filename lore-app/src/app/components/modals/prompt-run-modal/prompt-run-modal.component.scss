@@ -12,7 +12,7 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  width: min(480px, 96vw);
+  width: min(640px, 96vw);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
@@ -118,4 +118,102 @@
 
 .pr-send-btn {
   flex: 1;
+}
+
+/* Schedule toggle button */
+.pr-sched-toggle {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.active {
+    color: var(--acc);
+    border-color: var(--acc);
+    background: var(--accl);
+  }
+}
+
+/* Schedule panel */
+.pr-schedule {
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--inp);
+}
+
+.pr-sched-hdr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ts);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.pr-sched-clear {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0;
+  &:hover { text-decoration: underline; }
+}
+
+.pr-sched-row {
+  display: flex;
+  gap: 8px;
+}
+
+.pr-sched-sel {
+  cursor: pointer;
+
+  &:first-child {
+    flex: 0 0 110px; // Frequency — fixed narrow width
+  }
+
+  &:last-child {
+    flex: 1; // Section — takes remaining space
+  }
+}
+
+.pr-sched-time-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.pr-sched-colon {
+  font-size: 13px;
+  color: var(--ts);
+  font-weight: 600;
+}
+
+.pr-sched-hh,
+.pr-sched-mm {
+  width: 68px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pr-sched-note {
+  font-size: 11px;
+  color: var(--tt);
+  line-height: 1.4;
+}
+
+.pr-sched-save {
+  align-self: flex-end;
+  font-size: 12px;
+  padding: 6px 14px;
 }

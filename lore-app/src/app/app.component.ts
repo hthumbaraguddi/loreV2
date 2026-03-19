@@ -25,6 +25,7 @@ import { PageEditorComponent } from './components/page-editor/page-editor.compon
 import { PromptLibraryModalComponent } from './components/modals/prompt-library-modal/prompt-library-modal.component';
 import { PromptRunModalComponent } from './components/modals/prompt-run-modal/prompt-run-modal.component';
 import { SavedPrompt } from './models';
+import { ScheduledPromptService } from './services/scheduled-prompt.service';
 
 @Component({
   selector: 'app-root',
@@ -57,6 +58,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private templateService = inject(TemplateService);
   private exportImport = inject(ExportImportService);
   private drive = inject(DriveService);
+  private scheduler = inject(ScheduledPromptService);
 
   @ViewChild('importFileInput') importFileInput!: ElementRef<HTMLInputElement>;
 
@@ -180,6 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (this.data.getState().shelves.length === 0) {
         this.data.seedDemoData();
       }
+      this.scheduler.runOverdue();
       return;
     }
 
@@ -196,6 +199,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.data.getState().shelves.length === 0) {
       this.data.seedDemoData();
     }
+    this.scheduler.runOverdue();
   }
 
   // ── State helpers ─────────────────────────────────────────────────────────

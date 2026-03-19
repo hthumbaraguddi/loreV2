@@ -27,6 +27,8 @@ export class PromptLibraryModalComponent implements OnInit {
   newCategory = '';
   newBody = '';
 
+  expandedHistoryId: string | null = null;
+
   ngOnInit(): void {
     this.refresh();
   }
@@ -130,6 +132,18 @@ export class PromptLibraryModalComponent implements OnInit {
 
   onCancelNew(): void {
     this.showNewForm = false;
+  }
+
+  getRunCount(promptId: string): number {
+    return this.promptService.getRunHistory(promptId).length;
+  }
+
+  getRunHistory(promptId: string) {
+    return this.promptService.getRunHistory(promptId);
+  }
+
+  toggleHistory(promptId: string): void {
+    this.expandedHistoryId = this.expandedHistoryId === promptId ? null : promptId;
   }
 
   close(): void {

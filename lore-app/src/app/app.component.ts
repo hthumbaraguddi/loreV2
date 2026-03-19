@@ -151,7 +151,7 @@ export class AppComponent implements OnInit, OnDestroy {
               .then(driveData => {
                 if (driveData?.state) {
                   console.log('[App] session restore: loaded from Drive');
-                  this.data.loadFromObject(driveData.state);
+                  this.data.loadFromObject(driveData.state, driveData.prompts);
                   if (Array.isArray(driveData.customTemplates)) {
                     localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
                   }
@@ -188,7 +188,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const driveData = await this.drive.load();
     if (driveData?.state) {
-      this.data.loadFromObject(driveData.state);
+      this.data.loadFromObject(driveData.state, driveData.prompts);
       if (Array.isArray(driveData.customTemplates)) {
         localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
       }
@@ -504,7 +504,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // User reconnected Drive from settings — load latest data from Drive
     const driveData = await this.drive.load();
     if (driveData?.state) {
-      this.data.loadFromObject(driveData.state);
+      this.data.loadFromObject(driveData.state, driveData.prompts);
       if (Array.isArray(driveData.customTemplates)) {
         localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
       }

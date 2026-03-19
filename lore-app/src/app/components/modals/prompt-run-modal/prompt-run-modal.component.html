@@ -43,6 +43,14 @@
       <div class="pr-actions">
         <button
           class="btn-pr pr-send-btn"
+          *ngIf="hasApiKey"
+          [disabled]="!canSend || isRunning"
+          (click)="onRunWithAi()">
+          {{ isRunning ? '⏳ Running…' : '✦ Run with AI' }}
+        </button>
+        <button
+          class="btn-gh pr-send-btn"
+          *ngIf="!hasApiKey"
           [disabled]="!canSend"
           (click)="onSendToChat()">
           ↗ Send to Chat
@@ -51,6 +59,30 @@
         <button class="btn-gh pr-sched-toggle" (click)="showSchedule = !showSchedule" [class.active]="showSchedule || schedFrequency" title="Schedule">
           <lore-icon name="pulse" [size]="13"></lore-icon>
         </button>
+      </div>
+
+      <!-- AI Preview -->
+      <div class="pr-preview" *ngIf="showPreview">
+        <div class="pr-preview-hdr">
+          <span>AI Response</span>
+          <span class="pr-preview-streaming" *ngIf="isRunning">● streaming</span>
+        </div>
+        <div class="pr-preview-error" *ngIf="aiError">{{ aiError }}</div>
+        <div class="pr-preview-body" *ngIf="!aiError" [innerHTML]="aiResultHtml"></div>
+        <div class="pr-preview-acts" *ngIf="!isRunning && aiResult && !aiError">
+          <button class="btn-gh" (click)="onSendToChat()">↗ Send to Chat</button>
+          <button class="btn-pr" (click)="onSaveAsNote()" *ngIf="!noteSaved">Save as Note</button>
+          <span class="pr-saved-badge" *ngIf="noteSaved">✓ Saved</span>
+        </div>
+        <!-- Section picker for save -->
+        <div class="pr-save-picker" *ngIf="showSavePicker">
+          <select class="pr-input" [(ngModel)]="saveSectionId">
+            <option value="">Choose section…</option>
+            <option *ngFor="let s of sectionsForSave" [value]="s.id">{{ s.label }}</option>
+          </select>
+          <button class="btn-pr" [disabled]="!saveSectionId" (click)="onConfirmSave()">Save</button>
+          <button class="btn-gh" (click)="showSavePicker = false">Cancel</button>
+        </div>
       </div>
 
       <!-- Schedule config -->

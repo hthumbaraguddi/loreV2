@@ -63,6 +63,9 @@
             <span class="pl-row-name">{{ p.name }}</span>
             <span class="pl-badge pl-badge-builtin" *ngIf="p.isBuiltIn">Built-in</span>
             <span class="pl-row-last">Last run: {{ formatDate(p.lastRunAt) }}</span>
+            <span class="pl-row-hist" *ngIf="getRunCount(p.id) > 0" (click)="toggleHistory(p.id)" title="View generated notes">
+              {{ getRunCount(p.id) }} note{{ getRunCount(p.id) === 1 ? '' : 's' }} ↓
+            </span>
           </div>
           <div class="pl-row-acts">
             <button class="pl-act-btn pl-act-run" (click)="onRun(p)" title="Run">▶ Run</button>
@@ -73,6 +76,13 @@
               [disabled]="p.isBuiltIn"
               [title]="p.isBuiltIn ? 'Built-in prompts cannot be deleted' : 'Delete'"
               (click)="onDelete(p)">✕</button>
+          </div>
+          <!-- Run history -->
+          <div class="pl-history" *ngIf="expandedHistoryId === p.id">
+            <div class="pl-hist-row" *ngFor="let note of getRunHistory(p.id)">
+              <span class="pl-hist-title">{{ note.title }}</span>
+              <span class="pl-hist-date">{{ formatDate(note.createdAt) }}</span>
+            </div>
           </div>
         </div>
       </div>

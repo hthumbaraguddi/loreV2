@@ -1,0 +1,55 @@
+<div class="pr-overlay" *ngIf="isOpen && prompt" (click)="close()">
+  <div class="pr-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="pr-hdr">
+      <div class="pr-hdr-left">
+        <span class="pr-hdr-icon">✦</span>
+        <div>
+          <div class="pr-hdr-title">{{ prompt.name }}</div>
+          <div class="pr-hdr-cat">{{ prompt.category }}</div>
+        </div>
+      </div>
+      <button class="pr-close" (click)="close()">
+        <lore-icon name="close" [size]="12"></lore-icon>
+      </button>
+    </div>
+
+    <div class="pr-body">
+      <!-- Variable form -->
+      <div class="pr-no-vars" *ngIf="variables.length === 0">
+        No variables — this prompt runs as-is.
+      </div>
+
+      <div class="pr-field" *ngFor="let v of variables">
+        <label class="pr-label">{{ v }}</label>
+        <textarea
+          *ngIf="isTextarea(v)"
+          class="pr-textarea"
+          [placeholder]="'Enter ' + v + '…'"
+          [(ngModel)]="values[v]"
+          rows="4">
+        </textarea>
+        <input
+          *ngIf="!isTextarea(v)"
+          class="pr-input"
+          type="text"
+          [placeholder]="'Enter ' + v + '…'"
+          [(ngModel)]="values[v]"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="pr-actions">
+        <button
+          class="btn-pr pr-send-btn"
+          [disabled]="!canSend"
+          (click)="onSendToChat()">
+          ↗ Send to Chat
+        </button>
+        <button class="btn-gh" (click)="onCopyPrompt()">Copy Prompt</button>
+      </div>
+    </div>
+
+  </div>
+</div>

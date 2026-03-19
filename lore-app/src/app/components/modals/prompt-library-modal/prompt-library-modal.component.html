@@ -1,0 +1,84 @@
+<div class="pl-overlay" *ngIf="isOpen" (click)="close()">
+  <div class="pl-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="pl-hdr">
+      <div class="pl-hdr-left">
+        <span class="pl-hdr-icon">✦</span>
+        <span class="pl-hdr-title">Prompt Library</span>
+      </div>
+      <div class="pl-hdr-acts">
+        <button class="btn-gh pl-hdr-btn" (click)="onImportClick()" title="Import prompt">
+          <lore-icon name="import" [size]="13"></lore-icon>
+          <span>Import</span>
+        </button>
+        <button class="btn-pr" (click)="onNewPrompt()">
+          + New Prompt
+        </button>
+        <button class="pl-close" (click)="close()">
+          <lore-icon name="close" [size]="12"></lore-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="pl-search-wrap">
+      <lore-icon name="search" [size]="12" class="pl-search-ico"></lore-icon>
+      <input
+        class="pl-search"
+        type="text"
+        placeholder="Search prompts…"
+        [(ngModel)]="searchQuery"
+      />
+    </div>
+
+    <!-- New Prompt Form -->
+    <div class="pl-new-form" *ngIf="showNewForm">
+      <div class="pl-new-row">
+        <input class="pl-input" placeholder="Prompt name *" [(ngModel)]="newName" />
+        <input class="pl-input pl-input-sm" placeholder="Category" [(ngModel)]="newCategory" />
+      </div>
+      <textarea
+        class="pl-textarea"
+        [placeholder]="'Prompt body — use ' + '{{variable}}' + ' for dynamic fields *'"
+        [(ngModel)]="newBody"
+        rows="5">
+      </textarea>
+      <div class="pl-new-acts">
+        <button class="btn-gh" (click)="onCancelNew()">Cancel</button>
+        <button class="btn-pr" [disabled]="!newName.trim() || !newBody.trim()" (click)="onSaveNew()">Save Prompt</button>
+      </div>
+    </div>
+
+    <!-- Prompt list -->
+    <div class="pl-body">
+      <div *ngIf="filtered.length === 0" class="pl-empty">
+        No prompts found.
+      </div>
+
+      <div *ngFor="let cat of categories" class="pl-category">
+        <div class="pl-cat-label">{{ cat }}</div>
+        <div class="pl-row" *ngFor="let p of promptsForCategory(cat)">
+          <div class="pl-row-info">
+            <span class="pl-row-name">{{ p.name }}</span>
+            <span class="pl-badge pl-badge-builtin" *ngIf="p.isBuiltIn">Built-in</span>
+            <span class="pl-row-last">Last run: {{ formatDate(p.lastRunAt) }}</span>
+          </div>
+          <div class="pl-row-acts">
+            <button class="pl-act-btn pl-act-run" (click)="onRun(p)" title="Run">▶ Run</button>
+            <button class="pl-act-btn" (click)="onDuplicate(p)" title="Duplicate">⧉</button>
+            <button class="pl-act-btn" (click)="onExport(p)" title="Export"><lore-icon name="export" [size]="11"></lore-icon></button>
+            <button
+              class="pl-act-btn pl-act-del"
+              [disabled]="p.isBuiltIn"
+              [title]="p.isBuiltIn ? 'Built-in prompts cannot be deleted' : 'Delete'"
+              (click)="onDelete(p)">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden import input -->
+    <input #importInput type="file" accept=".json" style="display:none" (change)="onImportFile($event)" />
+  </div>
+</div>

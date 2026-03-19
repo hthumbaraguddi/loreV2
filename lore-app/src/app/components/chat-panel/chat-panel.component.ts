@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import { ChatMessage } from '../../models';
-import { AnthropicService } from '../../services/anthropic.service';
+import { AnthropicService, AI_PROVIDERS } from '../../services/anthropic.service';
 import { DataService } from '../../services/data.service';
 
 interface ChatEntry {
@@ -21,6 +21,7 @@ interface ChatEntry {
   content: string;
   renderedHtml?: SafeHtml;
   streaming?: boolean;
+  saved?: boolean;
 }
 
 @Component({
@@ -33,11 +34,12 @@ interface ChatEntry {
 export class ChatPanelComponent implements OnChanges {
   @Input() isOpen = false;
   @Input() activeNotebookId: string | null = null;
+  @Input() initialPrompt = '';
 
   @Output() closed = new EventEmitter<void>();
 
   private sanitizer = inject(DomSanitizer);
-  private anthropic = inject(AnthropicService);
+  readonly anthropic = inject(AnthropicService);
   private data = inject(DataService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -55,6 +57,18 @@ export class ChatPanelComponent implements OnChanges {
     return !!this.anthropic.getApiKey();
   }
 
+  get providerLabel(): string {
+    const pid = this.anthropic.getProviderId();
+    const provider = AI_PROVIDERS.find(p => p.id === pid);
+    return provider ? `Ask ${provider.name}` : 'Ask AI';
+  }
+
+  get assistantLabel(): string {
+    const pid = this.anthropic.getProviderId();
+    const provider = AI_PROVIDERS.find(p => p.id === pid);
+    return provider?.name ?? 'AI';
+  }
+
   get notebooks() {
     return this.data.getState().notebooks;
   }
@@ -67,8 +81,10 @@ export class ChatPanelComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && !this.isOpen) {
-      // Panel closed — reset error
       this.errorMessage = '';
+    }
+    if (changes['initialPrompt'] && this.initialPrompt) {
+      this.inputText = this.initialPrompt;
     }
   }
 
@@ -113,11 +129,15 @@ export class ChatPanelComponent implements OnChanges {
       } else if (code === 'RATE_LIMITED') {
         this.errorMessage = 'Rate limit reached — try again shortly';
       } else if (code === 'NETWORK_ERROR') {
-        this.errorMessage = 'Could not reach Anthropic — check your connection';
+        this.errorMessage = 'Could not reach the AI provider — check your connection';
       } else if (code === 'STREAM_INTERRUPTED') {
         assistantEntry.content += '\n\n*Response was cut short.*';
+      } else if (code.startsWith('API_ERROR:')) {
+        const status = code.split(':')[1];
+        this.errorMessage = `API error (HTTP ${status}) — check the browser console for details`;
       } else {
-        this.errorMessage = 'Something went wrong — please try again';
+        console.error('[ChatPanel] Unexpected error:', err);
+        this.errorMessage = 'Something went wrong — check the browser console for details';
       }
     } finally {
       assistantEntry.streaming = false;
@@ -153,7 +173,6 @@ export class ChatPanelComponent implements OnChanges {
     if (this.sectionPickerMode === 'single') {
       const entry = this.entries[this.sectionPickerEntryIndex];
       if (!entry) return;
-      // Find the preceding user message as context
       const userMsg = this.entries.slice(0, this.sectionPickerEntryIndex)
         .reverse().find(e => e.role === 'user');
       const markdown = userMsg
@@ -161,19 +180,22 @@ export class ChatPanelComponent implements OnChanges {
         : entry.content;
       const title = this.extractTitle(entry.content);
       this.data.addNote(notebookId, sectionId, title, 'rich', { markdown });
+      entry.saved = true;
       this.data.showToast('✓ Saved as note');
     } else {
-      // Save full conversation
       const markdown = this.entries.map(e =>
         e.role === 'user'
           ? `**You:** ${e.content}`
-          : `**Claude:** ${e.content}`
+          : `**${this.assistantLabel}:** ${e.content}`
       ).join('\n\n---\n\n');
       const firstUser = this.entries.find(e => e.role === 'user');
       const title = firstUser ? this.extractTitle(firstUser.content) : 'Chat Conversation';
       this.data.addNote(notebookId, sectionId, title, 'rich', { markdown });
+      // Mark all assistant entries as saved
+      this.entries.forEach(e => { if (e.role === 'assistant') e.saved = true; });
       this.data.showToast('✓ Conversation saved as note');
     }
+    this.cdr.detectChanges();
   }
 
   onSectionPickerCancelled(): void {

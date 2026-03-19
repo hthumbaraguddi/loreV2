@@ -417,6 +417,14 @@ export class DataService {
     this.saveAll(this.currentUsername);
   }
 
+  /** Add a note to a section by sectionId alone — finds the parent notebook automatically. */
+  addNoteToSection(sectionId: string, title: string, templateId: string, data: Record<string, any>): Note | null {
+    const s = this.getState();
+    const notebook = s.notebooks.find(nb => nb.sections.some(sec => sec.id === sectionId));
+    if (!notebook) return null;
+    return this.addNote(notebook.id, sectionId, title, templateId, data);
+  }
+
   /** Append an already-constructed shelf + notebooks (used by import) */
   appendShelfWithNotebooks(shelf: Shelf, notebooks: Notebook[]): void {
     const s = this.getState();

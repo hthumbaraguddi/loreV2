@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { SavedPrompt } from '../models';
+import { SavedPrompt, Note } from '../models';
+import { DataService } from './data.service';
 
 const STORAGE_KEY = 'lore_prompts';
 
@@ -93,7 +94,7 @@ Use markdown formatting with a summary table.`,
 export class PromptService {
   private prompts: SavedPrompt[] = [];
 
-  constructor() {
+  constructor(private dataService: DataService) {
     this.load();
   }
 
@@ -232,5 +233,21 @@ export class PromptService {
     const userPrompts = prompts.filter(p => !p.isBuiltIn);
     this.prompts = [...builtIns, ...userPrompts];
     this.persist();
+  }
+
+  /** Returns all notes that were generated from a given prompt (by data.promptId). */
+  getRunHistory(promptId: string): Note[] {
+    const state = this.dataService.getState();
+    const results: Note[] = [];
+    for (const nb of state.notebooks) {
+      for (const sec of nb.sections) {
+        for (const note of sec.notes) {
+          if (note.data?.['promptId'] === promptId) {
+            results.push(note);
+          }
+        }
+      }
+    }
+    return results.sort((a, b) => b.createdAt - a.createdAt);
   }
 }

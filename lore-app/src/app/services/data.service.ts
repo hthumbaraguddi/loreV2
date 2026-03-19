@@ -36,7 +36,7 @@ export class DataService {
   }
 
   /** Load state directly from a plain object (e.g. from Drive) */
-  loadFromObject(obj: Partial<AppState>): void {
+  loadFromObject(obj: Partial<AppState>, prompts?: any[]): void {
     const restored: AppState = {
       shelves: Array.isArray(obj.shelves) ? obj.shelves : [],
       notebooks: Array.isArray(obj.notebooks) ? obj.notebooks : [],
@@ -46,6 +46,9 @@ export class DataService {
       fontSize: typeof obj.fontSize === 'number' ? obj.fontSize : 14,
     };
     this.state$.next(restored);
+    if (Array.isArray(prompts) && prompts.length > 0) {
+      localStorage.setItem('lore_prompts', JSON.stringify(prompts));
+    }
   }
 
   loadAll(username: string): void {
@@ -110,6 +113,7 @@ export class DataService {
         this.drive.scheduleSave({
           state: this.state$.getValue(),
           customTemplates: this.getCustomTemplatesRaw(),
+          prompts: this.getPromptsRaw(),
         });
       } else {
         console.log('[Data] no Drive token — saved to localStorage only');
@@ -126,6 +130,12 @@ export class DataService {
   private getCustomTemplatesRaw(): any[] {
     try {
       return JSON.parse(localStorage.getItem('lore_custom_templates') || '[]');
+    } catch { return []; }
+  }
+
+  private getPromptsRaw(): any[] {
+    try {
+      return JSON.parse(localStorage.getItem('lore_prompts') || '[]');
     } catch { return []; }
   }
 

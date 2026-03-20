@@ -1,14 +1,13 @@
 {
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "app-shell",
+      "name": "app",
       "installMode": "prefetch",
-      "updateMode": "prefetch",
       "resources": {
         "files": [
           "/favicon.ico",
-          "/favicon.svg",
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",
@@ -17,25 +16,13 @@
       }
     },
     {
-      "name": "fonts-and-media",
-      "installMode": "prefetch",
-      "updateMode": "prefetch",
-      "resources": {
-        "files": [
-          "/media/*.woff2",
-          "/media/*.woff",
-          "/media/*.svg",
-          "/media/*.png"
-        ]
-      }
-    },
-    {
       "name": "assets",
-      "installMode": "prefetch",
+      "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
         "files": [
-          "/assets/**"
+          "/assets/**",
+          "/media/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
       }
     }

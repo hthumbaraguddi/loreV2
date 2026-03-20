@@ -286,7 +286,7 @@
 .land-divider {
   width: 1px;
   align-self: stretch;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.08) 15%, rgba(255,255,255,0.08) 85%, transparent);
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent 100%);
   flex-shrink: 0;
 }
 
@@ -510,7 +510,7 @@
   .land-divider {
     width: auto;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent);
+    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent 100%);
   }
 
   .land-right {

@@ -1,3 +1,12 @@
+// ══ SELF-HOSTED FONTS (bundled via @fontsource — no external requests) ══════
+@import '@fontsource/lora/latin-400.css';
+@import '@fontsource/lora/latin-500.css';
+@import '@fontsource/lora/latin-600.css';
+@import '@fontsource/dm-sans/latin-300.css';
+@import '@fontsource/dm-sans/latin-400.css';
+@import '@fontsource/dm-sans/latin-500.css';
+@import '@fontsource/dm-sans/latin-600.css';
+
 // ══ THEMES ══════════════════════════════════════════
 :root, [data-theme="default"] {
   --bg: #F7F6F3;

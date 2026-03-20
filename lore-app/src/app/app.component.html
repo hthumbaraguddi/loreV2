@@ -3,13 +3,6 @@
 <ng-container *ngIf="isLoggedIn && (state$ | async) as state">
   <div id="app" [class.sb-collapsed]="state.sidebarCollapsed">
 
-    <!-- Drive reconnect banner (shown when silent token fails after Google sign-in) -->
-    <div *ngIf="needsDriveConnect && !isLocalMode" class="drive-banner">
-      <span>Connect Google Drive to sync your notes across devices.</span>
-      <button class="drive-banner-btn" (click)="onConnectDrive()">Connect Drive</button>
-      <button class="drive-banner-dismiss" (click)="needsDriveConnect = false">✕</button>
-    </div>
-
     <!-- Sidebar -->
     <app-sidebar
       [state]="state"
@@ -38,6 +31,8 @@
         [hasActiveNotebook]="!!state.activeNotebookId"
         [syncStatus]="syncStatus"
         [isLocalMode]="isLocalMode"
+        [driveConnected]="driveConnected"
+        [needsDriveConnect]="needsDriveConnect"
         (searchChanged)="onSearchChanged($event)"
         (addSection)="onAddSection()"
         (addNote)="onNewPageNote(null, state)"
@@ -46,6 +41,8 @@
         (openChat)="onOpenChat()"
         (openPrompts)="onOpenPrompts()"
         (openSettings)="onOpenSettings()"
+        (connectDrive)="onConnectDrive()"
+        (reloadFromDrive)="onReloadFromDrive()"
         (logout)="onLogout()">
       </app-topbar>
 

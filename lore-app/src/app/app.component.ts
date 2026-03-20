@@ -67,6 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
   displayName = '';
   syncStatus: SyncStatus = 'idle';
   needsDriveConnect = false;
+  driveConnected = false;
   get isLocalMode(): boolean { return this.auth.isLocalMode; }
   state$!: Observable<AppState>;
   readonly sectionColors: SectionColorMap = SECTION_COLORS;
@@ -169,6 +170,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       // Fresh login: loadUserData() is called via (tokenReady) output after token is ready
     });    this.drive.syncStatus$.subscribe(s => this.syncStatus = s);
+    this.drive.driveConnected$.subscribe(connected => this.driveConnected = connected);
   }
 
   ngOnDestroy(): void {
@@ -528,6 +530,25 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Called from topbar reload button — re-fetches latest data from Drive */
+  async onReloadFromDrive(): Promise<void> {
+    if (!this.drive.hasToken()) {
+      this.needsDriveConnect = true;
+      return;
+    }
+    this.data.showToast('Syncing from Drive…');
+    const driveData = await this.drive.load();
+    if (driveData?.state) {
+      this.data.loadFromObject(driveData.state, driveData.prompts);
+      if (Array.isArray(driveData.customTemplates)) {
+        localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+      }
+      this.data.showToast('✓ Loaded from Google Drive');
+    } else {
+      this.data.showToast("You're up to date");
+    }
+  }
+
   async onDriveReconnected(): Promise<void> {
     this.needsDriveConnect = false;
     const driveData = await this.drive.load();
@@ -728,12 +749,24 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private applyStoredAppearance(): void {
     try {
-      const cu = localStorage.getItem('lore_cu') || '';
-      if (!cu) return;
-      const raw = localStorage.getItem('lore_users');
-      if (!raw) return;
-      const users = JSON.parse(raw);
-      const userData = users[cu]?.data;
+      let userData: any = null;
+
+      if (localStorage.getItem('lore_mode') === 'local') {
+        // Local mode: appearance is stored inside the app state under 'local' username
+        const raw = localStorage.getItem('lore_users');
+        if (raw) {
+          const users = JSON.parse(raw);
+          userData = users['local']?.data;
+        }
+      } else {
+        const cu = localStorage.getItem('lore_cu') || '';
+        if (!cu) return;
+        const raw = localStorage.getItem('lore_users');
+        if (!raw) return;
+        const users = JSON.parse(raw);
+        userData = users[cu]?.data;
+      }
+
       if (!userData) return;
       const html = document.documentElement;
       if (userData.theme && typeof userData.theme === 'string') {

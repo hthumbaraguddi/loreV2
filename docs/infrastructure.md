@@ -145,3 +145,83 @@ Any note/shelf/notebook change
   → DataService saves to localStorage immediately
   → DriveService.scheduleSave() → debounced 800ms → writes lore-data.json to Drive
 ```
+
+---
+
+## 6. Performance — PWA & Caching Strategy
+
+The app is configured as a **Progressive Web App (PWA)** using Angular's built-in service worker (`@angular/service-worker`). The goal is that after the first visit, the entire app runs from the browser cache with zero requests to Azure.
+
+### How it works
+
+**First visit:**
+1. Browser fetches `index.html` from Azure (served with `no-cache` — always fresh)
+2. `index.html` loads the Angular app (`main.js`, `styles.css`, `polyfills.js`)
+3. The Angular service worker (`ngsw-worker.js`) installs and immediately **prefetches** all app assets into the browser's Cache Storage — JS bundles, CSS, fonts, icons, SVGs
+
+**Every subsequent visit:**
+1. Service worker intercepts all requests before they reach the network
+2. All app assets are served from cache — no Azure round-trips, instant load
+3. In the background, the service worker fetches `ngsw.json` from Azure (a tiny manifest file, ~1kb)
+4. If a new version was deployed, it downloads the changed files silently
+5. The update activates on the user's next tab open — no manual cache clearing needed
+
+**Google Sign-In & Drive sync:**
+- These are calls to `accounts.google.com` and `www.googleapis.com` — external origins
+- The service worker does not intercept external origins, so auth and data sync work exactly as before
+
+### Files involved
+
+| File | Purpose |
+|---|---|
+| `lore-app/ngsw-config.json` | Defines which assets the service worker caches and with what strategy |
+| `lore-app/src/app/app.config.ts` | Registers the service worker (`provideServiceWorker`) |
+| `lore-app/src/manifest.webmanifest` | PWA manifest — app name, icons, theme color for "Add to Home Screen" |
+| `lore-app/public/staticwebapp.config.json` | Azure cache headers — immutable for hashed assets, no-cache for `index.html` |
+
+### Cache strategy details
+
+**`ngsw-config.json` — asset groups:**
+
+| Group | Strategy | What's included |
+|---|---|---|
+| `app-shell` | `prefetch` (install + update) | `index.html`, `*.js`, `*.css`, `manifest.webmanifest`, favicons |
+| `fonts-and-media` | `prefetch` (install + update) | All `.woff2`, `.woff`, `.svg`, `.png` in `/media/` |
+| `assets` | `prefetch` (install + update) | Everything in `/assets/` (icons SVG sprite, PWA icons) |
+
+`prefetch` means: download everything eagerly on first install, and re-download changed files eagerly when a new version is detected.
+
+**`staticwebapp.config.json` — HTTP cache headers:**
+
+| Route | Cache-Control | Reason |
+|---|---|---|
+| `/index.html` | `no-cache, no-store, must-revalidate` | Always check for new version |
+| `/*.js`, `/*.css` | `public, max-age=31536000, immutable` | Content-hashed filenames — safe to cache forever |
+| `/assets/*` | `public, max-age=604800, stale-while-revalidate=86400` | 1 week, serve stale while refreshing |
+| `/assets/fonts/*` | `public, max-age=31536000, immutable` | Font files never change |
+
+### Self-hosted fonts
+
+Google Fonts CDN was removed from `index.html`. Fonts are now bundled via `@fontsource` npm packages and included in the Angular build output. This eliminates the external DNS lookup and font download on every visit.
+
+Fonts bundled:
+- **Lora** (weights 400, 500, 600) — used for headings and brand name
+- **DM Sans** (weights 300, 400, 500, 600) — used for all UI text
+
+Font files are output to `/media/` with content-hashed filenames and served with 1-year immutable cache headers.
+
+### Service worker lifecycle
+
+```
+User visits lore.thumbaraguddi.in
+  → Browser fetches index.html (no-cache → always hits Azure, ~1kb)
+  → index.html loads main.js from cache (if cached) or Azure (first visit)
+  → ngsw-worker.js activates
+  → SW checks ngsw.json on Azure (background, ~1kb)
+    → If unchanged: serve everything from cache, no Azure traffic
+    → If new version: download changed files in background, activate on next visit
+```
+
+### Development note
+
+The service worker is **disabled in development mode** (`enabled: !isDevMode()` in `app.config.ts`). Running `ng serve` locally behaves normally — no caching, hot reload works as expected. The service worker only activates in production builds deployed to Azure.

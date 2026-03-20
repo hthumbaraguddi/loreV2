@@ -19,6 +19,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Input() hasActiveNotebook: boolean = false;
   @Input() syncStatus: SyncStatus = 'idle';
   @Input() isLocalMode: boolean = false;
+  @Input() driveConnected: boolean = false;
+  @Input() needsDriveConnect: boolean = false;
 
   @Output() searchChanged = new EventEmitter<string>();
   @Output() addSection = new EventEmitter<void>();
@@ -29,6 +31,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Output() openPrompts = new EventEmitter<void>();
   @Output() openSettings = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
+  @Output() connectDrive = new EventEmitter<void>();
+  @Output() reloadFromDrive = new EventEmitter<void>();
 
   searchValue: string = '';
 
@@ -87,6 +91,14 @@ export class TopbarComponent implements OnInit, OnDestroy {
 
   onLogout(): void {
     this.logout.emit();
+  }
+
+  onConnectDrive(): void {
+    this.connectDrive.emit();
+  }
+
+  onReloadFromDrive(): void {
+    this.reloadFromDrive.emit();
   }
 
   get syncLabel(): string {

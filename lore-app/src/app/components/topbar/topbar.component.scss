@@ -139,6 +139,52 @@
   to   { transform: rotate(360deg); }
 }
 
+// Drive status chips
+.btn-drive-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  white-space: nowrap;
+  border: 1px solid;
+
+  svg { flex-shrink: 0; }
+}
+
+.btn-drive-connect {
+  background: rgba(124,106,246,0.1);
+  border-color: rgba(124,106,246,0.35);
+  color: #A78BFA;
+
+  &:hover {
+    background: rgba(124,106,246,0.18);
+    border-color: rgba(124,106,246,0.55);
+    color: #C4B5FD;
+  }
+}
+
+.btn-drive-reload {
+  background: var(--inp);
+  border-color: var(--border);
+  color: var(--ts);
+
+  &:hover {
+    background: var(--card2);
+    border-color: var(--bh);
+    color: var(--tp);
+
+    svg {
+      animation: spin 0.6s linear;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .btn-save-drive .save-lbl {
     display: none;
@@ -149,5 +195,13 @@
     width: 36px;
     height: 36px;
     justify-content: center;
+  }
+
+  .drive-reload-lbl {
+    display: none;
+  }
+
+  .btn-drive-chip {
+    padding: 6px 8px;
   }
 }

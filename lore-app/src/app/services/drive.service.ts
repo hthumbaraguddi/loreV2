@@ -14,6 +14,8 @@ const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
 @Injectable({ providedIn: 'root' })
 export class DriveService {
   syncStatus$ = new BehaviorSubject<SyncStatus>('idle');
+  /** Emits true once a valid access token is available, false after clearToken(). */
+  driveConnected$ = new BehaviorSubject<boolean>(false);
 
   private accessToken = '';
   private tokenClient: any = null;
@@ -52,8 +54,9 @@ export class DriveService {
       if (!this.tokenClient) { reject('Token client not ready'); return; }
       this.tokenClient.callback = (resp: any) => {
         this.zone.run(() => {
-          if (resp.error) { reject(resp.error); return; }
+          if (resp.error) { this.driveConnected$.next(false); reject(resp.error); return; }
           this.accessToken = resp.access_token;
+          this.driveConnected$.next(true);
           resolve();
         });
       };
@@ -67,12 +70,12 @@ export class DriveService {
       if (!this.tokenClient) { reject('Token client not ready'); return; }
       this.tokenClient.callback = (resp: any) => {
         this.zone.run(() => {
-          if (resp.error) { reject(resp.error); return; }
+          if (resp.error) { this.driveConnected$.next(false); reject(resp.error); return; }
           this.accessToken = resp.access_token;
+          this.driveConnected$.next(true);
           resolve();
         });
       };
-      // Use 'select_account' so the user can pick their account in the popup
       this.tokenClient.requestAccessToken({ prompt: 'select_account' });
     });
   }
@@ -202,6 +205,7 @@ export class DriveService {
   clearToken(): void {
     this.accessToken = '';
     this.fileId = '';
+    this.driveConnected$.next(false);
     this.syncStatus$.next('idle');
   }
 }

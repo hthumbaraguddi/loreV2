@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, inject, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild, ElementRef, NgZone, isDevMode } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
+import { SwUpdate } from '@angular/service-worker';
 import { AuthService } from './services/auth.service';
 import { DataService } from './services/data.service';
 import { TemplateService } from './services/template.service';
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private drive = inject(DriveService);
   private scheduler = inject(ScheduledPromptService);
   private zone = inject(NgZone);
+  private swUpdate = inject(SwUpdate, { optional: true });
 
   @ViewChild('importFileInput') importFileInput!: ElementRef<HTMLInputElement>;
 
@@ -125,6 +127,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.applyStoredAppearance();
     this.registerWindowHelpers();
     this.state$ = this.data.state$;
+
+    // Check for app updates and reload automatically when a new version is available
+    if (this.swUpdate?.isEnabled) {
+      this.swUpdate.versionUpdates.subscribe(evt => {
+        if (evt.type === 'VERSION_READY') {
+          this.swUpdate!.activateUpdate().then(() => document.location.reload());
+        }
+      });
+      this.swUpdate.checkForUpdate();
+    }
 
     // Check if there's already a session before subscribing
     // (isLoggedIn$ fires synchronously from BehaviorSubject)

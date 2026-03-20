@@ -4,11 +4,14 @@ import {
   Output,
   EventEmitter,
   OnChanges,
+  OnInit,
+  OnDestroy,
   SimpleChanges,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AppState, CustomTemplate } from '../../models';
 import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
@@ -49,7 +52,7 @@ const SECTION_COLOR_MAP: Record<string, { bg: string; border: string }> = {
   templateUrl: './settings-panel.component.html',
   styleUrls: ['./settings-panel.component.scss'],
 })
-export class SettingsPanelComponent implements OnChanges {
+export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
   @Input() isOpen: boolean = false;
   @Input() state!: AppState;
   @Input() customTemplates: CustomTemplate[] = [];
@@ -73,6 +76,17 @@ export class SettingsPanelComponent implements OnChanges {
   private anthropicService = inject(AnthropicService);
 
   driveConnecting = false;
+  driveConnected = false;
+
+  private driveSub!: Subscription;
+
+  ngOnInit(): void {
+    this.driveSub = this.driveService.driveConnected$.subscribe(v => this.driveConnected = v);
+  }
+
+  ngOnDestroy(): void {
+    this.driveSub?.unsubscribe();
+  }
 
   apiKey: string = '';
   apiEndpoint: string = '';
@@ -201,10 +215,6 @@ export class SettingsPanelComponent implements OnChanges {
 
   get isLocalMode(): boolean {
     return this.authService.isLocalMode;
-  }
-
-  get driveConnected(): boolean {
-    return this.driveService.hasToken();
   }
 
   async onReconnectDrive(): Promise<void> {

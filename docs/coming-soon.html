@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lore — Coming Soon</title>
+  <meta name="description" content="Lore is coming to lorenotes.in. Something thoughtful is on its way.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --acc: #7C6AF6;
+      --acc2: #60A5FA;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #0F0B1E, #1A1035 45%, #0D1829);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    /* Ambient glows */
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 {
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(124,106,246,0.12), transparent 70%);
+      top: -15%;
+      left: 5%;
+    }
+    .glow-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(96,165,250,0.08), transparent 70%);
+      bottom: -10%;
+      right: 5%;
+    }
+    .glow-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(167,139,250,0.07), transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(124,106,246,0.5);
+      animation: float-up linear infinite;
+    }
+    @keyframes float-up {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+    }
+
+    /* Main content */
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px 24px;
+      max-width: 560px;
+      width: 100%;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    /* Eyebrow */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(167,139,250,0.7);
+      background: rgba(124,106,246,0.1);
+      border: 1px solid rgba(124,106,246,0.22);
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #A78BFA, #60A5FA);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* Headline */
+    .headline {
+      font-family: 'Lora', serif;
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .headline-grad {
+      background: linear-gradient(90deg, #A78BFA, #7C6AF6, #60A5FA, #A78BFA);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: grad-sweep 5s ease infinite;
+    }
+
+    @keyframes grad-sweep {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Subtext */
+    .subtext {
+      font-size: 15px;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.7;
+      margin-bottom: 48px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Notify form */
+    .notify-form {
+      display: flex;
+      gap: 8px;
+      max-width: 380px;
+      margin: 0 auto 16px;
+    }
+
+    .notify-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .notify-input::placeholder { color: rgba(255,255,255,0.25); }
+    .notify-input:focus { border-color: rgba(124,106,246,0.5); }
+
+    .notify-btn {
+      background: var(--acc);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .notify-btn:hover  { opacity: 0.88; }
+    .notify-btn:active { transform: scale(0.97); }
+
+    .notify-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 0.02em;
+    }
+
+    /* Confirmation state */
+    .notify-confirm {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(167,139,250,0.8);
+      margin-bottom: 16px;
+    }
+    .notify-confirm.show { display: flex; }
+    .notify-form.hide    { display: none; }
+
+    /* Divider */
+    .divider {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.08), transparent);
+      margin: 40px auto;
+    }
+
+    /* Domain badge */
+    .domain {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.04em;
+    }
+
+    .domain-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(124,106,246,0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .notify-form { flex-direction: column; }
+      .notify-btn  { width: 100%; }
+      .logo        { margin-bottom: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient glows -->
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+
+  <!-- Floating particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Content -->
+  <div class="container">
+
+    <!-- Logo -->
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="10" fill="url(#lg-grad)"/>
+        <text x="20" y="27" text-anchor="middle" font-family="Lora, serif" font-size="20" font-weight="700" fill="white">L</text>
+        <circle cx="30" cy="10" r="4" fill="url(#acc-grad)" opacity="0.9"/>
+        <defs>
+          <linearGradient id="lg-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#4F3FCC"/>
+            <stop offset="100%" stop-color="#7C6AF6"/>
+          </linearGradient>
+          <linearGradient id="acc-grad" x1="0" y1="0" x2="8" y2="8" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#A78BFA"/>
+            <stop offset="100%" stop-color="#60A5FA"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-name">Lore</span>
+    </div>
+
+    <!-- Eyebrow -->
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      Something is coming
+    </div>
+
+    <!-- Headline -->
+    <h1 class="headline">
+      Your thoughts,<br>
+      <span class="headline-grad">finally at home.</span>
+    </h1>
+
+    <!-- Subtext -->
+    <p class="subtext">
+      A quieter, more intentional place for everything you think, learn, and create.
+      <br>lorenotes.in — arriving soon.
+    </p>
+
+    <!-- Notify form -->
+    <div class="notify-form" id="notifyForm">
+      <input class="notify-input" type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
+      <button class="notify-btn" onclick="handleNotify()">Notify me</button>
+    </div>
+
+    <div class="notify-confirm" id="notifyConfirm">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="6.5" stroke="rgba(167,139,250,0.6)"/>
+        <path d="M4 7l2 2 4-4" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      You're on the list. We'll reach out.
+    </div>
+
+    <p class="notify-hint" id="notifyHint">No spam. Just one note when we're ready.</p>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Domain -->
+    <div class="domain">
+      <span class="domain-dot"></span>
+      lorenotes.in
+      <span class="domain-dot"></span>
+    </div>
+
+  </div>
+
+  <script>
+    // Particles
+    (function() {
+      const container = document.getElementById('particles');
+      const count = 18;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.bottom = '-10px';
+        p.style.width = (Math.random() * 2 + 1) + 'px';
+        p.style.height = p.style.width;
+        p.style.animationDuration = (Math.random() * 12 + 8) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        p.style.opacity = Math.random() * 0.6 + 0.2;
+        container.appendChild(p);
+      }
+    })();
+
+    // Notify
+    function handleNotify() {
+      const input = document.getElementById('emailInput');
+      const form  = document.getElementById('notifyForm');
+      const confirm = document.getElementById('notifyConfirm');
+      const hint  = document.getElementById('notifyHint');
+      if (!input.value || !input.value.includes('@')) {
+        input.style.borderColor = 'rgba(252,129,129,0.5)';
+        setTimeout(() => input.style.borderColor = '', 1200);
+        return;
+      }
+      form.classList.add('hide');
+      confirm.classList.add('show');
+      hint.style.display = 'none';
+    }
+
+    document.getElementById('emailInput')?.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleNotify();
+    });
+  </script>
+
+</body>
+</html>

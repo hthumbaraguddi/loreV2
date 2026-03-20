@@ -1,7 +1,14 @@
-<app-login *ngIf="!isLoggedIn" (tokenReady)="loadUserData()"></app-login>
+<app-login *ngIf="!isLoggedIn" (tokenReady)="loadUserData()" (driveConnectNeeded)="needsDriveConnect = true"></app-login>
 
 <ng-container *ngIf="isLoggedIn && (state$ | async) as state">
   <div id="app" [class.sb-collapsed]="state.sidebarCollapsed">
+
+    <!-- Drive reconnect banner (shown when silent token fails after Google sign-in) -->
+    <div *ngIf="needsDriveConnect && !isLocalMode" class="drive-banner">
+      <span>Connect Google Drive to sync your notes across devices.</span>
+      <button class="drive-banner-btn" (click)="onConnectDrive()">Connect Drive</button>
+      <button class="drive-banner-dismiss" (click)="needsDriveConnect = false">✕</button>
+    </div>
 
     <!-- Sidebar -->
     <app-sidebar

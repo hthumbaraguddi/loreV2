@@ -65,6 +65,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   displayName = '';
   syncStatus: SyncStatus = 'idle';
+  needsDriveConnect = false;
   get isLocalMode(): boolean { return this.auth.isLocalMode; }
   state$!: Observable<AppState>;
   readonly sectionColors: SectionColorMap = SECTION_COLORS;
@@ -157,7 +158,11 @@ export class AppComponent implements OnInit, OnDestroy {
                   }
                 }
               })
-              .catch(e => console.warn('[App] session restore: Drive sync skipped (silent token failed):', e));
+              .catch(e => {
+                console.warn('[App] session restore: silent token failed, data already loaded from localStorage:', e);
+                // Data is already loaded from localStorage above — app is usable.
+                // Drive will re-sync next time the user interacts (token refreshes on next save).
+              });
           }
         }
       }
@@ -500,7 +505,26 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isSettingsPanelOpen = false;
   }
 
+  async onConnectDrive(): Promise<void> {
+    try {
+      await this.drive.requestToken();
+      this.needsDriveConnect = false;
+      const driveData = await this.drive.load();
+      if (driveData?.state) {
+        this.data.loadFromObject(driveData.state, driveData.prompts);
+        if (Array.isArray(driveData.customTemplates)) {
+          localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
+        }
+        this.data.showToast('✓ Synced from Google Drive');
+      }
+    } catch (e) {
+      console.warn('[App] Drive connect failed:', e);
+      this.data.showToast('Drive access denied — working offline');
+    }
+  }
+
   async onDriveReconnected(): Promise<void> {
+    this.needsDriveConnect = false;
     // User reconnected Drive from settings — load latest data from Drive
     const driveData = await this.drive.load();
     if (driveData?.state) {

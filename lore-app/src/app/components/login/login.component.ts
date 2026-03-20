@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   private zone = inject(NgZone);
 
   @Output() tokenReady = new EventEmitter<void>();
+  @Output() driveConnectNeeded = new EventEmitter<void>();
 
   errorMessage = '';
   driveConnecting = false;
@@ -42,10 +43,13 @@ export class LoginComponent implements OnInit {
     try {
       await this.drive.requestToken();
       this.showDriveConnect = false;
+      // Only emit tokenReady if we haven't already (i.e. silent token failed path)
+      // In the new flow tokenReady was already emitted, so just trigger a Drive load
+      // by emitting again — app.component.loadUserData() will re-load from Drive
       this.tokenReady.emit();
     } catch (e) {
       console.warn('Drive connect failed:', e);
-      this.errorMessage = 'Drive access denied. You can still use the app without sync.';
+      this.errorMessage = 'Drive access denied. Your local data is still available.';
       this.driveConnecting = false;
     }
   }
@@ -68,11 +72,14 @@ export class LoginComponent implements OnInit {
               // Try silent token first (no popup — works if already authorized on this browser)
               try {
                 await this.drive.requestTokenSilent();
+                // Silent succeeded — emit tokenReady so app loads Drive data immediately
                 this.tokenReady.emit();
               } catch (e) {
-                // Silent failed — show explicit authorize button (user gesture needed for popup)
-                console.warn('Silent Drive token failed, showing authorize button:', e);
-                this.showDriveConnect = true;
+                // Silent failed — emit tokenReady anyway so app loads from localStorage
+                // and show the Drive connect button as a non-blocking option
+                console.warn('Silent Drive token failed, loading from localStorage:', e);
+                this.tokenReady.emit();
+                this.driveConnectNeeded.emit();
               }
             });
           }

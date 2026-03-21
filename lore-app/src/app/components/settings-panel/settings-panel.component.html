@@ -312,7 +312,7 @@
                   <ng-container *ngIf="gistConfigured">Sync to a private Gist — your data stays in your GitHub account</ng-container>
                   <ng-container *ngIf="!gistConfigured">Not configured — see Settings → GitHub OAuth setup</ng-container>
                 </ng-container>
-                <ng-container *ngIf="gistSyncStatus !== 'disconnected'">Connected as @{{ gistUsername }}</ng-container>
+                <ng-container *ngIf="gistSyncStatus !== 'disconnected'">Connected as {{ '@' + gistUsername }}</ng-container>
               </div>
             </div>
             <div class="sp-sync-status-dot"

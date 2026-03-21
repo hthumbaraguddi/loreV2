@@ -287,18 +287,7 @@
   width: 1px;
   align-self: stretch;
   flex-shrink: 0;
-  background: transparent;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.08) 75%, transparent 100%);
-  }
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.10) 80%, transparent 100%);
 }
 
 // ── Right column ──────────────────────────────────────────────────────────────
@@ -521,11 +510,7 @@
   .land-divider {
     width: auto;
     height: 1px;
-    background: transparent;
-
-    &::after {
-      background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.08) 75%, transparent 100%);
-    }
+    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.10) 80%, transparent 100%);
   }
 
   .land-right {

@@ -7,6 +7,8 @@ import { DataService } from './services/data.service';
 import { TemplateService } from './services/template.service';
 import { ExportImportService } from './services/export-import.service';
 import { DriveService, SyncStatus } from './services/drive.service';
+import { FileSyncService } from './services/file-sync.service';
+import { GistSyncService } from './services/gist-sync.service';
 import { AppState, Shelf, Notebook, Section, Note, CustomTemplate, SECTION_COLORS, SectionColorMap } from './models';
 import { LoginComponent } from './components/login/login.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -59,6 +61,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private templateService = inject(TemplateService);
   private exportImport = inject(ExportImportService);
   private drive = inject(DriveService);
+  private fileSync = inject(FileSyncService);
+  private gistSync = inject(GistSyncService);
   private scheduler = inject(ScheduledPromptService);
   private zone = inject(NgZone);
   private swUpdate = inject(SwUpdate, { optional: true });
@@ -128,6 +132,22 @@ export class AppComponent implements OnInit, OnDestroy {
     this.registerWindowHelpers();
     this.state$ = this.data.state$;
 
+    // Handle GitHub OAuth callback (?code=... in URL)
+    this.gistSync.handleOAuthCallback().then(async handled => {
+      if (handled) {
+        console.log('[App] GitHub OAuth callback handled');
+        // Log in with the GitHub user info from GistSyncService
+        const username = this.gistSync.username$.getValue();
+        this.auth.loginWithGitHub(username, username);
+        await this.loadUserData();
+      }
+    });
+
+    // Restore file sync handle from IndexedDB (if user previously picked a file)
+    this.fileSync.restoreHandle().then(restored => {
+      if (restored) console.log('[App] File sync handle restored:', this.fileSync.getFileName());
+    });
+
     // Check for app updates and reload automatically when a new version is available
     if (this.swUpdate?.isEnabled) {
       this.swUpdate.versionUpdates.subscribe(evt => {
@@ -159,24 +179,21 @@ export class AppComponent implements OnInit, OnDestroy {
           if (this.data.getState().shelves.length === 0) {
             this.data.seedDemoData();
           }
-          // For Google users: re-acquire Drive token silently and sync from Drive
-          if (!this.auth.isLocalMode) {
-            this.drive.requestTokenSilent()
-              .then(() => this.drive.load())
-              .then(driveData => {
-                this.zone.run(() => {
-                  if (driveData?.state) {
-                    console.log('[App] session restore: loaded from Drive');
-                    this.data.loadFromObject(driveData.state, driveData.prompts);
-                    if (Array.isArray(driveData.customTemplates)) {
-                      localStorage.setItem('lore_custom_templates', JSON.stringify(driveData.customTemplates));
-                    }
+          // For GitHub users: sync from Gist in background
+          if (this.auth.isGitHubMode) {
+            this.gistSync.load().then(gistData => {
+              this.zone.run(() => {
+                if (gistData?.state) {
+                  console.log('[App] session restore: loaded from Gist');
+                  this.data.loadFromObject(gistData.state, gistData.prompts);
+                  if (Array.isArray(gistData.customTemplates)) {
+                    localStorage.setItem('lore_custom_templates', JSON.stringify(gistData.customTemplates));
                   }
-                });
-              })
-              .catch(e => {
-                console.warn('[App] session restore: silent token failed, data already loaded from localStorage:', e);
+                }
               });
+            }).catch(e => {
+              console.warn('[App] session restore: Gist load failed, using localStorage:', e);
+            });
           }
         }
       }
@@ -197,7 +214,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.data.setCurrentUser(user.username);
 
     if (this.auth.isLocalMode) {
-      // Local mode: load from localStorage only, skip Drive
+      // Local mode: load from localStorage only
       this.data.loadAll(user.username);
       if (this.data.getState().shelves.length === 0) {
         this.data.seedDemoData();
@@ -206,6 +223,27 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.auth.isGitHubMode) {
+      // GitHub mode: load from Gist, fall back to localStorage
+      const gistData = await this.gistSync.load();
+      this.zone.run(() => {
+        if (gistData?.state) {
+          this.data.loadFromObject(gistData.state, gistData.prompts);
+          if (Array.isArray(gistData.customTemplates)) {
+            localStorage.setItem('lore_custom_templates', JSON.stringify(gistData.customTemplates));
+          }
+        } else {
+          this.data.loadAll(user.username);
+        }
+        if (this.data.getState().shelves.length === 0) {
+          this.data.seedDemoData();
+        }
+        this.scheduler.runOverdue();
+      });
+      return;
+    }
+
+    // Legacy Google Drive path (kept for existing Google users)
     const driveData = await this.drive.load();
     this.zone.run(() => {
       if (driveData?.state) {
@@ -387,8 +425,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onSaveNow(): void {
     if (this.auth.isLocalMode) {
-      // Local mode: data is already saved to localStorage on every mutation
       this.data.showToast('✓ Saved locally');
+      return;
+    }
+    if (this.auth.isGitHubMode) {
+      this.gistSync.save({
+        state: this.data.getState(),
+        customTemplates: JSON.parse(localStorage.getItem('lore_custom_templates') || '[]'),
+        prompts: JSON.parse(localStorage.getItem('lore_prompts') || '[]'),
+      });
       return;
     }
     this.drive.save({

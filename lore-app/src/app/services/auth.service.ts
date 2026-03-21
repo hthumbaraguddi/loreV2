@@ -6,6 +6,7 @@ const USERS_KEY = 'lore_users';
 const CU_KEY = 'lore_cu';
 const MODE_KEY = 'lore_mode';
 const LOCAL_USER_KEY = 'local_user';
+const GH_TOKEN_KEY = 'lore_gh_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -38,6 +39,19 @@ export class AuthService {
         return;
       }
     }
+    // Restore GitHub session (token already in localStorage via GistSyncService)
+    if (localStorage.getItem(MODE_KEY) === 'github') {
+      const cu = localStorage.getItem(CU_KEY) || '';
+      if (cu) {
+        const users = this.getUsers();
+        const user = users[cu];
+        if (user) {
+          this.currentUser$.next(user);
+          this.isLoggedIn$.next(true);
+          return;
+        }
+      }
+    }
     const cu = localStorage.getItem(CU_KEY) || '';
     if (!cu) return;
     const users = this.getUsers();
@@ -62,6 +76,21 @@ export class AuthService {
     } catch {
       return {};
     }
+  }
+
+  loginWithGitHub(login: string, name: string): void {
+    const ghKey = `github_${login}`;
+    const users = this.getUsers();
+    if (!users[ghKey]) {
+      users[ghKey] = { username: ghKey, password: '', name: name || login, email: '', data: {} };
+    } else {
+      users[ghKey].name = name || login;
+    }
+    this.saveUsers(users);
+    localStorage.setItem(CU_KEY, ghKey);
+    localStorage.setItem(MODE_KEY, 'github');
+    this.currentUser$.next(users[ghKey]);
+    this.isLoggedIn$.next(true);
   }
 
   loginWithGoogle(credential: string): string | null {
@@ -105,6 +134,10 @@ export class AuthService {
 
   get isLocalMode(): boolean {
     return localStorage.getItem(MODE_KEY) === 'local';
+  }
+
+  get isGitHubMode(): boolean {
+    return localStorage.getItem(MODE_KEY) === 'github';
   }
 
   logout(): void {

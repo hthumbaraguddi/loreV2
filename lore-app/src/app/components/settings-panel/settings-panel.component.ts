@@ -15,15 +15,15 @@ import { Subscription } from 'rxjs';
 import { AppState, CustomTemplate } from '../../models';
 import { AuthService } from '../../services/auth.service';
 import { DriveService } from '../../services/drive.service';
+import { FileSyncService } from '../../services/file-sync.service';
+import { GistSyncService } from '../../services/gist-sync.service';
 import { ExportImportService } from '../../services/export-import.service';
 import { AnthropicService, AI_PROVIDERS, AiProvider } from '../../services/anthropic.service';
+import { DataService } from '../../services/data.service';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
+import { APP_VERSION } from '../../version';
 
-interface ThemeOption {
-  id: string;
-  name: string;
-  dot: string;
-}
+interface ThemeOption { id: string; name: string; dot: string; }
 
 const THEMES: ThemeOption[] = [
   { id: 'default',      name: 'Default',       dot: 'linear-gradient(135deg,#191919,#7C6AF6)' },
@@ -67,36 +67,58 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
   @Output() templateExported = new EventEmitter<CustomTemplate>();
   @Output() logout = new EventEmitter<void>();
   @Output() exportWorkspace = new EventEmitter<void>();
-
   @Output() driveReconnected = new EventEmitter<void>();
 
   private authService = inject(AuthService);
   private driveService = inject(DriveService);
+  readonly fileSync = inject(FileSyncService);
+  readonly gistSync = inject(GistSyncService);
   private exportImportService = inject(ExportImportService);
   private anthropicService = inject(AnthropicService);
+  private dataService = inject(DataService);
 
+  readonly appVersion = APP_VERSION;
+
+  // Drive
   driveConnecting = false;
   driveConnected = false;
 
-  private driveSub!: Subscription;
+  // File sync
+  fileSyncStatus = 'no-file';
+  fileSyncFileName = '';
+
+  // Gist sync
+  gistSyncStatus = 'disconnected';
+  gistUsername = '';
+  readonly gistConfigured = this.gistSync.isConfigured;
+
+  private subs: Subscription[] = [];
 
   ngOnInit(): void {
-    this.driveSub = this.driveService.driveConnected$.subscribe(v => this.driveConnected = v);
+    this.subs.push(
+      this.driveService.driveConnected$.subscribe(v => this.driveConnected = v),
+      this.fileSync.status$.subscribe(s => {
+        this.fileSyncStatus = s;
+        this.fileSyncFileName = this.fileSync.getFileName();
+      }),
+      this.gistSync.status$.subscribe(s => this.gistSyncStatus = s),
+      this.gistSync.username$.subscribe(u => this.gistUsername = u),
+    );
   }
 
   ngOnDestroy(): void {
-    this.driveSub?.unsubscribe();
+    this.subs.forEach(s => s.unsubscribe());
   }
+
+  // ── AI ────────────────────────────────────────────────────────────────────
 
   apiKey: string = '';
   apiEndpoint: string = '';
   apiKeySyncDrive: boolean = false;
   apiKeyStatus: 'idle' | 'validating' | 'valid' | 'invalid' = 'idle';
-
   availableModels: string[] = [];
   selectedModel: string = '';
   modelsLoading = false;
-
   providers = AI_PROVIDERS;
   selectedProviderId: string = 'anthropic';
 
@@ -113,8 +135,6 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   displayName: string = '';
   userEmail: string = '';
-
-  /** Track which template rows are in "confirm delete" state */
   confirmDeleteId: string | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -130,92 +150,44 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
       this.apiKeyStatus = 'idle';
       this.selectedModel = this.anthropicService.getModel();
       this.availableModels = [];
-      // If key already exists, load models for current provider
-      if (this.apiKey) {
-        this.loadModels();
-      }
+      if (this.apiKey) this.loadModels();
     }
   }
 
-  onClose(): void {
-    this.closed.emit();
-  }
+  // ── General ───────────────────────────────────────────────────────────────
 
-  onThemeSelect(themeId: string): void {
-    this.themeChanged.emit(themeId);
-  }
-
-  onFontSizeChange(size: number): void {
-    this.fontSizeChanged.emit(Number(size));
-  }
+  onClose(): void { this.closed.emit(); }
+  onThemeSelect(themeId: string): void { this.themeChanged.emit(themeId); }
+  onFontSizeChange(size: number): void { this.fontSizeChanged.emit(Number(size)); }
 
   onNameBlur(): void {
     const trimmed = this.displayName.trim();
-    if (trimmed) {
-      this.nameChanged.emit(trimmed);
-    }
+    if (trimmed) this.nameChanged.emit(trimmed);
   }
 
   onNameKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      (event.target as HTMLInputElement).blur();
-    }
+    if (event.key === 'Enter') (event.target as HTMLInputElement).blur();
   }
 
-  onEditTemplate(tpl: CustomTemplate): void {
-    this.templateEdited.emit(tpl);
-  }
+  onEditTemplate(tpl: CustomTemplate): void { this.templateEdited.emit(tpl); }
 
   onExportTemplate(tpl: CustomTemplate): void {
     this.templateExported.emit(tpl);
     this.exportImportService.exportTemplate(tpl);
   }
 
-  onDeleteTemplate(tpl: CustomTemplate): void {
-    this.confirmDeleteId = tpl.id;
-  }
+  onDeleteTemplate(tpl: CustomTemplate): void { this.confirmDeleteId = tpl.id; }
+  onConfirmDelete(tpl: CustomTemplate): void { this.confirmDeleteId = null; this.templateDeleted.emit(tpl.id); }
+  onCancelDelete(): void { this.confirmDeleteId = null; }
 
-  onConfirmDelete(tpl: CustomTemplate): void {
-    this.confirmDeleteId = null;
-    this.templateDeleted.emit(tpl.id);
-  }
-
-  onCancelDelete(): void {
-    this.confirmDeleteId = null;
-  }
-
-  onLogout(): void {
-    this.logout.emit();
-    this.authService.logout();
-  }
+  onLogout(): void { this.logout.emit(); this.authService.logout(); }
 
   onExportWorkspace(): void {
     this.exportWorkspace.emit();
     this.exportImportService.exportWorkspace();
   }
 
-  getTemplateColorStyle(tpl: CustomTemplate): { background: string; border: string } {
-    const c = SECTION_COLOR_MAP[tpl.color] ?? SECTION_COLOR_MAP['gray'];
-    return { background: c.bg, border: `1px solid ${c.border}` };
-  }
-
-  getTemplateFieldSummary(tpl: CustomTemplate): string {
-    const nonTitle = tpl.fields.filter(f => f.id !== 'title');
-    const preview = nonTitle.slice(0, 3).map(f => f.label).join(', ');
-    return `${nonTitle.length} field${nonTitle.length !== 1 ? 's' : ''}${preview ? ' · ' + preview : ''}`;
-  }
-
-  get currentTheme(): string {
-    return this.state?.theme ?? 'default';
-  }
-
-  get currentFontSize(): number {
-    return this.state?.fontSize ?? 14;
-  }
-
-  get isLocalMode(): boolean {
-    return this.authService.isLocalMode;
-  }
+  // ── Drive ─────────────────────────────────────────────────────────────────
 
   async onReconnectDrive(): Promise<void> {
     this.driveConnecting = true;
@@ -229,9 +201,104 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
-  get totalTemplateCount(): number {
-    return 6 + (this.customTemplates?.length ?? 0);
+  // ── File Sync (Option 2) ──────────────────────────────────────────────────
+
+  get fileSyncSupported(): boolean { return this.fileSync.isSupported; }
+
+  async onPickSyncFile(): Promise<void> {
+    const ok = await this.fileSync.pickFile();
+    if (ok) {
+      const data = await this.fileSync.load();
+      if (data?.state) {
+        this.dataService.loadFromObject(data.state, data.prompts);
+        this.dataService.showToast('✓ Loaded from local file');
+      }
+    }
   }
+
+  async onCreateSyncFile(): Promise<void> {
+    const ok = await this.fileSync.createFile();
+    if (ok) {
+      await this.fileSync.save(this.buildSyncPayload());
+      this.dataService.showToast('✓ Sync file created');
+    }
+  }
+
+  async onSaveToFile(): Promise<void> {
+    if (this.fileSync.hasFile()) {
+      await this.fileSync.save(this.buildSyncPayload());
+      this.dataService.showToast('✓ Saved to local file');
+    } else {
+      this.fileSync.downloadBackup(this.buildSyncPayload());
+      this.dataService.showToast('✓ Backup downloaded');
+    }
+  }
+
+  async onLoadFromFile(): Promise<void> {
+    if (this.fileSync.hasFile()) {
+      const data = await this.fileSync.load();
+      if (data?.state) {
+        this.dataService.loadFromObject(data.state, data.prompts);
+        this.dataService.showToast('✓ Loaded from local file');
+      }
+    } else {
+      const data = await this.fileSync.uploadBackup();
+      if (data?.state) {
+        this.dataService.loadFromObject(data.state, data.prompts);
+        this.dataService.showToast('✓ Loaded from backup file');
+      }
+    }
+  }
+
+  onDisconnectFile(): void { this.fileSync.clearHandle(); }
+
+  // ── Gist Sync (Option 3) ──────────────────────────────────────────────────
+
+  async onConnectGist(): Promise<void> { this.gistSync.startOAuth(); }
+
+  async onSaveToGist(): Promise<void> {
+    await this.gistSync.save(this.buildSyncPayload());
+    this.dataService.showToast('✓ Saved to GitHub Gist');
+  }
+
+  async onLoadFromGist(): Promise<void> {
+    const data = await this.gistSync.load();
+    if (data?.state) {
+      this.dataService.loadFromObject(data.state, data.prompts);
+      this.dataService.showToast('✓ Loaded from GitHub Gist');
+    }
+  }
+
+  onDisconnectGist(): void { this.gistSync.disconnect(); }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  private buildSyncPayload(): any {
+    return {
+      state: this.dataService.getState(),
+      customTemplates: JSON.parse(localStorage.getItem('lore_custom_templates') || '[]'),
+      prompts: JSON.parse(localStorage.getItem('lore_prompts') || '[]'),
+    };
+  }
+
+  getTemplateColorStyle(tpl: CustomTemplate): { background: string; border: string } {
+    const c = SECTION_COLOR_MAP[tpl.color] ?? SECTION_COLOR_MAP['gray'];
+    return { background: c.bg, border: `1px solid ${c.border}` };
+  }
+
+  getTemplateFieldSummary(tpl: CustomTemplate): string {
+    const nonTitle = tpl.fields.filter(f => f.id !== 'title');
+    const preview = nonTitle.slice(0, 3).map(f => f.label).join(', ');
+    return `${nonTitle.length} field${nonTitle.length !== 1 ? 's' : ''}${preview ? ' · ' + preview : ''}`;
+  }
+
+  get currentTheme(): string { return this.state?.theme ?? 'default'; }
+  get currentFontSize(): number { return this.state?.fontSize ?? 14; }
+  get isLocalMode(): boolean { return this.authService.isLocalMode; }
+  get isGitHubMode(): boolean { return this.authService.isGitHubMode; }
+  get totalTemplateCount(): number { return 6 + (this.customTemplates?.length ?? 0); }
+
+  // ── AI ────────────────────────────────────────────────────────────────────
 
   onSelectProvider(id: string): void {
     this.selectedProviderId = id;
@@ -239,9 +306,7 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
     this.availableModels = [];
     this.selectedModel = '';
     const p = this.selectedProvider;
-    if (p.supportsCustomEndpoint) {
-      this.apiEndpoint = p.defaultEndpoint;
-    }
+    if (p.supportsCustomEndpoint) this.apiEndpoint = p.defaultEndpoint;
   }
 
   async loadModels(): Promise<void> {
@@ -252,7 +317,6 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
       ? this.apiEndpoint.trim() : p.defaultEndpoint;
     this.availableModels = await this.anthropicService.fetchModels(this.apiKey.trim(), p.id, endpoint);
     this.modelsLoading = false;
-    // Keep current selection if still valid, otherwise pick first
     if (this.selectedModel && this.availableModels.includes(this.selectedModel)) return;
     if (this.availableModels.length) {
       this.selectedModel = this.availableModels[0];
@@ -270,8 +334,7 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
     this.apiKeyStatus = 'validating';
     const p = this.selectedProvider;
     const endpoint = p.supportsCustomEndpoint && this.apiEndpoint.trim()
-      ? this.apiEndpoint.trim()
-      : p.defaultEndpoint;
+      ? this.apiEndpoint.trim() : p.defaultEndpoint;
     const valid = await this.anthropicService.validateApiKey(this.apiKey.trim(), p.id, endpoint);
     if (valid) {
       this.anthropicService.setApiKey(this.apiKey.trim());
@@ -300,7 +363,5 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
-  get hasApiKey(): boolean {
-    return !!this.anthropicService.getApiKey();
-  }
+  get hasApiKey(): boolean { return !!this.anthropicService.getApiKey(); }
 }

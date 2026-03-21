@@ -657,3 +657,128 @@
 
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
+
+// ── Data & Sync section ───────────────────────────────────────────────────────
+.sp-sync-section {
+  padding: 0 19px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sp-sync-card {
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 13px 10px;
+  transition: border-color 0.15s;
+
+  &.sp-sync-card-active {
+    border-color: rgba(124, 106, 246, 0.4);
+    background: var(--accl);
+  }
+}
+
+.sp-sync-card-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sp-sync-card-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--inp);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ts);
+  flex-shrink: 0;
+}
+
+.sp-sync-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-sync-card-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tp);
+  margin-bottom: 2px;
+}
+
+.sp-sync-card-desc {
+  font-size: 11px;
+  color: var(--ts);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-sync-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--border);
+
+  &.dot-active { background: #4ade80; }
+  &.dot-syncing {
+    background: #93c5fd;
+    animation: pulse-dot 1s ease-in-out infinite;
+  }
+  &.dot-error { background: #f87171; }
+}
+
+.sp-sync-card-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.sp-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &.sp-sync-btn-pr {
+    background: var(--acc);
+    color: #fff;
+    border-color: var(--acc);
+    &:hover:not(:disabled) { opacity: 0.88; }
+  }
+
+  &.sp-sync-btn-gh {
+    background: transparent;
+    color: var(--tp);
+    border-color: var(--border);
+    &:hover:not(:disabled) { border-color: var(--acc); color: var(--acc); }
+  }
+
+  &.sp-sync-btn-gh-dark {
+    background: #24292f;
+    color: #fff;
+    border-color: #24292f;
+    &:hover:not(:disabled) { background: #1a1f24; }
+  }
+
+  &.sp-sync-btn-danger {
+    background: transparent;
+    color: #DC2626;
+    border-color: rgba(220, 38, 38, 0.3);
+    &:hover:not(:disabled) { background: rgba(220, 38, 38, 0.08); }
+  }
+}

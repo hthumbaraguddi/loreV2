@@ -371,6 +371,49 @@
   letter-spacing: 0.02em;
 }
 
+// ── GitHub Sign-In ────────────────────────────────────────────────────────────
+.lg-gh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 16px;
+  background: #24292e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+  margin-bottom: 0;
+
+  &:hover:not(:disabled) {
+    background: #2f363d;
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) { transform: translateY(0); }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.lg-gh-hint {
+  text-align: center;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.22);
+  margin-top: 7px;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
 // ── Or divider ────────────────────────────────────────────────────────────────
 .lg-or {
   display: flex;

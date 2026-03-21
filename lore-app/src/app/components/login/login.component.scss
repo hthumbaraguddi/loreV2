@@ -287,7 +287,9 @@
   width: 1px;
   align-self: stretch;
   flex-shrink: 0;
-  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.10) 80%, transparent 100%);
+  background: rgba(255, 255, 255, 0.10);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
 }
 
 // ── Right column ──────────────────────────────────────────────────────────────
@@ -553,7 +555,9 @@
   .land-divider {
     width: auto;
     height: 1px;
-    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.10) 80%, transparent 100%);
+    background: rgba(255, 255, 255, 0.10);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
   }
 
   .land-right {

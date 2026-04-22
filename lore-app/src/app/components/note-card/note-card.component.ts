@@ -56,7 +56,7 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
     const iframe = document.createElement('iframe');
     iframe.className = 'rich-html-iframe';
     iframe.setAttribute('sandbox', 'allow-same-origin');
-    iframe.setAttribute('scrolling', 'yes');
+    iframe.setAttribute('scrolling', 'no');
     placeholder.replaceWith(iframe);
     // Write content after iframe is in DOM
     setTimeout(() => {
@@ -64,10 +64,10 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
         iframe.contentDocument?.open();
         iframe.contentDocument?.write(html);
         iframe.contentDocument?.close();
-        // Auto-size to content
+        // Auto-size to full content height (no cap)
         const resize = () => {
           const h = iframe.contentDocument?.body?.scrollHeight;
-          if (h) iframe.style.height = Math.min(h + 20, 600) + 'px';
+          if (h) iframe.style.height = (h + 20) + 'px';
         };
         iframe.contentDocument?.addEventListener('DOMContentLoaded', resize);
         setTimeout(resize, 200);
@@ -83,6 +83,10 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
 
   get isOpen(): boolean {
     return !this.note._collapsed;
+  }
+
+  get isHtmlNote(): boolean {
+    return this.note.templateId === 'rich' && this.note.data?.['contentType'] === 'html';
   }
 
   private highlightFn = (text: string): string => {

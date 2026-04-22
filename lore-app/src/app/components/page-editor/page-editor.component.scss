@@ -67,6 +67,10 @@
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
+
+  &.pg-editor-body--wide {
+    max-width: none;
+  }
 }
 
 // ── Header (icon + title) ─────────────────────────────
@@ -538,6 +542,30 @@
 // ── Inline template form ──────────────────────────────────────────────────
 .pg-template-form {
   margin-bottom: 24px;
+}
+
+.pg-paste-ai-row {
+  margin-top: 12px;
+}
+
+.btn-paste-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accl);
+  border: 1px solid var(--acc);
+  color: var(--acc);
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--acc);
+    color: #fff;
+  }
 }
 
 // ── Undo toast ────────────────────────────────────────────────────────────

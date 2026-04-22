@@ -10,6 +10,7 @@ import { LoreIconComponent } from '../lore-icon/lore-icon.component';
 import { TemplateMatcherService } from '../../services/template-matcher.service';
 import { TemplateService, TemplateDefinition } from '../../services/template.service';
 import { DataService } from '../../services/data.service';
+import { PasteAiResponseModalComponent } from '../modals/paste-ai-response-modal/paste-ai-response-modal.component';
 
 export interface PageBlock {
   type: 'text' | 'heading' | 'heading2' | 'callout' | 'todo' | 'quote' | 'divider';
@@ -20,7 +21,7 @@ export interface PageBlock {
 @Component({
   selector: 'app-page-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoreIconComponent],
+  imports: [CommonModule, FormsModule, LoreIconComponent, PasteAiResponseModalComponent],
   templateUrl: './page-editor.component.html',
   styleUrls: ['./page-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,6 +66,30 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   // ── Auto-apply undo toast ─────────────────────────────────────────────────
   showUndoToast = false;
   private undoToastTimer: any = null;
+
+  // ── Paste AI Response modal (rich template) ───────────────────────────────
+  pasteModalOpen = false;
+
+  get pasteTarget(): { notebookId: string; sectionId: string } | null {
+    return this.notebookId && this.section?.id
+      ? { notebookId: this.notebookId, sectionId: this.section.id }
+      : null;
+  }
+
+  openPasteModal(): void {
+    this.pasteModalOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  onPasteModalClosed(): void {
+    this.pasteModalOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  onPasteNoteSaved(): void {
+    this.pasteModalOpen = false;
+    this.cdr.markForCheck();
+  }
 
   readonly blockTypes: { type: PageBlock['type']; label: string; icon: string }[] = [
     { type: 'text',     label: 'Text',    icon: '¶' },

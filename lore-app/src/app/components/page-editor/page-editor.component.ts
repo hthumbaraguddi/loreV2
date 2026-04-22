@@ -4,8 +4,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Note, Section } from '../../models';
 import { LoreIconComponent } from '../lore-icon/lore-icon.component';
+import { TemplateMatcherService } from '../../services/template-matcher.service';
+import { TemplateService, TemplateDefinition } from '../../services/template.service';
+import { DataService } from '../../services/data.service';
 
 export interface PageBlock {
   type: 'text' | 'heading' | 'heading2' | 'callout' | 'todo' | 'quote' | 'divider';
@@ -32,6 +36,10 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
 
   private cdr = inject(ChangeDetectorRef);
   private el = inject(ElementRef);
+  private sanitizer = inject(DomSanitizer);
+  private templateMatcher = inject(TemplateMatcherService);
+  private templateService = inject(TemplateService);
+  private dataService = inject(DataService);
 
   icon = '📄';
   title = '';
@@ -40,6 +48,23 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   tagInput = '';
   isDirty = false;
   private needsResize = false;
+
+  // ── Template Picker ───────────────────────────────────────────────────────
+  showTemplatePicker = false;
+  allTemplates: TemplateDefinition[] = [];
+
+  // ── Decoration Banner ─────────────────────────────────────────────────────
+  pendingTemplateId: string | null = null;
+  pendingTemplateName = '';
+  pendingTemplateIcon = '';
+
+  // ── Inline template form (when a non-page template is selected) ───────────
+  selectedTemplateId: string | null = null;
+  formHtml: SafeHtml = '';
+
+  // ── Auto-apply undo toast ─────────────────────────────────────────────────
+  showUndoToast = false;
+  private undoToastTimer: any = null;
 
   readonly blockTypes: { type: PageBlock['type']; label: string; icon: string }[] = [
     { type: 'text',     label: 'Text',    icon: '¶' },
@@ -86,6 +111,11 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
     const ta = event.target as HTMLTextAreaElement;
     this.autoResize(ta);
     this.isDirty = true;
+    // Hide picker once user starts typing in title
+    if (this.showTemplatePicker && ta.value.trim()) {
+      this.showTemplatePicker = false;
+      this.cdr.markForCheck();
+    }
   }
 
   private loadFromNote(): void {
@@ -98,6 +128,201 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
     }
     this.tags = [...(d['tags'] || [])];
     this.isDirty = false;
+    this.selectedTemplateId = null;
+    this.formHtml = '';
+    this.showUndoToast = false;
+    if (this.undoToastTimer) { clearTimeout(this.undoToastTimer); this.undoToastTimer = null; }
+
+    // Load all templates for the picker
+    this.allTemplates = this.templateService.getTemplates();
+
+    // ── Decoration Banner ──────────────────────────────────────────────────
+    this.pendingTemplateId = d['_pendingTemplateId'] ?? null;
+    if (this.pendingTemplateId) {
+      const tpl = this.templateService.getTemplate(this.pendingTemplateId);
+      this.pendingTemplateName = tpl?.name ?? this.pendingTemplateId;
+      this.pendingTemplateIcon = tpl?.icon ?? '📄';
+      if (this.templateMatcher.isAutoApplyEnabled()) {
+        this.applyPendingTemplate(/* showToast */ true);
+        return; // applyPendingTemplate handles the rest
+      }
+    }
+
+    // ── Template Picker: show only for new empty notes ─────────────────────
+    const hasContent = this.blocks.some(b => b.content.trim() !== '' || b.type === 'divider');
+    this.showTemplatePicker = !hasContent && !this.pendingTemplateId;
+  }
+
+  // ── Template Picker ───────────────────────────────────────────────────────
+
+  onPickerSelectTemplate(templateId: string): void {
+    this.showTemplatePicker = false;
+    if (templateId === 'page') {
+      // Stay in block editor mode
+      this.selectedTemplateId = null;
+      this.formHtml = '';
+      this.cdr.markForCheck();
+      return;
+    }
+    // Switch to inline template form
+    this.selectedTemplateId = templateId;
+    const tpl = this.templateService.getTemplate(templateId);
+    if (tpl) {
+      const html = tpl.buildForm({ title: this.title });
+      this.formHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    }
+    this.isDirty = true;
+    this.cdr.markForCheck();
+  }
+
+  onPickerDismiss(): void {
+    this.showTemplatePicker = false;
+    this.cdr.markForCheck();
+  }
+
+  // ── Decoration Banner ─────────────────────────────────────────────────────
+
+  onBannerApply(): void {
+    this.applyPendingTemplate(false);
+  }
+
+  onBannerDismiss(): void {
+    this.clearPendingTemplate();
+  }
+
+  // ── Auto-apply undo ───────────────────────────────────────────────────────
+
+  onUndoAutoApply(): void {
+    // Revert to blank page state
+    this.selectedTemplateId = null;
+    this.formHtml = '';
+    this.showUndoToast = false;
+    if (this.undoToastTimer) { clearTimeout(this.undoToastTimer); this.undoToastTimer = null; }
+
+    // Clear _pendingTemplateId and save
+    const currentData = this.note.data || {};
+    const newData = { ...currentData };
+    delete newData['_pendingTemplateId'];
+    this.dataService.updateNote(
+      this.notebookId,
+      this.section.id,
+      this.note.id,
+      this.note.title,
+      'page',
+      newData,
+    );
+    this.pendingTemplateId = null;
+    this.pendingTemplateName = '';
+    this.pendingTemplateIcon = '';
+    this.cdr.markForCheck();
+  }
+
+  // ── Shared helpers ────────────────────────────────────────────────────────
+
+  private applyPendingTemplate(showToast: boolean): void {
+    if (!this.pendingTemplateId) return;
+    const tpl = this.templateService.getTemplate(this.pendingTemplateId);
+    if (!tpl) {
+      // Template no longer exists — just clear
+      this.clearPendingTemplate();
+      return;
+    }
+
+    this.selectedTemplateId = this.pendingTemplateId;
+    const html = tpl.buildForm({ title: this.title, ...this.note.data });
+    this.formHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.showTemplatePicker = false;
+
+    // Clear _pendingTemplateId from note data and persist
+    const currentData = this.note.data || {};
+    const newData = { ...currentData };
+    delete newData['_pendingTemplateId'];
+    this.dataService.updateNote(
+      this.notebookId,
+      this.section.id,
+      this.note.id,
+      this.note.title,
+      this.pendingTemplateId,
+      newData,
+    );
+
+    if (showToast) {
+      this.showUndoToast = true;
+      if (this.undoToastTimer) clearTimeout(this.undoToastTimer);
+      this.undoToastTimer = setTimeout(() => {
+        this.showUndoToast = false;
+        this.cdr.markForCheck();
+      }, 6000);
+    }
+
+    this.pendingTemplateId = null;
+    this.isDirty = false;
+    this.cdr.markForCheck();
+  }
+
+  private clearPendingTemplate(): void {
+    const currentData = this.note.data || {};
+    const newData = { ...currentData };
+    delete newData['_pendingTemplateId'];
+    this.dataService.updateNote(
+      this.notebookId,
+      this.section.id,
+      this.note.id,
+      this.note.title,
+      'page',
+      newData,
+    );
+    this.pendingTemplateId = null;
+    this.pendingTemplateName = '';
+    this.pendingTemplateIcon = '';
+    this.cdr.markForCheck();
+  }
+
+  /** Maps built-in template ids to lore-icon names. Returns null for custom templates (use emoji). */
+  getTemplateIconName(templateId: string): string | null {
+    const map: Record<string, string> = {
+      page:      'note-plus',
+      rich:      'section',
+      research:  'search',
+      finance:   'layers',
+      watchlist: 'list-view',
+      journal:   'pulse',
+      scrum:     'grid-view',
+      investing: 'ai-sparkle',
+    };
+    return map[templateId] ?? null;
+  }
+
+  extractPlainText(): string {
+    return this.blocks
+      .filter(b => b.type !== 'divider')
+      .map(b => b.content)
+      .join(' ')
+      .trim();
+  }
+
+  private runBackgroundAnalysis(noteId: string, text: string): void {
+    (async () => {
+      try {
+        const result = await this.templateMatcher.analyseContent(text);
+        if (result) {
+          const currentNote = this.note;
+          if (!currentNote) return;
+          const currentData = currentNote.data || {};
+          const newData = { ...currentData, _pendingTemplateId: result.templateId };
+          this.dataService.updateNote(
+            this.notebookId,
+            this.section.id,
+            noteId,
+            currentNote.title,
+            'page',
+            newData,
+          );
+        }
+      } catch (err) {
+        console.warn('[PageEditor] Background analysis failed:', err);
+      }
+    })();
   }
 
   // ── Block operations ──────────────────────────────────────────────────────
@@ -106,6 +331,10 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
     const block: PageBlock = { type, content: '', checked: type === 'todo' ? false : undefined };
     const idx = afterIndex !== undefined ? afterIndex + 1 : this.blocks.length;
     this.blocks.splice(idx, 0, block);
+    // Hide picker when user starts adding blocks
+    if (this.showTemplatePicker) {
+      this.showTemplatePicker = false;
+    }
     this.markDirty();
     setTimeout(() => {
       this.resizeAllTextareas();
@@ -183,6 +412,11 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   }
 
   onBlockInput(index: number, value: string): void {
+    // Hide picker when user starts typing in a block
+    if (this.showTemplatePicker && value.trim()) {
+      this.showTemplatePicker = false;
+    }
+
     // Slash command detection
     if (value === '/') {
       this.showSlashMenu(index);
@@ -252,16 +486,40 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   // ── Save / Delete / Close ─────────────────────────────────────────────────
 
   onSave(): void {
+    // If a non-page template is selected, read from the template form
+    if (this.selectedTemplateId && this.selectedTemplateId !== 'page') {
+      const tpl = this.templateService.getTemplate(this.selectedTemplateId);
+      if (tpl) {
+        const data = tpl.readForm();
+        const titleEl = document.getElementById('f_title') as HTMLInputElement | null;
+        const title = (titleEl?.value?.trim()) || this.title.trim() || 'Untitled';
+        this.saved.emit({ title, templateId: this.selectedTemplateId, data });
+        this.isDirty = false;
+        return;
+      }
+    }
+
+    const filteredBlocks = this.blocks.filter(
+      b => b.type === 'divider' || b.content.trim() !== '' || b.type === 'todo'
+    );
+
     this.saved.emit({
       title: this.title.trim() || 'Untitled',
       templateId: 'page',
       data: {
         icon: this.icon,
-        blocks: this.blocks.filter(b => b.type === 'divider' || b.content.trim() !== '' || b.type === 'todo'),
+        blocks: filteredBlocks,
         tags: this.tags,
       },
     });
     this.isDirty = false;
+
+    // Post-save background analysis hook (fire-and-forget)
+    const plainText = this.extractPlainText();
+    const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+    if (wordCount >= 20 && !this.pendingTemplateId) {
+      this.runBackgroundAnalysis(this.note.id, plainText);
+    }
   }
 
   onDelete(): void {

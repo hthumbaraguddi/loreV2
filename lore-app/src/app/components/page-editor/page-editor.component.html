@@ -21,6 +21,20 @@
   <div class="pg-editor-scroll">
     <div class="pg-editor-body">
 
+      <!-- Decoration Banner (shown when a pending template match exists) -->
+      <div class="pg-decoration-banner" *ngIf="pendingTemplateId && !showTemplatePicker">
+        <span class="pg-dec-icon">{{ pendingTemplateIcon }}</span>
+        <span class="pg-dec-msg">
+          This note looks like a <strong>{{ pendingTemplateName }}</strong>. Apply its structure?
+        </span>
+        <div class="pg-dec-actions">
+          <button class="btn-dec-apply" (click)="onBannerApply()">
+            Apply {{ pendingTemplateName }}
+          </button>
+          <button class="btn-dec-dismiss" (click)="onBannerDismiss()">Keep as plain note</button>
+        </div>
+      </div>
+
       <!-- Icon + Title -->
       <div class="pg-editor-header">
         <input
@@ -40,75 +54,110 @@
         ></textarea>
       </div>
 
-      <!-- Blocks -->
-      <div class="pg-editor-blocks">
-        <div
-          *ngFor="let block of blocks; let i = index; trackBy: trackByIndex"
-          class="pg-editor-block"
-          [class]="'pg-editor-block--' + block.type"
-        >
-          <!-- Left handle (shows block type label on hover, click opens slash menu) -->
-          <div class="pg-block-handle" *ngIf="block.type !== 'divider'" (click)="showSlashMenu(i)" title="Change block type or type /">
-            <span class="pg-handle-dot">⋮⋮</span>
-            <span class="pg-handle-label">{{ block.type === 'heading' ? 'H1' : block.type === 'heading2' ? 'H2' : block.type === 'callout' ? '💡' : block.type === 'todo' ? '☐' : block.type === 'quote' ? '"' : '¶' }}</span>
-          </div>
-
-          <!-- Divider block -->
-          <ng-container *ngIf="block.type === 'divider'">
-            <div class="pg-editor-divider-line"></div>
-            <button class="pg-block-remove" (click)="removeBlock(i)" title="Remove">✕</button>
-          </ng-container>
-
-          <!-- Todo block -->
-          <ng-container *ngIf="block.type === 'todo'">
-            <input
-              type="checkbox"
-              class="pg-todo-cb"
-              [(ngModel)]="block.checked"
-              (ngModelChange)="isDirty = true"
-            >
-            <textarea
-              class="pg-editor-block-ta"
-              [class.pg-todo-done-ta]="block.checked"
-              [(ngModel)]="block.content"
-              placeholder="To-do item…"
-              rows="1"
-              (keydown)="onBlockKeydown($event, i)"
-              (input)="onTextareaInput($event, i)"
-            ></textarea>
-          </ng-container>
-
-          <!-- All other blocks -->
-          <ng-container *ngIf="block.type !== 'divider' && block.type !== 'todo'">
-            <textarea
-              class="pg-editor-block-ta"
-              [(ngModel)]="block.content"
-              [placeholder]="block.type === 'heading' ? 'Heading 1…' : block.type === 'heading2' ? 'Heading 2…' : block.type === 'callout' ? 'Callout…' : block.type === 'quote' ? 'Quote…' : 'Write something… (/ for commands, Shift+Enter for line break)'"
-              rows="1"
-              (keydown)="onBlockKeydown($event, i)"
-              (input)="onTextareaInput($event, i)"
-              (focus)="hideSlashMenu()"
-            ></textarea>
-
-            <!-- Slash command menu -->
-            <div class="pg-slash-menu" *ngIf="slashMenuIndex === i">
-              <div class="pg-slash-item" *ngFor="let bt of blockTypes" (mousedown)="selectSlashType(bt.type, i)">
-                <span class="pg-slash-ico">{{ bt.icon }}</span>
-                <span>{{ bt.label }}</span>
-              </div>
-            </div>
-          </ng-container>
+      <!-- Template Picker (shown for new empty notes) -->
+      <div class="pg-template-picker" *ngIf="showTemplatePicker">
+        <div class="pg-picker-label">Choose a template to get started</div>
+        <div class="pg-picker-grid">
+          <button
+            *ngFor="let tpl of allTemplates"
+            class="pg-picker-card"
+            (click)="onPickerSelectTemplate(tpl.id)"
+            [title]="tpl.name"
+          >
+            <span class="pg-picker-card-icon">
+              <lore-icon *ngIf="getTemplateIconName(tpl.id)" [name]="getTemplateIconName(tpl.id)!" [size]="22"></lore-icon>
+              <span *ngIf="!getTemplateIconName(tpl.id)">{{ tpl.icon }}</span>
+            </span>
+            <span class="pg-picker-card-name">{{ tpl.name }}</span>
+          </button>
         </div>
-
-        <!-- Add block hint -->
-        <div class="pg-add-hint" (click)="addBlock('text')">
-          <span class="pg-add-hint-plus">+</span>
-          <span>Click to add a block, or press Enter at end of any block</span>
-        </div>
+        <button class="pg-picker-blank" (click)="onPickerDismiss()">
+          Start blank
+        </button>
       </div>
 
-      <!-- Tags -->
-      <div class="pg-editor-tags">
+      <!-- Inline template form (when a non-page template is selected from picker) -->
+      <ng-container *ngIf="selectedTemplateId && selectedTemplateId !== 'page' && !showTemplatePicker">
+        <div class="pg-template-form">
+          <div class="frow">
+            <label class="flbl">Title</label>
+            <input class="fin" id="f_title" [(ngModel)]="title" placeholder="Note title…" />
+          </div>
+          <div [innerHTML]="formHtml"></div>
+        </div>
+      </ng-container>
+
+      <!-- Blocks (shown when no non-page template is selected) -->
+      <ng-container *ngIf="!selectedTemplateId || selectedTemplateId === 'page'">
+        <div class="pg-editor-blocks" *ngIf="!showTemplatePicker">
+          <div
+            *ngFor="let block of blocks; let i = index; trackBy: trackByIndex"
+            class="pg-editor-block"
+            [class]="'pg-editor-block--' + block.type"
+          >
+            <!-- Left handle (shows block type label on hover, click opens slash menu) -->
+            <div class="pg-block-handle" *ngIf="block.type !== 'divider'" (click)="showSlashMenu(i)" title="Change block type or type /">
+              <span class="pg-handle-dot">⋮⋮</span>
+              <span class="pg-handle-label">{{ block.type === 'heading' ? 'H1' : block.type === 'heading2' ? 'H2' : block.type === 'callout' ? '💡' : block.type === 'todo' ? '☐' : block.type === 'quote' ? '"' : '¶' }}</span>
+            </div>
+
+            <!-- Divider block -->
+            <ng-container *ngIf="block.type === 'divider'">
+              <div class="pg-editor-divider-line"></div>
+              <button class="pg-block-remove" (click)="removeBlock(i)" title="Remove">✕</button>
+            </ng-container>
+
+            <!-- Todo block -->
+            <ng-container *ngIf="block.type === 'todo'">
+              <input
+                type="checkbox"
+                class="pg-todo-cb"
+                [(ngModel)]="block.checked"
+                (ngModelChange)="isDirty = true"
+              >
+              <textarea
+                class="pg-editor-block-ta"
+                [class.pg-todo-done-ta]="block.checked"
+                [(ngModel)]="block.content"
+                placeholder="To-do item…"
+                rows="1"
+                (keydown)="onBlockKeydown($event, i)"
+                (input)="onTextareaInput($event, i)"
+              ></textarea>
+            </ng-container>
+
+            <!-- All other blocks -->
+            <ng-container *ngIf="block.type !== 'divider' && block.type !== 'todo'">
+              <textarea
+                class="pg-editor-block-ta"
+                [(ngModel)]="block.content"
+                [placeholder]="block.type === 'heading' ? 'Heading 1…' : block.type === 'heading2' ? 'Heading 2…' : block.type === 'callout' ? 'Callout…' : block.type === 'quote' ? 'Quote…' : 'Write something… (/ for commands, Shift+Enter for line break)'"
+                rows="1"
+                (keydown)="onBlockKeydown($event, i)"
+                (input)="onTextareaInput($event, i)"
+                (focus)="hideSlashMenu()"
+              ></textarea>
+
+              <!-- Slash command menu -->
+              <div class="pg-slash-menu" *ngIf="slashMenuIndex === i">
+                <div class="pg-slash-item" *ngFor="let bt of blockTypes" (mousedown)="selectSlashType(bt.type, i)">
+                  <span class="pg-slash-ico">{{ bt.icon }}</span>
+                  <span>{{ bt.label }}</span>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Add block hint -->
+          <div class="pg-add-hint" (click)="addBlock('text')">
+            <span class="pg-add-hint-plus">+</span>
+            <span>Click to add a block, or press Enter at end of any block</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Tags (always visible when not in picker mode) -->
+      <div class="pg-editor-tags" *ngIf="!showTemplatePicker">
         <span class="pg-tag" *ngFor="let tag of tags; let i = index">
           {{ tag }}
           <button class="pg-tag-rm" (click)="removeTag(i)">✕</button>
@@ -122,6 +171,13 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- Undo toast (auto-apply) -->
+  <div class="pg-undo-toast" *ngIf="showUndoToast">
+    <span>Applied {{ pendingTemplateName || 'template' }} — </span>
+    <button class="pg-undo-btn" (click)="onUndoAutoApply()">Undo</button>
+    <button class="pg-undo-close" (click)="showUndoToast = false">✕</button>
   </div>
 
 </div>

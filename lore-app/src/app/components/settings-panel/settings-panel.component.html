@@ -1,55 +1,70 @@
-<div class="spanel" [class.open]="isOpen" (click)="onClose()">
-  <div class="sp-modal" (click)="$event.stopPropagation()">
+<div class="sp-view">
 
-    <!-- Header -->
-    <div class="sp-hdr">
-      <span class="sp-title">Settings</span>
-      <button class="btn-sp-close" (click)="onClose()">
-        <lore-icon name="close" [size]="11"></lore-icon>
+  <!-- Topbar — matches page editor style -->
+  <div class="sp-topbar">
+    <button class="sp-back-btn" (click)="onClose()">
+      <lore-icon name="arrow-left" [size]="14"></lore-icon>
+      Back
+    </button>
+    <span class="sp-topbar-title">Settings</span>
+    <div class="sp-topbar-right">
+      <button class="btn-gh sp-logout-btn" (click)="onLogout()">
+        <lore-icon name="logout" [size]="13"></lore-icon> Sign out
       </button>
     </div>
+  </div>
 
-    <!-- Body -->
-    <div class="sp-body">
+  <!-- Scrollable content -->
+  <div class="sp-scroll">
+    <div class="sp-content">
 
       <!-- ── Appearance ── -->
-      <div class="sp-sec">
-        <div class="sp-sec-ttl">Appearance</div>
-      </div>
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="layers" [size]="14"></lore-icon>
+          Appearance
+        </h2>
 
-      <!-- Theme grid -->
-      <div class="sp-theme-grid">
-        <div
-          *ngFor="let theme of themes"
-          class="sp-topt"
-          [class.on]="currentTheme === theme.id"
-          (click)="onThemeSelect(theme.id)"
-        >
-          <div class="sp-tdot" [style.background]="theme.dot"></div>
-          <div class="sp-tnm">{{ theme.name }}</div>
+        <div class="sp-theme-grid">
+          <div
+            *ngFor="let theme of themes"
+            class="sp-topt"
+            [class.on]="currentTheme === theme.id"
+            (click)="onThemeSelect(theme.id)"
+          >
+            <div class="sp-tdot" [style.background]="theme.dot"></div>
+            <div class="sp-tnm">{{ theme.name }}</div>
+          </div>
         </div>
-      </div>
 
-      <!-- Font size -->
-      <div class="sp-row">
-        <lore-icon name="font-size" [size]="15" class="sp-row-ico"></lore-icon>
-        <div class="sp-row-info">
-          <div class="sp-row-lbl">Font Size</div>
+        <div class="sp-field-row">
+          <lore-icon name="font-size" [size]="14" class="sp-field-ico"></lore-icon>
+          <label class="sp-field-lbl">Font Size</label>
+          <select class="sp-sel" [ngModel]="currentFontSize" (ngModelChange)="onFontSizeChange($event)">
+            <option *ngFor="let fs of fontSizes" [ngValue]="fs.value">{{ fs.label }}</option>
+          </select>
         </div>
-        <select
-          class="sp-sel"
-          [ngModel]="currentFontSize"
-          (ngModelChange)="onFontSizeChange($event)"
-        >
-          <option *ngFor="let fs of fontSizes" [ngValue]="fs.value">{{ fs.label }}</option>
-        </select>
-      </div>
+      </section>
 
       <!-- ── Profile ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">Profile</div>
-      </div>
-      <div class="sp-prof">
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="settings" [size]="14"></lore-icon>
+          Profile
+        </h2>
+
+        <div class="sp-account-card">
+          <div class="sp-acct-avatar">{{ displayName ? displayName[0].toUpperCase() : (isLocalMode ? 'L' : 'G') }}</div>
+          <div class="sp-acct-info">
+            <div class="sp-acct-name">{{ displayName || (isLocalMode ? 'Local User' : (isGitHubMode ? gistUsername || 'GitHub User' : 'Google User')) }}</div>
+            <div class="sp-acct-sub">
+              <ng-container *ngIf="isLocalMode">Local storage mode</ng-container>
+              <ng-container *ngIf="isGitHubMode">Signed in with GitHub · Gist sync</ng-container>
+              <ng-container *ngIf="!isLocalMode && !isGitHubMode">{{ userEmail || 'Signed in with Google' }}</ng-container>
+            </div>
+          </div>
+        </div>
+
         <div class="sp-pf">
           <label class="sp-pl">Display Name</label>
           <input
@@ -60,171 +75,8 @@
             (keydown)="onNameKeydown($event)"
           />
         </div>
-      </div>
 
-      <!-- ── Custom Templates ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">My Custom Templates</div>
-      </div>
-
-      <div style="padding: 0 19px 4px">
-        <ng-container *ngIf="customTemplates && customTemplates.length > 0; else noTemplates">
-          <div *ngFor="let tpl of customTemplates" class="sp-ctpl-row">
-            <div class="sp-ctpl-ico" [ngStyle]="getTemplateColorStyle(tpl)">{{ tpl.icon }}</div>
-            <div class="sp-ctpl-info">
-              <div class="sp-ctpl-name">{{ tpl.name }}</div>
-              <div class="sp-ctpl-meta">{{ getTemplateFieldSummary(tpl) }}</div>
-            </div>
-            <div class="sp-ctpl-acts">
-              <ng-container *ngIf="confirmDeleteId !== tpl.id">
-                <button class="btn-tpl-act" title="Edit" (click)="onEditTemplate(tpl)">✎</button>
-                <button class="btn-tpl-act" title="Export" (click)="onExportTemplate(tpl)">⬇</button>
-                <button class="btn-tpl-act del" title="Delete" (click)="onDeleteTemplate(tpl)">✕</button>
-              </ng-container>
-              <ng-container *ngIf="confirmDeleteId === tpl.id">
-                <span class="sp-del-confirm-lbl">Delete?</span>
-                <button class="btn-tpl-act del" (click)="onConfirmDelete(tpl)">Yes</button>
-                <button class="btn-tpl-act" (click)="onCancelDelete()">No</button>
-              </ng-container>
-            </div>
-          </div>
-        </ng-container>
-        <ng-template #noTemplates>
-          <div class="sp-no-templates">No custom templates yet. Build your first one!</div>
-        </ng-template>
-      </div>
-
-      <!-- ── AI (Claude) ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">AI Provider</div>
-      </div>
-      <div class="sp-ai-section">
-
-        <!-- Provider cards -->
-        <div class="sp-ai-providers">
-          <div
-            *ngFor="let p of providers"
-            class="sp-ai-prov"
-            [class.sel]="selectedProviderId === p.id"
-            (click)="onSelectProvider(p.id)"
-          >
-            <div class="sp-ai-prov-top">
-              <span class="sp-ai-prov-name">{{ p.name }}</span>
-              <span class="sp-ai-badge" [class.free]="p.free" [class.paid]="!p.free">
-                {{ p.free ? 'Free' : 'Paid' }}
-              </span>
-            </div>
-            <div class="sp-ai-prov-label">{{ p.label }}</div>
-          </div>
-        </div>
-
-        <!-- Selected provider note + link -->
-        <div class="sp-ai-prov-note" *ngIf="selectedProvider.note">
-          {{ selectedProvider.note }}
-          <a *ngIf="selectedProvider.url" [href]="selectedProvider.url" target="_blank" rel="noopener" class="sp-ai-link">
-            Get key →
-          </a>
-        </div>
-
-        <!-- API Key input -->
-        <div class="sp-pf" style="margin-top: 10px">
-          <label class="sp-pl">API Key</label>
-          <input
-            class="sp-pin sp-api-key-input"
-            type="password"
-            [(ngModel)]="apiKey"
-            [placeholder]="selectedProvider.keyPlaceholder"
-          />
-        </div>
-
-        <!-- Custom endpoint (only for providers that support it) -->
-        <div class="sp-pf" style="margin-top: 8px" *ngIf="selectedProvider.supportsCustomEndpoint">
-          <label class="sp-pl">API Endpoint URL</label>
-          <input
-            class="sp-pin"
-            type="text"
-            [(ngModel)]="apiEndpoint"
-            [placeholder]="selectedProvider.defaultEndpoint || 'https://your-endpoint/v1/messages'"
-          />
-        </div>
-
-        <div class="sp-ai-actions">
-          <button class="sp-ai-save" (click)="onSaveApiKey()" [disabled]="!apiKey.trim() || apiKeyStatus === 'validating'">
-            {{ apiKeyStatus === 'validating' ? 'Validating…' : 'Save & Validate' }}
-          </button>
-          <button *ngIf="hasApiKey" class="sp-ai-remove" (click)="onRemoveApiKey()">Remove</button>
-        </div>
-        <div *ngIf="apiKeyStatus === 'valid'" class="sp-ai-status valid">✓ API key is valid</div>
-        <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check key and endpoint</div>
-
-        <!-- Model selector -->
-        <div class="sp-pf sp-model-row" *ngIf="hasApiKey">
-          <label class="sp-pl">Model</label>
-          <div class="sp-model-sel-wrap">
-            <select
-              class="sp-sel sp-model-sel"
-              [ngModel]="selectedModel"
-              (ngModelChange)="onModelChange($event)"
-              [disabled]="modelsLoading || !availableModels.length"
-            >
-              <option *ngIf="modelsLoading" value="">Loading models…</option>
-              <option *ngIf="!modelsLoading && !availableModels.length" value="">No models found</option>
-              <option *ngFor="let m of availableModels" [value]="m">{{ m }}</option>
-            </select>
-            <button class="sp-model-refresh" (click)="loadModels()" [disabled]="modelsLoading" title="Refresh models">
-              {{ modelsLoading ? '…' : '↻' }}
-            </button>
-          </div>
-        </div>
-        <div class="sp-ai-sync-row">
-          <label class="sp-ai-sync-label">
-            <input type="checkbox" [(ngModel)]="apiKeySyncDrive" (ngModelChange)="onApiKeySyncChange()" />
-            Sync API key to Google Drive
-          </label>
-        </div>
-      </div>
-
-      <!-- ── Smart Notes ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">Smart Notes</div>
-      </div>
-      <div class="sp-smart-notes">
-        <label class="sp-ai-sync-label" [class.disabled]="!hasApiKey">
-          <input
-            type="checkbox"
-            [(ngModel)]="smartNotesAiMatching"
-            (ngModelChange)="onSmartNotesAiMatchingChange()"
-            [disabled]="!hasApiKey"
-          />
-          AI template matching
-          <span *ngIf="!hasApiKey" class="sp-hint">Requires an AI provider API key</span>
-        </label>
-        <label class="sp-ai-sync-label">
-          <input
-            type="checkbox"
-            [(ngModel)]="smartNotesAutoApply"
-            (ngModelChange)="onSmartNotesAutoApplyChange()"
-          />
-          Auto-apply matched template
-        </label>
-      </div>
-
-      <!-- ── Account ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">Account</div>
-      </div>
-      <div class="sp-account">
-        <div class="sp-acct-row">
-          <div class="sp-acct-avatar">{{ displayName ? displayName[0].toUpperCase() : (isLocalMode ? 'L' : 'G') }}</div>
-          <div class="sp-acct-info">
-            <div class="sp-acct-name">{{ displayName || (isLocalMode ? 'Local User' : (isGitHubMode ? gistUsername || 'GitHub User' : 'Google User')) }}</div>
-            <div class="sp-acct-email">
-              <ng-container *ngIf="isLocalMode">Local storage mode</ng-container>
-              <ng-container *ngIf="isGitHubMode">Signed in with GitHub · Gist sync</ng-container>
-              <ng-container *ngIf="!isLocalMode && !isGitHubMode">{{ userEmail || 'Signed in with Google' }}</ng-container>
-            </div>
-          </div>
-        </div>
+        <!-- Sync status -->
         <ng-container *ngIf="isLocalMode; else cloudSync">
           <div class="sp-sync-row sync-saved">
             <span class="sp-sync-dot"></span>
@@ -258,116 +110,209 @@
             </button>
           </ng-template>
         </ng-template>
+
         <button class="sp-export-ws" (click)="onExportWorkspace()">
           <lore-icon name="export" [size]="14"></lore-icon> Export Workspace
         </button>
-      </div>
+      </section>
+
+      <!-- ── AI Provider ── -->
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="ai-sparkle" [size]="14"></lore-icon>
+          AI Provider
+        </h2>
+
+        <div class="sp-ai-providers">
+          <div
+            *ngFor="let p of providers"
+            class="sp-ai-prov"
+            [class.sel]="selectedProviderId === p.id"
+            (click)="onSelectProvider(p.id)"
+          >
+            <div class="sp-ai-prov-top">
+              <span class="sp-ai-prov-name">{{ p.name }}</span>
+              <span class="sp-ai-badge" [class.free]="p.free" [class.paid]="!p.free">
+                {{ p.free ? 'Free' : 'Paid' }}
+              </span>
+            </div>
+            <div class="sp-ai-prov-label">{{ p.label }}</div>
+          </div>
+        </div>
+
+        <div class="sp-ai-prov-note" *ngIf="selectedProvider.note">
+          {{ selectedProvider.note }}
+          <a *ngIf="selectedProvider.url" [href]="selectedProvider.url" target="_blank" rel="noopener" class="sp-ai-link">Get key →</a>
+        </div>
+
+        <div class="sp-pf" style="margin-top: 12px">
+          <label class="sp-pl">API Key</label>
+          <input class="sp-pin sp-api-key-input" type="password" [(ngModel)]="apiKey" [placeholder]="selectedProvider.keyPlaceholder" />
+        </div>
+
+        <div class="sp-pf" style="margin-top: 8px" *ngIf="selectedProvider.supportsCustomEndpoint">
+          <label class="sp-pl">API Endpoint URL</label>
+          <input class="sp-pin" type="text" [(ngModel)]="apiEndpoint" [placeholder]="selectedProvider.defaultEndpoint || 'https://your-endpoint/v1/messages'" />
+        </div>
+
+        <div class="sp-ai-actions">
+          <button class="sp-ai-save" (click)="onSaveApiKey()" [disabled]="!apiKey.trim() || apiKeyStatus === 'validating'">
+            {{ apiKeyStatus === 'validating' ? 'Validating…' : 'Save & Validate' }}
+          </button>
+          <button *ngIf="hasApiKey" class="sp-ai-remove" (click)="onRemoveApiKey()">Remove</button>
+        </div>
+        <div *ngIf="apiKeyStatus === 'valid'" class="sp-ai-status valid">✓ API key is valid</div>
+        <div *ngIf="apiKeyStatus === 'invalid'" class="sp-ai-status invalid">✕ Invalid API key — check key and endpoint</div>
+
+        <div class="sp-pf sp-model-row" *ngIf="hasApiKey">
+          <label class="sp-pl">Model</label>
+          <div class="sp-model-sel-wrap">
+            <select class="sp-sel sp-model-sel" [ngModel]="selectedModel" (ngModelChange)="onModelChange($event)" [disabled]="modelsLoading || !availableModels.length">
+              <option *ngIf="modelsLoading" value="">Loading models…</option>
+              <option *ngIf="!modelsLoading && !availableModels.length" value="">No models found</option>
+              <option *ngFor="let m of availableModels" [value]="m">{{ m }}</option>
+            </select>
+            <button class="sp-model-refresh" (click)="loadModels()" [disabled]="modelsLoading" title="Refresh models">
+              {{ modelsLoading ? '…' : '↻' }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Smart Notes ── -->
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="pulse" [size]="14"></lore-icon>
+          Smart Notes
+        </h2>
+        <div class="sp-toggle-list">
+          <label class="sp-toggle-row" [class.disabled]="!hasApiKey">
+            <div class="sp-toggle-info">
+              <span class="sp-toggle-lbl">AI template matching</span>
+              <span class="sp-toggle-desc" *ngIf="!hasApiKey">Requires an AI provider API key</span>
+              <span class="sp-toggle-desc" *ngIf="hasApiKey">Use AI to suggest the best template for your notes</span>
+            </div>
+            <input type="checkbox" [(ngModel)]="smartNotesAiMatching" (ngModelChange)="onSmartNotesAiMatchingChange()" [disabled]="!hasApiKey" />
+          </label>
+          <label class="sp-toggle-row">
+            <div class="sp-toggle-info">
+              <span class="sp-toggle-lbl">Auto-apply matched template</span>
+              <span class="sp-toggle-desc">Apply template automatically on next open</span>
+            </div>
+            <input type="checkbox" [(ngModel)]="smartNotesAutoApply" (ngModelChange)="onSmartNotesAutoApplyChange()" />
+          </label>
+        </div>
+      </section>
+
+      <!-- ── Custom Templates ── -->
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="template" [size]="14"></lore-icon>
+          My Custom Templates
+        </h2>
+        <ng-container *ngIf="customTemplates && customTemplates.length > 0; else noTemplates">
+          <div *ngFor="let tpl of customTemplates" class="sp-ctpl-row">
+            <div class="sp-ctpl-ico" [ngStyle]="getTemplateColorStyle(tpl)">{{ tpl.icon }}</div>
+            <div class="sp-ctpl-info">
+              <div class="sp-ctpl-name">{{ tpl.name }}</div>
+              <div class="sp-ctpl-meta">{{ getTemplateFieldSummary(tpl) }}</div>
+            </div>
+            <div class="sp-ctpl-acts">
+              <ng-container *ngIf="confirmDeleteId !== tpl.id">
+                <button class="btn-tpl-act" title="Edit" (click)="onEditTemplate(tpl)">✎</button>
+                <button class="btn-tpl-act" title="Export" (click)="onExportTemplate(tpl)">⬇</button>
+                <button class="btn-tpl-act del" title="Delete" (click)="onDeleteTemplate(tpl)">✕</button>
+              </ng-container>
+              <ng-container *ngIf="confirmDeleteId === tpl.id">
+                <span class="sp-del-confirm-lbl">Delete?</span>
+                <button class="btn-tpl-act del" (click)="onConfirmDelete(tpl)">Yes</button>
+                <button class="btn-tpl-act" (click)="onCancelDelete()">No</button>
+              </ng-container>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noTemplates>
+          <div class="sp-no-templates">No custom templates yet. Build your first one!</div>
+        </ng-template>
+      </section>
 
       <!-- ── Data & Sync ── -->
-      <div class="sp-sec" style="margin-top: 4px">
-        <div class="sp-sec-ttl">Data &amp; Sync</div>
-      </div>
-      <div class="sp-sync-section">
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="save" [size]="14"></lore-icon>
+          Data &amp; Sync
+        </h2>
+        <div class="sp-sync-section">
 
-        <!-- Option 2: Local File Sync -->
-        <div class="sp-sync-card" [class.sp-sync-card-active]="fileSyncStatus !== 'no-file'">
-          <div class="sp-sync-card-hdr">
-            <div class="sp-sync-card-ico">
-              <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
-                <rect x="2" y="3" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M7 17h6M10 14v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="sp-sync-card-info">
-              <div class="sp-sync-card-title">Local File Sync</div>
-              <div class="sp-sync-card-desc">
-                <ng-container *ngIf="fileSyncStatus === 'no-file'">Save to a file on your device — works offline, no account needed</ng-container>
-                <ng-container *ngIf="fileSyncStatus !== 'no-file'">{{ fileSyncFileName || 'lore-data.json' }}</ng-container>
+          <!-- Local File Sync -->
+          <div class="sp-sync-card" [class.sp-sync-card-active]="fileSyncStatus !== 'no-file'">
+            <div class="sp-sync-card-hdr">
+              <div class="sp-sync-card-ico">
+                <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
+                  <rect x="2" y="3" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 17h6M10 14v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
               </div>
+              <div class="sp-sync-card-info">
+                <div class="sp-sync-card-title">Local File Sync</div>
+                <div class="sp-sync-card-desc">
+                  <ng-container *ngIf="fileSyncStatus === 'no-file'">Save to a file on your device</ng-container>
+                  <ng-container *ngIf="fileSyncStatus !== 'no-file'">{{ fileSyncFileName || 'lore-data.json' }}</ng-container>
+                </div>
+              </div>
+              <div class="sp-sync-status-dot" [class.dot-active]="fileSyncStatus === 'saved' || fileSyncStatus === 'idle'" [class.dot-syncing]="fileSyncStatus === 'syncing'" [class.dot-error]="fileSyncStatus === 'error'"></div>
             </div>
-            <div class="sp-sync-status-dot"
-              [class.dot-active]="fileSyncStatus === 'saved' || fileSyncStatus === 'idle'"
-              [class.dot-syncing]="fileSyncStatus === 'syncing'"
-              [class.dot-error]="fileSyncStatus === 'error'">
+            <div class="sp-sync-card-actions" *ngIf="fileSyncStatus === 'no-file'">
+              <ng-container *ngIf="fileSyncSupported">
+                <button class="sp-sync-btn sp-sync-btn-pr" (click)="onCreateSyncFile()"><lore-icon name="save" [size]="12"></lore-icon> Create sync file</button>
+                <button class="sp-sync-btn sp-sync-btn-gh" (click)="onPickSyncFile()"><lore-icon name="import" [size]="12"></lore-icon> Open existing</button>
+              </ng-container>
+              <ng-container *ngIf="!fileSyncSupported">
+                <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToFile()"><lore-icon name="export" [size]="12"></lore-icon> Download backup</button>
+                <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromFile()"><lore-icon name="import" [size]="12"></lore-icon> Restore from file</button>
+              </ng-container>
+            </div>
+            <div class="sp-sync-card-actions" *ngIf="fileSyncStatus !== 'no-file'">
+              <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToFile()"><lore-icon name="save" [size]="12"></lore-icon> Save now</button>
+              <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromFile()"><lore-icon name="import" [size]="12"></lore-icon> Load from file</button>
+              <button class="sp-sync-btn sp-sync-btn-danger" (click)="onDisconnectFile()">Disconnect</button>
             </div>
           </div>
 
-          <div class="sp-sync-card-actions" *ngIf="fileSyncStatus === 'no-file'">
-            <ng-container *ngIf="fileSyncSupported">
-              <button class="sp-sync-btn sp-sync-btn-pr" (click)="onCreateSyncFile()">
-                <lore-icon name="save" [size]="12"></lore-icon> Create sync file
-              </button>
-              <button class="sp-sync-btn sp-sync-btn-gh" (click)="onPickSyncFile()">
-                <lore-icon name="import" [size]="12"></lore-icon> Open existing
-              </button>
-            </ng-container>
-            <ng-container *ngIf="!fileSyncSupported">
-              <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToFile()">
-                <lore-icon name="export" [size]="12"></lore-icon> Download backup
-              </button>
-              <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromFile()">
-                <lore-icon name="import" [size]="12"></lore-icon> Restore from file
-              </button>
-            </ng-container>
-          </div>
-
-          <div class="sp-sync-card-actions" *ngIf="fileSyncStatus !== 'no-file'">
-            <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToFile()">
-              <lore-icon name="save" [size]="12"></lore-icon> Save now
-            </button>
-            <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromFile()">
-              <lore-icon name="import" [size]="12"></lore-icon> Load from file
-            </button>
-            <button class="sp-sync-btn sp-sync-btn-danger" (click)="onDisconnectFile()">Disconnect</button>
+          <!-- GitHub Gist Sync -->
+          <div class="sp-sync-card" [class.sp-sync-card-active]="gistSyncStatus !== 'disconnected'">
+            <div class="sp-sync-card-hdr">
+              <div class="sp-sync-card-ico">
+                <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
+                  <path d="M10 1.5C5.3 1.5 1.5 5.3 1.5 10c0 3.75 2.43 6.93 5.8 8.05.42.08.58-.18.58-.4v-1.4c-2.36.51-2.86-1.14-2.86-1.14-.39-1-.95-1.26-.95-1.26-.77-.53.06-.52.06-.52.85.06 1.3.87 1.3.87.76 1.3 1.99.92 2.47.7.08-.55.3-.92.54-1.13-1.88-.21-3.86-.94-3.86-4.19 0-.93.33-1.68.87-2.28-.09-.21-.38-1.08.08-2.24 0 0 .71-.23 2.33.87A8.1 8.1 0 0110 5.8c.72 0 1.44.1 2.12.28 1.62-1.1 2.33-.87 2.33-.87.46 1.16.17 2.03.08 2.24.54.6.87 1.35.87 2.28 0 3.26-1.99 3.98-3.88 4.19.31.27.58.79.58 1.6v2.37c0 .22.15.49.58.4A8.51 8.51 0 0018.5 10c0-4.7-3.8-8.5-8.5-8.5z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="sp-sync-card-info">
+                <div class="sp-sync-card-title">GitHub Gist Sync</div>
+                <div class="sp-sync-card-desc">
+                  <ng-container *ngIf="gistSyncStatus === 'disconnected'">
+                    <ng-container *ngIf="gistConfigured">Sync to a private Gist in your GitHub account</ng-container>
+                    <ng-container *ngIf="!gistConfigured">Not configured — deploy the OAuth worker first</ng-container>
+                  </ng-container>
+                  <ng-container *ngIf="gistSyncStatus !== 'disconnected'">Connected as {{ '@' + gistUsername }}</ng-container>
+                </div>
+              </div>
+              <div class="sp-sync-status-dot" [class.dot-active]="gistSyncStatus === 'saved' || gistSyncStatus === 'idle'" [class.dot-syncing]="gistSyncStatus === 'syncing'" [class.dot-error]="gistSyncStatus === 'error'"></div>
+            </div>
+            <div class="sp-sync-card-actions" *ngIf="gistSyncStatus === 'disconnected' && gistConfigured">
+              <button class="sp-sync-btn sp-sync-btn-gh-dark" (click)="onConnectGist()">Connect GitHub</button>
+            </div>
+            <div class="sp-sync-card-actions" *ngIf="gistSyncStatus !== 'disconnected'">
+              <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToGist()" [disabled]="gistSyncStatus === 'syncing'"><lore-icon name="save" [size]="12"></lore-icon> Save now</button>
+              <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromGist()" [disabled]="gistSyncStatus === 'syncing'"><lore-icon name="import" [size]="12"></lore-icon> Load</button>
+              <button class="sp-sync-btn sp-sync-btn-danger" (click)="onDisconnectGist()">Disconnect</button>
+            </div>
           </div>
         </div>
-
-        <!-- Option 3: GitHub Gist Sync -->
-        <div class="sp-sync-card" [class.sp-sync-card-active]="gistSyncStatus !== 'disconnected'">
-          <div class="sp-sync-card-hdr">
-            <div class="sp-sync-card-ico">
-              <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
-                <path d="M10 1.5C5.3 1.5 1.5 5.3 1.5 10c0 3.75 2.43 6.93 5.8 8.05.42.08.58-.18.58-.4v-1.4c-2.36.51-2.86-1.14-2.86-1.14-.39-1-.95-1.26-.95-1.26-.77-.53.06-.52.06-.52.85.06 1.3.87 1.3.87.76 1.3 1.99.92 2.47.7.08-.55.3-.92.54-1.13-1.88-.21-3.86-.94-3.86-4.19 0-.93.33-1.68.87-2.28-.09-.21-.38-1.08.08-2.24 0 0 .71-.23 2.33.87A8.1 8.1 0 0110 5.8c.72 0 1.44.1 2.12.28 1.62-1.1 2.33-.87 2.33-.87.46 1.16.17 2.03.08 2.24.54.6.87 1.35.87 2.28 0 3.26-1.99 3.98-3.88 4.19.31.27.58.79.58 1.6v2.37c0 .22.15.49.58.4A8.51 8.51 0 0018.5 10c0-4.7-3.8-8.5-8.5-8.5z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="sp-sync-card-info">
-              <div class="sp-sync-card-title">GitHub Gist Sync</div>
-              <div class="sp-sync-card-desc">
-                <ng-container *ngIf="gistSyncStatus === 'disconnected'">
-                  <ng-container *ngIf="gistConfigured">Sync to a private Gist — your data stays in your GitHub account</ng-container>
-                  <ng-container *ngIf="!gistConfigured">Not configured — see Settings → GitHub OAuth setup</ng-container>
-                </ng-container>
-                <ng-container *ngIf="gistSyncStatus !== 'disconnected'">Connected as {{ '@' + gistUsername }}</ng-container>
-              </div>
-            </div>
-            <div class="sp-sync-status-dot"
-              [class.dot-active]="gistSyncStatus === 'saved' || gistSyncStatus === 'idle'"
-              [class.dot-syncing]="gistSyncStatus === 'syncing'"
-              [class.dot-error]="gistSyncStatus === 'error'">
-            </div>
-          </div>
-
-          <div class="sp-sync-card-actions" *ngIf="gistSyncStatus === 'disconnected' && gistConfigured">
-            <button class="sp-sync-btn sp-sync-btn-gh-dark" (click)="onConnectGist()">
-              Connect GitHub
-            </button>
-          </div>
-
-          <div class="sp-sync-card-actions" *ngIf="gistSyncStatus !== 'disconnected'">
-            <button class="sp-sync-btn sp-sync-btn-pr" (click)="onSaveToGist()" [disabled]="gistSyncStatus === 'syncing'">
-              <lore-icon name="save" [size]="12"></lore-icon> Save now
-            </button>
-            <button class="sp-sync-btn sp-sync-btn-gh" (click)="onLoadFromGist()" [disabled]="gistSyncStatus === 'syncing'">
-              <lore-icon name="import" [size]="12"></lore-icon> Load
-            </button>
-            <button class="sp-sync-btn sp-sync-btn-danger" (click)="onDisconnectGist()">Disconnect</button>
-          </div>
-        </div>
-
-      </div>
+      </section>
 
       <!-- ── About ── -->
-      <div class="sp-about">
+      <section class="sp-section sp-about">
         <div class="sp-about-logo">
           <svg viewBox="0 0 26 26" fill="none" width="26" height="26">
             <rect width="26" height="26" rx="6" fill="url(#sag2)"/>
@@ -384,8 +329,8 @@
         </div>
         <p>Your knowledge, beautifully organised.</p>
         <div class="sp-ver">v{{ appVersion }} · {{ totalTemplateCount }} templates · {{ customTemplates.length }} custom</div>
-      </div>
+      </section>
 
-    </div><!-- /sp-body -->
-  </div><!-- /sp-modal -->
+    </div>
+  </div>
 </div>

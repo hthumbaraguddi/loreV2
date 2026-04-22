@@ -38,43 +38,74 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
   cardBodyHtml: SafeHtml = '';
   template: TemplateDefinition | undefined;
   private iframeInjected = false;
+  private iframeSized = false;
 
   ngOnChanges(): void {
     this.template = this.templateService.getTemplate(this.note.templateId);
     this.cardBodyHtml = this.buildCardBody();
     this.iframeInjected = false;
+    this.iframeSized = false;
   }
 
   ngAfterViewChecked(): void {
-    if (this.iframeInjected) return;
-    const placeholder = this.el.nativeElement.querySelector('.rich-html-placeholder');
-    if (!placeholder) return;
-    this.iframeInjected = true;
-    const encoded = placeholder.getAttribute('data-html-content');
-    if (!encoded) return;
-    const html = decodeURIComponent(encoded);
-    const iframe = document.createElement('iframe');
-    iframe.className = 'rich-html-iframe';
-    iframe.setAttribute('sandbox', 'allow-same-origin');
-    iframe.setAttribute('scrolling', 'no');
-    placeholder.replaceWith(iframe);
-    // Write content after iframe is in DOM
-    setTimeout(() => {
-      try {
-        iframe.contentDocument?.open();
-        iframe.contentDocument?.write(html);
-        iframe.contentDocument?.close();
-        // Auto-size to full content height (no cap)
-        const resize = () => {
-          const h = iframe.contentDocument?.body?.scrollHeight;
-          if (h) iframe.style.height = (h + 20) + 'px';
-        };
-        iframe.contentDocument?.addEventListener('DOMContentLoaded', resize);
-        setTimeout(resize, 200);
-      } catch (e) {
-        console.warn('iframe write failed', e);
+    // Only inject when the card body is visible (open)
+    if (!this.isOpen) return;
+
+    if (!this.iframeInjected) {
+      const placeholder = this.el.nativeElement.querySelector('.rich-html-placeholder');
+      if (!placeholder) return;
+      this.iframeInjected = true;
+      const encoded = placeholder.getAttribute('data-html-content');
+      if (!encoded) return;
+      const html = decodeURIComponent(encoded);
+      const iframe = document.createElement('iframe');
+      iframe.className = 'rich-html-iframe';
+      iframe.setAttribute('sandbox', 'allow-same-origin');
+      iframe.setAttribute('scrolling', 'no');
+      placeholder.replaceWith(iframe);
+      setTimeout(() => {
+        try {
+          iframe.contentDocument?.open();
+          // Inject containment CSS to prevent HTML content from overflowing the iframe
+          const containmentCss = `<style>
+            html, body { max-width: 100% !important; overflow-x: hidden !important; box-sizing: border-box !important; margin: 0 !important; }
+            * { max-width: 100% !important; box-sizing: border-box !important; }
+            nav, header, .nav, .navbar { position: relative !important; width: 100% !important; }
+            [style*="position:fixed"], [style*="position: fixed"] { position: relative !important; }
+            table { table-layout: fixed !important; width: 100% !important; }
+            img, video { max-width: 100% !important; height: auto !important; }
+            pre, code { white-space: pre-wrap !important; word-break: break-all !important; }
+          </style>`;
+          iframe.contentDocument?.write(containmentCss + html);
+          iframe.contentDocument?.close();
+          this.sizeIframe(iframe);
+        } catch (e) {
+          console.warn('iframe write failed', e);
+        }
+      }, 0);
+      return;
+    }
+
+    // Re-size if already injected but not yet sized (card was closed during injection)
+    if (!this.iframeSized) {
+      const iframe = this.el.nativeElement.querySelector('.rich-html-iframe') as HTMLIFrameElement | null;
+      if (iframe) this.sizeIframe(iframe);
+    }
+  }
+
+  private sizeIframe(iframe: HTMLIFrameElement): void {
+    const resize = () => {
+      const h = iframe.contentDocument?.body?.scrollHeight;
+      if (h && h > 50) {
+        iframe.style.height = (h + 20) + 'px';
+        this.iframeSized = true;
       }
-    }, 0);
+    };
+    iframe.contentDocument?.addEventListener('DOMContentLoaded', resize);
+    setTimeout(resize, 50);
+    setTimeout(resize, 300);
+    setTimeout(resize, 1000);
+    setTimeout(resize, 2500);
   }
 
   get badgeText(): string {
@@ -111,6 +142,10 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
 
   onToggle(): void {
     this.data.toggleNoteCollapse(this.notebookId, this.section.id, this.note.id);
+    // When opening an HTML note, reset sized flag so ngAfterViewChecked re-measures
+    if (this.isHtmlNote && this.note._collapsed) {
+      this.iframeSized = false;
+    }
   }
 
   onEdit(event: Event): void {

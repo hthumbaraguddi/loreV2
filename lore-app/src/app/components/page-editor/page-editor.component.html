@@ -19,7 +19,7 @@
 
   <!-- Page content -->
   <div class="pg-editor-scroll">
-    <div class="pg-editor-body">
+    <div class="pg-editor-body" [class.pg-editor-body--wide]="selectedTemplateId === 'rich'">
 
       <!-- Decoration Banner (shown when a pending template match exists) -->
       <div class="pg-decoration-banner" *ngIf="pendingTemplateId && !showTemplatePicker">
@@ -84,6 +84,12 @@
             <input class="fin" id="f_title" [(ngModel)]="title" placeholder="Note title…" />
           </div>
           <div [innerHTML]="formHtml"></div>
+          <!-- Paste AI Response button (rich template only) -->
+          <div *ngIf="selectedTemplateId === 'rich'" class="pg-paste-ai-row">
+            <button class="btn-paste-ai" (click)="openPasteModal()">
+              <lore-icon name="ai-sparkle" [size]="13"></lore-icon> Paste AI Response
+            </button>
+          </div>
         </div>
       </ng-container>
 
@@ -179,5 +185,13 @@
     <button class="pg-undo-btn" (click)="onUndoAutoApply()">Undo</button>
     <button class="pg-undo-close" (click)="showUndoToast = false">✕</button>
   </div>
+
+  <!-- Paste AI Response modal (rich template) -->
+  <app-paste-ai-response-modal
+    [isOpen]="pasteModalOpen"
+    [targetSection]="pasteTarget"
+    (closed)="onPasteModalClosed()"
+    (noteSaved)="onPasteNoteSaved()">
+  </app-paste-ai-response-modal>
 
 </div>

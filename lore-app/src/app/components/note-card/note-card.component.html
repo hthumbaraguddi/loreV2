@@ -1,4 +1,4 @@
-<div class="note-card">
+<div class="note-card" [class.note-card--html]="isHtmlNote">
   <div class="card-hdr" (click)="note.templateId === 'page' ? onEdit($event) : onToggle()">
     <span
       class="card-sec-badge"
@@ -23,5 +23,5 @@
     <span class="chev" [class.open]="isOpen">▾</span>
   </div>
 
-  <div class="card-body" [class.open]="isOpen" [innerHTML]="cardBodyHtml"></div>
+  <div class="card-body" [class.open]="isOpen" [class.card-body--html]="isHtmlNote" [innerHTML]="cardBodyHtml"></div>
 </div>

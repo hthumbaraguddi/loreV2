@@ -402,6 +402,23 @@ export class AppComponent implements OnInit, OnDestroy {
   onShelfPickerSelected(shelfId: string): void {
     this.showShelfPickerModal = false;
     if (!this.pendingNotebookImportJson) return;
+
+    // HTML import path
+    const pending = this.pendingNotebookImportJson as any;
+    if (pending.__htmlImport) {
+      const nb = this.data.addNotebook(pending.notebookName, '📄', shelfId);
+      const sec = this.data.addSection(nb.id, 'Content', '', 'purple');
+      this.data.addNote(nb.id, sec.id, pending.notebookName, 'rich', {
+        contentType: 'html',
+        markdown: pending.html,
+        tags: [],
+      });
+      this.data.setActiveNotebook(nb.id);
+      this.data.showToast(`✓ Imported "${pending.notebookName}"`);
+      this.pendingNotebookImportJson = null;
+      return;
+    }
+
     try {
       const newNbId = this.exportImport.importNotebook(this.pendingNotebookImportJson, shelfId);
       this.data.setActiveNotebook(newNbId);
@@ -763,10 +780,20 @@ export class AppComponent implements OnInit, OnDestroy {
     const file = input.files?.[0];
     if (!file) return;
 
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
     const reader = new FileReader();
     reader.onload = (e) => {
+      const raw = e.target?.result as string;
       try {
-        const json = JSON.parse(e.target?.result as string);
+        // ── HTML import (notebook context only) ───────────────────────────
+        if (ext === 'html' && this.importContext === 'notebook') {
+          this.importHtmlAsNotebook(raw, file.name);
+          input.value = '';
+          return;
+        }
+
+        const json = JSON.parse(raw);
         if (this.importContext === 'template') {
           this.exportImport.importTemplate(json);
           this.data.showToast('Template imported successfully.');
@@ -794,12 +821,51 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       } catch (err: any) {
         if (err?.message && !err.message.startsWith('Invalid')) {
-          this.data.showToast('Import failed: invalid JSON file.');
+          this.data.showToast('Import failed: invalid file.');
         }
       }
       input.value = '';
     };
     reader.readAsText(file);
+  }
+
+  /** Creates a notebook from an HTML file — one section with one rich HTML note. */
+  private importHtmlAsNotebook(html: string, fileName: string): void {
+    const state = this.data.getState();
+    if (state.shelves.length === 0) {
+      this.data.showToast('Create a shelf first before importing.');
+      return;
+    }
+
+    // Extract a title from <title> or <h1>
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const h1Match = html.match(/<h[123][^>]*>([^<]+)<\/h[123]>/i);
+    const notebookName = titleMatch
+      ? titleMatch[1].trim().substring(0, 60)
+      : h1Match
+        ? h1Match[1].trim().substring(0, 60)
+        : fileName.replace(/\.html?$/i, '');
+
+    const doImport = (shelfId: string) => {
+      const nb = this.data.addNotebook(notebookName, '📄', shelfId);
+      const sec = this.data.addSection(nb.id, 'Content', '', 'purple');
+      this.data.addNote(nb.id, sec.id, notebookName, 'rich', {
+        contentType: 'html',
+        markdown: html,
+        tags: [],
+      });
+      this.data.setActiveNotebook(nb.id);
+      this.data.showToast(`✓ Imported "${notebookName}"`);
+    };
+
+    if (state.shelves.length === 1) {
+      doImport(state.shelves[0].id);
+    } else {
+      // Reuse shelf picker — store a special marker
+      this.pendingNotebookImportJson = { __htmlImport: true, html, notebookName };
+      this.shelfPickerShelves = state.shelves;
+      this.showShelfPickerModal = true;
+    }
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────

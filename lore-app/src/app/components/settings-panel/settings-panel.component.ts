@@ -151,6 +151,10 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
       this.selectedModel = this.anthropicService.getModel();
       this.availableModels = [];
       if (this.apiKey) this.loadModels();
+
+      // Smart Notes settings
+      this.smartNotesAiMatching = localStorage.getItem('lore_smart_notes_ai_matching') === 'true';
+      this.smartNotesAutoApply  = localStorage.getItem('lore_smart_notes_auto_apply')  === 'true';
     }
   }
 
@@ -364,4 +368,25 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   get hasApiKey(): boolean { return !!this.anthropicService.getApiKey(); }
+
+  // ── Smart Notes ───────────────────────────────────────────────────────────
+
+  smartNotesAiMatching = false;
+  smartNotesAutoApply = false;
+
+  onSmartNotesAiMatchingChange(): void {
+    if (this.smartNotesAiMatching) {
+      localStorage.setItem('lore_smart_notes_ai_matching', 'true');
+    } else {
+      localStorage.removeItem('lore_smart_notes_ai_matching');
+    }
+  }
+
+  onSmartNotesAutoApplyChange(): void {
+    if (this.smartNotesAutoApply) {
+      localStorage.setItem('lore_smart_notes_auto_apply', 'true');
+    } else {
+      localStorage.removeItem('lore_smart_notes_auto_apply');
+    }
+  }
 }

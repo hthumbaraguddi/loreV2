@@ -184,6 +184,31 @@
         </div>
       </div>
 
+      <!-- ── Smart Notes ── -->
+      <div class="sp-sec" style="margin-top: 4px">
+        <div class="sp-sec-ttl">Smart Notes</div>
+      </div>
+      <div class="sp-smart-notes">
+        <label class="sp-ai-sync-label" [class.disabled]="!hasApiKey">
+          <input
+            type="checkbox"
+            [(ngModel)]="smartNotesAiMatching"
+            (ngModelChange)="onSmartNotesAiMatchingChange()"
+            [disabled]="!hasApiKey"
+          />
+          AI template matching
+          <span *ngIf="!hasApiKey" class="sp-hint">Requires an AI provider API key</span>
+        </label>
+        <label class="sp-ai-sync-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="smartNotesAutoApply"
+            (ngModelChange)="onSmartNotesAutoApplyChange()"
+          />
+          Auto-apply matched template
+        </label>
+      </div>
+
       <!-- ── Account ── -->
       <div class="sp-sec" style="margin-top: 4px">
         <div class="sp-sec-ttl">Account</div>

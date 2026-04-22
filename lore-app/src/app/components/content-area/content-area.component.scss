@@ -6,6 +6,9 @@
   min-width: 0;
 }
 
+:host([hidden]) {
+  display: none !important;
+}
 .sbanner {
   background: var(--accl);
   border-bottom: 1px solid var(--border);

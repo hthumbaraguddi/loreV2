@@ -1,82 +1,110 @@
-<div class="pl-overlay" *ngIf="isOpen" (click)="close()">
-  <div class="pl-modal" (click)="$event.stopPropagation()">
+<div class="pl-view" *ngIf="isOpen">
 
-    <!-- Header -->
-    <div class="pl-hdr">
-      <div class="pl-hdr-left">
-        <span class="pl-hdr-icon">✦</span>
-        <span class="pl-hdr-title">Prompt Library</span>
-      </div>
-      <div class="pl-hdr-acts">
-        <button class="btn-gh pl-hdr-btn" (click)="onImportClick()" title="Import prompt">
-          <lore-icon name="import" [size]="13"></lore-icon>
-          <span>Import</span>
-        </button>
-        <button class="btn-pr" (click)="onNewPrompt()">
-          + New Prompt
-        </button>
-        <button class="pl-close" (click)="close()">
-          <lore-icon name="close" [size]="12"></lore-icon>
-        </button>
-      </div>
+  <!-- Topbar -->
+  <div class="pl-topbar">
+    <button class="pl-back-btn" (click)="close()">
+      <lore-icon name="arrow-left" [size]="14"></lore-icon>
+      Back
+    </button>
+    <span class="pl-topbar-title">
+      <lore-icon name="prompt" [size]="14"></lore-icon>
+      Prompt Library
+    </span>
+    <div class="pl-topbar-right">
+      <button class="btn-gh pl-import-btn" (click)="onImportClick()">
+        <lore-icon name="import" [size]="13"></lore-icon> Import
+      </button>
+      <button class="btn-pr" (click)="onNewPrompt()">
+        <lore-icon name="note-plus" [size]="13"></lore-icon> New Prompt
+      </button>
     </div>
+  </div>
 
-    <!-- Search -->
-    <div class="pl-search-wrap">
-      <lore-icon name="search" [size]="12" class="pl-search-ico"></lore-icon>
-      <input
-        class="pl-search"
-        type="text"
-        placeholder="Search prompts…"
-        [(ngModel)]="searchQuery"
-      />
-    </div>
+  <!-- Search bar -->
+  <div class="pl-search-bar">
+    <lore-icon name="search" [size]="13" class="pl-search-ico"></lore-icon>
+    <input
+      class="pl-search"
+      type="text"
+      placeholder="Search prompts…"
+      [(ngModel)]="searchQuery"
+    />
+  </div>
 
-    <!-- New Prompt Form -->
-    <div class="pl-new-form" *ngIf="showNewForm">
-      <div class="pl-new-row">
-        <input class="pl-input" placeholder="Prompt name *" [(ngModel)]="newName" />
-        <input class="pl-input pl-input-sm" placeholder="Category" [(ngModel)]="newCategory" />
+  <!-- Scrollable content -->
+  <div class="pl-scroll">
+    <div class="pl-content">
+
+      <!-- New Prompt Form -->
+      <div class="pl-new-form" *ngIf="showNewForm">
+        <h3 class="pl-new-title">New Prompt</h3>
+        <div class="pl-new-row">
+          <div class="pl-pf">
+            <label class="pl-pl">Name *</label>
+            <input class="pl-pin" placeholder="e.g. Weekly Summary" [(ngModel)]="newName" />
+          </div>
+          <div class="pl-pf">
+            <label class="pl-pl">Category</label>
+            <input class="pl-pin" placeholder="e.g. Research" [(ngModel)]="newCategory" />
+          </div>
+        </div>
+        <div class="pl-pf">
+          <label class="pl-pl">Prompt body — use {{ '{' }}{{ '{' }}variable{{ '}' }}{{ '}' }} for dynamic fields *</label>
+          <textarea
+            class="pl-pta"
+            [(ngModel)]="newBody"
+            rows="6"
+            placeholder="Write your prompt here…">
+          </textarea>
+        </div>
+        <div class="pl-new-acts">
+          <button class="btn-gh" (click)="onCancelNew()">Cancel</button>
+          <button class="btn-pr" [disabled]="!newName.trim() || !newBody.trim()" (click)="onSaveNew()">Save Prompt</button>
+        </div>
       </div>
-      <textarea
-        class="pl-textarea"
-        [placeholder]="'Prompt body — use ' + '{{variable}}' + ' for dynamic fields *'"
-        [(ngModel)]="newBody"
-        rows="5">
-      </textarea>
-      <div class="pl-new-acts">
-        <button class="btn-gh" (click)="onCancelNew()">Cancel</button>
-        <button class="btn-pr" [disabled]="!newName.trim() || !newBody.trim()" (click)="onSaveNew()">Save Prompt</button>
-      </div>
-    </div>
 
-    <!-- Prompt list -->
-    <div class="pl-body">
-      <div *ngIf="filtered.length === 0" class="pl-empty">
-        No prompts found.
+      <!-- Empty state -->
+      <div *ngIf="filtered.length === 0 && !showNewForm" class="pl-empty">
+        <lore-icon name="prompt" [size]="32"></lore-icon>
+        <p>No prompts found.</p>
       </div>
 
+      <!-- Prompt categories -->
       <div *ngFor="let cat of categories" class="pl-category">
         <div class="pl-cat-label">{{ cat }}</div>
-        <div class="pl-row" *ngFor="let p of promptsForCategory(cat)">
-          <div class="pl-row-info">
-            <span class="pl-row-name">{{ p.name }}</span>
-            <span class="pl-badge pl-badge-builtin" *ngIf="p.isBuiltIn">Built-in</span>
-            <span class="pl-row-last">Last run: {{ formatDate(p.lastRunAt) }}</span>
-            <span class="pl-row-hist" *ngIf="getRunCount(p.id) > 0" (click)="toggleHistory(p.id)" title="View generated notes">
-              {{ getRunCount(p.id) }} note{{ getRunCount(p.id) === 1 ? '' : 's' }} ↓
-            </span>
+
+        <div class="pl-card" *ngFor="let p of promptsForCategory(cat)">
+          <div class="pl-card-main">
+            <div class="pl-card-info">
+              <span class="pl-card-name">{{ p.name }}</span>
+              <span class="pl-badge-builtin" *ngIf="p.isBuiltIn">Built-in</span>
+            </div>
+            <div class="pl-card-meta">
+              Last run: {{ formatDate(p.lastRunAt) }}
+              <span class="pl-hist-link" *ngIf="getRunCount(p.id) > 0" (click)="toggleHistory(p.id)">
+                · {{ getRunCount(p.id) }} note{{ getRunCount(p.id) === 1 ? '' : 's' }}
+              </span>
+            </div>
           </div>
-          <div class="pl-row-acts">
-            <button class="pl-act-btn pl-act-run" (click)="onRun(p)" title="Run">▶ Run</button>
-            <button class="pl-act-btn" (click)="onDuplicate(p)" title="Duplicate">⧉</button>
-            <button class="pl-act-btn" (click)="onExport(p)" title="Export"><lore-icon name="export" [size]="11"></lore-icon></button>
+          <div class="pl-card-acts">
+            <button class="pl-btn-run" (click)="onRun(p)">
+              <lore-icon name="prompt" [size]="12"></lore-icon> Run
+            </button>
+            <button class="pl-btn-icon" (click)="onDuplicate(p)" title="Duplicate">
+              <lore-icon name="layers" [size]="12"></lore-icon>
+            </button>
+            <button class="pl-btn-icon" (click)="onExport(p)" title="Export">
+              <lore-icon name="export" [size]="12"></lore-icon>
+            </button>
             <button
-              class="pl-act-btn pl-act-del"
+              class="pl-btn-icon pl-btn-del"
               [disabled]="p.isBuiltIn"
               [title]="p.isBuiltIn ? 'Built-in prompts cannot be deleted' : 'Delete'"
-              (click)="onDelete(p)">✕</button>
+              (click)="onDelete(p)">
+              <lore-icon name="close" [size]="11"></lore-icon>
+            </button>
           </div>
+
           <!-- Run history -->
           <div class="pl-history" *ngIf="expandedHistoryId === p.id">
             <div class="pl-hist-row" *ngFor="let note of getRunHistory(p.id)">
@@ -86,9 +114,10 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Hidden import input -->
-    <input #importInput type="file" accept=".json" style="display:none" (change)="onImportFile($event)" />
+    </div>
   </div>
+
+  <!-- Hidden import input -->
+  <input #importInput type="file" accept=".json" style="display:none" (change)="onImportFile($event)" />
 </div>

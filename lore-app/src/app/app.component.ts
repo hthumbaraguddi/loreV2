@@ -321,6 +321,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onOpenSettings(): void {
     this.isSettingsPanelOpen = true;
+    this.showPromptLibrary = false;
   }
 
   onOpenChat(): void {
@@ -329,6 +330,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onOpenPrompts(): void {
     this.showPromptLibrary = true;
+    this.isSettingsPanelOpen = false;
   }
 
   onRunPrompt(prompt: SavedPrompt): void {

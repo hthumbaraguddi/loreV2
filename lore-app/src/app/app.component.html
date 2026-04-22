@@ -47,7 +47,7 @@
       </app-topbar>
 
       <app-content-area
-        [hidden]="isPageEditorOpen"
+        [hidden]="isPageEditorOpen || isSettingsPanelOpen || showPromptLibrary"
         [notebook]="getActiveNotebook(state)"
         [searchQuery]="searchQuery"
         [colors]="sectionColors"
@@ -73,6 +73,31 @@
         (deleted)="onNoteDeleted(state); isPageEditorOpen = false"
         (closed)="onPageEditorClosed()">
       </app-page-editor>
+
+      <!-- Settings — inline main area view -->
+      <app-settings-panel
+        [hidden]="!isSettingsPanelOpen"
+        [isOpen]="isSettingsPanelOpen"
+        [state]="state"
+        [customTemplates]="getCustomTemplates()"
+        [syncStatus]="syncStatus"
+        (closed)="onSettingsClosed()"
+        (themeChanged)="onThemeChanged($event)"
+        (fontSizeChanged)="onFontSizeChanged($event)"
+        (nameChanged)="onNameChanged($event)"
+        (templateDeleted)="onTemplateDeleted($event)"
+        (templateEdited)="onTemplateEdited($event)"
+        (driveReconnected)="onDriveReconnected()"
+        (logout)="onLogout()">
+      </app-settings-panel>
+
+      <!-- Prompt Library — inline main area view -->
+      <app-prompt-library-modal
+        [hidden]="!showPromptLibrary"
+        [isOpen]="showPromptLibrary"
+        (closed)="showPromptLibrary = false"
+        (runPrompt)="onRunPrompt($event)">
+      </app-prompt-library-modal>
     </div>
 
     <!-- Edit Panel -->
@@ -86,22 +111,6 @@
       (closed)="onEditPanelClosed()">
     </app-edit-panel>
 
-    <!-- Settings Panel -->
-    <app-settings-panel
-      [isOpen]="isSettingsPanelOpen"
-      [state]="state"
-      [customTemplates]="getCustomTemplates()"
-      [syncStatus]="syncStatus"
-      (closed)="onSettingsClosed()"
-      (themeChanged)="onThemeChanged($event)"
-      (fontSizeChanged)="onFontSizeChanged($event)"
-      (nameChanged)="onNameChanged($event)"
-      (templateDeleted)="onTemplateDeleted($event)"
-      (templateEdited)="onTemplateEdited($event)"
-      (driveReconnected)="onDriveReconnected()"
-      (logout)="onLogout()">
-    </app-settings-panel>
-
     <!-- Chat Panel -->
     <app-chat-panel
       [isOpen]="isChatPanelOpen"
@@ -109,13 +118,6 @@
       [initialPrompt]="chatInitialPrompt"
       (closed)="isChatPanelOpen = false">
     </app-chat-panel>
-
-    <!-- Prompt Library Modal -->
-    <app-prompt-library-modal
-      [isOpen]="showPromptLibrary"
-      (closed)="showPromptLibrary = false"
-      (runPrompt)="onRunPrompt($event)">
-    </app-prompt-library-modal>
 
     <!-- Prompt Run Modal -->
     <app-prompt-run-modal

@@ -7,7 +7,7 @@
 </button>
 
 <!-- Sidebar -->
-<div id="sidebar" [class.collapsed]="state.sidebarCollapsed && !isMobileOpen" [class.mobile-open]="isMobileOpen">
+<div id="sidebar" [class.collapsed]="state.sidebarCollapsed === true && !isMobileOpen" [class.mobile-open]="isMobileOpen">
 
   <!-- Workspace header -->
   <div class="ws-hdr">

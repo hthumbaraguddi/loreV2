@@ -1,7 +1,7 @@
 <app-login *ngIf="!isLoggedIn" (tokenReady)="loadUserData()" (driveConnectNeeded)="needsDriveConnect = true"></app-login>
 
 <ng-container *ngIf="isLoggedIn && (state$ | async) as state">
-  <div id="app" [class.sb-collapsed]="state.sidebarCollapsed">
+  <div id="app" [class.sb-collapsed]="state.sidebarCollapsed === true">
 
     <!-- Sidebar -->
     <app-sidebar
@@ -47,7 +47,7 @@
       </app-topbar>
 
       <app-content-area
-        *ngIf="!isPageEditorOpen"
+        [hidden]="isPageEditorOpen"
         [notebook]="getActiveNotebook(state)"
         [searchQuery]="searchQuery"
         [colors]="sectionColors"
@@ -64,7 +64,8 @@
 
       <!-- Page Editor — full-width inline editor for 'page' template notes -->
       <app-page-editor
-        *ngIf="isPageEditorOpen && editingNote"
+        [hidden]="!isPageEditorOpen || !editingNote"
+        *ngIf="editingNote"
         [note]="editingNote"
         [section]="editingNoteSection!"
         [notebookId]="getActiveNotebook(state)?.id ?? ''"

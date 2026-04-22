@@ -22,11 +22,15 @@ export default {
     const origin = request.headers.get('Origin') ?? '';
     const allowed = env.ALLOWED_ORIGIN ?? '';
 
+    // Allow production origin + localhost for dev
+    const isAllowed = origin === allowed || origin.startsWith('http://localhost');
+    const corsOrigin = isAllowed ? origin : allowed;
+
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
-          'Access-Control-Allow-Origin': allowed,
+          'Access-Control-Allow-Origin': corsOrigin,
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
@@ -66,7 +70,7 @@ export default {
     return new Response(JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowed,
+        'Access-Control-Allow-Origin': corsOrigin,
       },
     });
   },

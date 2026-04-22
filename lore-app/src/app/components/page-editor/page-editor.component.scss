@@ -5,6 +5,10 @@
   overflow: hidden;
 }
 
+:host([hidden]) {
+  display: none !important;
+}
+
 .pg-editor {
   display: flex;
   flex-direction: column;

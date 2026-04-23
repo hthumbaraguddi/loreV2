@@ -303,9 +303,28 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onAddNotebook(shelf: Shelf): void {
-    this.editingNotebook = null;
-    this.notebookTargetShelfId = shelf.id;
-    this.showNotebookModal = true;
+    // Skip the modal — create a blank "Untitled" notebook immediately
+    const notebook = this.data.addNotebook('Untitled', '📓', shelf.id);
+    this.data.setActiveNotebook(notebook.id);
+    
+    // Auto-create a blank "Untitled" page note and open the page editor
+    const updatedState = this.data.getState();
+    const updatedNb = updatedState.notebooks.find(n => n.id === notebook.id);
+    if (updatedNb && updatedNb.sections.length > 0) {
+      const defaultSection = updatedNb.sections[0];
+      this.data.addNote(notebook.id, defaultSection.id, 'Untitled', 'page', { icon: '📄', blocks: [], tags: [] });
+      
+      // Find the newly created note and open the page editor
+      const finalState = this.data.getState();
+      const finalNb = finalState.notebooks.find(n => n.id === notebook.id);
+      const finalSection = finalNb?.sections.find(s => s.id === defaultSection.id);
+      const newNote = finalSection?.notes[finalSection.notes.length - 1];
+      if (newNote && finalSection) {
+        this.editingNote = newNote;
+        this.editingNoteSection = finalSection;
+        this.isPageEditorOpen = true;
+      }
+    }
   }
 
   onEditShelf(shelf: Shelf): void {
@@ -408,15 +427,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // HTML import path
     const pending = this.pendingNotebookImportJson as any;
     if (pending.__htmlImport) {
-      const nb = this.data.addNotebook(pending.notebookName, '📄', shelfId);
-      const sec = this.data.addSection(nb.id, 'Content', '', 'purple');
-      this.data.addNote(nb.id, sec.id, pending.notebookName, 'rich', {
-        contentType: 'html',
-        markdown: pending.html,
-        tags: [],
-      });
-      this.data.setActiveNotebook(nb.id);
-      this.data.showToast(`✓ Imported "${pending.notebookName}"`);
+      this._doHtmlImport(pending, shelfId);
       this.pendingNotebookImportJson = null;
       return;
     }
@@ -534,6 +545,13 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.data.addNote(nb.id, sectionId, payload.title, payload.templateId, payload.data);
     }
+
+    // If the notebook is still "Untitled" and the note has a real title, rename the notebook to match
+    const newTitle = payload.title.trim();
+    if (nb.name === 'Untitled' && newTitle && newTitle !== 'Untitled') {
+      this.data.updateNotebook(nb.id, newTitle, nb.icon);
+    }
+
     this.isEditPanelOpen = false;
     this.editingNote = null;
     this.editingNoteSection = null;
@@ -559,6 +577,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isPageEditorOpen = false;
     this.editingNote = null;
     this.editingNoteSection = null;
+  }
+
+  onPageTitleChanged(title: string, state: AppState): void {
+    const nb = this.getActiveNotebook(state);
+    if (!nb) return;
+    const trimmed = title.trim();
+    // Rename the notebook live while the user types, as long as it's still "Untitled"
+    if (nb.name === 'Untitled' && trimmed && trimmed !== 'Untitled') {
+      this.data.updateNotebook(nb.id, trimmed, nb.icon);
+    }
   }
 
   onNewPageNote(section: Section | null, state: AppState): void {
@@ -674,7 +702,28 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.editingShelf) {
       this.data.updateShelf(this.editingShelf.id, payload.name, payload.icon);
     } else {
-      this.data.addShelf(payload.name, payload.icon);
+      const shelf = this.data.addShelf(payload.name, payload.icon);
+      // Auto-create a blank notebook so the user lands in a ready-to-write state
+      const notebook = this.data.addNotebook('Untitled', '📓', shelf.id);
+      this.data.setActiveNotebook(notebook.id);
+
+      // Auto-create a blank "Untitled" page note and open the page editor
+      const updatedState = this.data.getState();
+      const updatedNb = updatedState.notebooks.find(n => n.id === notebook.id);
+      if (updatedNb && updatedNb.sections.length > 0) {
+        const defaultSection = updatedNb.sections[0];
+        this.data.addNote(notebook.id, defaultSection.id, 'Untitled', 'page', { icon: '📄', blocks: [], tags: [] });
+
+        const finalState = this.data.getState();
+        const finalNb = finalState.notebooks.find(n => n.id === notebook.id);
+        const finalSection = finalNb?.sections.find(s => s.id === defaultSection.id);
+        const newNote = finalSection?.notes[finalSection.notes.length - 1];
+        if (newNote && finalSection) {
+          this.editingNote = newNote;
+          this.editingNoteSection = finalSection;
+          this.isPageEditorOpen = true;
+        }
+      }
     }
     this.showShelfModal = false;
     this.editingShelf = null;
@@ -699,7 +748,8 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.editingNotebook) {
       this.data.updateNotebook(this.editingNotebook.id, payload.name, payload.icon);
     } else {
-      this.data.addNotebook(payload.name, payload.icon, payload.shelfId);
+      const notebook = this.data.addNotebook(payload.name, payload.icon, payload.shelfId);
+      this.data.setActiveNotebook(notebook.id);
     }
     this.showNotebookModal = false;
     this.editingNotebook = null;
@@ -831,7 +881,8 @@ export class AppComponent implements OnInit, OnDestroy {
     reader.readAsText(file);
   }
 
-  /** Creates a notebook from an HTML file — one section with one rich HTML note. */
+  /** Creates a notebook from an HTML file.
+   *  Tries to split the document into per-section notes; falls back to one note. */
   private importHtmlAsNotebook(html: string, fileName: string): void {
     const state = this.data.getState();
     if (state.shelves.length === 0) {
@@ -839,35 +890,90 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Extract a title from <title> or <h1>
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    const h1Match = html.match(/<h[123][^>]*>([^<]+)<\/h[123]>/i);
-    const notebookName = titleMatch
-      ? titleMatch[1].trim().substring(0, 60)
-      : h1Match
-        ? h1Match[1].trim().substring(0, 60)
-        : fileName.replace(/\.html?$/i, '');
-
-    const doImport = (shelfId: string) => {
-      const nb = this.data.addNotebook(notebookName, '📄', shelfId);
-      const sec = this.data.addSection(nb.id, 'Content', '', 'purple');
-      this.data.addNote(nb.id, sec.id, notebookName, 'rich', {
-        contentType: 'html',
-        markdown: html,
-        tags: [],
-      });
-      this.data.setActiveNotebook(nb.id);
-      this.data.showToast(`✓ Imported "${notebookName}"`);
-    };
+    const parsed = this._parseHtmlForImport(html, fileName);
 
     if (state.shelves.length === 1) {
-      doImport(state.shelves[0].id);
+      this._doHtmlImport(parsed, state.shelves[0].id);
     } else {
-      // Reuse shelf picker — store a special marker
-      this.pendingNotebookImportJson = { __htmlImport: true, html, notebookName };
+      this.pendingNotebookImportJson = { __htmlImport: true, ...parsed };
       this.shelfPickerShelves = state.shelves;
       this.showShelfPickerModal = true;
     }
+  }
+
+  /**
+   * Parse an HTML document into a notebook structure.
+   * Strategy:
+   *  1. Extract <title> text (strip inner tags) as the notebook name.
+   *  2. Extract the <head> styles/fonts to prepend to each section note.
+   *  3. Import as a single note containing the full document (preserving original layout).
+   */
+  private _parseHtmlForImport(html: string, fileName: string): {
+    notebookName: string;
+    headStyles: string;
+    sections: Array<{ title: string; html: string }>;
+  } {
+    // ── 1. Extract notebook name from <title> (strip any inner tags) ──────────
+    const titleTagMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const rawTitle = titleTagMatch ? titleTagMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+    const notebookName = (rawTitle || fileName.replace(/\.html?$/i, '')).substring(0, 60);
+
+    // ── 2. Extract <head> styles to inject into each section note ─────────────
+    const headMatch = html.match(/<head[\s\S]*?>([\s\S]*?)<\/head>/i);
+    const headContent = headMatch ? headMatch[1] : '';
+    // Keep only <style> and <link rel="stylesheet"> tags — drop scripts/meta
+    const headStyles = headContent
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<meta[^>]*>/gi, '')
+      .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+      .trim();
+
+    // ── 3. Import as single note with full document ───────────────────────────
+    // Try to get a display title from the first visible heading in <body>
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    const bodyContent = bodyMatch ? bodyMatch[1] : html;
+    const firstH = bodyContent.match(/<h[123][^>]*>([\s\S]*?)<\/h[123]>/i);
+    const fallbackTitle = firstH
+      ? firstH[1].replace(/<[^>]+>/g, '').trim().substring(0, 80)
+      : notebookName;
+
+    return {
+      notebookName,
+      headStyles,
+      sections: [{ title: fallbackTitle || notebookName, html }],
+    };
+  }
+
+  /** Materialise a parsed HTML import into the data store under the given shelf. */
+  private _doHtmlImport(
+    parsed: { notebookName: string; sections: Array<{ title: string; html: string }> },
+    shelfId: string
+  ): void {
+    const nb = this.data.addNotebook(parsed.notebookName, '📄', shelfId);
+
+    if (parsed.sections.length === 1) {
+      // Single note — keep original behaviour
+      const sec = this.data.addSection(nb.id, 'Content', '', 'purple');
+      this.data.addNote(nb.id, sec.id, parsed.sections[0].title, 'rich', {
+        contentType: 'html',
+        markdown: parsed.sections[0].html,
+        tags: [],
+      });
+    } else {
+      // One section per parsed section, all under a single "Sections" group
+      const sec = this.data.addSection(nb.id, 'Sections', '', 'purple');
+      for (const s of parsed.sections) {
+        this.data.addNote(nb.id, sec.id, s.title, 'rich', {
+          contentType: 'html',
+          markdown: s.html,
+          tags: [],
+        });
+      }
+    }
+
+    this.data.setActiveNotebook(nb.id);
+    const noteCount = parsed.sections.length;
+    this.data.showToast(`✓ Imported "${parsed.notebookName}" (${noteCount} note${noteCount !== 1 ? 's' : ''})`);
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────

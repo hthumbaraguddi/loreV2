@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { SyncStatus } from '../../services/drive.service';
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss']
 })
-export class TopbarComponent implements OnInit, OnDestroy {
+export class TopbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() activeShelfName: string = '';
   @Input() activeNotebookName: string = '';
   @Input() activeNotebookIcon: string = '';
@@ -34,6 +34,8 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @Output() connectDrive = new EventEmitter<void>();
   @Output() reloadFromDrive = new EventEmitter<void>();
 
+  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
+
   searchValue: string = '';
 
   private searchSubject = new Subject<string>();
@@ -45,6 +47,14 @@ export class TopbarComponent implements OnInit, OnDestroy {
     ).subscribe(query => {
       this.searchChanged.emit(query);
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Force-clear the input after render to defeat browser session restore,
+    // which ignores autocomplete attributes and restores the previous value.
+    if (this.searchInputRef?.nativeElement) {
+      this.searchInputRef.nativeElement.value = '';
+    }
   }
 
   ngOnDestroy(): void {

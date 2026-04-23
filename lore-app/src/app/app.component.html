@@ -71,7 +71,8 @@
         [notebookId]="getActiveNotebook(state)?.id ?? ''"
         (saved)="onNoteSaved($event, state); onPageEditorClosed()"
         (deleted)="onNoteDeleted(state); isPageEditorOpen = false"
-        (closed)="onPageEditorClosed()">
+        (closed)="onPageEditorClosed()"
+        (titleChanged)="onPageTitleChanged($event, state)">
       </app-page-editor>
 
       <!-- Settings — inline main area view -->

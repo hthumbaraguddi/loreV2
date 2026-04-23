@@ -1,8 +1,16 @@
 # Lore Demo Prompts
 
-Sample prompts for demoing Lore's **Rich Note** feature. Run these on Claude (claude.ai) and paste the response into Lore using **"Paste AI Response"**.
+Sample prompts for demoing Lore's **Rich Note** feature. Run these on Claude (claude.ai) and paste the response into Lore using **"Paste AI Response"** or **"Import File"**.
 
 Lore auto-detects whether the output is **Markdown** or **HTML** and renders accordingly.
+
+---
+
+## Start here: HTML System Prompt
+
+Before writing your own HTML prompts, grab the reusable instruction block that tells any AI how to generate Lore-compatible HTML:
+
+- **`00-lore-html-system-prompt.md`** — Prepend this to any prompt to get HTML that renders correctly in Lore (inline CSS, no scripts, no animations, correct sizing)
 
 ---
 
@@ -28,6 +36,6 @@ Responses render with full original styling — fonts, colors, layout preserved 
 2. Copy a prompt from any file below
 3. Paste into Claude and send
 4. Copy Claude's full response
-5. In Lore: open a notebook → New Note → Rich Note → **Paste AI Response**
-6. Paste the response — Lore auto-detects HTML vs Markdown
+5. In Lore: open a notebook → New Note → Rich Note → **Paste AI Response** or **Import File**
+6. Paste or import — Lore auto-detects HTML vs Markdown
 7. Save as note

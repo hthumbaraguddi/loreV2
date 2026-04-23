@@ -14,9 +14,14 @@
       <lore-icon name="search" [size]="12"></lore-icon>
     </span>
     <input
+      #searchInput
       class="sr-in"
-      type="text"
+      type="search"
       placeholder="Search notes…"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
       [value]="searchValue"
       (input)="onSearchInput($any($event.target).value)"
     />

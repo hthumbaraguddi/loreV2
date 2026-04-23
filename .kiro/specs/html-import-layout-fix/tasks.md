@@ -1,0 +1,153 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Topbar Width and Padding Responsiveness
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing case(s) to ensure reproducibility
+  - Test implementation details from Bug Condition in design:
+    - When sidebar is collapsed, topbar left padding should be 24px (not 36px)
+    - When sidebar is collapsed, topbar should expand to full available width
+    - When sidebar is collapsed, page editor topbar should use 24px left padding
+    - When HTML content is displayed and sidebar is toggled, content container should adjust width
+    - When notes are added to a notebook, topbar width should remain consistent
+  - The test assertions should match the Expected Behavior Properties from design:
+    - Property 1: Topbar SHALL maintain consistent width across full available space
+    - Property 1: Topbar SHALL adjust left padding from 36px (open) to 24px (collapsed)
+    - Property 2: HTML content container SHALL dynamically adjust width when sidebar state changes
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found to understand root cause:
+    - Topbar maintains 36px left padding even when sidebar is collapsed
+    - Topbar width doesn't increase when sidebar is collapsed
+    - Page editor topbar doesn't respond to sidebar state changes
+    - HTML content containers don't adjust width when sidebar is toggled
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Default Layout Behavior
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs:
+    - When sidebar is in default open state, topbar has 36px left padding and standard width
+    - When standard (non-HTML) notes are displayed, they render with existing layout
+    - When page editor is used with standard blocks, it uses 720px max-width
+    - When mobile view is active, sidebar and topbar behave according to mobile rules
+    - When users interact with topbar controls, they function correctly
+    - When app switches between view modes, transitions work smoothly
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements:
+    - For all sidebar-open states, topbar SHALL have 36px left padding
+    - For all standard note displays, layout SHALL match original implementation
+    - For all page editor standard mode uses, max-width SHALL be 720px
+    - For all mobile view states, layout SHALL follow existing mobile rules
+    - For all topbar control interactions, functionality SHALL remain unchanged
+    - For all view mode transitions, behavior SHALL remain smooth
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
+
+- [x] 3. Fix for HTML import layout issues
+
+  - [x] 3.1 Add CSS custom property for dynamic topbar padding
+    - Add `--topbar-left-padding: 36px;` to `:root` in `lore-app/src/styles.scss`
+    - Add `--topbar-left-padding: 24px;` to `#app.sb-collapsed` selector
+    - This creates a responsive padding value that changes based on sidebar state
+    - _Bug_Condition: isBugCondition(input) where input.sidebarState == 'collapsed' AND topbarWidth != expectedWidthForCollapsed_
+    - _Expected_Behavior: Topbar SHALL adjust left padding from 36px to 24px when sidebar is collapsed_
+    - _Preservation: When sidebar is open, topbar SHALL maintain 36px left padding_
+    - _Requirements: 2.1, 2.2, 3.1_
+
+  - [x] 3.2 Update topbar to use dynamic padding
+    - In `lore-app/src/styles.scss`, update `#topbar` selector
+    - Change `padding: 9px 20px 9px 36px;` to `padding: 9px 20px 9px var(--topbar-left-padding);`
+    - Remove the existing `#app.sb-collapsed #topbar { padding-left: 24px; }` rule (now handled by custom property)
+    - _Bug_Condition: isBugCondition(input) where input.sidebarState == 'collapsed'_
+    - _Expected_Behavior: Topbar SHALL use dynamic padding that responds to sidebar state_
+    - _Preservation: Topbar layout SHALL remain unchanged when sidebar is open_
+    - _Requirements: 2.2, 2.3, 3.1_
+
+  - [x] 3.3 Update page editor topbar to use dynamic padding
+    - In `lore-app/src/app/components/page-editor/page-editor.component.scss`
+    - Change `.pg-editor-topbar` padding from `padding: 9px 24px 9px 36px;` to `padding: 9px 24px 9px var(--topbar-left-padding);`
+    - This ensures page editor topbar also responds to sidebar state
+    - _Bug_Condition: isBugCondition(input) where input.sidebarState == 'collapsed' AND page editor is open_
+    - _Expected_Behavior: Page editor topbar SHALL adjust padding when sidebar is collapsed_
+    - _Preservation: Page editor topbar SHALL maintain current padding when sidebar is open_
+    - _Requirements: 2.2, 2.5, 3.3_
+
+  - [x] 3.4 Add width calculations for main content area
+    - In `lore-app/src/styles.scss`, update `#main` selector
+    - Add `width: calc(100vw - var(--sbw));` to calculate width when sidebar is open
+    - Add `#app.sb-collapsed #main { width: 100vw; }` to expand when sidebar is collapsed
+    - This ensures main content area expands to fill available space
+    - _Bug_Condition: isBugCondition(input) where input.sidebarState == 'collapsed'_
+    - _Expected_Behavior: Main content area SHALL expand by 262px when sidebar is collapsed_
+    - _Preservation: Main content area SHALL maintain current width when sidebar is open_
+    - _Requirements: 2.2, 2.3, 3.1_
+
+  - [x] 3.5 Add responsive rules for HTML content containers
+    - In `lore-app/src/styles.scss`, add new rules for HTML content
+    - Add `.card-body--html { overflow: hidden; border-radius: 0 0 12px 12px; max-width: 100%; }`
+    - Add `.card-body--html iframe, .card-body--html .html-content { max-width: 100%; width: 100%; }`
+    - Add `.pg-editor-body--wide .card-body--html { width: 100%; }`
+    - This ensures HTML content responds to sidebar state changes
+    - _Bug_Condition: isBugCondition(input) where input.contentType == 'html' AND sidebar state changes_
+    - _Expected_Behavior: HTML content SHALL adjust width when sidebar is toggled_
+    - _Preservation: Standard (non-HTML) notes SHALL render with existing layout_
+    - _Requirements: 2.4, 2.5, 3.2_
+
+  - [x] 3.6 Ensure topbar controls use flexbox properly
+    - In `lore-app/src/styles.scss`, verify `#topbar` has `justify-content: space-between;`
+    - Verify `.tb-crumb` has `flex: 1; min-width: 0; overflow: hidden;`
+    - Remove any `max-width` constraints on `.tb-crumb` to allow it to use available space
+    - This ensures controls spread across available width when sidebar is collapsed
+    - _Bug_Condition: isBugCondition(input) where input.sidebarState == 'collapsed'_
+    - _Expected_Behavior: Topbar controls SHALL reposition to utilize full width_
+    - _Preservation: Topbar controls SHALL function as they currently do_
+    - _Requirements: 2.3, 3.5_
+
+  - [x] 3.7 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Topbar Width and Padding Responsiveness
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify all assertions pass:
+      - Topbar left padding is 24px when sidebar is collapsed
+      - Topbar expands to full available width when sidebar is collapsed
+      - Page editor topbar uses 24px left padding when sidebar is collapsed
+      - HTML content containers adjust width when sidebar is toggled
+      - Topbar width remains consistent when notes are added
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+  - [x] 3.8 Verify preservation tests still pass
+    - **Property 2: Preservation** - Default Layout Behavior
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Verify all preservation assertions pass:
+      - Topbar has 36px left padding when sidebar is open
+      - Standard notes render with existing layout
+      - Page editor standard mode uses 720px max-width
+      - Mobile view layout follows existing rules
+      - Topbar controls function correctly
+      - View mode transitions work smoothly
+    - Confirm all tests still pass after fix (no regressions)
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Run all tests (exploration + preservation)
+  - Verify bug is fixed: topbar and content areas respond to sidebar state changes
+  - Verify no regressions: existing layout behavior is preserved
+  - Test manually in browser:
+    - Toggle sidebar and verify topbar expands/contracts
+    - Import HTML file as note and toggle sidebar
+    - Open page editor and toggle sidebar
+    - Add notes to notebook and verify topbar width stays consistent
+    - Verify mobile view still works correctly
+  - Ask the user if questions arise or if additional testing is needed

@@ -389,4 +389,53 @@ export class SettingsPanelComponent implements OnChanges, OnInit, OnDestroy {
       localStorage.removeItem('lore_smart_notes_auto_apply');
     }
   }
+
+  // ── Get HTML from AI ──────────────────────────────────────────────────────
+
+  htmlPromptCopied = false;
+
+  readonly htmlSystemPrompt =
+`You are generating a styled HTML document to be imported into Lore, a personal knowledge app.
+
+OUTPUT RULES — follow these exactly:
+
+1. Return a complete HTML document starting with <!DOCTYPE html>.
+2. Use inline CSS only — no external stylesheets, no <link rel="stylesheet"> to third-party CSS frameworks (Tailwind, Bootstrap, etc.). Google Fonts <link> tags are allowed.
+3. Do NOT include any <script> tags or JavaScript of any kind.
+4. Do NOT use CSS animations, transitions, or keyframes. All content must be fully visible in its final state without any interaction or delay.
+5. Do NOT use CSS classes that hide content by default (e.g. display:none, visibility:hidden, opacity:0). Every element must be visible on load.
+6. Do NOT use position:fixed or position:sticky — these break inside an iframe viewer.
+7. Constrain the layout to a max-width of 800px centered on the page (margin: 0 auto).
+8. Use only web-safe fallback fonts or Google Fonts loaded via <link>. Do not reference local system fonts that may not exist.
+9. Set a <title> tag that clearly names the document — Lore uses this as the note title.
+10. Images: only use publicly accessible URLs (https://). Do not use base64-encoded images or local file paths.
+
+DESIGN GUIDELINES:
+- Use a clean, readable layout with clear visual hierarchy.
+- Prefer card-based or section-based layouts with padding and soft shadows.
+- Use a consistent color palette — pick 2–3 accent colors and stick to them.
+- Body font size should be 15–16px for readability.
+- Headings should use a larger weight/size to create clear hierarchy.
+- Add sufficient padding (at least 24px) around content sections.
+
+Now generate the following:`;
+
+  onCopyHtmlPrompt(): void {
+    navigator.clipboard.writeText(this.htmlSystemPrompt).then(() => {
+      this.htmlPromptCopied = true;
+      setTimeout(() => { this.htmlPromptCopied = false; }, 2000);
+    }).catch(() => {
+      // Fallback for environments without clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = this.htmlSystemPrompt;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      this.htmlPromptCopied = true;
+      setTimeout(() => { this.htmlPromptCopied = false; }, 2000);
+    });
+  }
 }

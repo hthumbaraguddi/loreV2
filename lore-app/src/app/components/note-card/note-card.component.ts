@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter, inject, OnChanges, AfterViewChecked, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnChanges, AfterViewChecked, OnDestroy, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Note, Section, SectionColor } from '../../models';
 import { DataService } from '../../services/data.service';
 import { TemplateService, TemplateDefinition } from '../../services/template.service';
+import { HtmlProcessorService } from '../../services/html-processor.service';
 
 function escHtml(s: string): string {
   return String(s ?? '')
@@ -20,7 +21,7 @@ function escHtml(s: string): string {
   templateUrl: './note-card.component.html',
   styleUrls: ['./note-card.component.scss'],
 })
-export class NoteCardComponent implements OnChanges, AfterViewChecked {
+export class NoteCardComponent implements OnChanges, AfterViewChecked, OnDestroy {
   @Input() note!: Note;
   @Input() section!: Section;
   @Input() color!: SectionColor;
@@ -33,12 +34,14 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
   private sanitizer = inject(DomSanitizer);
   private data = inject(DataService);
   private templateService = inject(TemplateService);
+  private htmlProcessor = inject(HtmlProcessorService);
   private el = inject(ElementRef);
 
   cardBodyHtml: SafeHtml = '';
   template: TemplateDefinition | undefined;
   private iframeInjected = false;
   private iframeSized = false;
+  private blobUrl: string | null = null;
 
   ngOnChanges(): void {
     this.template = this.templateService.getTemplate(this.note.templateId);
@@ -47,8 +50,11 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
     this.iframeSized = false;
   }
 
+  ngOnDestroy(): void {
+    this._revokeBlobUrl();
+  }
+
   ngAfterViewChecked(): void {
-    // Only inject when the card body is visible (open)
     if (!this.isOpen) return;
 
     if (!this.iframeInjected) {
@@ -58,54 +64,78 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
       const encoded = placeholder.getAttribute('data-html-content');
       if (!encoded) return;
       const html = decodeURIComponent(encoded);
-      const iframe = document.createElement('iframe');
-      iframe.className = 'rich-html-iframe';
-      iframe.setAttribute('sandbox', 'allow-same-origin');
-      iframe.setAttribute('scrolling', 'no');
-      placeholder.replaceWith(iframe);
-      setTimeout(() => {
-        try {
-          iframe.contentDocument?.open();
-          // Inject containment CSS to prevent HTML content from overflowing the iframe
-          const containmentCss = `<style>
-            html, body { max-width: 100% !important; overflow-x: hidden !important; box-sizing: border-box !important; margin: 0 !important; }
-            * { max-width: 100% !important; box-sizing: border-box !important; }
-            nav, header, .nav, .navbar { position: relative !important; width: 100% !important; }
-            [style*="position:fixed"], [style*="position: fixed"] { position: relative !important; }
-            table { table-layout: fixed !important; width: 100% !important; }
-            img, video { max-width: 100% !important; height: auto !important; }
-            pre, code { white-space: pre-wrap !important; word-break: break-all !important; }
-          </style>`;
-          iframe.contentDocument?.write(containmentCss + html);
-          iframe.contentDocument?.close();
-          this.sizeIframe(iframe);
-        } catch (e) {
-          console.warn('iframe write failed', e);
-        }
-      }, 0);
+      this._injectBlobIframe(placeholder, html);
       return;
     }
 
     // Re-size if already injected but not yet sized (card was closed during injection)
     if (!this.iframeSized) {
       const iframe = this.el.nativeElement.querySelector('.rich-html-iframe') as HTMLIFrameElement | null;
-      if (iframe) this.sizeIframe(iframe);
+      if (iframe) this._sizeIframe(iframe);
     }
   }
 
-  private sizeIframe(iframe: HTMLIFrameElement): void {
-    const resize = () => {
-      const h = iframe.contentDocument?.body?.scrollHeight;
-      if (h && h > 50) {
-        iframe.style.height = (h + 20) + 'px';
-        this.iframeSized = true;
+  private _injectBlobIframe(placeholder: Element, html: string): void {
+    const prepared = this.htmlProcessor.prepareForRendering(html);
+
+    const iframe = document.createElement('iframe');
+    iframe.className = 'rich-html-iframe';
+    iframe.setAttribute('sandbox', 'allow-same-origin');
+    iframe.setAttribute('scrolling', 'no');
+    iframe.setAttribute('tabindex', '-1');
+    iframe.style.pointerEvents = 'auto';
+    iframe.addEventListener('focus', () => iframe.blur(), true);
+
+    placeholder.replaceWith(iframe);
+
+    if (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+      // Primary path: Blob URL — works for large files, no document.write deprecation
+      this._revokeBlobUrl(); // clean up any previous blob
+      const blob = new Blob([prepared], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      this.blobUrl = url;
+      iframe.src = url;
+      iframe.addEventListener('load', () => this._sizeIframe(iframe), { once: true });
+    } else {
+      // Fallback: document.write (legacy browsers)
+      console.warn('Blob URL unavailable, falling back to document.write');
+      setTimeout(() => {
+        try {
+          iframe.contentDocument?.open();
+          // eslint-disable-next-line deprecation/deprecation
+          (iframe.contentDocument as any).write(prepared);
+          iframe.contentDocument?.close();
+          this._sizeIframe(iframe);
+        } catch (e) {
+          console.warn('iframe write failed', e);
+        }
+      }, 0);
+    }
+  }
+
+  private _sizeIframe(iframe: HTMLIFrameElement): void {
+    const measure = (retries = 0) => {
+      try {
+        const h = iframe.contentDocument?.body?.scrollHeight;
+        if (h && h > 50) {
+          iframe.style.height = (h + 20) + 'px';
+          this.iframeSized = true;
+        } else if (retries < 2) {
+          // Retry at 300ms and 1000ms if content not yet laid out
+          setTimeout(() => measure(retries + 1), retries === 0 ? 300 : 700);
+        }
+      } catch (e) {
+        console.warn('iframe sizing failed — contentDocument inaccessible', e);
       }
     };
-    iframe.contentDocument?.addEventListener('DOMContentLoaded', resize);
-    setTimeout(resize, 50);
-    setTimeout(resize, 300);
-    setTimeout(resize, 1000);
-    setTimeout(resize, 2500);
+    measure();
+  }
+
+  private _revokeBlobUrl(): void {
+    if (this.blobUrl) {
+      URL.revokeObjectURL(this.blobUrl);
+      this.blobUrl = null;
+    }
   }
 
   get badgeText(): string {
@@ -142,8 +172,10 @@ export class NoteCardComponent implements OnChanges, AfterViewChecked {
 
   onToggle(): void {
     this.data.toggleNoteCollapse(this.notebookId, this.section.id, this.note.id);
-    // When opening an HTML note, reset sized flag so ngAfterViewChecked re-measures
-    if (this.isHtmlNote && this.note._collapsed) {
+    // When collapsing an HTML note, revoke the blob URL to free memory
+    if (this.isHtmlNote && !this.note._collapsed) {
+      this._revokeBlobUrl();
+      this.iframeInjected = false;
       this.iframeSized = false;
     }
   }

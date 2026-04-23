@@ -1,7 +1,9 @@
 import {
-  Component, Input, Output, EventEmitter, OnChanges, SimpleChanges,
+  Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges,
   ChangeDetectionStrategy, ChangeDetectorRef, inject, AfterViewChecked, ElementRef,
 } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -26,7 +28,7 @@ export interface PageBlock {
   styleUrls: ['./page-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageEditorComponent implements OnChanges, AfterViewChecked {
+export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestroy {
   @Input() note!: Note;
   @Input() section!: Section;
   @Input() notebookId!: string;
@@ -34,6 +36,8 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   @Output() saved = new EventEmitter<{ title: string; templateId: string; data: Record<string, any> }>();
   @Output() deleted = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
+  /** Emits the current title ~300ms after the user stops typing, for live notebook rename. */
+  @Output() titleChanged = new EventEmitter<string>();
 
   private cdr = inject(ChangeDetectorRef);
   private el = inject(ElementRef);
@@ -49,6 +53,9 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
   tagInput = '';
   isDirty = false;
   private needsResize = false;
+
+  private titleSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   // ── Template Picker ───────────────────────────────────────────────────────
   showTemplatePicker = false;
@@ -103,9 +110,21 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['note'] && this.note) {
+      // Set up title debounce on first load
+      if (changes['note'].firstChange) {
+        this.titleSubject.pipe(
+          debounceTime(300),
+          takeUntil(this.destroy$)
+        ).subscribe(t => this.titleChanged.emit(t));
+      }
       this.loadFromNote();
       this.needsResize = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngAfterViewChecked(): void {
@@ -136,6 +155,8 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked {
     const ta = event.target as HTMLTextAreaElement;
     this.autoResize(ta);
     this.isDirty = true;
+    // Emit debounced title change for live notebook rename
+    this.titleSubject.next(ta.value);
     // Hide picker once user starts typing in title
     if (this.showTemplatePicker && ta.value.trim()) {
       this.showTemplatePicker = false;

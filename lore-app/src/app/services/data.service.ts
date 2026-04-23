@@ -199,8 +199,19 @@ export class DataService {
 
   // ── Notebook mutations ────────────────────────────────────────────────────
 
-  addNotebook(name: string, icon: string, shelfId: string): Notebook {
-    const notebook: Notebook = { id: this.uid(), name, icon, shelfId, sections: [] };
+  addNotebook(name: string, icon: string, shelfId: string, skipDefaultSection?: boolean): Notebook {
+    const sections: Section[] = [];
+    if (!skipDefaultSection) {
+      const defaultSection: Section = {
+        id: this.uid(),
+        title: 'Page',
+        subtitle: '',
+        color: 'purple',
+        notes: [],
+      };
+      sections.push(defaultSection);
+    }
+    const notebook: Notebook = { id: this.uid(), name, icon, shelfId, sections };
     const s = this.getState();
     const newState: AppState = { ...s, notebooks: [...s.notebooks, notebook] };
     this.state$.next(newState);
@@ -456,7 +467,7 @@ export class DataService {
   /** Seed a demo shelf/notebook so new users see the app in action. */
   seedDemoData(): void {
     const shelf = this.addShelf('🌟 Demo Workspace', '🌟');
-    const notebook = this.addNotebook('Lore Showcase', '📓', shelf.id);
+    const notebook = this.addNotebook('Lore Showcase', '📓', shelf.id, true);
     const nbId = notebook.id;
 
     // ── Section 1: Research Notes (purple) ───────────────────────────────

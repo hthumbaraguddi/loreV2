@@ -4,7 +4,24 @@
 
     <p *ngIf="!targetSection" class="no-section-msg">Please select a section first</p>
 
-    <div class="mod-fld">
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'paste'"
+        (click)="selectTab('paste')">
+        Paste Text
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'import'"
+        (click)="selectTab('import')">
+        Import File
+      </button>
+    </div>
+
+    <!-- Paste Text tab -->
+    <div class="mod-fld" *ngIf="activeTab === 'paste'">
       <div class="fld-header">
         <label class="flbl">Content</label>
         <div class="type-toggle" *ngIf="content.trim()">
@@ -38,6 +55,36 @@
           Markdown detected — will render via markdown parser
         </span>
       </div>
+    </div>
+
+    <!-- Import File tab -->
+    <div class="mod-fld" *ngIf="activeTab === 'import'">
+      <div
+        class="drag-zone"
+        [class.drag-over]="isDragOver"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        <span class="drag-zone-icon">📄</span>
+        <span class="drag-zone-text">Drop an HTML file here</span>
+        <label class="browse-btn">
+          Browse…
+          <input
+            type="file"
+            accept=".html,.htm"
+            style="display: none"
+            (change)="onFileSelected($event)">
+        </label>
+        <span class="drag-zone-hint">Supports .html and .htm files up to 10 MB</span>
+      </div>
+
+      <div class="file-info" *ngIf="selectedFile && !fileError">
+        <span class="file-icon">✅</span>
+        <span class="file-name">{{ selectedFile.name }}</span>
+        <span class="file-size">{{ (selectedFile.size / 1024).toFixed(1) }} KB</span>
+      </div>
+
+      <div class="file-error" *ngIf="fileError">{{ fileError }}</div>
     </div>
 
     <div class="mod-act">

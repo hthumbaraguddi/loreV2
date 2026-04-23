@@ -8,7 +8,8 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
-  let service: AuthService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let service: any; // cast to any — register/login were removed from AuthService
   let localStorageStore: Record<string, string>;
 
   beforeEach(() => {

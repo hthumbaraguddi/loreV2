@@ -382,8 +382,8 @@ describe('DataService — Property 9: Cascade Delete Completeness', () => {
 
   it('should remove the notebook and all its sections and notes when a notebook is deleted', () => {
     const shelf = service.addShelf('Shelf', '📚');
-    const nb = service.addNotebook('Target Notebook', '📓', shelf.id);
-    const otherNb = service.addNotebook('Other Notebook', '📓', shelf.id);
+    const nb = service.addNotebook('Target Notebook', '📓', shelf.id, true);
+    const otherNb = service.addNotebook('Other Notebook', '📓', shelf.id, true);
 
     const sec1 = service.addSection(nb.id, 'Section 1', '', 'blue');
     const sec2 = service.addSection(nb.id, 'Section 2', '', 'amber');
@@ -880,5 +880,506 @@ describe('DataService — Property 8: Note Collapse Toggle Idempotence', () => {
       .not.toBe(before);
 
     expect(after).toBe(!before);
+  });
+});
+
+/**
+ * Property-Based Tests and Unit Tests: Notebook Default Page
+ *
+ * Property 1: New Notebook Always Has a Default Section
+ * Property 2: Default Section Has a Unique ID
+ * Property 3: Notebook Creation Is Atomic — Section Present in State Immediately
+ *
+ * Unit Tests:
+ * - seedDemoData() sections are unchanged
+ * - addNotebook() calls saveAll exactly once
+ *
+ * Validates: Requirements 1.1, 1.2, 1.4, 1.5, 3.1, 3.2, 4.1
+ */
+describe('DataService — Notebook Default Page', () => {
+  let service: DataService;
+  let localStorageStore: Record<string, string>;
+  const TEST_USER = 'default_page_test_user';
+
+  beforeEach(() => {
+    localStorageStore = {};
+
+    spyOn(localStorage, 'getItem').and.callFake((key: string) =>
+      localStorageStore[key] ?? null
+    );
+    spyOn(localStorage, 'setItem').and.callFake((key: string, value: string) => {
+      localStorageStore[key] = value;
+    });
+    spyOn(localStorage, 'removeItem').and.callFake((key: string) => {
+      delete localStorageStore[key];
+    });
+
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DataService);
+    service.setCurrentUser(TEST_USER);
+  });
+
+  // ── Sub-task 1.1 — Property 1: New Notebook Always Has a Default Section ──
+
+  it('Property 1: new notebook always has exactly one default "Page" section for 100 random inputs', () => {
+    /**
+     * **Validates: Requirements 1.1, 1.5**
+     *
+     * For 100 random (name, icon, shelfId) combinations, assert:
+     * - sections.length === 1
+     * - sections[0].title === 'Page'
+     * - sections[0].subtitle === ''
+     * - sections[0].color === 'purple'
+     * - sections[0].notes.length === 0
+     */
+    const ITERATIONS = 100;
+    const icons = ['📓', '📔', '📒', '📕', '📗', '📘', '📙', '🗒️'];
+    const shelf = service.addShelf('Test Shelf', '📚');
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      const name = `Notebook-${i}-${Math.random().toString(36).slice(2)}`;
+      const icon = icons[i % icons.length];
+      const notebook = service.addNotebook(name, icon, shelf.id);
+
+      expect(notebook.sections.length)
+        .withContext(`iteration ${i}: sections.length should be 1`)
+        .toBe(1);
+
+      const defaultSection = notebook.sections[0];
+
+      expect(defaultSection.title)
+        .withContext(`iteration ${i}: default section title should be 'Page'`)
+        .toBe('Page');
+
+      expect(defaultSection.subtitle)
+        .withContext(`iteration ${i}: default section subtitle should be ''`)
+        .toBe('');
+
+      expect(defaultSection.color)
+        .withContext(`iteration ${i}: default section color should be 'purple'`)
+        .toBe('purple');
+
+      expect(defaultSection.notes.length)
+        .withContext(`iteration ${i}: default section notes should be empty`)
+        .toBe(0);
+    }
+  });
+
+  // ── Sub-task 1.2 — Property 2: Default Section Has a Unique ID ────────────
+
+  it('Property 2: all default section ids are distinct non-empty strings across 100 addNotebook() calls', () => {
+    /**
+     * **Validates: Requirements 1.4**
+     *
+     * Call addNotebook() 100 times; collect all default section id values
+     * and assert they form a set of 100 distinct non-empty strings.
+     */
+    const ITERATIONS = 100;
+    const shelf = service.addShelf('Test Shelf', '📚');
+    const sectionIds: string[] = [];
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      const notebook = service.addNotebook(`Notebook-${i}`, '📓', shelf.id);
+      const sectionId = notebook.sections[0].id;
+
+      expect(typeof sectionId)
+        .withContext(`iteration ${i}: section id should be a string`)
+        .toBe('string');
+
+      expect(sectionId.length)
+        .withContext(`iteration ${i}: section id should be non-empty`)
+        .toBeGreaterThan(0);
+
+      sectionIds.push(sectionId);
+    }
+
+    const uniqueIds = new Set(sectionIds);
+    expect(uniqueIds.size)
+      .withContext('all 100 default section ids should be distinct')
+      .toBe(ITERATIONS);
+  });
+
+  // ── Sub-task 1.3 — Property 3: Notebook Creation Is Atomic ───────────────
+
+  it('Property 3: after each addNotebook() call, state immediately contains the notebook with its default section', () => {
+    /**
+     * **Validates: Requirements 1.2, 4.1**
+     *
+     * After each addNotebook() call, synchronously read getState() and assert
+     * the returned notebook is already present with its default section —
+     * no intermediate state without the section.
+     */
+    const ITERATIONS = 100;
+    const shelf = service.addShelf('Test Shelf', '📚');
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      const notebook = service.addNotebook(`Notebook-${i}`, '📓', shelf.id);
+
+      // Synchronously read state immediately after addNotebook()
+      const state = service.getState();
+      const notebookInState = state.notebooks.find(nb => nb.id === notebook.id);
+
+      expect(notebookInState)
+        .withContext(`iteration ${i}: notebook should be present in state immediately`)
+        .toBeDefined();
+
+      expect(notebookInState!.sections.length)
+        .withContext(`iteration ${i}: notebook in state should already have its default section`)
+        .toBe(1);
+
+      expect(notebookInState!.sections[0].title)
+        .withContext(`iteration ${i}: default section in state should have title 'Page'`)
+        .toBe('Page');
+    }
+  });
+
+  // ── Sub-task 1.4 — Unit test: seedDemoData() sections are unchanged ────────
+
+  it('seedDemoData() demo notebook contains exactly the expected sections with no extra "Page" section', () => {
+    /**
+     * Validates: Requirements 3.1, 3.2
+     *
+     * Call seedDemoData() and assert the demo notebook contains exactly the
+     * expected sections (Research, Journal, Finance, Standups, Watchlist, Investing)
+     * with no extra "Page" section.
+     */
+    service.seedDemoData();
+
+    const state = service.getState();
+    expect(state.notebooks.length)
+      .withContext('seedDemoData should create exactly one notebook')
+      .toBe(1);
+
+    const demoNotebook = state.notebooks[0];
+    const sectionTitles = demoNotebook.sections.map(s => s.title);
+
+    const expectedTitles = ['Research', 'Journal', 'Finance', 'Standups', 'Watchlist', 'Investing'];
+
+    expect(sectionTitles.length)
+      .withContext('demo notebook should have exactly 6 sections')
+      .toBe(expectedTitles.length);
+
+    for (const expectedTitle of expectedTitles) {
+      expect(sectionTitles)
+        .withContext(`demo notebook should contain section "${expectedTitle}"`)
+        .toContain(expectedTitle);
+    }
+
+    expect(sectionTitles)
+      .withContext('demo notebook should NOT contain an extra "Page" section')
+      .not.toContain('Page');
+  });
+
+  // ── Sub-task 1.5 — Unit test: addNotebook() calls saveAll exactly once ────
+
+  it('addNotebook() calls saveAll exactly once', () => {
+    /**
+     * Validates: Requirements 4.1
+     *
+     * Spy on saveAll; call addNotebook() once; verify saveAll was called exactly once.
+     */
+    const shelf = service.addShelf('Test Shelf', '📚');
+
+    // Reset the saveAll spy call count after addShelf (which also calls saveAll)
+    const saveAllSpy = spyOn(service, 'saveAll').and.callThrough();
+
+    service.addNotebook('My Notebook', '📓', shelf.id);
+
+    expect(saveAllSpy)
+      .withContext('saveAll should be called exactly once during addNotebook()')
+      .toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * Property-Based Tests and Unit Tests: Notebook Default Page — Persistence & Non-Interference
+ *
+ * Property 4: Persistence Round-Trip Preserves Default Section
+ * Property 5: updateNotebook() Does Not Modify Sections
+ * Property 6: loadAll() Does Not Mutate Sections
+ *
+ * Unit Tests:
+ * - appendNotebook() import path is unaffected
+ *
+ * Validates: Requirements 2.1, 2.2, 2.3, 4.1, 4.2
+ */
+describe('DataService — Notebook Default Page: Persistence & Non-Interference', () => {
+  let service: DataService;
+  let localStorageStore: Record<string, string>;
+  const TEST_USER = 'persistence_noninterference_test_user';
+
+  beforeEach(() => {
+    localStorageStore = {};
+
+    spyOn(localStorage, 'getItem').and.callFake((key: string) =>
+      localStorageStore[key] ?? null
+    );
+    spyOn(localStorage, 'setItem').and.callFake((key: string, value: string) => {
+      localStorageStore[key] = value;
+    });
+    spyOn(localStorage, 'removeItem').and.callFake((key: string) => {
+      delete localStorageStore[key];
+    });
+
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DataService);
+    service.setCurrentUser(TEST_USER);
+  });
+
+  /** Create a fresh DataService that reads from the same localStorageStore. */
+  function createFreshService(): DataService {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const fresh = TestBed.inject(DataService);
+    fresh.setCurrentUser(TEST_USER);
+    fresh.loadAll(TEST_USER);
+    return fresh;
+  }
+
+  // ── Sub-task 4.1 — Property 4: Persistence Round-Trip Preserves Default Section ──
+
+  it('Property 4: persistence round-trip preserves default section for 100 iterations', () => {
+    /**
+     * **Validates: Requirements 4.1, 4.2**
+     *
+     * For 100 iterations: call addNotebook(), then saveAll(), then reload into a
+     * fresh DataService via loadAll(); assert the restored notebook has a section
+     * with the same id, title, subtitle, color, and notes as the original.
+     */
+    const ITERATIONS = 100;
+    const icons = ['📓', '📔', '📒', '📕', '📗', '📘', '📙', '🗒️'];
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      // Reset state for each iteration
+      localStorageStore = {};
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      service = TestBed.inject(DataService);
+      service.setCurrentUser(TEST_USER);
+
+      const shelf = service.addShelf(`Shelf-${i}`, '📚');
+      const name = `Notebook-${i}-${Math.random().toString(36).slice(2)}`;
+      const icon = icons[i % icons.length];
+      const notebook = service.addNotebook(name, icon, shelf.id);
+
+      // Capture the original default section
+      const originalSection = notebook.sections[0];
+      expect(originalSection).withContext(`iteration ${i}: notebook should have a default section`).toBeDefined();
+
+      // saveAll is called automatically by addNotebook; reload into a fresh service
+      const freshService = createFreshService();
+      const restoredState = freshService.getState();
+
+      const restoredNotebook = restoredState.notebooks.find(nb => nb.id === notebook.id);
+      expect(restoredNotebook)
+        .withContext(`iteration ${i}: notebook should be present after reload`)
+        .toBeDefined();
+
+      expect(restoredNotebook!.sections.length)
+        .withContext(`iteration ${i}: restored notebook should have exactly 1 section`)
+        .toBe(1);
+
+      const restoredSection = restoredNotebook!.sections[0];
+
+      expect(restoredSection.id)
+        .withContext(`iteration ${i}: restored section id should match original`)
+        .toBe(originalSection.id);
+
+      expect(restoredSection.title)
+        .withContext(`iteration ${i}: restored section title should match original`)
+        .toBe(originalSection.title);
+
+      expect(restoredSection.subtitle)
+        .withContext(`iteration ${i}: restored section subtitle should match original`)
+        .toBe(originalSection.subtitle);
+
+      expect(restoredSection.color)
+        .withContext(`iteration ${i}: restored section color should match original`)
+        .toBe(originalSection.color);
+
+      expect(JSON.stringify(restoredSection.notes))
+        .withContext(`iteration ${i}: restored section notes should match original`)
+        .toBe(JSON.stringify(originalSection.notes));
+    }
+  });
+
+  // ── Sub-task 4.2 — Property 5: updateNotebook() Does Not Modify Sections ──
+
+  it('Property 5: updateNotebook() does not modify sections for 100 random name/icon pairs', () => {
+    /**
+     * **Validates: Requirements 2.2**
+     *
+     * For 100 random new-name/icon pairs, call updateNotebook() on a notebook
+     * that already has its default section; assert sections array is identical
+     * (same ids, titles, subtitles, colors, notes) before and after.
+     */
+    const ITERATIONS = 100;
+    const icons = ['📓', '📔', '📒', '📕', '📗', '📘', '📙', '🗒️', '✏️', '🖊️'];
+    const shelf = service.addShelf('Test Shelf', '📚');
+    const notebook = service.addNotebook('Original Name', '📓', shelf.id);
+
+    // Capture the sections before any updates
+    const sectionsBeforeJSON = JSON.stringify(service.getState().notebooks.find(nb => nb.id === notebook.id)!.sections);
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      const newName = `Updated-Name-${i}-${Math.random().toString(36).slice(2)}`;
+      const newIcon = icons[i % icons.length];
+
+      service.updateNotebook(notebook.id, newName, newIcon);
+
+      const updatedNotebook = service.getState().notebooks.find(nb => nb.id === notebook.id)!;
+
+      expect(JSON.stringify(updatedNotebook.sections))
+        .withContext(`iteration ${i}: sections should be unchanged after updateNotebook()`)
+        .toBe(sectionsBeforeJSON);
+
+      expect(updatedNotebook.sections.length)
+        .withContext(`iteration ${i}: sections.length should remain 1`)
+        .toBe(1);
+
+      expect(updatedNotebook.sections[0].title)
+        .withContext(`iteration ${i}: default section title should still be 'Page'`)
+        .toBe('Page');
+
+      expect(updatedNotebook.sections[0].subtitle)
+        .withContext(`iteration ${i}: default section subtitle should still be ''`)
+        .toBe('');
+
+      expect(updatedNotebook.sections[0].color)
+        .withContext(`iteration ${i}: default section color should still be 'purple'`)
+        .toBe('purple');
+
+      expect(updatedNotebook.sections[0].notes.length)
+        .withContext(`iteration ${i}: default section notes should still be empty`)
+        .toBe(0);
+    }
+  });
+
+  // ── Sub-task 4.3 — Property 6: loadAll() Does Not Mutate Sections ─────────
+
+  it('Property 6: loadAll() does not mutate sections — each notebook retains exactly N sections after reload', () => {
+    /**
+     * **Validates: Requirements 2.1**
+     *
+     * Persist a state containing notebooks with N sections each; call loadAll()
+     * in a fresh service; assert each notebook still has exactly N sections.
+     */
+    const ITERATIONS = 100;
+    const colors = ['purple', 'teal', 'blue', 'amber', 'coral', 'green', 'pink', 'gray'];
+
+    for (let i = 0; i < ITERATIONS; i++) {
+      // Reset state for each iteration
+      localStorageStore = {};
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      service = TestBed.inject(DataService);
+      service.setCurrentUser(TEST_USER);
+
+      const shelf = service.addShelf(`Shelf-${i}`, '📚');
+
+      // Create a notebook with skipDefaultSection=true so we control the section count precisely
+      const notebook = service.addNotebook(`NB-${i}`, '📓', shelf.id, true);
+
+      // Add N sections (1 to 5, varying by iteration)
+      const N = 1 + (i % 5);
+      const sectionIds: string[] = [];
+      for (let s = 0; s < N; s++) {
+        const color = colors[(i + s) % colors.length];
+        const sec = service.addSection(notebook.id, `Section-${s}`, `subtitle-${s}`, color);
+        sectionIds.push(sec.id);
+      }
+
+      // Verify the section count before save
+      const stateBeforeSave = service.getState();
+      const nbBeforeSave = stateBeforeSave.notebooks.find(nb => nb.id === notebook.id)!;
+      expect(nbBeforeSave.sections.length)
+        .withContext(`iteration ${i}: notebook should have ${N} sections before save`)
+        .toBe(N);
+
+      // saveAll is called automatically; reload into a fresh service
+      const freshService = createFreshService();
+      const restoredState = freshService.getState();
+
+      const restoredNotebook = restoredState.notebooks.find(nb => nb.id === notebook.id);
+      expect(restoredNotebook)
+        .withContext(`iteration ${i}: notebook should be present after reload`)
+        .toBeDefined();
+
+      expect(restoredNotebook!.sections.length)
+        .withContext(`iteration ${i}: notebook should still have exactly ${N} sections after loadAll()`)
+        .toBe(N);
+
+      // Verify each section id is preserved
+      for (const sectionId of sectionIds) {
+        const found = restoredNotebook!.sections.find(s => s.id === sectionId);
+        expect(found)
+          .withContext(`iteration ${i}: section ${sectionId} should still exist after loadAll()`)
+          .toBeDefined();
+      }
+    }
+  });
+
+  // ── Sub-task 4.4 — Unit test: appendNotebook() import path is unaffected ──
+
+  it('appendNotebook() does not add a "Page" section to an imported notebook with known sections', () => {
+    /**
+     * Validates: Requirements 2.3
+     *
+     * Call appendNotebook() with a pre-built notebook that has known sections;
+     * assert no "Page" section was added.
+     */
+    const shelf = service.addShelf('Import Shelf', '📥');
+
+    // Build a pre-constructed notebook with known sections (simulating an import)
+    const importedNotebook = {
+      id: 'imported-nb-001',
+      name: 'Imported Notebook',
+      icon: '📥',
+      shelfId: shelf.id,
+      sections: [
+        {
+          id: 'imported-sec-001',
+          title: 'Chapter 1',
+          subtitle: 'Introduction',
+          color: 'teal',
+          notes: [],
+        },
+        {
+          id: 'imported-sec-002',
+          title: 'Chapter 2',
+          subtitle: 'Deep Dive',
+          color: 'blue',
+          notes: [],
+        },
+      ],
+    };
+
+    service.appendNotebook(importedNotebook);
+
+    const state = service.getState();
+    const appended = state.notebooks.find(nb => nb.id === 'imported-nb-001');
+
+    expect(appended)
+      .withContext('imported notebook should be present in state')
+      .toBeDefined();
+
+    // Should have exactly the 2 original sections — no extra "Page" section
+    expect(appended!.sections.length)
+      .withContext('appendNotebook() should not add any extra sections')
+      .toBe(2);
+
+    const sectionTitles = appended!.sections.map(s => s.title);
+
+    expect(sectionTitles)
+      .withContext('imported sections should be preserved')
+      .toContain('Chapter 1');
+
+    expect(sectionTitles)
+      .withContext('imported sections should be preserved')
+      .toContain('Chapter 2');
+
+    expect(sectionTitles)
+      .withContext('appendNotebook() should NOT add a "Page" section')
+      .not.toContain('Page');
   });
 });

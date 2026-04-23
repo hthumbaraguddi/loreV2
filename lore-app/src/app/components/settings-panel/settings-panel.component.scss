@@ -449,6 +449,108 @@
 .sp-toggle-lbl { display: block; font-size: 13px; font-weight: 500; color: var(--tp); }
 .sp-toggle-desc { display: block; font-size: 11px; color: var(--ts); margin-top: 2px; }
 
+// ── Get HTML from AI ─────────────────────────────────────────────────────────
+.sp-html-prompt-desc {
+  font-size: 12.5px;
+  color: var(--ts);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.sp-html-prompt-box {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.sp-html-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--inp);
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-html-prompt-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tt);
+}
+
+.sp-html-copy-btn {
+  background: var(--acc);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 11px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  min-width: 60px;
+  text-align: center;
+
+  &:hover { opacity: 0.88; }
+
+  &.copied {
+    background: #16A34A;
+  }
+}
+
+.sp-html-prompt-pre {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--card);
+  overflow-x: auto;
+  max-height: 220px;
+  overflow-y: auto;
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+    font-size: 11px;
+    line-height: 1.65;
+    color: var(--ts);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+.sp-html-prompt-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-html-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--ts);
+  line-height: 1.5;
+
+  strong { color: var(--tp); font-weight: 500; }
+}
+
+.sp-html-step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accl);
+  color: var(--acc);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
 // ── Custom templates ──────────────────────────────────────────────────────────
 .sp-no-templates {
   font-size: 12.5px;

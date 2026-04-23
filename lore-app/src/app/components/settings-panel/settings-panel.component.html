@@ -71,6 +71,8 @@
             class="sp-pin"
             [(ngModel)]="displayName"
             placeholder="Your name"
+            name="lore-display-name"
+            autocomplete="name"
             (blur)="onNameBlur()"
             (keydown)="onNameKeydown($event)"
           />
@@ -147,12 +149,12 @@
 
         <div class="sp-pf" style="margin-top: 12px">
           <label class="sp-pl">API Key</label>
-          <input class="sp-pin sp-api-key-input" type="password" [(ngModel)]="apiKey" [placeholder]="selectedProvider.keyPlaceholder" />
+          <input class="sp-pin sp-api-key-input" type="password" [(ngModel)]="apiKey" [placeholder]="selectedProvider.keyPlaceholder" name="lore-api-key" autocomplete="off" />
         </div>
 
         <div class="sp-pf" style="margin-top: 8px" *ngIf="selectedProvider.supportsCustomEndpoint">
           <label class="sp-pl">API Endpoint URL</label>
-          <input class="sp-pin" type="text" [(ngModel)]="apiEndpoint" [placeholder]="selectedProvider.defaultEndpoint || 'https://your-endpoint/v1/messages'" />
+          <input class="sp-pin" type="text" [(ngModel)]="apiEndpoint" [placeholder]="selectedProvider.defaultEndpoint || 'https://your-endpoint/v1/messages'" name="lore-api-endpoint" autocomplete="off" />
         </div>
 
         <div class="sp-ai-actions">
@@ -201,6 +203,44 @@
             </div>
             <input type="checkbox" [(ngModel)]="smartNotesAutoApply" (ngModelChange)="onSmartNotesAutoApplyChange()" />
           </label>
+        </div>
+      </section>
+
+      <!-- ── Get HTML from AI ── -->
+      <section class="sp-section">
+        <h2 class="sp-section-title">
+          <lore-icon name="ai-sparkle" [size]="14"></lore-icon>
+          Get HTML from AI
+        </h2>
+
+        <p class="sp-html-prompt-desc">
+          Paste this prompt at the start of any AI conversation (Claude, ChatGPT, etc.) to get HTML that renders correctly in Lore. Then describe what you want on the next line.
+        </p>
+
+        <div class="sp-html-prompt-box">
+          <div class="sp-html-prompt-header">
+            <span class="sp-html-prompt-label">System Prompt</span>
+            <button class="sp-html-copy-btn" (click)="onCopyHtmlPrompt()" [class.copied]="htmlPromptCopied">
+              <span *ngIf="!htmlPromptCopied">Copy</span>
+              <span *ngIf="htmlPromptCopied">✓ Copied!</span>
+            </button>
+          </div>
+          <pre class="sp-html-prompt-pre"><code>{{ htmlSystemPrompt }}</code></pre>
+        </div>
+
+        <div class="sp-html-prompt-steps">
+          <div class="sp-html-step">
+            <span class="sp-html-step-num">1</span>
+            <span>Copy the prompt above</span>
+          </div>
+          <div class="sp-html-step">
+            <span class="sp-html-step-num">2</span>
+            <span>Paste it at the start of your AI chat, then describe what you want</span>
+          </div>
+          <div class="sp-html-step">
+            <span class="sp-html-step-num">3</span>
+            <span>Copy the full HTML response and import it into Lore via <strong>Import File</strong> or <strong>Paste AI Response</strong></span>
+          </div>
         </div>
       </section>
 

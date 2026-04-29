@@ -1,6 +1,7 @@
 import {
-  Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges,
-  ChangeDetectionStrategy, ChangeDetectorRef, inject, AfterViewChecked, ElementRef,
+  Component, Input, Output, EventEmitter, OnChanges, OnDestroy, AfterViewInit,
+  SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef, inject, ElementRef,
+  ViewChild, NgZone,
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -28,7 +29,7 @@ export interface PageBlock {
   styleUrls: ['./page-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestroy {
+export class PageEditorComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() note!: Note;
   @Input() section!: Section;
   @Input() notebookId!: string;
@@ -39,20 +40,20 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
   /** Emits the current title ~300ms after the user stops typing, for live notebook rename. */
   @Output() titleChanged = new EventEmitter<string>();
 
+  @ViewChild('editorCanvas') canvasRef!: ElementRef<HTMLDivElement>;
+
   private cdr = inject(ChangeDetectorRef);
-  private el = inject(ElementRef);
   private sanitizer = inject(DomSanitizer);
   private templateMatcher = inject(TemplateMatcherService);
   private templateService = inject(TemplateService);
   private dataService = inject(DataService);
+  private zone = inject(NgZone);
 
   icon = '📄';
   title = '';
-  blocks: PageBlock[] = [];
   tags: string[] = [];
   tagInput = '';
   isDirty = false;
-  private needsResize = false;
 
   private titleSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -77,26 +78,10 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
   // ── Paste AI Response modal (rich template) ───────────────────────────────
   pasteModalOpen = false;
 
-  get pasteTarget(): { notebookId: string; sectionId: string } | null {
-    return this.notebookId && this.section?.id
-      ? { notebookId: this.notebookId, sectionId: this.section.id }
-      : null;
-  }
-
-  openPasteModal(): void {
-    this.pasteModalOpen = true;
-    this.cdr.markForCheck();
-  }
-
-  onPasteModalClosed(): void {
-    this.pasteModalOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  onPasteNoteSaved(): void {
-    this.pasteModalOpen = false;
-    this.cdr.markForCheck();
-  }
+  // ── Slash menu ────────────────────────────────────────────────────────────
+  slashMenuVisible = false;
+  slashMenuTop = 0;
+  slashMenuLeft = 0;
 
   readonly blockTypes: { type: PageBlock['type']; label: string; icon: string }[] = [
     { type: 'text',     label: 'Text',    icon: '¶' },
@@ -108,9 +93,24 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
     { type: 'divider',  label: 'Divider', icon: '—' },
   ];
 
+  // ── Pending blocks to render after view init ──────────────────────────────
+  private pendingBlocks: PageBlock[] | null = null;
+  private viewInitialized = false;
+
+  get pasteTarget(): { notebookId: string; sectionId: string } | null {
+    return this.notebookId && this.section?.id
+      ? { notebookId: this.notebookId, sectionId: this.section.id }
+      : null;
+  }
+
+  openPasteModal(): void { this.pasteModalOpen = true; this.cdr.markForCheck(); }
+  onPasteModalClosed(): void { this.pasteModalOpen = false; this.cdr.markForCheck(); }
+  onPasteNoteSaved(): void { this.pasteModalOpen = false; this.cdr.markForCheck(); }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['note'] && this.note) {
-      // Set up title debounce on first load
       if (changes['note'].firstChange) {
         this.titleSubject.pipe(
           debounceTime(300),
@@ -118,85 +118,458 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
         ).subscribe(t => this.titleChanged.emit(t));
       }
       this.loadFromNote();
-      this.needsResize = true;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.viewInitialized = true;
+    // Set default paragraph separator so Enter creates <p> not <div>
+    document.execCommand('defaultParagraphSeparator', false, 'p');
+    if (this.pendingBlocks !== null) {
+      this.renderBlocks(this.pendingBlocks);
+      this.pendingBlocks = null;
     }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.undoToastTimer) clearTimeout(this.undoToastTimer);
   }
 
-  ngAfterViewChecked(): void {
-    if (this.needsResize) {
-      this.needsResize = false;
-      this.resizeAllTextareas();
-    }
-  }
-
-  /** Auto-resize all textareas to fit their content. */
-  resizeAllTextareas(): void {
-    const tas = this.el.nativeElement.querySelectorAll('textarea') as NodeListOf<HTMLTextAreaElement>;
-    tas.forEach((ta: HTMLTextAreaElement) => this.autoResize(ta));
-  }
-
-  autoResize(ta: HTMLTextAreaElement): void {
-    ta.style.height = 'auto';
-    ta.style.height = ta.scrollHeight + 'px';
-  }
-
-  onTextareaInput(event: Event, index: number): void {
-    const ta = event.target as HTMLTextAreaElement;
-    this.autoResize(ta);
-    this.onBlockInput(index, ta.value);
-  }
-
-  onTitleInput(event: Event): void {
-    const ta = event.target as HTMLTextAreaElement;
-    this.autoResize(ta);
-    this.isDirty = true;
-    // Emit debounced title change for live notebook rename
-    this.titleSubject.next(ta.value);
-    // Hide picker once user starts typing in title
-    if (this.showTemplatePicker && ta.value.trim()) {
-      this.showTemplatePicker = false;
-      this.cdr.markForCheck();
-    }
-  }
+  // ── Load ──────────────────────────────────────────────────────────────────
 
   private loadFromNote(): void {
     const d = this.note.data || {};
     this.icon = d['icon'] || '📄';
     this.title = this.note.title || '';
-    this.blocks = (d['blocks'] || []).map((b: any) => ({ ...b }));
-    if (!this.blocks.length) {
-      this.blocks = [{ type: 'text', content: '' }];
-    }
+    const blocks: PageBlock[] = (d['blocks'] || []).map((b: any) => ({ ...b }));
+    if (!blocks.length) blocks.push({ type: 'text', content: '' });
     this.tags = [...(d['tags'] || [])];
     this.isDirty = false;
     this.selectedTemplateId = null;
     this.formHtml = '';
     this.showUndoToast = false;
     if (this.undoToastTimer) { clearTimeout(this.undoToastTimer); this.undoToastTimer = null; }
-
-    // Load all templates for the picker
     this.allTemplates = this.templateService.getTemplates();
 
-    // ── Decoration Banner ──────────────────────────────────────────────────
+    // Decoration Banner
     this.pendingTemplateId = d['_pendingTemplateId'] ?? null;
     if (this.pendingTemplateId) {
       const tpl = this.templateService.getTemplate(this.pendingTemplateId);
       this.pendingTemplateName = tpl?.name ?? this.pendingTemplateId;
       this.pendingTemplateIcon = tpl?.icon ?? '📄';
       if (this.templateMatcher.isAutoApplyEnabled()) {
-        this.applyPendingTemplate(/* showToast */ true);
-        return; // applyPendingTemplate handles the rest
+        this.applyPendingTemplate(true);
+        return;
       }
     }
 
-    // ── Template Picker: show only for new empty notes ─────────────────────
-    const hasContent = this.blocks.some(b => b.content.trim() !== '' || b.type === 'divider');
+    // Template Picker: show only for new empty notes
+    const hasContent = blocks.some(b => b.content.trim() !== '' || b.type === 'divider');
     this.showTemplatePicker = !hasContent && !this.pendingTemplateId;
+
+    // Render canvas
+    if (this.viewInitialized && this.canvasRef) {
+      this.renderBlocks(blocks);
+    } else {
+      this.pendingBlocks = blocks;
+    }
+  }
+
+  private renderBlocks(blocks: PageBlock[]): void {
+    if (!this.canvasRef) return;
+    this.canvasRef.nativeElement.innerHTML = this.blocksToHtml(blocks);
+  }
+
+  // ── Serialization ─────────────────────────────────────────────────────────
+
+  /**
+   * Convert PageBlock[] to HTML string for setting as canvas innerHTML.
+   * Pure function — no side effects.
+   */
+  blocksToHtml(blocks: PageBlock[]): string {
+    if (!blocks.length) return '<p><br></p>';
+    return blocks.map(b => {
+      const c = b.content ? this.escapeHtml(b.content) : '<br>';
+      switch (b.type) {
+        case 'text':     return `<p>${c}</p>`;
+        case 'heading':  return `<h1>${c}</h1>`;
+        case 'heading2': return `<h2>${c}</h2>`;
+        case 'callout':  return `<div data-type="callout"><p>${c}</p></div>`;
+        case 'todo':     return `<p data-type="todo" data-checked="${!!b.checked}">${c}</p>`;
+        case 'quote':    return `<blockquote><p>${c}</p></blockquote>`;
+        case 'divider':  return `<hr>`;
+        default:         return `<p>${c}</p>`;
+      }
+    }).join('');
+  }
+
+  /**
+   * Convert canvas innerHTML back to PageBlock[].
+   * Walks live child nodes of the canvas element.
+   * Pure function — reads only the passed element's children.
+   */
+  htmlToBlocks(canvas: HTMLElement): PageBlock[] {
+    const blocks: PageBlock[] = [];
+    const children = Array.from(canvas.childNodes);
+
+    for (const node of children) {
+      if (node.nodeType !== Node.ELEMENT_NODE) continue;
+      const el = node as HTMLElement;
+      const tag = el.tagName.toLowerCase();
+      const dataType = el.getAttribute('data-type');
+
+      if (tag === 'hr') {
+        blocks.push({ type: 'divider', content: '' });
+        continue;
+      }
+
+      if (tag === 'h1') {
+        blocks.push({ type: 'heading', content: this.getTextContent(el) });
+        continue;
+      }
+
+      if (tag === 'h2') {
+        blocks.push({ type: 'heading2', content: this.getTextContent(el) });
+        continue;
+      }
+
+      if (tag === 'blockquote') {
+        const inner = el.querySelector('p') ?? el;
+        blocks.push({ type: 'quote', content: this.getTextContent(inner) });
+        continue;
+      }
+
+      if (tag === 'div' && dataType === 'callout') {
+        const inner = el.querySelector('p') ?? el;
+        blocks.push({ type: 'callout', content: this.getTextContent(inner) });
+        continue;
+      }
+
+      if (tag === 'p' && dataType === 'todo') {
+        blocks.push({
+          type: 'todo',
+          content: this.getTextContent(el),
+          checked: el.getAttribute('data-checked') === 'true',
+        });
+        continue;
+      }
+
+      // Default: treat as text block (covers <p>, unknown <div>, etc.)
+      blocks.push({ type: 'text', content: this.getTextContent(el) });
+    }
+
+    return blocks.length ? blocks : [{ type: 'text', content: '' }];
+  }
+
+  private getTextContent(el: HTMLElement): string {
+    // Use innerText to get rendered text (respects <br> as newline)
+    // Then trim and normalize
+    return (el.innerText ?? el.textContent ?? '').replace(/\n$/, '').trim();
+  }
+
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Canvas event handlers ─────────────────────────────────────────────────
+
+  onCanvasInput(_event: Event): void {
+    this.isDirty = true;
+
+    // Check for markdown shortcuts on the current block
+    const block = this.getBlockAtCursor();
+    if (block) {
+      this.applyMarkdownShortcut(block);
+    }
+
+    // Hide template picker once user starts typing
+    if (this.showTemplatePicker) {
+      this.showTemplatePicker = false;
+      this.cdr.markForCheck();
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  onCanvasKeydown(event: KeyboardEvent): void {
+    // Slash on empty line → show slash menu
+    if (event.key === '/' && this.isCurrentBlockEmpty()) {
+      // Let the '/' character be inserted first, then show menu
+      setTimeout(() => {
+        const block = this.getBlockAtCursor();
+        if (block && (block.textContent?.trim() === '/')) {
+          this.showSlashMenuAtCursor();
+          this.cdr.markForCheck();
+        }
+      }, 0);
+      return;
+    }
+
+    // Escape → hide slash menu
+    if (event.key === 'Escape') {
+      if (this.slashMenuVisible) {
+        this.hideSlashMenu();
+        event.preventDefault();
+      }
+      return;
+    }
+
+    // Tab → insert 2 spaces
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      document.execCommand('insertText', false, '  ');
+      return;
+    }
+
+    // Enter in a heading → create a plain text paragraph after
+    if (event.key === 'Enter' && !event.shiftKey) {
+      const block = this.getBlockAtCursor();
+      if (block) {
+        const tag = block.tagName?.toLowerCase();
+        if (tag === 'h1' || tag === 'h2') {
+          event.preventDefault();
+          this.insertParagraphAfter(block);
+          return;
+        }
+      }
+    }
+  }
+
+  onCanvasClick(event: MouseEvent): void {
+    // Handle todo checkbox click (the ::before pseudo-element area)
+    const target = event.target as HTMLElement;
+    if (target.getAttribute('data-type') === 'todo') {
+      const rect = target.getBoundingClientRect();
+      // Click in the left ~24px = checkbox area
+      if (event.clientX - rect.left < 24) {
+        const current = target.getAttribute('data-checked') === 'true';
+        target.setAttribute('data-checked', String(!current));
+        this.isDirty = true;
+        this.cdr.markForCheck();
+        event.preventDefault();
+      }
+    }
+    // Hide slash menu on click elsewhere
+    if (this.slashMenuVisible) {
+      this.hideSlashMenu();
+    }
+  }
+
+  onTitleInput(event: Event): void {
+    const ta = event.target as HTMLTextAreaElement;
+    this.autoResizeTextarea(ta);
+    this.isDirty = true;
+    this.titleSubject.next(ta.value);
+    if (this.showTemplatePicker && ta.value.trim()) {
+      this.showTemplatePicker = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  // ── Slash menu ────────────────────────────────────────────────────────────
+
+  showSlashMenuAtCursor(): void {
+    const block = this.getBlockAtCursor();
+    if (!block || !this.canvasRef) return;
+    const rect = block.getBoundingClientRect();
+    const canvasRect = this.canvasRef.nativeElement.getBoundingClientRect();
+    this.slashMenuTop = rect.bottom - canvasRect.top + 4;
+    this.slashMenuLeft = Math.max(0, rect.left - canvasRect.left);
+    this.slashMenuVisible = true;
+  }
+
+  hideSlashMenu(): void {
+    this.slashMenuVisible = false;
+    this.cdr.markForCheck();
+  }
+
+  selectSlashType(type: PageBlock['type']): void {
+    const block = this.getBlockAtCursor();
+    this.hideSlashMenu();
+    if (!block) return;
+
+    // Clear the '/' character and replace block with chosen type
+    const newEl = this.createBlockElement(type);
+    block.replaceWith(newEl);
+    this.placeCursorIn(newEl);
+    this.isDirty = true;
+    this.cdr.markForCheck();
+  }
+
+  // ── Markdown shortcuts ────────────────────────────────────────────────────
+
+  /**
+   * Detect and apply markdown trigger patterns on the given block element.
+   * Returns true if a shortcut was applied.
+   * Patterns are anchored (^ and $) so they only fire on exact full-line matches.
+   */
+  applyMarkdownShortcut(blockEl: Element): boolean {
+    const text = blockEl.textContent ?? '';
+
+    const triggers: { pattern: RegExp; type: PageBlock['type'] }[] = [
+      { pattern: /^# $/,              type: 'heading'  },
+      { pattern: /^## $/,             type: 'heading2' },
+      { pattern: /^> $/,              type: 'quote'    },
+      { pattern: /^---$/,             type: 'divider'  },
+      { pattern: /^\[\] $|^\[ \] $/, type: 'todo'     },
+    ];
+
+    const match = triggers.find(t => t.pattern.test(text));
+    if (!match) return false;
+
+    const newEl = this.createBlockElement(match.type);
+    blockEl.replaceWith(newEl);
+    this.placeCursorIn(newEl);
+    return true;
+  }
+
+  // ── Block helpers ─────────────────────────────────────────────────────────
+
+  private createBlockElement(type: PageBlock['type']): HTMLElement {
+    switch (type) {
+      case 'heading': {
+        const h = document.createElement('h1');
+        h.innerHTML = '<br>';
+        return h;
+      }
+      case 'heading2': {
+        const h = document.createElement('h2');
+        h.innerHTML = '<br>';
+        return h;
+      }
+      case 'callout': {
+        const d = document.createElement('div');
+        d.setAttribute('data-type', 'callout');
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        d.appendChild(p);
+        return d;
+      }
+      case 'todo': {
+        const p = document.createElement('p');
+        p.setAttribute('data-type', 'todo');
+        p.setAttribute('data-checked', 'false');
+        p.innerHTML = '<br>';
+        return p;
+      }
+      case 'quote': {
+        const bq = document.createElement('blockquote');
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        bq.appendChild(p);
+        return bq;
+      }
+      case 'divider': {
+        const hr = document.createElement('hr');
+        // Insert a new paragraph after the divider for continued typing
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        // Return a fragment-like approach: we'll handle this in selectSlashType
+        // For now return hr; the paragraph insertion is handled separately
+        return hr;
+      }
+      default: {
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        return p;
+      }
+    }
+  }
+
+  private placeCursorIn(el: HTMLElement): void {
+    // For dividers, place cursor in the next sibling or insert a new paragraph
+    if (el.tagName?.toLowerCase() === 'hr') {
+      const next = el.nextElementSibling as HTMLElement | null;
+      if (next) {
+        this.placeCursorIn(next);
+      } else {
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        el.after(p);
+        this.placeCursorIn(p);
+      }
+      return;
+    }
+
+    // For elements with a nested <p> (callout, quote), focus the inner <p>
+    const target = el.querySelector('p') ?? el;
+    target.focus?.();
+
+    const sel = window.getSelection();
+    if (!sel) return;
+    const range = document.createRange();
+    // Place cursor at start of the element
+    if (target.childNodes.length > 0) {
+      range.setStart(target.childNodes[0], 0);
+    } else {
+      range.setStart(target, 0);
+    }
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  private insertParagraphAfter(block: HTMLElement): void {
+    const p = document.createElement('p');
+    p.innerHTML = '<br>';
+    block.after(p);
+    this.placeCursorIn(p);
+  }
+
+  private getBlockAtCursor(): HTMLElement | null {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return null;
+    let node: Node | null = sel.getRangeAt(0).startContainer;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return null;
+    // Walk up to find a direct child of the canvas
+    while (node && node.parentElement !== canvas) {
+      node = node.parentElement;
+    }
+    return node as HTMLElement | null;
+  }
+
+  private isCurrentBlockEmpty(): boolean {
+    const block = this.getBlockAtCursor();
+    return !block || (block.textContent?.trim() ?? '') === '';
+  }
+
+  private autoResizeTextarea(ta: HTMLTextAreaElement): void {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  }
+
+  // ── Extract plain text for background analysis ────────────────────────────
+
+  extractPlainText(): string {
+    if (!this.canvasRef) return '';
+    return (this.canvasRef.nativeElement.innerText ?? '').trim();
+  }
+
+  private runBackgroundAnalysis(noteId: string, text: string): void {
+    (async () => {
+      try {
+        const result = await this.templateMatcher.analyseContent(text);
+        if (result) {
+          const currentNote = this.note;
+          if (!currentNote) return;
+          const currentData = currentNote.data || {};
+          const newData = { ...currentData, _pendingTemplateId: result.templateId };
+          this.dataService.updateNote(
+            this.notebookId, this.section.id, noteId,
+            currentNote.title, 'page', newData,
+          );
+        }
+      } catch (err) {
+        console.warn('[PageEditor] Background analysis failed:', err);
+      }
+    })();
   }
 
   // ── Template Picker ───────────────────────────────────────────────────────
@@ -204,13 +577,11 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
   onPickerSelectTemplate(templateId: string): void {
     this.showTemplatePicker = false;
     if (templateId === 'page') {
-      // Stay in block editor mode
       this.selectedTemplateId = null;
       this.formHtml = '';
       this.cdr.markForCheck();
       return;
     }
-    // Switch to inline template form
     this.selectedTemplateId = templateId;
     const tpl = this.templateService.getTemplate(templateId);
     if (tpl) {
@@ -228,79 +599,41 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
 
   // ── Decoration Banner ─────────────────────────────────────────────────────
 
-  onBannerApply(): void {
-    this.applyPendingTemplate(false);
-  }
-
-  onBannerDismiss(): void {
-    this.clearPendingTemplate();
-  }
-
-  // ── Auto-apply undo ───────────────────────────────────────────────────────
+  onBannerApply(): void { this.applyPendingTemplate(false); }
+  onBannerDismiss(): void { this.clearPendingTemplate(); }
 
   onUndoAutoApply(): void {
-    // Revert to blank page state
     this.selectedTemplateId = null;
     this.formHtml = '';
     this.showUndoToast = false;
     if (this.undoToastTimer) { clearTimeout(this.undoToastTimer); this.undoToastTimer = null; }
-
-    // Clear _pendingTemplateId and save
     const currentData = this.note.data || {};
     const newData = { ...currentData };
     delete newData['_pendingTemplateId'];
-    this.dataService.updateNote(
-      this.notebookId,
-      this.section.id,
-      this.note.id,
-      this.note.title,
-      'page',
-      newData,
-    );
+    this.dataService.updateNote(this.notebookId, this.section.id, this.note.id, this.note.title, 'page', newData);
     this.pendingTemplateId = null;
     this.pendingTemplateName = '';
     this.pendingTemplateIcon = '';
     this.cdr.markForCheck();
   }
 
-  // ── Shared helpers ────────────────────────────────────────────────────────
-
   private applyPendingTemplate(showToast: boolean): void {
     if (!this.pendingTemplateId) return;
     const tpl = this.templateService.getTemplate(this.pendingTemplateId);
-    if (!tpl) {
-      // Template no longer exists — just clear
-      this.clearPendingTemplate();
-      return;
-    }
-
+    if (!tpl) { this.clearPendingTemplate(); return; }
     this.selectedTemplateId = this.pendingTemplateId;
     const html = tpl.buildForm({ title: this.title, ...this.note.data });
     this.formHtml = this.sanitizer.bypassSecurityTrustHtml(html);
     this.showTemplatePicker = false;
-
-    // Clear _pendingTemplateId from note data and persist
     const currentData = this.note.data || {};
     const newData = { ...currentData };
     delete newData['_pendingTemplateId'];
-    this.dataService.updateNote(
-      this.notebookId,
-      this.section.id,
-      this.note.id,
-      this.note.title,
-      this.pendingTemplateId,
-      newData,
-    );
-
+    this.dataService.updateNote(this.notebookId, this.section.id, this.note.id, this.note.title, this.pendingTemplateId, newData);
     if (showToast) {
       this.showUndoToast = true;
       if (this.undoToastTimer) clearTimeout(this.undoToastTimer);
-      this.undoToastTimer = setTimeout(() => {
-        this.showUndoToast = false;
-        this.cdr.markForCheck();
-      }, 6000);
+      this.undoToastTimer = setTimeout(() => { this.showUndoToast = false; this.cdr.markForCheck(); }, 6000);
     }
-
     this.pendingTemplateId = null;
     this.isDirty = false;
     this.cdr.markForCheck();
@@ -310,200 +643,21 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
     const currentData = this.note.data || {};
     const newData = { ...currentData };
     delete newData['_pendingTemplateId'];
-    this.dataService.updateNote(
-      this.notebookId,
-      this.section.id,
-      this.note.id,
-      this.note.title,
-      'page',
-      newData,
-    );
+    this.dataService.updateNote(this.notebookId, this.section.id, this.note.id, this.note.title, 'page', newData);
     this.pendingTemplateId = null;
     this.pendingTemplateName = '';
     this.pendingTemplateIcon = '';
     this.cdr.markForCheck();
   }
 
-  /** Maps built-in template ids to lore-icon names. Returns null for custom templates (use emoji). */
+  /** Maps built-in template ids to lore-icon names. */
   getTemplateIconName(templateId: string): string | null {
     const map: Record<string, string> = {
-      page:      'note-plus',
-      rich:      'section',
-      research:  'search',
-      finance:   'layers',
-      watchlist: 'list-view',
-      journal:   'pulse',
-      scrum:     'grid-view',
-      investing: 'ai-sparkle',
+      page: 'note-plus', rich: 'section', research: 'search',
+      finance: 'layers', watchlist: 'list-view', journal: 'pulse',
+      scrum: 'grid-view', investing: 'ai-sparkle',
     };
     return map[templateId] ?? null;
-  }
-
-  extractPlainText(): string {
-    return this.blocks
-      .filter(b => b.type !== 'divider')
-      .map(b => b.content)
-      .join(' ')
-      .trim();
-  }
-
-  private runBackgroundAnalysis(noteId: string, text: string): void {
-    (async () => {
-      try {
-        const result = await this.templateMatcher.analyseContent(text);
-        if (result) {
-          const currentNote = this.note;
-          if (!currentNote) return;
-          const currentData = currentNote.data || {};
-          const newData = { ...currentData, _pendingTemplateId: result.templateId };
-          this.dataService.updateNote(
-            this.notebookId,
-            this.section.id,
-            noteId,
-            currentNote.title,
-            'page',
-            newData,
-          );
-        }
-      } catch (err) {
-        console.warn('[PageEditor] Background analysis failed:', err);
-      }
-    })();
-  }
-
-  // ── Block operations ──────────────────────────────────────────────────────
-
-  addBlock(type: PageBlock['type'], afterIndex?: number): void {
-    const block: PageBlock = { type, content: '', checked: type === 'todo' ? false : undefined };
-    const idx = afterIndex !== undefined ? afterIndex + 1 : this.blocks.length;
-    this.blocks.splice(idx, 0, block);
-    // Hide picker when user starts adding blocks
-    if (this.showTemplatePicker) {
-      this.showTemplatePicker = false;
-    }
-    this.markDirty();
-    setTimeout(() => {
-      this.resizeAllTextareas();
-      this.focusBlock(idx);
-    }, 30);
-  }
-
-  removeBlock(index: number): void {
-    if (this.blocks.length <= 1) {
-      this.blocks[0] = { type: 'text', content: '' };
-    } else {
-      this.blocks.splice(index, 1);
-      setTimeout(() => {
-        this.resizeAllTextareas();
-        this.focusBlock(Math.max(0, index - 1));
-      }, 30);
-    }
-    this.markDirty();
-  }
-
-  changeBlockType(index: number, type: PageBlock['type']): void {
-    const content = this.blocks[index].content;
-    this.blocks[index] = { type, content, checked: type === 'todo' ? false : undefined };
-    this.markDirty();
-    setTimeout(() => {
-      this.resizeAllTextareas();
-      this.focusBlock(index);
-    }, 30);
-  }
-
-  onBlockKeydown(event: KeyboardEvent, index: number): void {
-    const block = this.blocks[index];
-    const ta = event.target as HTMLTextAreaElement;
-
-    if (event.key === 'Enter' && event.shiftKey) {
-      // Shift+Enter: insert a real newline within the block
-      event.preventDefault();
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const val = block.content;
-      block.content = val.slice(0, start) + '\n' + val.slice(end);
-      this.markDirty();
-      setTimeout(() => {
-        ta.setSelectionRange(start + 1, start + 1);
-        this.autoResize(ta);
-      }, 0);
-      return;
-    }
-
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.addBlock('text', index);
-      return;
-    }
-
-    if (event.key === 'Backspace' && block.content === '' && this.blocks.length > 1) {
-      event.preventDefault();
-      this.removeBlock(index);
-      return;
-    }
-
-    if (event.key === 'ArrowUp' && index > 0) {
-      if (ta.selectionStart === 0) {
-        event.preventDefault();
-        this.focusBlock(index - 1, 'end');
-      }
-    }
-
-    if (event.key === 'ArrowDown' && index < this.blocks.length - 1) {
-      if (ta.selectionStart === ta.value.length) {
-        event.preventDefault();
-        this.focusBlock(index + 1, 'start');
-      }
-    }
-  }
-
-  onBlockInput(index: number, value: string): void {
-    // Hide picker when user starts typing in a block
-    if (this.showTemplatePicker && value.trim()) {
-      this.showTemplatePicker = false;
-    }
-
-    // Slash command detection
-    if (value === '/') {
-      this.showSlashMenu(index);
-      return;
-    }
-    // Markdown shortcuts
-    if (value === '# ') { this.changeBlockType(index, 'heading'); this.blocks[index].content = ''; return; }
-    if (value === '## ') { this.changeBlockType(index, 'heading2'); this.blocks[index].content = ''; return; }
-    if (value === '> ') { this.changeBlockType(index, 'quote'); this.blocks[index].content = ''; return; }
-    if (value === '---') { this.changeBlockType(index, 'divider'); this.blocks[index].content = ''; return; }
-    if (value === '[] ' || value === '[ ] ') { this.changeBlockType(index, 'todo'); this.blocks[index].content = ''; return; }
-
-    this.blocks[index].content = value;
-    this.markDirty();
-  }
-
-  slashMenuIndex: number | null = null;
-
-  showSlashMenu(index: number): void {
-    this.slashMenuIndex = index;
-    this.cdr.markForCheck();
-  }
-
-  hideSlashMenu(): void {
-    this.slashMenuIndex = null;
-    this.cdr.markForCheck();
-  }
-
-  selectSlashType(type: PageBlock['type'], index: number): void {
-    this.blocks[index].content = '';
-    this.changeBlockType(index, type);
-    this.hideSlashMenu();
-  }
-
-  private focusBlock(index: number, position: 'start' | 'end' = 'end'): void {
-    const textareas = document.querySelectorAll<HTMLTextAreaElement>('.pg-editor-block-ta');
-    const ta = textareas[index];
-    if (!ta) return;
-    ta.focus();
-    const pos = position === 'end' ? ta.value.length : 0;
-    ta.setSelectionRange(pos, pos);
   }
 
   // ── Tags ──────────────────────────────────────────────────────────────────
@@ -512,27 +666,24 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
     if ((event.key === 'Enter' || event.key === ',') && this.tagInput.trim()) {
       event.preventDefault();
       const tag = this.tagInput.trim().replace(/,$/, '');
-      if (tag && !this.tags.includes(tag)) {
-        this.tags.push(tag);
-        this.markDirty();
-      }
+      if (tag && !this.tags.includes(tag)) { this.tags.push(tag); this.isDirty = true; }
       this.tagInput = '';
     }
     if (event.key === 'Backspace' && !this.tagInput && this.tags.length) {
       this.tags.pop();
-      this.markDirty();
+      this.isDirty = true;
     }
   }
 
   removeTag(index: number): void {
     this.tags.splice(index, 1);
-    this.markDirty();
+    this.isDirty = true;
   }
 
   // ── Save / Delete / Close ─────────────────────────────────────────────────
 
   onSave(): void {
-    // If a non-page template is selected, read from the template form
+    // Non-page template: read from the template form
     if (this.selectedTemplateId && this.selectedTemplateId !== 'page') {
       const tpl = this.templateService.getTemplate(this.selectedTemplateId);
       if (tpl) {
@@ -545,22 +696,23 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
       }
     }
 
-    const filteredBlocks = this.blocks.filter(
+    // Page template: read from canvas
+    const blocks = this.canvasRef
+      ? this.htmlToBlocks(this.canvasRef.nativeElement)
+      : [{ type: 'text' as const, content: '' }];
+
+    const filteredBlocks = blocks.filter(
       b => b.type === 'divider' || b.content.trim() !== '' || b.type === 'todo'
     );
 
     this.saved.emit({
       title: this.title.trim() || 'Untitled',
       templateId: 'page',
-      data: {
-        icon: this.icon,
-        blocks: filteredBlocks,
-        tags: this.tags,
-      },
+      data: { icon: this.icon, blocks: filteredBlocks, tags: this.tags },
     });
     this.isDirty = false;
 
-    // Post-save background analysis hook (fire-and-forget)
+    // Post-save background analysis
     const plainText = this.extractPlainText();
     const wordCount = plainText.split(/\s+/).filter(Boolean).length;
     if (wordCount >= 20 && !this.pendingTemplateId) {
@@ -568,20 +720,6 @@ export class PageEditorComponent implements OnChanges, AfterViewChecked, OnDestr
     }
   }
 
-  onDelete(): void {
-    this.deleted.emit();
-  }
-
-  onClose(): void {
-    this.closed.emit();
-  }
-
-  private markDirty(): void {
-    this.isDirty = true;
-    this.cdr.markForCheck();
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
+  onDelete(): void { this.deleted.emit(); }
+  onClose(): void { this.closed.emit(); }
 }

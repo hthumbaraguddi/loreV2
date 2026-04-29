@@ -115,175 +115,151 @@
   &::placeholder { color: var(--tt); opacity: 0.4; }
 }
 
-// ── Blocks ────────────────────────────────────────────
-.pg-editor-blocks {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.pg-editor-block {
-  display: flex;
-  align-items: flex-start;
-  gap: 0;
-  border-radius: 6px;
-  padding: 1px 0;
+// ── Canvas wrapper ────────────────────────────────────
+.pg-canvas-wrapper {
   position: relative;
-
-  // Show handle on hover
-  &:hover .pg-block-handle {
-    opacity: 1;
-  }
 }
 
-// ── Left handle ───────────────────────────────────────
-.pg-block-handle {
-  width: 36px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6px;
-  opacity: 0;
-  transition: opacity 0.12s;
-  cursor: pointer;
-  padding-top: 6px;
-  gap: 2px;
-  color: var(--tt);
-
-  &:hover {
-    color: var(--ts);
-    .pg-handle-dot { display: none; }
-    .pg-handle-label { display: flex; }
-  }
-}
-
-.pg-handle-dot {
-  font-size: 10px;
-  letter-spacing: -1px;
-  line-height: 1;
-  color: var(--tt);
-}
-
-.pg-handle-label {
-  display: none;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--ts);
-  background: var(--inp);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 4px;
-  white-space: nowrap;
-}
-
-// ── Block textarea ────────────────────────────────────
-.pg-editor-block-ta {
-  flex: 1;
-  background: transparent;
-  border: none;
+// ── Canvas (contenteditable) ──────────────────────────
+.pg-canvas {
   outline: none;
+  min-height: 200px;
   font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
   color: var(--tp);
   line-height: 1.75;
-  resize: none;
-  min-height: 34px;
-  font-family: 'DM Sans', sans-serif;
-  padding: 4px 8px 4px 2px;
-  overflow: hidden;
-  width: 100%;
-  &::placeholder { color: var(--tt); opacity: 0.3; }
+  caret-color: var(--acc);
+  word-break: break-word;
+
+  // Placeholder — shown when canvas has only one empty <p>
+  &:empty::before,
+  > p:only-child:empty::before,
+  > p:first-child:empty:last-child::before {
+    content: attr(data-placeholder);
+    color: var(--tt);
+    opacity: 0.35;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  // ── Text block (default <p>) ──────────────────────
+  > p {
+    margin: 0 0 2px;
+    padding: 2px 0;
+    min-height: 1.75em;
+
+    &:empty::before {
+      content: '\200B'; // zero-width space keeps line height
+    }
+  }
+
+  // ── Headings ──────────────────────────────────────
+  > h1 {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: 'Lora', serif;
+    line-height: 1.3;
+    margin: 20px 0 6px;
+    color: var(--tp);
+    padding: 2px 0;
+
+    &:first-child { margin-top: 0; }
+  }
+
+  > h2 {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Lora', serif;
+    line-height: 1.35;
+    margin: 16px 0 4px;
+    color: var(--tp);
+    padding: 2px 0;
+
+    &:first-child { margin-top: 0; }
+  }
+
+  // ── Callout ───────────────────────────────────────
+  > div[data-type="callout"] {
+    background: var(--accl);
+    border-left: 3px solid var(--acc);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 6px 0;
+    color: var(--acc);
+    font-size: 14px;
+
+    > p {
+      margin: 0;
+      color: var(--acc);
+    }
+  }
+
+  // ── Todo ──────────────────────────────────────────
+  > p[data-type="todo"] {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 2px 0;
+    cursor: text;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 4px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    &[data-checked="true"] {
+      opacity: 0.5;
+      text-decoration: line-through;
+
+      &::before {
+        background: var(--acc);
+        border-color: var(--acc);
+        // Checkmark via background-image
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-size: 10px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
+  }
+
+  // ── Quote ─────────────────────────────────────────
+  > blockquote {
+    border-left: 3px solid var(--bh);
+    margin: 4px 0;
+    padding: 2px 0 2px 16px;
+    color: var(--ts);
+    font-style: italic;
+
+    > p {
+      margin: 0;
+      color: var(--ts);
+    }
+  }
+
+  // ── Divider ───────────────────────────────────────
+  > hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
-// Block type variants
-.pg-editor-block--heading .pg-editor-block-ta {
-  font-size: 26px;
-  font-weight: 700;
-  font-family: 'Lora', serif;
-  line-height: 1.3;
-  min-height: 44px;
-}
-
-.pg-editor-block--heading2 .pg-editor-block-ta {
-  font-size: 20px;
-  font-weight: 600;
-  font-family: 'Lora', serif;
-  line-height: 1.35;
-  min-height: 38px;
-}
-
-.pg-editor-block--callout {
-  background: var(--accl) !important;
-  border-radius: 8px;
-  padding: 6px 10px 6px 4px;
-  border-left: 3px solid var(--acc);
-  margin: 4px 0;
-  .pg-editor-block-ta { color: var(--acc); font-size: 14px; }
-}
-
-.pg-editor-block--quote {
-  border-left: 3px solid var(--bh);
-  padding-left: 4px;
-  margin: 2px 0;
-  .pg-editor-block-ta { color: var(--ts); font-style: italic; font-size: 15px; }
-}
-
-// Divider
-.pg-editor-block--divider {
-  align-items: center;
-  padding: 10px 0;
-  cursor: default;
-}
-
-.pg-editor-divider-line {
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-// Todo
-.pg-editor-block--todo {
-  align-items: flex-start;
-}
-
-.pg-todo-cb {
-  margin-top: 9px;
-  margin-left: 2px;
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  accent-color: var(--acc);
-  cursor: pointer;
-}
-
-.pg-todo-done-ta {
-  text-decoration: line-through;
-  opacity: 0.4;
-}
-
-.pg-block-remove {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--tt);
-  border-radius: 4px;
-  width: 20px;
-  height: 20px;
-  font-size: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 6px;
-  flex-shrink: 0;
-  transition: all 0.12s;
-  &:hover { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
-}
-
-// Slash menu
+// ── Slash menu ────────────────────────────────────────
 .pg-slash-menu {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 36px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -311,33 +287,6 @@
   text-align: center;
   flex-shrink: 0;
   color: var(--ts);
-}
-
-// Add block hint
-.pg-add-hint {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 6px 8px 6px 36px;
-  color: var(--tt);
-  font-size: 13px;
-  cursor: pointer;
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity 0.15s;
-  &:hover { opacity: 1; background: var(--inp); }
-}
-
-.pg-editor-blocks:hover .pg-add-hint {
-  opacity: 0.5;
-}
-
-.pg-add-hint-plus {
-  font-size: 16px;
-  font-weight: 300;
-  color: var(--ts);
-  line-height: 1;
 }
 
 // ── Tags ──────────────────────────────────────────────
@@ -388,12 +337,13 @@
 @media (max-width: 768px) {
   .pg-editor-scroll { padding: 24px 12px 60px; }
   .pg-title-field { font-size: 24px; }
-  .pg-editor-block--heading .pg-editor-block-ta { font-size: 20px; }
-  .pg-editor-block--heading2 .pg-editor-block-ta { font-size: 17px; }
-  .pg-block-handle { width: 24px; }
+  .pg-canvas {
+    > h1 { font-size: 20px; }
+    > h2 { font-size: 17px; }
+  }
 }
 
-// ── Template Picker ───────────────────────────────────────────────────────
+// ── Template Picker ───────────────────────────────────
 .pg-template-picker {
   margin-bottom: 32px;
   padding: 20px 0 0;
@@ -475,7 +425,7 @@
   }
 }
 
-// ── Decoration Banner ─────────────────────────────────────────────────────
+// ── Decoration Banner ─────────────────────────────────
 .pg-decoration-banner {
   display: flex;
   align-items: center;
@@ -488,27 +438,17 @@
   flex-wrap: wrap;
 }
 
-.pg-dec-icon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
+.pg-dec-icon { font-size: 20px; flex-shrink: 0; }
 
 .pg-dec-msg {
   flex: 1;
   font-size: 13px;
   color: var(--tp);
   min-width: 160px;
-
-  strong {
-    color: var(--acc);
-  }
+  strong { color: var(--acc); }
 }
 
-.pg-dec-actions {
-  display: flex;
-  gap: 7px;
-  flex-shrink: 0;
-}
+.pg-dec-actions { display: flex; gap: 7px; flex-shrink: 0; }
 
 .btn-dec-apply {
   background: var(--acc);
@@ -521,7 +461,6 @@
   cursor: pointer;
   transition: opacity 0.15s;
   white-space: nowrap;
-
   &:hover { opacity: 0.88; }
 }
 
@@ -535,18 +474,12 @@
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
-
   &:hover { border-color: var(--acc); color: var(--acc); }
 }
 
-// ── Inline template form ──────────────────────────────────────────────────
-.pg-template-form {
-  margin-bottom: 24px;
-}
-
-.pg-paste-ai-row {
-  margin-top: 12px;
-}
+// ── Inline template form ──────────────────────────────
+.pg-template-form { margin-bottom: 24px; }
+.pg-paste-ai-row { margin-top: 12px; }
 
 .btn-paste-ai {
   display: inline-flex;
@@ -561,14 +494,10 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
-
-  &:hover {
-    background: var(--acc);
-    color: #fff;
-  }
+  &:hover { background: var(--acc); color: #fff; }
 }
 
-// ── Undo toast ────────────────────────────────────────────────────────────
+// ── Undo toast ────────────────────────────────────────
 .pg-undo-toast {
   position: fixed;
   bottom: 24px;
@@ -597,7 +526,6 @@
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
-
   &:hover { opacity: 0.8; }
 }
 
@@ -609,6 +537,5 @@
   cursor: pointer;
   padding: 0 2px;
   margin-left: 4px;
-
   &:hover { color: var(--ts); }
 }

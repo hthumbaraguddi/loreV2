@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lore v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sb-bg:#F0EEF9;--sb-border:#E2DEFA;--sb-text:#6B6585;--sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06);--nav-bg:#EAE7F7;--nav-border:#DDD8F5;
+  --bg:#FAFAF9;--canvas:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09);--border2:rgba(109,40,217,0.16);
+  --t1:#1C1829;--t2:#4A445F;--t3:#9490AA;--t4:#C4C0D4;
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-light:#FDE68A;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --orange:#C2410C;--orange-bg:#FFF7ED;
+  --red:#DC2626;--red-bg:#FEF2F2;
+  --nav-w:52px;--sb-w:248px;--toolbar-h:46px;
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* ═══ NAV RAIL ═══ */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(80,60,160,0.45);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:white;font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sb-topbar{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);flex-shrink:0;}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.7);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 8px;transition:all 0.15s;}
+.sb-search:focus-within{background:white;border-color:var(--p300);}
+.sb-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);width:100%;outline:none;}
+.sb-search input::placeholder{color:var(--t4);}
+.sb-search svg{color:var(--t4);flex-shrink:0;width:12px;height:12px;}
+.sb-icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+.sb-icon-btn:hover{background:white;color:var(--p600);}
+.sb-icon-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+.shelf{}
+.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;}
+.note-item:hover{background:rgba(109,40,217,0.05);}
+.note-item.active{background:rgba(109,40,217,0.08);border-left-color:var(--p600);}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p700);}
+.badge-html{background:#FEF3C7;color:#92400E;}
+.badge-cron{background:var(--amber-bg);color:var(--amber);}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--toolbar-h);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:9px;flex-shrink:0;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+.tb-btn.danger{background:var(--red-bg);border-color:var(--red);color:var(--red);}
+.tb-btn.success{background:var(--green-bg);border-color:#86EFAC;color:var(--green);}
+.tb-btn.ghost{border:none;color:var(--t3);}
+
+/* ═══════════════════════════════════
+   SPLIT NOTES VIEW
+═══════════════════════════════════ */
+.notes-split-bar{height:var(--toolbar-h);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;}
+.nsb-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.nsb-bc a{color:var(--p600);font-weight:500;cursor:pointer;}
+.nsb-bc .cur{color:var(--t2);font-weight:500;}
+.nsb-bc .sep{color:var(--t4);}
+.split-toggle-group{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:2px;}
+.split-btn{width:28px;height:24px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.15s;}
+.split-btn.active{background:white;color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.1);}
+.split-btn svg{width:14px;height:14px;}
+.ai-pill-sm{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.notes-split-body{flex:1;display:flex;overflow:hidden;}
+.note-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.note-pane+.note-pane{border-left:2px solid var(--p200);}
+.note-pane-header{height:38px;background:var(--p50);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;}
+.nph-title{font-size:12px;font-weight:500;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nph-type{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.nph-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;flex-shrink:0;}
+.nph-btn:hover{background:white;color:var(--p600);}
+.nph-btn svg{width:12px;height:12px;}
+.note-pane-body{flex:1;overflow-y:auto;padding:28px 36px;background:white;}
+.paper-title-sm{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--t1);line-height:1.25;margin-bottom:14px;letter-spacing:-0.02em;resize:none;overflow:hidden;}
+.paper-title-sm::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:18px;}
+.paper-body-sm{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--t2);resize:none;min-height:160px;}
+.paper-body-sm::placeholder{color:var(--t4);font-style:italic;}
+.blk-callout{display:flex;gap:10px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 12px;margin-bottom:12px;}
+.blk-callout.hyp{background:#FFFBF0;border-color:var(--amber);}
+.blk-callout.con{background:#F0FDF9;border-color:var(--teal);}
+.blk-callout.ai-blk{background:var(--p50);border-color:var(--p400);}
+.blk-callout.warn{background:var(--orange-bg);border-color:var(--orange);}
+.blk-ico{font-size:13px;flex-shrink:0;margin-top:1px;}
+.blk-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.blk-callout.hyp .blk-lbl{color:var(--amber);}
+.blk-callout.con .blk-lbl{color:var(--teal);}
+.blk-callout.ai-blk .blk-lbl{color:var(--p600);}
+.blk-callout.warn .blk-lbl{color:var(--orange);}
+.blk-txt{font-size:13.5px;line-height:1.6;color:var(--t2);font-family:'Lora',serif;font-style:italic;}
+.kd-sm{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-bottom:12px;}
+.kd-sm-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-sm-col-hdr{flex:1;padding:6px 10px;font-size:10px;font-weight:600;color:var(--p700);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+.kd-sm-col-hdr:last-child{border-right:none;}
+.kd-sm-body{display:flex;}
+.kd-sm-col{flex:1;border-right:1px solid var(--border2);}
+.kd-sm-col:last-child{border-right:none;}
+.kd-sm-row{display:flex;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--t2);align-items:flex-start;}
+.kd-sm-row:last-child{border-bottom:none;}
+.kd-sm-dot{width:4px;height:4px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:5px;}
+.pane-insert-bar{display:flex;align-items:center;gap:5px;padding:8px 14px;border-top:1px solid var(--border);background:var(--p50);flex-shrink:0;flex-wrap:wrap;}
+.pib-lbl{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-right:3px;}
+.pib-btn{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--t3);background:white;border:1px solid var(--border2);border-radius:5px;padding:3px 7px;cursor:pointer;transition:0.12s;}
+.pib-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.pib-btn.html-btn{border-color:#F59E0B;color:#92400E;background:#FFFBEB;}
+.pane-resizer{width:4px;background:var(--p200);cursor:col-resize;flex-shrink:0;transition:background 0.15s;}
+.pane-resizer:hover{background:var(--p400);}
+
+/* ═══════════════════════════════════
+   SCHEDULED RUNS VIEW
+═══════════════════════════════════ */
+.runs-layout{flex:1;display:flex;overflow:hidden;}
+.runs-main{flex:1;overflow-y:auto;padding:0;}
+.runs-toolbar{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);background:white;position:sticky;top:0;z-index:10;}
+.runs-stats-row{display:flex;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.run-stat-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 18px;display:flex;align-items:center;gap:12px;flex:1;min-width:160px;box-shadow:var(--shadow);}
+.rsc-icon{font-size:20px;flex-shrink:0;}
+.rsc-n{font-size:20px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.rsc-l{font-size:11px;color:var(--t3);}
+.rsc-trend{font-size:11px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:5px;}
+.rsc-trend.up{background:var(--green-bg);color:var(--green);}
+.rsc-trend.down{background:var(--red-bg);color:var(--red);}
+/* runs table */
+.runs-table-wrap{padding:20px 24px;}
+.runs-section-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:12px;}
+.runs-table{width:100%;border-collapse:collapse;}
+.runs-table th{text-align:left;padding:8px 12px;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:2px solid var(--border);background:white;position:sticky;top:0;}
+.runs-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.runs-table tr:hover td{background:var(--p50);}
+.run-name{font-size:13px;font-weight:500;color:var(--t1);display:flex;align-items:center;gap:7px;}
+.run-name-sub{font-size:10.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.run-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+.run-status.success{background:var(--green-bg);color:var(--green);}
+.run-status.running{background:var(--p100);color:var(--p700);}
+.run-status.failed{background:var(--red-bg);color:var(--red);}
+.run-status.scheduled{background:var(--amber-bg);color:var(--amber);}
+.run-status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.run-status.running .run-status-dot{animation:pulse 1s infinite;}
+.run-cron{font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;}
+.run-output-link{font-size:11.5px;color:var(--p600);cursor:pointer;text-decoration:none;}
+.run-output-link:hover{text-decoration:underline;}
+.run-toggle{width:32px;height:18px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.run-toggle.on{background:var(--p600);}
+.run-toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15);}
+.run-toggle.on::after{left:16px;}
+.run-action-btn{width:26px;height:26px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;}
+.run-action-btn:hover{background:var(--p50);color:var(--p600);}
+.run-action-btn svg{width:13px;height:13px;}
+/* next runs panel */
+.runs-sidebar{width:300px;border-left:1px solid var(--border);background:white;overflow-y:auto;flex-shrink:0;padding:20px 18px;}
+.rs-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.next-run-card{border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;transition:0.15s;}
+.next-run-card:hover{border-color:var(--p300);background:var(--p50);}
+.nrc-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.nrc-ico{font-size:16px;flex-shrink:0;}
+.nrc-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.nrc-toggle{margin-left:auto;width:28px;height:16px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;flex-shrink:0;}
+.nrc-toggle::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:2px;left:14px;transition:left 0.2s;}
+.nrc-countdown{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.countdown-chip{background:var(--p50);border:1px solid var(--p200);border-radius:6px;padding:4px 8px;text-align:center;min-width:40px;}
+.countdown-n{font-size:16px;font-weight:600;color:var(--p700);font-family:'Lora',serif;line-height:1;}
+.countdown-l{font-size:8.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.countdown-sep{font-size:14px;color:var(--t4);margin-bottom:10px;}
+.nrc-schedule{font-size:10.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.nrc-vars{margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;}
+.nrc-var{font-size:9.5px;background:var(--p100);color:var(--p700);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;}
+.nrc-run-btn{width:100%;margin-top:8px;padding:5px;border-radius:6px;border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.nrc-run-btn:hover{background:var(--p100);}
+
+/* ═══════════════════════════════════
+   PROMPT LIBRARY WITH SLIDEOVER
+═══════════════════════════════════ */
+.pl-layout{flex:1;display:flex;overflow:hidden;}
+.pl-main{flex:1;overflow-y:auto;padding:0;}
+.pl-toolbar{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);background:white;position:sticky;top:0;z-index:10;}
+.pl-search{flex:1;display:flex;align-items:center;gap:7px;background:var(--p50);border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;}
+.pl-search:focus-within{background:white;border-color:var(--p300);}
+.pl-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);width:100%;outline:none;}
+.pl-search input::placeholder{color:var(--t4);}
+.pl-f-row{display:flex;gap:5px;padding:10px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:white;position:sticky;top:61px;z-index:9;}
+.pl-f{padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.pl-f:hover,.pl-f.active{background:var(--p600);border-color:var(--p600);color:white;}
+.pl-body{padding:18px 24px;}
+.pl-section-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.pc{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);position:relative;}
+.pc:hover{border-color:var(--p300);transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.pc.selected{border-color:var(--p600);box-shadow:0 0 0 2px var(--p300);}
+.pc-top{display:flex;gap:9px;margin-bottom:8px;align-items:flex-start;}
+.pc-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pc-name{font-size:13px;font-weight:600;color:var(--t1);}
+.pc-cat{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.pc-desc{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px;}
+.pc-preview{background:var(--p50);border:1px solid var(--p200);border-radius:5px;padding:7px 9px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--p700);line-height:1.5;margin-bottom:8px;}
+.pc-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pc-uses{font-size:10.5px;color:var(--t3);}
+.pc-badge{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:white;}
+.pc-cron-badge{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;border:1px solid var(--amber-light);}
+.pc-use{padding:3px 9px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;margin-left:auto;}
+
+/* PROMPT SLIDEOVER */
+.prompt-slideover{width:0;overflow:hidden;border-left:1px solid var(--border);background:white;flex-shrink:0;transition:width 0.25s ease;display:flex;flex-direction:column;}
+.prompt-slideover.open{width:380px;}
+.pso-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.pso-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.pso-close{width:24px;height:24px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);margin-left:auto;}
+.pso-close:hover{background:var(--p50);color:var(--t1);}
+.pso-body{flex:1;overflow-y:auto;padding:14px 18px;}
+.pso-section{margin-bottom:18px;}
+.pso-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.pso-prompt-body{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:10px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--p700);line-height:1.6;}
+.var-table-sm{width:100%;border-collapse:collapse;font-size:12px;}
+.var-table-sm th{text-align:left;padding:5px 8px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);}
+.var-table-sm td{padding:5px 8px;border-bottom:1px solid var(--border);}
+.var-table-sm tr:last-child td{border-bottom:none;}
+.var-table-sm td:first-child{font-family:'JetBrains Mono',monospace;color:var(--p700);font-size:11px;}
+.var-table-sm td input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);width:100%;}
+/* run history table in slideover */
+.run-hist-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.run-hist-row:last-child{border-bottom:none;}
+.run-hist-status{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.rhs-ok{background:var(--green-bg);color:var(--green);}
+.rhs-fail{background:var(--red-bg);color:var(--red);}
+.rhs-run{background:var(--p100);color:var(--p700);}
+.run-hist-date{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;flex:1;}
+.run-hist-out{font-size:11px;color:var(--p600);cursor:pointer;}
+.run-hist-out:hover{text-decoration:underline;}
+.pso-action-row{display:flex;gap:6px;margin-top:4px;}
+.pso-cron-next{background:var(--amber-bg);border:1px solid var(--amber-light);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.pso-cron-icon{font-size:18px;}
+.pso-cron-text{font-size:12px;color:var(--t2);line-height:1.5;}
+.pso-cron-text strong{color:var(--amber);}
+/* ai provider selector in slideover */
+.pso-provider-row{display:flex;gap:5px;flex-wrap:wrap;}
+.prov-pill{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;border:1px solid var(--border2);background:white;cursor:pointer;font-size:11.5px;color:var(--t2);transition:0.12s;}
+.prov-pill:hover{border-color:var(--p300);}
+.prov-pill.sel{border-color:var(--p500);background:var(--p50);color:var(--p700);}
+.prov-ico{width:13px;height:13px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;}
+
+/* ═══════════════════════════════════
+   TEMPLATE → NOTE FLOW
+═══════════════════════════════════ */
+/* The template flow goes directly to notes view, so we reuse notes view */
+/* Template selection sidebar inside settings */
+.tpl-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-top:4px;}
+.tpl-card{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;background:white;box-shadow:var(--shadow);}
+.tpl-card:hover{border-color:var(--p300);transform:translateY(-2px);}
+.tpl-card.selected{border-color:var(--p600);box-shadow:0 0 0 2px var(--p300);}
+.tpl-preview{height:80px;display:flex;flex-direction:column;gap:3px;padding:10px;border-bottom:1px solid var(--border);}
+.tpl-line{height:7px;border-radius:20px;background:var(--p100);}
+.tpl-line.h{height:10px;background:var(--p200);width:55%;}
+.tpl-line.w80{width:80%;}.tpl-line.w60{width:60%;}.tpl-line.w40{width:40%;}
+.tpl-callout-prev{height:18px;border-radius:3px;background:var(--teal-bg);border-left:2px solid var(--teal);margin:3px 0;}
+.tpl-kd-prev{display:flex;height:18px;border:1px solid var(--border2);border-radius:3px;overflow:hidden;margin:3px 0;}
+.tpl-kd-col{flex:1;padding:2px 3px;border-right:1px solid var(--border2);}
+.tpl-kd-col:last-child{border:none;}
+.tpl-kd-line{height:4px;border-radius:2px;background:var(--p100);}
+.tpl-info{padding:8px 10px;}
+.tpl-name{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:1px;}
+.tpl-desc{font-size:10.5px;color:var(--t3);line-height:1.3;}
+
+/* ═══════════════════════════════════
+   HTML GENERATION FLOW
+═══════════════════════════════════ */
+/* generation states inside the modal */
+.gen-state{display:none;}
+.gen-state.active{display:block;}
+.gen-progress-bar{height:4px;background:var(--p100);border-radius:2px;overflow:hidden;margin:12px 0;}
+.gen-progress-fill{height:100%;background:linear-gradient(90deg,var(--p400),var(--p600));border-radius:2px;transition:width 0.5s ease;}
+.gen-step{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.gen-step:last-child{border-bottom:none;}
+.gen-step-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
+.gen-step-icon.done{background:var(--green-bg);color:var(--green);}
+.gen-step-icon.active{background:var(--p100);color:var(--p600);animation:pulse 1s infinite;}
+.gen-step-icon.pending{background:var(--t4);opacity:0.3;}
+.gen-step-text{font-size:12.5px;color:var(--t2);}
+.gen-step-text.done{color:var(--green);}
+.gen-step-text.pending{color:var(--t4);}
+.gen-preview-thumb{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-top:14px;height:200px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#F5F3FF,#EDE9FE);}
+
+/* ═══════════════════════════════════
+   KNOWLEDGE GRAPH
+═══════════════════════════════════ */
+.gv-layout{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.graph-wrap{flex:1;display:flex;overflow:hidden;}
+.graph-canvas{flex:1;position:relative;background:var(--bg);overflow:hidden;}
+#kg{width:100%;height:100%;}
+.graph-controls{position:absolute;bottom:18px;right:18px;display:flex;flex-direction:column;gap:4px;}
+.graph-ctrl-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:13px;box-shadow:var(--shadow);transition:0.12s;}
+.graph-ctrl-btn:hover{border-color:var(--p300);color:var(--p600);}
+.graph-legend{position:absolute;bottom:18px;left:18px;background:white;border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;box-shadow:var(--shadow);}
+.gl-title{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:7px;}
+.gl-item{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t2);margin-bottom:4px;}
+.gl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.gl-line{width:16px;height:2px;flex-shrink:0;}
+.graph-info-panel{width:260px;border-left:1px solid var(--border);background:white;overflow-y:auto;flex-shrink:0;padding:18px;}
+.gip-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:4px;}
+.gip-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;margin-bottom:12px;display:inline-flex;}
+.gip-stats{display:flex;gap:12px;margin-bottom:14px;}
+.gip-stat-n{font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+.gip-stat-l{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.gi-conn{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.gi-conn:last-child{border-bottom:none;}
+.gi-cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.gi-cname{font-size:12px;color:var(--t2);flex:1;}
+.gi-cstr{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+
+/* ═══ SETTINGS ═══ */
+.settings-wrap{flex:1;display:flex;overflow:hidden;}
+.settings-nav{width:180px;border-right:1px solid var(--border);background:white;padding:12px 0;flex-shrink:0;}
+.snav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:12.5px;color:var(--t2);border-left:2px solid transparent;transition:0.12s;}
+.snav-item:hover{background:var(--p50);color:var(--t1);}
+.snav-item.active{background:var(--p50);color:var(--p700);border-left-color:var(--p600);font-weight:500;}
+.snav-item svg{width:13px;height:13px;opacity:0.7;}
+.snav-divider{border:none;border-top:1px solid var(--border);margin:8px 0;}
+.settings-content{flex:1;overflow-y:auto;padding:24px 32px;}
+.s-panel{display:none;}
+.s-panel.active{display:block;}
+.s-sec{margin-bottom:28px;}
+.s-title{font-size:16px;font-weight:600;color:var(--t1);margin-bottom:3px;font-family:'Lora',serif;}
+.s-desc{font-size:12px;color:var(--t3);margin-bottom:14px;}
+.s-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;box-shadow:var(--shadow);}
+.toggle-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.toggle-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.sw{width:32px;height:18px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;margin-top:2px;}
+.sw.on{background:var(--p600);}
+.sw::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.sw.on::after{left:16px;}
+.form-row{display:flex;gap:12px;margin-bottom:12px;}
+.form-group{flex:1;display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11.5px;font-weight:500;color:var(--t2);}
+.form-input{border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;background:white;}
+.form-input:focus{border-color:var(--p400);}
+.form-input::placeholder{color:var(--t4);}
+.form-textarea{resize:vertical;min-height:70px;font-family:'DM Sans',sans-serif;}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:white;flex-shrink:0;}
+.sel-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;display:inline-flex;}
+.sel-chip:hover{border-color:var(--p300);color:var(--p700);}
+.sel-chip.active{background:var(--p600);border-color:var(--p600);color:white;}
+.api-row{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.api-row:last-child{margin-bottom:0;}
+.api-logo{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.api-info{flex:1;min-width:0;}
+.api-name{font-size:12px;font-weight:500;color:var(--t1);}
+.api-status{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.api-input{flex:2;border:1px solid var(--border2);border-radius:var(--r-md);padding:5px 9px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--p50);outline:none;}
+.api-input:focus{border-color:var(--p400);background:white;}
+.api-btn{padding:4px 11px;border-radius:var(--r-md);border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;}
+.api-btn.on{background:var(--green-bg);border-color:#86EFAC;color:var(--green);}
+
+/* ═══ MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;}
+.modal-sm{width:520px;}
+.modal-lg{width:720px;}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-close:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:20px 22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:11.5px;font-weight:500;color:var(--t2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.field-hint{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.field-input{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;}
+.field-input:focus{border-color:var(--p400);}
+.field-textarea{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t2);outline:none;resize:vertical;min-height:120px;line-height:1.6;}
+.field-textarea:focus{border-color:var(--p400);}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV RAIL ═══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('runs',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/><path d="M6.5 3.5A7 7 0 013 10"/></svg>
+    <span class="nav-tip">Scheduled Runs</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-topbar">
+    <div class="sb-search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <input type="text" placeholder="Search notes…"/>
+    </div>
+    <button class="sb-icon-btn" onclick="openTplPickerModal()" title="New from Template">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>
+    </button>
+    <button class="sb-icon-btn" onclick="createBlankNote()" title="New Note  ⌘N">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+    </button>
+  </div>
+  <div class="sb-tree">
+    <div class="shelf open" id="shelf1">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();createBlankNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📔</span>
+            <span class="nb-name">Transformers</span>
+            <span class="nb-count">3</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item active" onclick="selectNote(this,'Transformer Architecture Deep Dive','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings, tradeoffs.</div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'BERT vs GPT Analysis','Idea')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-prev">Bidirectional vs autoregressive enterprise tradeoffs.</div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'Tata Motors Q4 (HTML)','Reference')">
+              <div class="ni-top"><span class="ni-badge badge-html">HTML</span><span class="ni-date">Apr 20</span></div>
+              <div class="ni-title">Tata Motors Q4 — AI Report</div>
+              <div class="ni-prev">Auto-generated via Equity Monitor cron job.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📗</span>
+            <span class="nb-name">RAG Patterns</span>
+            <span class="nb-count">2</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Hybrid Retrieval Strategies','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense, cross-encoder re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf open" id="shelf2">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();createBlankNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📒</span>
+            <span class="nb-name">Daily Journal</span>
+            <span class="nb-count">12</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Monday — Deep Work Session','Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf" id="shelf3">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf3')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#0F766E;"></div>
+        <span class="sh-name">Work &amp; Finance</span>
+        <span class="sh-count">6</span>
+        <button class="sh-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb4">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb4')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📊</span>
+            <span class="nb-name">Equity Research</span>
+            <span class="nb-count">4</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Indian Equity Framework','Reference')">
+              <div class="ni-top"><span class="ni-badge badge-reference">Reference</span><span class="ni-date">Feb 10</span></div>
+              <div class="ni-title">Indian Equity Framework</div>
+              <div class="ni-prev">BRSR, Beneish M-Score, ROIC vs WACC.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- ══ VIEW: NOTES (SPLIT) ══ -->
+  <div class="view active" id="view-notes">
+    <div class="notes-split-bar">
+      <div class="nsb-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span>
+        <span>Transformers</span><span class="sep"> › </span>
+        <span class="cur" id="paneLeftTitle">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="split-toggle-group">
+        <button class="split-btn active" title="Single" onclick="setSplit(1,this)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/></svg>
+        </button>
+        <button class="split-btn" title="2 panes" onclick="setSplit(2,this)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="12" rx="1"/></svg>
+        </button>
+        <button class="split-btn" title="3 panes" onclick="setSplit(3,this)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="4" height="12" rx="1"/><rect x="6" y="2" width="4" height="12" rx="1"/><rect x="11" y="2" width="4" height="12" rx="1"/></svg>
+        </button>
+      </div>
+      <div class="ai-pill-sm"><div class="ai-dot"></div>Ask AI</div>
+      <button class="tb-btn" onclick="openTplPickerModal()">📄 Templates</button>
+      <button class="tb-btn primary" onclick="createBlankNote()">+ New Note</button>
+    </div>
+    <div class="notes-split-body" id="splitBody">
+      <!-- PANE LEFT -->
+      <div class="note-pane" id="pane-left">
+        <div class="note-pane-header">
+          <span class="nph-type badge-research">Research</span>
+          <span class="nph-title" id="paneLeftHeader">Transformer Architecture Deep Dive</span>
+          <button class="nph-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg></button>
+        </div>
+        <div class="note-pane-body" id="pane-left-body">
+          <textarea class="paper-title-sm" id="leftTitle" rows="1" oninput="syncTitle(this,'paneLeftTitle','paneLeftHeader')">Transformer Architecture Deep Dive</textarea>
+          <hr class="paper-sep"/>
+          <div class="blk-callout hyp"><div class="blk-ico">💡</div><div><div class="blk-lbl">Hypothesis</div><div class="blk-txt">Attention mechanisms can fully replace recurrence for sequence modelling tasks.</div></div></div>
+          <div class="kd-sm">
+            <div class="kd-sm-hdr"><div class="kd-sm-col-hdr">Encoder-only (BERT)</div><div class="kd-sm-col-hdr">Decoder-only (GPT)</div></div>
+            <div class="kd-sm-body">
+              <div class="kd-sm-col">
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Bidirectional attention</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Best for classification</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Needs fine-tuning</div>
+              </div>
+              <div class="kd-sm-col">
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Causal attention</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Best for generation</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Few-shot capable</div>
+              </div>
+            </div>
+          </div>
+          <textarea class="paper-body-sm" placeholder="Continue writing…">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer on a toy dataset to validate core claims about positional encoding behaviour.</textarea>
+        </div>
+        <div class="pane-insert-bar">
+          <span class="pib-lbl">/</span>
+          <button class="pib-btn">💡 Hypothesis</button>
+          <button class="pib-btn">🎯 Conclusion</button>
+          <button class="pib-btn">⚡ Key Diff</button>
+          <button class="pib-btn">🔑 Findings</button>
+          <button class="pib-btn html-btn" onclick="openHtmlGenModal()">✦ Generate HTML</button>
+        </div>
+      </div>
+      <!-- hidden right panes -->
+      <div class="pane-resizer" id="resizer" style="display:none;"></div>
+      <div class="note-pane" id="pane-right" style="display:none;">
+        <div class="note-pane-header">
+          <span class="nph-type badge-idea">Idea</span>
+          <span class="nph-title">BERT vs GPT Analysis</span>
+          <button class="nph-btn" onclick="setSplit(1,document.querySelectorAll('.split-btn')[0])"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <div class="note-pane-body">
+          <textarea class="paper-title-sm" rows="1">BERT vs GPT — Enterprise Use Cases</textarea>
+          <hr class="paper-sep"/>
+          <div class="blk-callout ai-blk"><div class="blk-ico">✦</div><div><div class="blk-lbl">Claude · Sonnet 4</div><div class="blk-txt">For SAP CS support ticket classification, BERT-family models outperform GPT-family by 4–8% F1. For generating personalised responses, GPT-4o / Claude are significantly better.</div></div></div>
+          <textarea class="paper-body-sm" placeholder="Continue…">Key insight: use BERT for classification &amp; routing; use Claude/GPT for generation, summarisation, and response drafting in enterprise workflows.</textarea>
+        </div>
+        <div class="pane-insert-bar">
+          <span class="pib-lbl">/</span>
+          <button class="pib-btn">⚡ Key Diff</button>
+          <button class="pib-btn">✅ Checklist</button>
+          <button class="pib-btn html-btn" onclick="openHtmlGenModal()">✦ Generate HTML</button>
+        </div>
+      </div>
+      <div class="pane-resizer" id="resizer2" style="display:none;"></div>
+      <div class="note-pane" id="pane-third" style="display:none;">
+        <div class="note-pane-header">
+          <span class="nph-type badge-reference">Reference</span>
+          <span class="nph-title">Indian Equity Framework</span>
+          <button class="nph-btn" onclick="setSplit(2,document.querySelectorAll('.split-btn')[1])"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <div class="note-pane-body">
+          <textarea class="paper-title-sm" rows="1">Indian Equity Research Framework</textarea>
+          <hr class="paper-sep"/>
+          <textarea class="paper-body-sm" placeholder="Notes…">BRSR signals, SEBI LODR compliance checks, Beneish M-Score forensic accounting flags, ROIC vs WACC spread analysis, promoter pledge tracking.</textarea>
+        </div>
+        <div class="pane-insert-bar">
+          <span class="pib-lbl">/</span>
+          <button class="pib-btn">📊 Table</button>
+          <button class="pib-btn html-btn" onclick="openHtmlGenModal()">✦ Generate HTML</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: PROMPT LIBRARY ══ -->
+  <div class="view" id="view-prompts">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+      <span class="vhbar-title">Prompt Library</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn" onclick="switchView('runs',document.querySelectorAll('.nav-btn')[2])">⏱ Scheduled Runs</button>
+      <button class="tb-btn primary" onclick="openPromptEditor(null)">+ New Prompt</button>
+    </div>
+    <div class="pl-layout">
+      <div class="pl-main">
+        <div class="pl-toolbar">
+          <div class="pl-search"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg><input type="text" placeholder="Search prompts…"/></div>
+        </div>
+        <div class="pl-f-row">
+          <div class="pl-f active">All</div><div class="pl-f">Research</div><div class="pl-f">Finance</div>
+          <div class="pl-f">Journal</div><div class="pl-f">HTML Reports</div><div class="pl-f">Cron Jobs</div>
+        </div>
+        <div class="pl-body">
+          <div class="pl-section-title">Scheduled Prompts (Cron Jobs)</div>
+          <div class="pl-grid">
+            <div class="pc" id="pc-equity" onclick="openPromptSlideover('equity')">
+              <div class="pc-top"><div class="pc-ico" style="background:var(--rose-bg);">📈</div><div><div class="pc-name">Equity Performance Monitor</div><div class="pc-cat">Finance · Cron · HTML Report</div></div></div>
+              <div class="pc-desc">Monitors {{company_list}} weekly. Generates HTML report with M-Score, ROIC/WACC, promoter pledge flags.</div>
+              <div class="pc-preview">Analyse {{company_list}} for week ending {{date}}. ROIC/WACC, M-Score, promoter pledge, analyst consensus.</div>
+              <div class="pc-footer"><span class="pc-cron-badge">⏱ Mon 08:00 IST</span><div style="display:flex;gap:3px;margin-left:auto;"><div class="pc-badge" style="background:#7C3AED;">C</div></div><button class="pc-use" onclick="event.stopPropagation();openRunNowModal()">▶ Run</button></div>
+            </div>
+            <div class="pc" onclick="openPromptSlideover('journal')">
+              <div class="pc-top"><div class="pc-ico" style="background:var(--amber-bg);">📔</div><div><div class="pc-name">Daily Journal Starter</div><div class="pc-cat">Journal · Cron</div></div></div>
+              <div class="pc-desc">Creates a pre-filled journal note every morning with yesterday's tasks and today's focus.</div>
+              <div class="pc-preview">Today is {{date}}. Journal note: intention, top 3 tasks yesterday, energy check-in.</div>
+              <div class="pc-footer"><span class="pc-cron-badge">⏱ Mon–Fri 07:00 IST</span><div style="display:flex;gap:3px;margin-left:auto;"><div class="pc-badge" style="background:#7C3AED;">C</div></div><button class="pc-use" onclick="event.stopPropagation();">▶ Run</button></div>
+            </div>
+          </div>
+          <div class="pl-section-title" style="margin-top:8px;">All Prompts</div>
+          <div class="pl-grid">
+            <div class="pc" onclick="openPromptSlideover('research')">
+              <div class="pc-top"><div class="pc-ico" style="background:var(--teal-bg);">🔬</div><div><div class="pc-name">Research Deep Dive</div><div class="pc-cat">Research · Analysis</div></div></div>
+              <div class="pc-desc">Summarise key findings, tradeoffs, and open questions from your note content.</div>
+              <div class="pc-preview">Analyse: (1) core thesis, (2) findings, (3) open questions, (4) related work gaps.</div>
+              <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">47 uses</span><div style="display:flex;gap:3px;margin-left:auto;"><div class="pc-badge" style="background:#7C3AED;">C</div><div class="pc-badge" style="background:#10A37F;">G</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+            </div>
+            <div class="pc" onclick="openPromptSlideover('html-report')">
+              <div class="pc-top"><div class="pc-ico" style="background:#FEF3C7;">📄</div><div><div class="pc-name">Generate HTML Report</div><div class="pc-cat">HTML Notes · AI</div></div></div>
+              <div class="pc-desc">Generates a polished, self-contained HTML report from your note. Saved as HTML Note type.</div>
+              <div class="pc-preview">Generate a polished HTML report for: {{topic}}. Include summary, data table for {{company_list}}, charts.</div>
+              <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">24 uses</span><div style="display:flex;gap:3px;margin-left:auto;"><div class="pc-badge" style="background:#7C3AED;">C</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+            </div>
+            <div class="pc" onclick="openPromptSlideover('equity-deep')">
+              <div class="pc-top"><div class="pc-ico" style="background:var(--rose-bg);">📊</div><div><div class="pc-name">Equity Deep Analysis</div><div class="pc-cat">Finance · Research</div></div></div>
+              <div class="pc-desc">Institutional-grade equity analysis: BRSR, Beneish M-Score, ROIC vs WACC, promoter pledge checks.</div>
+              <div class="pc-preview">Analyse {{company}}: M-Score forensic flags, ROIC/WACC spread, promoter pledge %, SEBI LODR flags.</div>
+              <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">18 uses</span><div style="display:flex;gap:3px;margin-left:auto;"><div class="pc-badge" style="background:#7C3AED;">C</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+            </div>
+            <div class="pc" style="border-style:dashed;border-color:var(--p300);background:var(--p50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;" onclick="openPromptEditor(null)">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7C3AED" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg></div>
+              <div style="font-size:13px;font-weight:500;color:var(--p700);">New Prompt</div>
+              <div style="font-size:11px;color:var(--t3);text-align:center;max-width:160px;">Custom prompt with variables, AI provider, cron schedule</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT SLIDEOVER -->
+      <div class="prompt-slideover" id="promptSlideover">
+        <div class="pso-header">
+          <div>
+            <div class="pso-title">
+              <span id="psoTitleIcon">📈</span>
+              <span id="psoTitleText">Equity Performance Monitor</span>
+              <button class="pso-close" onclick="closePromptSlideover()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+            </div>
+            <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;" id="psoCat">Finance · Cron · HTML Report</div>
+          </div>
+        </div>
+        <div class="pso-body">
+
+          <!-- Next run countdown -->
+          <div class="pso-section">
+            <div class="pso-lbl">Next Scheduled Run</div>
+            <div class="pso-cron-next">
+              <div class="pso-cron-icon">⏱</div>
+              <div>
+                <div class="pso-cron-text"><strong>Mon Apr 28 · 08:00 IST</strong></div>
+                <div style="display:flex;gap:6px;margin-top:6px;" id="countdown">
+                  <div class="countdown-chip"><div class="countdown-n" id="cdDays">2</div><div class="countdown-l">days</div></div>
+                  <div class="countdown-sep">:</div>
+                  <div class="countdown-chip"><div class="countdown-n" id="cdHours">14</div><div class="countdown-l">hours</div></div>
+                  <div class="countdown-sep">:</div>
+                  <div class="countdown-chip"><div class="countdown-n" id="cdMins">32</div><div class="countdown-l">mins</div></div>
+                </div>
+                <div class="pso-cron-text" style="margin-top:6px;font-size:11px;color:var(--t3);">Every <strong>Monday at 08:00 IST</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prompt body -->
+          <div class="pso-section">
+            <div class="pso-lbl">Prompt</div>
+            <div class="pso-prompt-body" id="psoPromptBody">Analyse {{company_list}} for the week ending {{date}}. Generate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus. Output as a polished HTML report.</div>
+          </div>
+
+          <!-- Variable values -->
+          <div class="pso-section">
+            <div class="pso-lbl">Variable Values</div>
+            <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;">
+              <table class="var-table-sm">
+                <thead><tr><th>Variable</th><th>Value</th></tr></thead>
+                <tbody id="psoVarTable">
+                  <tr><td>{{company_list}}</td><td><input value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td></tr>
+                  <tr><td>{{date}}</td><td><input value="Auto: current Monday date"/></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AI Provider -->
+          <div class="pso-section">
+            <div class="pso-lbl">AI Provider</div>
+            <div class="pso-provider-row">
+              <div class="prov-pill sel"><div class="prov-ico" style="background:#7C3AED;">C</div>Claude</div>
+              <div class="prov-pill" onclick="selProv(this)"><div class="prov-ico" style="background:#10A37F;">G</div>GPT-4o</div>
+              <div class="prov-pill" onclick="selProv(this)"><div class="prov-ico" style="background:#4285F4;">G</div>Gemini</div>
+            </div>
+          </div>
+
+          <!-- Run history -->
+          <div class="pso-section">
+            <div class="pso-lbl">Run History</div>
+            <div class="run-hist-row"><span class="run-hist-status rhs-ok">✓ Success</span><span class="run-hist-date">Apr 21 · 08:00 IST</span><a class="run-hist-out" onclick="openHtmlPreviewMini()">View HTML →</a></div>
+            <div class="run-hist-row"><span class="run-hist-status rhs-ok">✓ Success</span><span class="run-hist-date">Apr 14 · 08:00 IST</span><a class="run-hist-out" onclick="openHtmlPreviewMini()">View HTML →</a></div>
+            <div class="run-hist-row"><span class="run-hist-status rhs-fail">✗ Failed</span><span class="run-hist-date">Apr 7 · 08:00 IST</span><span style="font-size:11px;color:var(--t4);">API timeout</span></div>
+            <div class="run-hist-row"><span class="run-hist-status rhs-ok">✓ Success</span><span class="run-hist-date">Mar 31 · 08:00 IST</span><a class="run-hist-out" onclick="openHtmlPreviewMini()">View HTML →</a></div>
+          </div>
+        </div>
+        <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;">
+          <button class="tb-btn primary" style="flex:1;justify-content:center;" onclick="openRunNowModal()">▶ Run Now</button>
+          <button class="tb-btn" style="flex:1;justify-content:center;" onclick="openPromptEditor('equity')">✏️ Edit</button>
+        </div>
+      </div>
+
+    </div><!-- /pl-layout -->
+  </div><!-- /view-prompts -->
+
+  <!-- ══ VIEW: SCHEDULED RUNS ══ -->
+  <div class="view" id="view-runs">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/></svg>
+      <span class="vhbar-title">Scheduled Runs</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">Export log</button>
+      <button class="tb-btn primary" onclick="openPromptEditor(null)">+ New Cron Prompt</button>
+    </div>
+    <div class="runs-layout">
+      <div class="runs-main">
+        <!-- Stats -->
+        <div class="runs-stats-row">
+          <div class="run-stat-card"><div class="rsc-icon">✅</div><div><div class="rsc-n">47</div><div class="rsc-l">Total runs this month</div></div><div class="rsc-trend up">↑ 12%</div></div>
+          <div class="run-stat-card"><div class="rsc-icon">📄</div><div><div class="rsc-n">18</div><div class="rsc-l">HTML reports generated</div></div><div class="rsc-trend up">↑ 6%</div></div>
+          <div class="run-stat-card"><div class="rsc-icon">✗</div><div><div class="rsc-n">2</div><div class="rsc-l">Failed runs this month</div></div><div class="rsc-trend down">API timeout</div></div>
+          <div class="run-stat-card"><div class="rsc-icon">⏱</div><div><div class="rsc-n">5</div><div class="rsc-l">Active cron jobs</div></div></div>
+        </div>
+        <!-- Table -->
+        <div class="runs-table-wrap">
+          <div class="runs-section-title">Run Log</div>
+          <table class="runs-table">
+            <thead>
+              <tr>
+                <th>Prompt</th>
+                <th>Schedule</th>
+                <th>Last Run</th>
+                <th>Status</th>
+                <th>Output</th>
+                <th>Active</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;">📈</span>Equity Performance Monitor</div><div class="run-name-sub">Claude · Finance · HTML Report</div></td>
+                <td><div class="run-cron">Mon 08:00 IST</div><div style="font-size:10px;color:var(--t4);">Next: Apr 28</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 21, 08:00</div><div style="font-size:10.5px;color:var(--t4);">2m 14s</div></td>
+                <td><span class="run-status success"><span class="run-status-dot"></span>Success</span></td>
+                <td><a class="run-output-link" onclick="openHtmlPreviewMini()">Equity-Apr21.html</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td><div style="display:flex;gap:3px;">
+                  <button class="run-action-btn" title="Run now" onclick="openRunNowModal()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-action-btn" title="Edit" onclick="openPromptEditor('equity')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;">📔</span>Daily Journal Starter</div><div class="run-name-sub">Claude · Journal · Note</div></td>
+                <td><div class="run-cron">Mon–Fri 07:00 IST</div><div style="font-size:10px;color:var(--t4);">Next: Apr 28</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 25, 07:00</div><div style="font-size:10.5px;color:var(--t4);">0m 38s</div></td>
+                <td><span class="run-status success"><span class="run-status-dot"></span>Success</span></td>
+                <td><a class="run-output-link">Journal-Apr25.note</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td><div style="display:flex;gap:3px;">
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-action-btn" onclick="openPromptEditor('journal')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;">🔬</span>Research Summary</div><div class="run-name-sub">GPT-4o · Research · Note</div></td>
+                <td><div class="run-cron">Sunday 09:00 IST</div><div style="font-size:10px;color:var(--t4);">Next: Apr 27</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 20, 09:00</div><div style="font-size:10.5px;color:var(--t4);">1m 52s</div></td>
+                <td><span class="run-status success"><span class="run-status-dot"></span>Success</span></td>
+                <td><a class="run-output-link">Research-Summary-Apr20.note</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td><div style="display:flex;gap:3px;">
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;">📈</span>Equity Performance Monitor</div><div class="run-name-sub">Claude · Finance · HTML Report</div></td>
+                <td><div class="run-cron">Mon 08:00 IST</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 7, 08:00</div><div style="font-size:10.5px;color:var(--t4);">—</div></td>
+                <td><span class="run-status failed"><span class="run-status-dot"></span>Failed</span></td>
+                <td><span style="font-size:11px;color:var(--t4);">API timeout</span></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td><div style="display:flex;gap:3px;">
+                  <button class="run-action-btn" onclick="openRunNowModal()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><div class="run-name" style="opacity:0.5;"><span style="font-size:14px;">🧠</span>Weekly AI News Digest</div><div class="run-name-sub">Gemini · Research · Note</div></td>
+                <td><div class="run-cron" style="color:var(--t4);">Fri 18:00 IST</div><div style="font-size:10px;color:var(--t4);">Paused</div></td>
+                <td><div style="font-size:12px;color:var(--t4);">Apr 18</div></td>
+                <td><span class="run-status scheduled"><span class="run-status-dot"></span>Paused</span></td>
+                <td><span style="font-size:11px;color:var(--t4);">—</span></td>
+                <td><div class="run-toggle" onclick="this.classList.toggle('on')"></div></td>
+                <td><div style="display:flex;gap:3px;">
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-action-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Next runs sidebar -->
+      <div class="runs-sidebar">
+        <div class="rs-title">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>
+          Upcoming Runs
+        </div>
+
+        <div class="next-run-card">
+          <div class="nrc-top">
+            <div class="nrc-ico">📔</div>
+            <div><div class="nrc-name">Daily Journal Starter</div></div>
+            <div class="nrc-toggle"></div>
+          </div>
+          <div class="nrc-countdown">
+            <div class="countdown-chip"><div class="countdown-n">0</div><div class="countdown-l">days</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">3</div><div class="countdown-l">hrs</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">42</div><div class="countdown-l">min</div></div>
+          </div>
+          <div class="nrc-schedule">Mon Apr 28 · 07:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{date}}</span></div>
+          <button class="nrc-run-btn" onclick="openRunNowModal()">▶ Run Now</button>
+        </div>
+
+        <div class="next-run-card">
+          <div class="nrc-top">
+            <div class="nrc-ico">📈</div>
+            <div><div class="nrc-name">Equity Performance Monitor</div></div>
+            <div class="nrc-toggle"></div>
+          </div>
+          <div class="nrc-countdown">
+            <div class="countdown-chip"><div class="countdown-n">2</div><div class="countdown-l">days</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">14</div><div class="countdown-l">hrs</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">18</div><div class="countdown-l">min</div></div>
+          </div>
+          <div class="nrc-schedule">Mon Apr 28 · 08:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{company_list}}</span><span class="nrc-var">{{date}}</span></div>
+          <button class="nrc-run-btn" onclick="openRunNowModal()">▶ Run Now</button>
+        </div>
+
+        <div class="next-run-card">
+          <div class="nrc-top">
+            <div class="nrc-ico">🔬</div>
+            <div><div class="nrc-name">Research Summary</div></div>
+            <div class="nrc-toggle"></div>
+          </div>
+          <div class="nrc-countdown">
+            <div class="countdown-chip"><div class="countdown-n">1</div><div class="countdown-l">day</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">20</div><div class="countdown-l">hrs</div></div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-chip"><div class="countdown-n">07</div><div class="countdown-l">min</div></div>
+          </div>
+          <div class="nrc-schedule">Sun Apr 27 · 09:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{topic}}</span></div>
+          <button class="nrc-run-btn">▶ Run Now</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ VIEW: KNOWLEDGE GRAPH ══ -->
+  <div class="view" id="view-graph">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+      <span class="vhbar-title">Knowledge Graph</span>
+      <span style="font-size:11.5px;color:var(--t3);margin-left:4px;">13 notes · 18 connections</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">Filter by shelf</button>
+      <button class="tb-btn">Cluster by topic</button>
+      <button class="tb-btn primary">+ Add Note</button>
+    </div>
+    <div class="gv-layout">
+      <div class="graph-wrap">
+        <div class="graph-canvas">
+          <svg id="kg" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg">
+            <!-- background grid -->
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#EDE9FE" stroke-width="0.5"/></pattern>
+            <rect width="860" height="520" fill="url(#grid)"/>
+            <!-- Shelf cluster outlines -->
+            <ellipse cx="380" cy="185" rx="175" ry="110" fill="#7C3AED" opacity="0.035" stroke="#7C3AED" stroke-width="1" stroke-dasharray="6,4"/>
+            <text x="230" y="90" fill="#A78BFA" font-size="10" font-family="JetBrains Mono,monospace">📚 AI &amp; ML shelf</text>
+            <ellipse cx="200" cy="380" rx="110" ry="65" fill="#D97706" opacity="0.04" stroke="#D97706" stroke-width="1" stroke-dasharray="6,4"/>
+            <text x="120" y="430" fill="#FCD34D" font-size="10" font-family="JetBrains Mono,monospace">📚 Personal</text>
+            <ellipse cx="680" cy="370" rx="100" ry="70" fill="#0F766E" opacity="0.04" stroke="#0F766E" stroke-width="1" stroke-dasharray="6,4"/>
+            <text x="615" y="440" fill="#5EEAD4" font-size="10" font-family="JetBrains Mono,monospace">📚 Work</text>
+            <!-- Edges -->
+            <g stroke="#DDD6FE" stroke-width="1.5" fill="none">
+              <line x1="400" y1="190" x2="240" y2="115"/><line x1="400" y1="190" x2="560" y2="125"/>
+              <line x1="400" y1="190" x2="200" y2="370"/><line x1="400" y1="190" x2="680" y2="370"/>
+              <line x1="400" y1="190" x2="400" y2="380"/>
+              <line x1="400" y1="190" x2="310" y2="230" stroke="#C4B5FD" stroke-width="2"/>
+              <line x1="240" y1="115" x2="560" y2="125" stroke="#E9E4FD" stroke-dasharray="5,4"/>
+              <line x1="200" y1="370" x2="400" y2="380" stroke="#FDE68A" stroke-dasharray="5,4"/>
+              <line x1="560" y1="125" x2="680" y2="370" stroke="#CCFBF1" stroke-dasharray="5,4"/>
+              <!-- Cron → Note arrows -->
+              <path d="M610 190 Q650 180 680 370" stroke="#FDE68A" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow)"/>
+            </g>
+            <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#FCD34D"/></marker></defs>
+            <!-- Central hub: Transformer -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('transformer')">
+              <circle cx="400" cy="190" r="50" fill="#7C3AED" opacity="0.09"/>
+              <circle cx="400" cy="190" r="38" fill="#7C3AED"/>
+              <circle cx="400" cy="190" r="38" fill="none" stroke="white" stroke-width="1.5" opacity="0.2"/>
+              <text x="400" y="185" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text>
+              <text x="400" y="200" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="DM Sans,sans-serif">Architecture</text>
+              <text x="400" y="240" text-anchor="middle" fill="#A78BFA" font-size="9" font-family="JetBrains Mono,monospace">Research · 5 links</text>
+            </g>
+            <!-- RAG -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('rag')">
+              <circle cx="240" cy="115" r="28" fill="#0F766E"/>
+              <text x="240" y="110" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">RAG</text>
+              <text x="240" y="124" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">Patterns</text>
+              <text x="240" y="155" text-anchor="middle" fill="#0F766E" font-size="8.5" font-family="JetBrains Mono,monospace">Research · 2</text>
+            </g>
+            <!-- AI Roadmap -->
+            <g style="cursor:pointer;">
+              <circle cx="560" cy="125" r="30" fill="#1D4ED8"/>
+              <text x="560" y="119" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">AI Roadmap</text>
+              <text x="560" y="133" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">36 Weeks</text>
+              <text x="560" y="167" text-anchor="middle" fill="#1D4ED8" font-size="8.5" font-family="JetBrains Mono,monospace">Task · 3</text>
+            </g>
+            <!-- BERT note -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('bert')">
+              <circle cx="310" cy="230" r="24" fill="#BE185D"/>
+              <text x="310" y="225" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">BERT vs</text>
+              <text x="310" y="238" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8.5" font-family="DM Sans,sans-serif">GPT</text>
+              <text x="310" y="265" text-anchor="middle" fill="#BE185D" font-size="8.5" font-family="JetBrains Mono,monospace">Idea</text>
+            </g>
+            <!-- Journal -->
+            <g style="cursor:pointer;">
+              <circle cx="200" cy="370" r="26" fill="#D97706"/>
+              <text x="200" y="364" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Monday</text>
+              <text x="200" y="377" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8.5" font-family="DM Sans,sans-serif">Journal</text>
+              <text x="200" y="407" text-anchor="middle" fill="#D97706" font-size="8.5" font-family="JetBrains Mono,monospace">Journal</text>
+            </g>
+            <!-- Equity -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('equity')">
+              <circle cx="680" cy="370" r="28" fill="#0F766E"/>
+              <text x="680" y="364" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Equity</text>
+              <text x="680" y="377" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">Research</text>
+              <text x="680" y="408" text-anchor="middle" fill="#0F766E" font-size="8.5" font-family="JetBrains Mono,monospace">Reference · 3</text>
+            </g>
+            <!-- HTML Note (cron output) -->
+            <g style="cursor:pointer;">
+              <circle cx="610" cy="190" r="22" fill="#92400E" opacity="0.85"/>
+              <text x="610" y="185" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="DM Sans,sans-serif">Tata Q4</text>
+              <text x="610" y="197" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" font-family="DM Sans,sans-serif">HTML</text>
+              <text x="610" y="222" text-anchor="middle" fill="#92400E" font-size="8" font-family="JetBrains Mono,monospace">HTML Note</text>
+            </g>
+            <!-- Linear Algebra -->
+            <g style="cursor:pointer;">
+              <circle cx="400" cy="380" r="26" fill="#7C3AED" opacity="0.72"/>
+              <text x="400" y="374" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="DM Sans,sans-serif">Linear</text>
+              <text x="400" y="386" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8.5" font-family="DM Sans,sans-serif">Algebra</text>
+              <text x="400" y="415" text-anchor="middle" fill="#7C3AED" font-size="8.5" font-family="JetBrains Mono,monospace">Idea</text>
+            </g>
+            <!-- Cron arrow label -->
+            <text x="648" y="280" fill="#FCD34D" font-size="9" font-family="JetBrains Mono,monospace">⏱ cron</text>
+            <text x="700" y="490" text-anchor="middle" fill="#BCB6D4" font-size="11" font-family="DM Sans,sans-serif">Click a node to inspect · Shelf clusters shown as dashed outlines</text>
+          </svg>
+          <div class="graph-controls">
+            <button class="graph-ctrl-btn" title="Zoom in">+</button>
+            <button class="graph-ctrl-btn" title="Zoom out">−</button>
+            <button class="graph-ctrl-btn" title="Reset view">⤢</button>
+          </div>
+          <div class="graph-legend">
+            <div class="gl-title">Node types</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#7C3AED;"></div>Research</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#D97706;"></div>Journal</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#1D4ED8;"></div>Task</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#0F766E;"></div>Reference</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#BE185D;"></div>Idea</div>
+            <div class="gl-item"><div class="gl-dot" style="background:#92400E;"></div>HTML Note</div>
+            <div style="border-top:1px solid var(--border);margin:7px 0;"></div>
+            <div class="gl-item"><div class="gl-line" style="background:var(--p200);border-radius:1px;"></div>Manual link</div>
+            <div class="gl-item"><div class="gl-line" style="background:var(--amber-light);border-radius:1px;border-top:2px dashed var(--amber);height:0;"></div>Cron output</div>
+          </div>
+        </div>
+        <div class="graph-info-panel" id="graphPanel">
+          <div style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Selected Note</div>
+          <div class="gip-title" id="gipTitle">Transformer Architecture</div>
+          <div style="margin:5px 0 12px;"><span class="gip-badge badge-research">Research</span></div>
+          <div class="gip-stats">
+            <div><div class="gip-stat-n">5</div><div class="gip-stat-l">links</div></div>
+            <div><div class="gip-stat-n">4</div><div class="gip-stat-l">AI calls</div></div>
+            <div><div class="gip-stat-n">847</div><div class="gip-stat-l">words</div></div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin-bottom:12px;"/>
+          <div style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Connected Notes</div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#0F766E;"></div><span class="gi-cname">RAG Patterns</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#1D4ED8;"></div><span class="gi-cname">AI Roadmap</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#BE185D;"></div><span class="gi-cname">BERT vs GPT</span><span class="gi-cstr">medium</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#7C3AED;opacity:0.7;"></div><span class="gi-cname">Linear Algebra</span><span class="gi-cstr">medium</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#D97706;"></div><span class="gi-cname">Monday Journal</span><span class="gi-cstr">weak</span></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;"/>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.6;">Central hub — 5 connections. Strong thematic overlap with RAG and Roadmap.</div>
+          <button class="tb-btn" style="width:100%;margin-top:10px;justify-content:center;" onclick="selectNote(null,'Transformer Architecture Deep Dive','Research');switchView('notes',document.querySelectorAll('.nav-btn')[0])">Open Note →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: SETTINGS ══ -->
+  <div class="view" id="view-settings">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/></svg>
+      <span class="vhbar-title">Settings</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn primary">Save Changes</button>
+    </div>
+    <div class="settings-wrap">
+      <div class="settings-nav">
+        <div class="snav-item active" onclick="switchSettingsPanel('ai-providers',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 2"/></svg>AI Providers</div>
+        <div class="snav-item" onclick="switchSettingsPanel('profile',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Profile</div>
+        <div class="snav-divider"></div>
+        <div class="snav-item" onclick="switchSettingsPanel('ai-behaviour',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v3M8 11v3M2 8h3M11 8h3"/></svg>AI Behaviour</div>
+        <div class="snav-item" onclick="switchSettingsPanel('sync',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1112 0M14 8l-2-2-2 2"/></svg>Sync &amp; Export</div>
+        <div class="snav-item" onclick="switchSettingsPanel('templates',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 5h6M5 8h4"/></svg>Templates</div>
+        <div class="snav-divider"></div>
+        <div class="snav-item" onclick="switchSettingsPanel('appearance',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2"/></svg>Appearance</div>
+      </div>
+      <div class="settings-content">
+        <!-- AI Providers -->
+        <div class="s-panel active" id="sp-ai-providers">
+          <div class="s-sec">
+            <div class="s-title">AI Provider API Keys</div>
+            <div class="s-desc">Keys stored locally. Each key enables @mention for that model inline in notes and scheduled prompts.</div>
+            <div class="s-card">
+              <div class="api-row"><div class="api-logo" style="background:#7C3AED;">C</div><div class="api-info"><div class="api-name">Anthropic · Claude</div><div class="api-status">claude-sonnet-4 · Connected ✓</div></div><input class="api-input" type="password" value="sk-ant-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#10A37F;">G</div><div class="api-info"><div class="api-name">OpenAI · ChatGPT</div><div class="api-status">gpt-4o · Connected ✓</div></div><input class="api-input" type="password" value="sk-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#4285F4;">G</div><div class="api-info"><div class="api-name">Google · Gemini</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="AIza••••••••••••"/><button class="api-btn">Connect</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#F55036;">Q</div><div class="api-info"><div class="api-name">Groq · Llama 3</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="gsk_••••••••••••"/><button class="api-btn">Connect</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#1A1A2E;">O</div><div class="api-info"><div class="api-name">OpenRouter</div><div class="api-status">50+ models</div></div><input class="api-input" type="text" placeholder="sk-or-••••••••••••"/><button class="api-btn">Connect</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- Profile -->
+        <div class="s-panel" id="sp-profile">
+          <div class="s-sec">
+            <div class="s-title">Your Profile</div>
+            <div class="s-desc">Your name and bio are injected into AI prompts for personalised responses.</div>
+            <div class="s-card">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+                <div class="profile-avatar">H</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <button class="tb-btn">📷 Change photo</button>
+                  <button class="tb-btn ghost" style="font-size:11px;color:var(--rose);">Remove photo</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Full name</label><input class="form-input" value="Harsha"/></div>
+                <div class="form-group"><label class="form-label">Display name</label><input class="form-input" value="Harsha"/></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" value="harsha@example.com"/></div>
+                <div class="form-group"><label class="form-label">Timezone</label><select class="form-input"><option>Asia/Kolkata (IST +5:30)</option><option>UTC</option></select></div>
+              </div>
+              <div class="form-group"><label class="form-label">Bio <span style="font-size:10px;color:var(--t4);font-weight:400;">(used as AI context)</span></label><textarea class="form-input form-textarea">AI consultant at enterprise IT firm. Expertise in SAP/S4HANA, ServiceNow, Salesforce, AI/LLM engineering. Building a 36-week AI learning roadmap and open-source linear algebra book.</textarea></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">AI Persona Context</div>
+            <div class="s-desc">Injected into every AI prompt for better, context-aware responses.</div>
+            <div class="s-card">
+              <div class="form-group"><label class="form-label">Professional context</label><textarea class="form-input form-textarea" style="min-height:80px;">Enterprise AI consultant. Working across SAP BTP, ServiceNow Now Assist, Salesforce Einstein. Focus on RAG, LLM fine-tuning, prompt engineering for enterprise workflows.</textarea></div>
+              <div class="form-group"><label class="form-label">Response style preferences</label>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Concise</div>
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Technical depth</div>
+                  <div class="sel-chip" onclick="this.classList.toggle('active')">With examples</div>
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Bullet points</div>
+                  <div class="sel-chip" onclick="this.classList.toggle('active')">ELI5 when needed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- AI Behaviour -->
+        <div class="s-panel" id="sp-ai-behaviour">
+          <div class="s-sec">
+            <div class="s-title">AI Behaviour</div>
+            <div class="s-desc">Control how AI integrates with notes, blocks, knowledge graph, and scheduled prompts.</div>
+            <div class="s-card">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-link AI responses to Knowledge Graph</div><div class="toggle-desc">Replies are parsed for concepts and linked as graph nodes automatically</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include note context in every AI prompt</div><div class="toggle-desc">The current note content is sent as context with each @mention query</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include personal bio and persona context</div><div class="toggle-desc">Inject profile bio into AI system prompts for personalised responses</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Save AI exchanges as sub-notes</div><div class="toggle-desc">@mention conversations saved as linked child notes in the same notebook</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-generate note summary on save</div><div class="toggle-desc">2-sentence sidebar preview summary generated by default model</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Show token usage and cost per AI call</div><div class="toggle-desc">Displays estimated cost in each block footer</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Scheduled prompts (Cron Jobs) enabled</div><div class="toggle-desc">Allow Prompt Library prompts to run on a schedule</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">HTML Note generation enabled</div><div class="toggle-desc">Allow AI to produce rich HTML reports saved as HTML Note type</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+        </div>
+        <!-- Sync & Export -->
+        <div class="s-panel" id="sp-sync">
+          <div class="s-sec">
+            <div class="s-title">GitHub Gist Sync</div>
+            <div class="s-desc">Notes synced as JSON + HTML to a private Gist. Your data, your account.</div>
+            <div class="s-card" style="display:flex;align-items:center;gap:14px;">
+              <div style="width:36px;height:36px;border-radius:9px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg></div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--t1);">Connected · @harsha</div><div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Gist: lore-notes-backup · Last sync: 2 min ago</div></div>
+              <button class="api-btn on">Syncing</button>
+            </div>
+            <div class="s-card" style="margin-top:8px;">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-sync on save</div><div class="toggle-desc">Push changes to Gist immediately after saving</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include HTML notes in sync</div><div class="toggle-desc">Save AI-generated HTML files to Gist</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Encrypt private notes before sync</div><div class="toggle-desc">AES-256 applied to notes tagged as private</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">Export</div>
+            <div class="s-card" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export all as JSON</div><div style="font-size:11px;color:var(--t3);">Complete data: notes, blocks, AI history, metadata</div></div><button class="tb-btn">📦 Export JSON</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export as Markdown</div><div style="font-size:11px;color:var(--t3);">One .md file per note</div></div><button class="tb-btn">📝 Export MD</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export HTML notes as ZIP</div><div style="font-size:11px;color:var(--t3);">All AI-generated HTML files bundled</div></div><button class="tb-btn">🗜️ Export ZIP</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Import</div><div style="font-size:11px;color:var(--t3);">Restore from JSON / Markdown, import HTML notes</div></div><button class="tb-btn primary">📥 Import</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- Templates -->
+        <div class="s-panel" id="sp-templates">
+          <div class="s-sec">
+            <div class="s-title">Note Templates</div>
+            <div class="s-desc">Click a template to preview it. Use it when creating a new note — your note opens immediately with all blocks pre-loaded. No forms, no extra screens.</div>
+            <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+              <div class="sel-chip active" onclick="filterTpl('all',this)">All</div>
+              <div class="sel-chip" onclick="filterTpl('research',this)">Research</div>
+              <div class="sel-chip" onclick="filterTpl('journal',this)">Journal</div>
+              <div class="sel-chip" onclick="filterTpl('finance',this)">Finance</div>
+              <div class="sel-chip" onclick="filterTpl('engineering',this)">Engineering</div>
+              <div class="sel-chip" onclick="filterTpl('my',this)">My Templates</div>
+            </div>
+            <div class="tpl-gallery" id="tplGallery">
+              <div class="tpl-card" onclick="useTpl('Research Deep Dive','Research')" data-cat="research">
+                <div class="tpl-preview"><div class="tpl-line h"></div><div class="tpl-callout-prev"></div><div class="tpl-line w80"></div><div class="tpl-kd-prev"><div class="tpl-kd-col"><div class="tpl-kd-line"></div><div class="tpl-kd-line" style="width:60%;"></div></div><div class="tpl-kd-col"><div class="tpl-kd-line"></div><div class="tpl-kd-line" style="width:75%;"></div></div></div></div>
+                <div class="tpl-info"><div class="tpl-name">Research Deep Dive</div><div class="tpl-desc">Hypothesis · Key Differences · Findings · Conclusion</div></div>
+              </div>
+              <div class="tpl-card" onclick="useTpl('Daily Journal','Journal')" data-cat="journal">
+                <div class="tpl-preview" style="background:var(--amber-bg);"><div class="tpl-line h" style="background:#FDE68A;"></div><div style="display:flex;gap:3px;margin:3px 0;"><div style="height:16px;width:32px;border-radius:3px;background:#FDE68A;"></div><div style="height:16px;width:32px;border-radius:3px;background:#FEF3C7;"></div><div style="height:16px;width:32px;border-radius:3px;background:#FDE68A;"></div></div><div class="tpl-line w80" style="background:#FDE68A;"></div><div class="tpl-line w60" style="background:#FDE68A;"></div></div>
+                <div class="tpl-info"><div class="tpl-name">Daily Journal</div><div class="tpl-desc">Intention · Mood · Wins · Blockers · Tomorrow</div></div>
+              </div>
+              <div class="tpl-card" onclick="useTpl('Equity Research','Research')" data-cat="finance">
+                <div class="tpl-preview" style="background:var(--rose-bg);"><div class="tpl-line h" style="background:#FCE7F3;"></div><div class="tpl-kd-prev" style="height:28px;"><div class="tpl-kd-col"><div class="tpl-kd-line" style="background:#FCE7F3;"></div></div><div class="tpl-kd-col"><div class="tpl-kd-line" style="background:#FCE7F3;"></div></div><div class="tpl-kd-col"><div class="tpl-kd-line" style="background:#FCE7F3;"></div></div></div><div class="tpl-line w80" style="background:#FCE7F3;"></div></div>
+                <div class="tpl-info"><div class="tpl-name">Equity Research</div><div class="tpl-desc">BRSR · M-Score · ROIC vs WACC · Signal</div></div>
+              </div>
+              <div class="tpl-card" onclick="useTpl('Sprint Plan','Task')" data-cat="engineering">
+                <div class="tpl-preview" style="background:var(--blue-bg);"><div class="tpl-line h" style="background:#DBEAFE;"></div><div style="display:flex;align-items:center;gap:3px;margin:3px 0;"><div style="width:8px;height:8px;border-radius:2px;background:#93C5FD;"></div><div class="tpl-line w80" style="background:#DBEAFE;height:6px;flex:1;"></div></div><div style="display:flex;align-items:center;gap:3px;margin:2px 0;"><div style="width:8px;height:8px;border-radius:2px;background:#DBEAFE;"></div><div class="tpl-line" style="background:#DBEAFE;height:6px;width:60%;"></div></div></div>
+                <div class="tpl-info"><div class="tpl-name">Sprint Plan</div><div class="tpl-desc">Goals · Stories · Tasks · Done criteria</div></div>
+              </div>
+              <div class="tpl-card" onclick="useTpl('Meeting Notes','Task')" data-cat="engineering">
+                <div class="tpl-preview"><div class="tpl-line h"></div><div style="display:flex;gap:3px;margin:3px 0;"><div style="height:12px;width:36px;border-radius:2px;background:var(--p100);"></div><div style="height:12px;width:36px;border-radius:2px;background:var(--teal-bg);"></div></div><div class="tpl-line w80"></div><div class="tpl-line w60"></div></div>
+                <div class="tpl-info"><div class="tpl-name">Meeting Notes</div><div class="tpl-desc">Attendees · Agenda · Decisions · Actions</div></div>
+              </div>
+              <div class="tpl-card" onclick="useTpl('AI Conversation','Research')" data-cat="research">
+                <div class="tpl-preview" style="background:var(--p50);"><div class="tpl-line h" style="background:var(--p200);"></div><div style="height:18px;border-radius:4px;background:var(--p100);border-left:2px solid var(--p400);margin:3px 0;"></div><div class="tpl-line w80" style="background:var(--p200);"></div></div>
+                <div class="tpl-info"><div class="tpl-name">AI Conversation</div><div class="tpl-desc">Pre-loaded @claude prompt block · ready to ask</div></div>
+              </div>
+              <!-- Create your own -->
+              <div class="tpl-card" style="border-style:dashed;border-color:var(--p300);background:var(--p50);cursor:pointer;" data-cat="my" onclick="alert('Template builder coming in next phase!')">
+                <div class="tpl-preview" style="background:var(--p50);display:flex;align-items:center;justify-content:center;"><div style="width:30px;height:30px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#7C3AED" stroke-width="1.8"><path d="M7 2v10M2 7h10"/></svg></div></div>
+                <div class="tpl-info"><div class="tpl-name" style="color:var(--p700);">Create Template</div><div class="tpl-desc">Design your own block structure</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:16px;">💡</div>
+            <div style="font-size:12.5px;color:var(--t2);line-height:1.6;">
+              <strong>How templates work:</strong> Click any template card above or use the <strong>📄 Templates</strong> button in the notes toolbar. Your new note opens <em>instantly</em> in the editor with all blocks pre-loaded — no forms, no extra steps. Just start typing your title and the idea flows.
+            </div>
+          </div>
+        </div>
+        <!-- Appearance -->
+        <div class="s-panel" id="sp-appearance">
+          <div class="s-sec">
+            <div class="s-title">Appearance</div>
+            <div class="s-card">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Theme</div></div><div style="display:flex;gap:5px;"><div class="sel-chip active" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Light</div><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Dark</div><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">System</div></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Canvas background</div></div><div style="display:flex;gap:5px;"><div class="sel-chip active" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Plain white</div><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Dot grid</div><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Lined</div></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Font size</div></div><div style="display:flex;gap:5px;"><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Small</div><div class="sel-chip active" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Medium</div><div class="sel-chip" onclick="this.parentElement.querySelectorAll('.sel-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')">Large</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ═══ TEMPLATE PICKER MODAL ═══ -->
+<div class="modal-overlay" id="tplPickerModal" onclick="if(event.target===this)closeTplPickerModal()">
+  <div class="modal modal-lg" style="max-width:660px;">
+    <div class="modal-header">
+      <div class="modal-title">Start from a Template</div>
+      <button class="modal-close" onclick="closeTplPickerModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--t3);margin-bottom:16px;">Choose a template — your note opens immediately with blocks pre-loaded. Just type your title and go.</p>
+      <div class="tpl-gallery">
+        <div class="tpl-card" onclick="useTpl('Research Deep Dive','Research');closeTplPickerModal()">
+          <div class="tpl-preview"><div class="tpl-line h"></div><div class="tpl-callout-prev"></div><div class="tpl-line w80"></div><div class="tpl-kd-prev"><div class="tpl-kd-col"><div class="tpl-kd-line"></div></div><div class="tpl-kd-col"><div class="tpl-kd-line"></div></div></div></div>
+          <div class="tpl-info"><div class="tpl-name">Research Deep Dive</div><div class="tpl-desc">Hypothesis · Key Diff · Findings · Conclusion</div></div>
+        </div>
+        <div class="tpl-card" onclick="useTpl('Daily Journal','Journal');closeTplPickerModal()">
+          <div class="tpl-preview" style="background:var(--amber-bg);"><div class="tpl-line h" style="background:#FDE68A;"></div><div class="tpl-line w80" style="background:#FDE68A;"></div><div class="tpl-line w60" style="background:#FDE68A;"></div></div>
+          <div class="tpl-info"><div class="tpl-name">Daily Journal</div><div class="tpl-desc">Intention · Wins · Blockers · Tomorrow</div></div>
+        </div>
+        <div class="tpl-card" onclick="useTpl('Equity Research','Research');closeTplPickerModal()">
+          <div class="tpl-preview" style="background:var(--rose-bg);"><div class="tpl-line h" style="background:#FCE7F3;"></div><div class="tpl-kd-prev" style="height:22px;"><div class="tpl-kd-col"><div class="tpl-kd-line" style="background:#FCE7F3;"></div></div><div class="tpl-kd-col"><div class="tpl-kd-line" style="background:#FCE7F3;"></div></div></div></div>
+          <div class="tpl-info"><div class="tpl-name">Equity Research</div><div class="tpl-desc">BRSR · M-Score · ROIC · Signal</div></div>
+        </div>
+        <div class="tpl-card" onclick="useTpl('Sprint Plan','Task');closeTplPickerModal()">
+          <div class="tpl-preview" style="background:var(--blue-bg);"><div class="tpl-line h" style="background:#DBEAFE;"></div><div style="display:flex;align-items:center;gap:3px;margin:3px 0;"><div style="width:8px;height:8px;border-radius:2px;background:#93C5FD;"></div><div class="tpl-line w80" style="background:#DBEAFE;height:5px;flex:1;"></div></div></div>
+          <div class="tpl-info"><div class="tpl-name">Sprint Plan</div><div class="tpl-desc">Goals · Tasks · Done criteria</div></div>
+        </div>
+        <div class="tpl-card" onclick="useTpl('Meeting Notes','Task');closeTplPickerModal()">
+          <div class="tpl-preview"><div class="tpl-line h"></div><div class="tpl-line w80"></div><div class="tpl-line w60"></div></div>
+          <div class="tpl-info"><div class="tpl-name">Meeting Notes</div><div class="tpl-desc">Attendees · Decisions · Actions</div></div>
+        </div>
+        <div class="tpl-card" onclick="createBlankNote();closeTplPickerModal()" style="border-style:dashed;border-color:var(--p300);background:var(--p50);">
+          <div class="tpl-preview" style="background:var(--p50);display:flex;align-items:center;justify-content:center;"><div style="font-size:24px;">📄</div></div>
+          <div class="tpl-info"><div class="tpl-name" style="color:var(--p700);">Blank Note</div><div class="tpl-desc">Start with an empty page</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn" onclick="closeTplPickerModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROMPT EDITOR MODAL ═══ -->
+<div class="modal-overlay" id="promptEditorModal" onclick="if(event.target===this)closePromptEditor()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="peTitle">New Prompt</div>
+      <button class="modal-close" onclick="closePromptEditor()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;gap:20px;">
+      <div style="flex:1;min-width:0;">
+        <div class="field-group"><label class="field-label">Prompt name</label><input class="field-input" id="peName" placeholder="e.g. Equity Performance Monitor"/></div>
+        <div class="field-group"><label class="field-label">Category</label><div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;"><div class="sel-chip" onclick="toggleChip(this)">Research</div><div class="sel-chip active" onclick="toggleChip(this)">Finance</div><div class="sel-chip" onclick="toggleChip(this)">Journal</div><div class="sel-chip" onclick="toggleChip(this)">HTML Reports</div><div class="sel-chip" onclick="toggleChip(this)">Engineering</div></div></div>
+        <div class="field-group">
+          <label class="field-label">Prompt body <span style="font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;">Use {{variable}} for dynamic values</span></label>
+          <textarea class="field-textarea" id="peBody" style="min-height:140px;" placeholder="Write your prompt here…&#10;&#10;Use {{company_list}} for a list of companies&#10;Use {{date}} for today's date&#10;Use {{note_content}} to include current note&#10;Use {{topic}} for a dynamic topic"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Variable values table</label>
+          <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:var(--p50);"><th style="text-align:left;padding:5px 10px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);">Variable</th><th style="text-align:left;padding:5px 10px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);">Default / Source</th><th style="text-align:left;padding:5px 10px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);">Type</th></tr></thead>
+              <tbody id="peVarTable">
+                <tr><td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;color:var(--p700);font-size:11px;background:var(--p50);border-bottom:1px solid var(--border);">{{company_list}}</td><td style="padding:5px 10px;border-bottom:1px solid var(--border);"><input style="border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);width:100%;" value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td><td style="padding:5px 10px;border-bottom:1px solid var(--border);"><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Static list</option><option>Dynamic query</option></select></td></tr>
+                <tr><td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;color:var(--p700);font-size:11px;background:var(--p50);"><input style="border:none;background:var(--p50);outline:none;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--p700);width:100%;" placeholder="{{variable}}"/></td><td style="padding:5px 10px;"><input style="border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);width:100%;" placeholder="Default value…"/></td><td style="padding:5px 10px;"><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Static</option><option>Auto date</option><option>From note</option></select></td></tr>
+              </tbody>
+            </table>
+            <div style="text-align:center;padding:7px;font-size:11.5px;color:var(--t4);cursor:pointer;border-top:1px dashed var(--border2);" onclick="addVarRow()">+ Add variable row</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right col -->
+      <div style="width:210px;flex-shrink:0;">
+        <div class="field-group">
+          <label class="field-label">AI Provider</label>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <div class="prov-pill sel" onclick="selProv(this)"><div class="prov-ico" style="background:#7C3AED;">C</div>Claude</div>
+            <div class="prov-pill" onclick="selProv(this)"><div class="prov-ico" style="background:#10A37F;">G</div>GPT-4o</div>
+            <div class="prov-pill" onclick="selProv(this)"><div class="prov-ico" style="background:#4285F4;">G</div>Gemini</div>
+            <div class="prov-pill" onclick="selProv(this)"><div class="prov-ico" style="background:#F55036;">Q</div>Groq</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Output type</label>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="sel-chip active" onclick="toggleChip(this)" style="justify-content:flex-start;">📝 Save as note</div>
+            <div class="sel-chip" onclick="toggleChip(this)" style="justify-content:flex-start;">📄 Generate HTML report</div>
+            <div class="sel-chip" onclick="toggleChip(this)" style="justify-content:flex-start;">🔔 Send notification</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Save to notebook</label>
+          <select class="field-input" style="font-size:12.5px;padding:6px 10px;"><option>Equity Research</option><option>Transformers</option><option>Daily Journal</option></select>
+        </div>
+        <!-- Cron -->
+        <div style="border-top:1px solid var(--border);padding-top:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><label class="field-label" style="margin:0;">Cron Schedule</label><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="field-group"><label style="font-size:11px;font-weight:500;color:var(--t2);">Frequency</label><select class="field-input" style="font-size:12px;padding:6px 9px;" onchange="updateCronLabel(this)"><option>Daily</option><option selected>Weekly</option><option>Monthly</option></select></div>
+          <div class="field-group"><label style="font-size:11px;font-weight:500;color:var(--t2);">Time (IST)</label><select class="field-input" style="font-size:12px;padding:6px 9px;"><option>07:00</option><option selected>08:00</option><option>09:00</option><option>18:00</option></select></div>
+          <div class="field-group"><label style="font-size:11px;font-weight:500;color:var(--t2);">Days</label><div style="display:flex;gap:3px;flex-wrap:wrap;" id="pedays"><button style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--p600);color:white;font-size:10.5px;font-weight:500;cursor:pointer;" onclick="this.style.background=this.style.background===''?'var(--p600)':'';this.style.color=this.style.color==='white'?'':'white'">Mo</button><button style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:white;font-size:10.5px;font-weight:500;cursor:pointer;color:var(--t2);">Tu</button><button style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:white;font-size:10.5px;font-weight:500;cursor:pointer;color:var(--t2);">We</button><button style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:white;font-size:10.5px;font-weight:500;cursor:pointer;color:var(--t2);">Th</button><button style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:white;font-size:10.5px;font-weight:500;cursor:pointer;color:var(--t2);">Fr</button></div></div>
+          <div style="background:var(--amber-bg);border:1px solid var(--amber-light);border-radius:var(--r-md);padding:9px 11px;font-size:11.5px;color:var(--t2);"><strong style="color:var(--amber);">Every Monday at 08:00 IST</strong><div style="font-size:10px;color:var(--t4);margin-top:3px;">Next: Mon Apr 28, 2026</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary" onclick="closePromptEditor()">💾 Save Prompt</button>
+      <button class="tb-btn" onclick="closePromptEditor()">▶ Test Run</button>
+      <button class="tb-btn" onclick="closePromptEditor()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RUN NOW MODAL ═══ -->
+<div class="modal-overlay" id="runNowModal" onclick="if(event.target===this)closeRunNowModal()">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">▶ Run Prompt Now</div>
+      <button class="modal-close" onclick="closeRunNowModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body" id="runModalBody">
+      <!-- State 1: Confirm -->
+      <div class="gen-state active" id="runState1">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6;">Running <strong>Equity Performance Monitor</strong> with Claude Sonnet 4.</div>
+        <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-bottom:14px;">
+          <table class="var-table-sm">
+            <thead><tr><th>Variable</th><th>Value for this run</th></tr></thead>
+            <tbody>
+              <tr><td>{{company_list}}</td><td><input style="border:none;background:transparent;outline:none;font-size:12px;color:var(--t2);width:100%;" value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td></tr>
+              <tr><td>{{date}}</td><td><input style="border:none;background:transparent;outline:none;font-size:12px;color:var(--t2);width:100%;" value="Apr 25, 2026 (today)"/></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:12px;color:var(--t3);">Output will be saved as an HTML Note in <strong style="color:var(--t2);">Equity Research</strong> notebook.</div>
+      </div>
+      <!-- State 2: Generating -->
+      <div class="gen-state" id="runState2">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:12px;">Generating report…</div>
+        <div class="gen-progress-bar"><div class="gen-progress-fill" id="genFill" style="width:0%;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div class="gen-step" id="gs1"><div class="gen-step-icon done">✓</div><div class="gen-step-text done">Sending prompt to Claude Sonnet 4</div></div>
+          <div class="gen-step" id="gs2"><div class="gen-step-icon active" id="gs2ico">⟳</div><div class="gen-step-text" id="gs2txt">Analysing {{company_list}} financial data</div></div>
+          <div class="gen-step" id="gs3"><div class="gen-step-icon pending" id="gs3ico">3</div><div class="gen-step-text pending" id="gs3txt">Generating HTML report</div></div>
+          <div class="gen-step" id="gs4"><div class="gen-step-icon pending" id="gs4ico">4</div><div class="gen-step-text pending" id="gs4txt">Saving to Equity Research notebook</div></div>
+        </div>
+      </div>
+      <!-- State 3: Done -->
+      <div class="gen-state" id="runState3">
+        <div style="text-align:center;padding:8px 0 16px;">
+          <div style="font-size:36px;margin-bottom:10px;">🎉</div>
+          <div style="font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:6px;">HTML Report Generated!</div>
+          <div style="font-size:12.5px;color:var(--t3);">Saved as <strong style="color:var(--p700);">Equity-Apr25-2026.html</strong><br/>in the Equity Research notebook</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="tb-btn primary" style="flex:1;justify-content:center;" onclick="closeRunNowModal()">🔍 Open Note</button>
+          <button class="tb-btn" style="flex:1;justify-content:center;" onclick="closeRunNowModal()">📤 Export HTML</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="runModalFooter">
+      <button class="tb-btn primary" onclick="startGeneration()">▶ Run Now</button>
+      <button class="tb-btn" onclick="closeRunNowModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════ VIEW ════ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+
+/* ════ SETTINGS PANEL ════ */
+function switchSettingsPanel(id, el) {
+  document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('sp-' + id)?.classList.add('active');
+  document.querySelectorAll('.snav-item').forEach(i => i.classList.remove('active'));
+  el?.classList.add('active');
+}
+
+/* ════ SIDEBAR ════ */
+function toggleShelf(id) { document.getElementById(id)?.classList.toggle('open'); }
+function toggleNb(id)    { document.getElementById(id)?.classList.toggle('open'); }
+function selectNote(el, title, type) {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  el?.classList.add('active');
+  if (title) {
+    document.getElementById('paneLeftTitle').textContent = title;
+    document.getElementById('paneLeftHeader').textContent = title;
+  }
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+
+/* ════ SPLIT PANES ════ */
+function setSplit(n, btn) {
+  document.querySelectorAll('.split-btn').forEach((b,i) => b.classList.toggle('active', i === n-1));
+  document.getElementById('pane-right').style.display   = n >= 2 ? '' : 'none';
+  document.getElementById('resizer').style.display      = n >= 2 ? '' : 'none';
+  document.getElementById('pane-third').style.display   = n >= 3 ? '' : 'none';
+  document.getElementById('resizer2').style.display     = n >= 3 ? '' : 'none';
+}
+function syncTitle(el, bcId, hdrId) {
+  el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
+  const v = el.value || 'Untitled';
+  document.getElementById(bcId).textContent = v;
+  document.getElementById(hdrId).textContent = v;
+}
+
+/* ════ BLANK NOTE ════ */
+function createBlankNote() {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  const nb1 = document.querySelector('#nb1 .nb-body');
+  const ni = document.createElement('div');
+  ni.className = 'note-item active';
+  ni.innerHTML = `<div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Now</span></div><div class="ni-title">Untitled</div><div class="ni-prev">Start writing…</div>`;
+  ni.onclick = () => selectNote(ni, 'Untitled', 'Research');
+  nb1.prepend(ni);
+  const t = document.getElementById('leftTitle');
+  t.value = '';
+  document.getElementById('paneLeftTitle').textContent = 'Untitled';
+  document.getElementById('paneLeftHeader').textContent = 'Untitled';
+  document.getElementById('pane-left-body').querySelector('.paper-body-sm').value = '';
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => t.focus(), 50);
+}
+
+/* ════ TEMPLATE USE ════ */
+function useTpl(tplName, type) {
+  createBlankNote();
+  const t = document.getElementById('leftTitle');
+  t.value = '';
+  t.placeholder = tplName + ' — type your title…';
+  // Pre-insert template blocks into left pane body
+  const body = document.getElementById('pane-left-body');
+  // Clear existing blocks then add template-specific ones
+  body.querySelectorAll('.blk-callout, .kd-sm').forEach(b => b.remove());
+  const sep = body.querySelector('.paper-sep');
+
+  if (tplName.includes('Research')) {
+    const h = document.createElement('div');
+    h.className = 'blk-callout hyp';
+    h.innerHTML = '<div class="blk-ico">💡</div><div><div class="blk-lbl">Hypothesis</div><div class="blk-txt" contenteditable="true" style="outline:none;">State your hypothesis here…</div></div>';
+    sep.after(h);
+    const kd = document.createElement('div');
+    kd.className = 'kd-sm';
+    kd.innerHTML = '<div class="kd-sm-hdr"><div class="kd-sm-col-hdr">Option A</div><div class="kd-sm-col-hdr">Option B</div></div><div class="kd-sm-body"><div class="kd-sm-col"><div class="kd-sm-row"><div class="kd-sm-dot"></div>Point 1</div><div class="kd-sm-row"><div class="kd-sm-dot"></div>Point 2</div></div><div class="kd-sm-col"><div class="kd-sm-row"><div class="kd-sm-dot"></div>Point 1</div><div class="kd-sm-row"><div class="kd-sm-dot"></div>Point 2</div></div></div>';
+    h.after(kd);
+  } else if (tplName.includes('Journal')) {
+    const h = document.createElement('div');
+    h.className = 'blk-callout hyp';
+    h.innerHTML = '<div class="blk-ico">✨</div><div><div class="blk-lbl">Intention</div><div class="blk-txt" contenteditable="true" style="outline:none;">What do I want to achieve today?</div></div>';
+    sep.after(h);
+  } else if (tplName.includes('Equity')) {
+    const kd = document.createElement('div');
+    kd.className = 'kd-sm';
+    kd.innerHTML = '<div class="kd-sm-hdr"><div class="kd-sm-col-hdr">M-Score / BRSR</div><div class="kd-sm-col-hdr">ROIC vs WACC</div><div class="kd-sm-col-hdr">Promoter %</div></div><div class="kd-sm-body"><div class="kd-sm-col"><div class="kd-sm-row"><div class="kd-sm-dot"></div>Signal here</div></div><div class="kd-sm-col"><div class="kd-sm-row"><div class="kd-sm-dot"></div>Spread here</div></div><div class="kd-sm-col"><div class="kd-sm-row"><div class="kd-sm-dot"></div>% here</div></div></div>';
+    sep.after(kd);
+  }
+  document.getElementById('paneLeftTitle').textContent = tplName;
+  document.getElementById('paneLeftHeader').textContent = tplName;
+}
+
+/* ════ PROMPT SLIDEOVER ════ */
+const PROMPT_DATA = {
+  equity:       { icon:'📈', title:'Equity Performance Monitor', cat:'Finance · Cron · HTML Report', prompt:'Analyse {{company_list}} for the week ending {{date}}. Generate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus.' },
+  journal:      { icon:'📔', title:'Daily Journal Starter',       cat:'Journal · Cron',               prompt:'Today is {{date}}. Create a journal note: intention for today, top 3 tasks from yesterday, energy check-in (1–5).' },
+  research:     { icon:'🔬', title:'Research Deep Dive',          cat:'Research · Analysis',          prompt:'Analyse this research note: (1) core thesis, (2) key findings, (3) open questions, (4) related work gaps.' },
+  'html-report':{ icon:'📄', title:'Generate HTML Report',        cat:'HTML Notes · AI',              prompt:'Generate a polished HTML report for {{topic}}. Include summary, data table for {{company_list}}, charts using Chart.js.' },
+  'equity-deep':{ icon:'📊', title:'Equity Deep Analysis',        cat:'Finance · Research',           prompt:'Analyse {{company}}: M-Score forensic flags, ROIC/WACC spread, promoter pledge %, SEBI LODR flags.' },
+};
+function openPromptSlideover(id) {
+  const d = PROMPT_DATA[id] || PROMPT_DATA.equity;
+  document.getElementById('psoTitleIcon').textContent = d.icon;
+  document.getElementById('psoTitleText').textContent = d.title;
+  document.getElementById('psoCat').textContent = d.cat;
+  document.getElementById('psoPromptBody').textContent = d.prompt;
+  // mark card
+  document.querySelectorAll('.pc').forEach(c => c.classList.remove('selected'));
+  document.getElementById('pc-' + id)?.classList.add('selected');
+  document.getElementById('promptSlideover').classList.add('open');
+}
+function closePromptSlideover() {
+  document.getElementById('promptSlideover').classList.remove('open');
+  document.querySelectorAll('.pc').forEach(c => c.classList.remove('selected'));
+}
+function selProv(btn) {
+  const p = btn.closest('.pso-provider-row, .ai-provider-row, div');
+  if (!p) return;
+  p.querySelectorAll('.prov-pill').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+/* ════ TEMPLATE PICKER MODAL ════ */
+function openTplPickerModal()  { document.getElementById('tplPickerModal').classList.add('open'); }
+function closeTplPickerModal() { document.getElementById('tplPickerModal').classList.remove('open'); }
+
+/* ════ TEMPLATE FILTER ════ */
+function filterTpl(cat, el) {
+  document.querySelectorAll('.sel-chip').forEach(c => { if(c.onclick?.toString().includes('filterTpl')) c.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('.tpl-card[data-cat]').forEach(c => {
+    c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+  });
+}
+
+/* ════ PROMPT EDITOR MODAL ════ */
+function openPromptEditor(id) {
+  const d = id ? PROMPT_DATA[id] : null;
+  document.getElementById('peTitle').textContent = d ? 'Edit Prompt' : 'New Prompt';
+  document.getElementById('peName').value = d ? d.title : '';
+  document.getElementById('peBody').value = d ? d.prompt : '';
+  document.getElementById('promptEditorModal').classList.add('open');
+}
+function closePromptEditor() { document.getElementById('promptEditorModal').classList.remove('open'); }
+
+/* ════ RUN NOW MODAL ════ */
+let genTimer;
+function openRunNowModal() {
+  document.getElementById('runState1').classList.add('active');
+  document.getElementById('runState2').classList.remove('active');
+  document.getElementById('runState3').classList.remove('active');
+  document.getElementById('runModalFooter').style.display = '';
+  document.getElementById('genFill').style.width = '0%';
+  document.getElementById('runNowModal').classList.add('open');
+}
+function closeRunNowModal() { document.getElementById('runNowModal').classList.remove('open'); clearInterval(genTimer); }
+
+function startGeneration() {
+  document.getElementById('runState1').classList.remove('active');
+  document.getElementById('runState2').classList.add('active');
+  document.getElementById('runModalFooter').style.display = 'none';
+  let prog = 0;
+  const fill = document.getElementById('genFill');
+  const steps = [
+    { id:'gs2ico', txt:'gs2txt', icon:'✓', cls:'done', next:30,  label:'Fetched financial data for 5 companies' },
+    { id:'gs3ico', txt:'gs3txt', icon:'⟳', cls:'active', next:65, label:'Building HTML report…' },
+    { id:'gs4ico', txt:'gs4txt', icon:'✓', cls:'done', next:95, label:'Saving HTML to notebook' },
+  ];
+  let si = 0;
+  genTimer = setInterval(() => {
+    prog = Math.min(prog + (si < steps.length ? 3 : 1), 100);
+    fill.style.width = prog + '%';
+    if (si < steps.length && prog >= [30,65,95][si]) {
+      const s = steps[si];
+      document.getElementById(s.id).textContent = s.icon;
+      document.getElementById(s.id).className = 'gen-step-icon ' + s.cls;
+      document.getElementById(s.txt).textContent = s.label;
+      document.getElementById(s.txt).className = 'gen-step-text ' + (s.cls === 'done' ? 'done' : '');
+      si++;
+    }
+    if (prog >= 100) {
+      clearInterval(genTimer);
+      setTimeout(() => {
+        document.getElementById('runState2').classList.remove('active');
+        document.getElementById('runState3').classList.add('active');
+      }, 400);
+    }
+  }, 60);
+}
+
+/* ════ GRAPH NODE SELECT ════ */
+function selectGraphNode(id) {
+  const titles = { transformer:'Transformer Architecture', rag:'RAG Patterns', bert:'BERT vs GPT', equity:'Indian Equity Framework' };
+  document.getElementById('gipTitle').textContent = titles[id] || 'Note';
+}
+
+/* ════ HTML PREVIEW (mini inline) ════ */
+function openHtmlPreviewMini() { openRunNowModal(); }
+function openHtmlGenModal() { openRunNowModal(); }
+
+/* ════ MISC ════ */
+function toggleChip(c) { c.classList.toggle('active'); }
+function addVarRow() {
+  const tb = document.getElementById('peVarTable');
+  if (!tb) return;
+  const r = document.createElement('tr');
+  r.innerHTML = `<td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;color:var(--p700);font-size:11px;background:var(--p50);"><input style="border:none;background:var(--p50);outline:none;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--p700);width:100%;" placeholder="{{variable}}"/></td><td style="padding:5px 10px;"><input style="border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);width:100%;" placeholder="Value…"/></td><td style="padding:5px 10px;"><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Static</option><option>Auto date</option></select></td>`;
+  tb.appendChild(r);
+}
+function updateCronLabel(sel) {} // visual only
+document.querySelectorAll('.snav-item').forEach(i => i.addEventListener('click', () => {
+  document.querySelectorAll('.snav-item').forEach(x => x.classList.remove('active')); i.classList.add('active');
+}));
+document.querySelectorAll('.pl-f').forEach(f => f.addEventListener('click', () => {
+  document.querySelectorAll('.pl-f').forEach(x => x.classList.remove('active')); f.classList.add('active');
+}));
+// auto-grow title on load
+const pt = document.getElementById('leftTitle');
+if (pt) { pt.style.height='auto'; pt.style.height=pt.scrollHeight+'px'; }
+// countdown tick (visual)
+setInterval(() => {
+  const m = document.getElementById('cdMins');
+  if (!m) return;
+  let v = parseInt(m.textContent) - 1;
+  if (v < 0) { v = 59; const h = document.getElementById('cdHours'); h.textContent = Math.max(0, parseInt(h.textContent)-1); }
+  m.textContent = v < 10 ? '0'+v : v;
+}, 60000);
+</script>
+</body>
+</html>

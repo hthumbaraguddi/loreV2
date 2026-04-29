@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lore — Your AI-Powered Knowledge Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --p50:  #F5F3FF;
+  --p100: #EDE9FE;
+  --p200: #DDD6FE;
+  --p300: #C4B5FD;
+  --p400: #A78BFA;
+  --p500: #8B5CF6;
+  --p600: #7C3AED;
+  --p700: #6D28D9;
+  --p900: #2E1065;
+
+  --bg:      #F8F7FC;
+  --surface: #FFFFFF;
+  --surface2: #FAFAF9;
+  --border:  rgba(109,40,217,0.1);
+  --border2: rgba(109,40,217,0.18);
+
+  --t1: #1A1529;
+  --t2: #4B4568;
+  --t3: #8C84A8;
+  --t4: #BCB6D4;
+
+  --amber: #D97706; --amber-bg: #FFFBEB;
+  --teal:  #0F766E; --teal-bg:  #F0FDFA;
+  --rose:  #BE185D; --rose-bg:  #FFF1F2;
+  --blue:  #1D4ED8; --blue-bg:  #EFF6FF;
+  --green: #15803D; --green-bg: #F0FDF4;
+
+  --sidebar-nav-w: 56px;
+  --sidebar-list-w: 260px;
+  --note-editor-min: 520px;
+  --toolbar-h: 48px;
+
+  --radius-sm: 5px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 1px 3px rgba(109,40,217,0.06), 0 4px 16px rgba(109,40,217,0.05);
+  --shadow-float: 0 8px 32px rgba(109,40,217,0.15), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--t1);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+}
+
+/* ─── scrollbars ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--p200); border-radius: 3px; }
+
+/* ══════════════════════════════════════════
+   NAV RAIL (left icon strip)
+══════════════════════════════════════════ */
+.nav-rail {
+  width: var(--sidebar-nav-w);
+  background: var(--p900);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 16px;
+  gap: 4px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+.nav-logo {
+  width: 34px; height: 34px;
+  background: var(--p600);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Lora', serif;
+  font-size: 16px; font-weight: 600;
+  color: white;
+  margin-bottom: 16px;
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.3);
+}
+.nav-spacer { flex: 1; }
+.nav-btn {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: rgba(255,255,255,0.45);
+  transition: all 0.15s;
+  position: relative;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+.nav-btn.active { background: var(--p600); color: white; }
+.nav-btn svg { width: 18px; height: 18px; }
+.nav-tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--t1);
+  color: white;
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+.nav-btn:hover .nav-tooltip { opacity: 1; }
+.nav-divider { width: 28px; height: 1px; background: rgba(255,255,255,0.08); margin: 6px 0; }
+.nav-user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--p400), var(--p700));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: white;
+  cursor: pointer; margin-top: 8px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR PANEL (note list / section list)
+══════════════════════════════════════════ */
+.sidebar-panel {
+  width: var(--sidebar-list-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 10px;
+}
+.search-box {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--p50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+}
+.search-box input {
+  border: none; background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--t1);
+  width: 100%; outline: none;
+}
+.search-box input::placeholder { color: var(--t4); }
+.search-box svg { color: var(--t4); flex-shrink: 0; width: 13px; height: 13px; }
+
+.sidebar-note-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+
+.sidebar-section-label {
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--t4); font-family: 'JetBrains Mono', monospace;
+  padding: 10px 16px 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.sidebar-section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.note-list-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  margin: 1px 6px;
+  transition: background 0.12s;
+  border-left: 2px solid transparent;
+}
+.note-list-item:hover { background: var(--p50); }
+.note-list-item.active {
+  background: var(--p50);
+  border-left-color: var(--p600);
+}
+.nli-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.nli-badge {
+  font-size: 9px; font-weight: 600;
+  padding: 2px 6px; border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.badge-research  { background: var(--teal-bg);  color: var(--teal);  }
+.badge-journal   { background: var(--amber-bg); color: var(--amber); }
+.badge-task      { background: var(--blue-bg);  color: var(--blue);  }
+.badge-idea      { background: var(--rose-bg);  color: var(--rose);  }
+.badge-reference { background: var(--p100);     color: var(--p700);  }
+.nli-title {
+  font-size: 13px; font-weight: 500; color: var(--t1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1;
+}
+.nli-date { font-size: 10px; color: var(--t4); font-family: 'JetBrains Mono', monospace; }
+.nli-preview { font-size: 11.5px; color: var(--t3); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.sidebar-new-btn {
+  margin: 10px 8px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px;
+  border: 1px dashed var(--p300);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--p600); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.sidebar-new-btn:hover { background: var(--p50); border-style: solid; }
+
+/* ══════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ─── VIEW MANAGER ─── */
+.view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.view.active { display: flex; }
+
+/* ══════════════════════════════════════════
+   NOTE EDITOR VIEW
+══════════════════════════════════════════ */
+.note-toolbar {
+  height: var(--toolbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 20px; flex-shrink: 0;
+}
+.nt-breadcrumb { font-size: 12.5px; color: var(--t3); display: flex; align-items: center; gap: 5px; }
+.nt-breadcrumb .sep { opacity: 0.5; }
+.nt-breadcrumb .cur { color: var(--t2); font-weight: 500; }
+.nt-spacer { flex: 1; }
+.nt-btn {
+  height: 28px; padding: 0 10px;
+  border-radius: var(--radius-md); border: 1px solid var(--border2);
+  background: transparent; color: var(--t2); font-size: 12px;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  display: flex; align-items: center; gap: 5px; transition: 0.12s;
+}
+.nt-btn:hover { background: var(--p50); }
+.nt-btn.primary {
+  background: var(--p600); border-color: var(--p600);
+  color: white; font-weight: 500;
+}
+.nt-btn.primary:hover { background: var(--p700); }
+.ai-pill {
+  height: 26px; padding: 0 10px;
+  border-radius: 20px; border: 1px solid var(--p300);
+  background: var(--p50); color: var(--p700);
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 5px; cursor: pointer;
+}
+.ai-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--p500); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+.note-editor-area {
+  flex: 1; display: flex; flex-direction: row; overflow: hidden;
+}
+
+.note-editor-main {
+  flex: 1; overflow-y: auto; padding: 36px 48px;
+}
+
+.note-type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.note-type-select {
+  appearance: none;
+  border: 1px solid var(--border2); border-radius: var(--radius-md);
+  background: var(--surface); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; color: var(--t2); padding: 4px 10px; cursor: pointer; outline: none;
+}
+.status-select {
+  appearance: none; border: 1px solid var(--border2); border-radius: 20px;
+  background: var(--p50); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--p700); padding: 3px 10px; cursor: pointer; outline: none;
+}
+
+.note-title-input {
+  width: 100%; border: none; background: transparent; outline: none;
+  font-family: 'Lora', serif; font-size: 28px; font-weight: 600;
+  color: var(--t1); line-height: 1.3; margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.note-title-input::placeholder { color: var(--t4); }
+
+.note-meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.meta-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--p50); border: 1px solid var(--border);
+  font-size: 11px; color: var(--p700);
+  font-family: 'JetBrains Mono', monospace; cursor: pointer;
+}
+.meta-chip:hover { background: var(--p100); }
+
+.editor-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 20px; }
+
+/* ─── Callout blocks ─── */
+.callout {
+  border-left: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 12px 14px; margin-bottom: 16px; display: flex; gap: 10px;
+}
+.callout.hyp  { background: #FFFBF0; border-color: var(--amber); }
+.callout.con  { background: #F0FDF9; border-color: var(--teal);  }
+.callout.note { background: var(--p50); border-color: var(--p400); }
+.callout-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.callout-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+.callout.hyp  .callout-lbl { color: var(--amber); }
+.callout.con  .callout-lbl { color: var(--teal);  }
+.callout.note .callout-lbl { color: var(--p600);  }
+.callout-text { font-size: 13.5px; line-height: 1.65; color: var(--t2); font-family: 'Lora', serif; font-style: italic; }
+
+/* ─── Editable content ─── */
+.note-content-area {
+  font-size: 14.5px; line-height: 1.75; color: var(--t2);
+  outline: none; min-height: 200px; position: relative;
+}
+.note-content-area p { margin-bottom: 10px; }
+
+/* ─── @mention chip in text ─── */
+.ai-mention {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--p100); color: var(--p700);
+  border-radius: 4px; padding: 1px 6px;
+  font-size: 12.5px; font-family: 'JetBrains Mono', monospace;
+  font-weight: 500; cursor: default;
+}
+.ai-response-block {
+  background: var(--p50); border: 1px solid var(--p200);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  margin: 12px 0; position: relative;
+}
+.ai-response-header {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.ai-response-logo {
+  width: 18px; height: 18px; border-radius: 4px;
+  background: var(--p600); display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: white; font-family: 'Lora', serif;
+}
+.ai-response-name { font-size: 11px; font-weight: 600; color: var(--p700); font-family: 'JetBrains Mono', monospace; }
+.ai-response-text { font-size: 13.5px; color: var(--t2); line-height: 1.65; }
+.ai-response-footer { margin-top: 8px; display: flex; gap: 6px; }
+.ai-resp-btn {
+  font-size: 11px; color: var(--t3); border: 1px solid var(--border2);
+  background: white; border-radius: 5px; padding: 3px 8px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.ai-resp-btn:hover { color: var(--p600); border-color: var(--p300); }
+
+/* ─── @mention dropdown ─── */
+.mention-dropdown {
+  position: absolute; z-index: 200;
+  background: white; border: 1px solid var(--border2);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-float);
+  width: 220px; overflow: hidden;
+  display: none;
+}
+.mention-dropdown.open { display: block; }
+.mention-dd-header {
+  padding: 8px 12px 6px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--t3);
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 1px solid var(--border);
+}
+.mention-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 12px; cursor: pointer; transition: background 0.1s;
+}
+.mention-item:hover { background: var(--p50); }
+.mention-item-logo {
+  width: 22px; height: 22px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.mention-item-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+.mention-item-desc { font-size: 11px; color: var(--t3); }
+.mention-item-connected { margin-left: auto; font-size: 9px; font-family: 'JetBrains Mono', monospace; padding: 2px 5px; border-radius: 3px; background: var(--green-bg); color: var(--green); }
+
+/* ─── Right panel: note context ─── */
+.note-context-panel {
+  width: 240px; border-left: 1px solid var(--border);
+  background: var(--surface2);
+  padding: 20px 16px; overflow-y: auto; flex-shrink: 0;
+}
+.cp-section { margin-bottom: 20px; }
+.cp-label {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--t4);
+  font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;
+}
+.cp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.cp-tag {
+  font-size: 10.5px; padding: 2px 8px; border-radius: 20px;
+  background: var(--p100); color: var(--p700); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid var(--p200);
+}
+.cp-tag:hover { background: var(--p200); }
+.cp-linked-note {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 6px 8px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: white;
+  cursor: pointer; margin-bottom: 5px; transition: 0.12s;
+}
+.cp-linked-note:hover { border-color: var(--p300); }
+.cp-linked-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.cp-linked-text { font-size: 11.5px; color: var(--t2); line-height: 1.4; }
+.cp-ai-used {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px; border-radius: 6px;
+  background: var(--p50); border: 1px solid var(--p200);
+  margin-bottom: 4px;
+}
+.cp-ai-icon { width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white; }
+.cp-ai-name { font-size: 11px; color: var(--p700); font-family: 'JetBrains Mono', monospace; }
+.cp-ai-count { margin-left: auto; font-size: 10px; color: var(--t4); }
+
+/* ══════════════════════════════════════════
+   SETTINGS VIEW
+══════════════════════════════════════════ */
+.settings-layout {
+  flex: 1; display: flex; overflow: hidden;
+}
+.settings-sidebar {
+  width: 200px; border-right: 1px solid var(--border);
+  background: var(--surface); padding: 20px 0; flex-shrink: 0;
+}
+.settings-nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 18px; cursor: pointer; font-size: 13px; color: var(--t2);
+  border-left: 2px solid transparent; transition: 0.12s;
+}
+.settings-nav-item:hover { background: var(--p50); color: var(--t1); }
+.settings-nav-item.active { background: var(--p50); color: var(--p700); border-left-color: var(--p600); font-weight: 500; }
+.settings-nav-item svg { width: 15px; height: 15px; opacity: 0.7; }
+.settings-content { flex: 1; overflow-y: auto; padding: 32px 40px; }
+.settings-section { margin-bottom: 36px; }
+.settings-section-title {
+  font-size: 16px; font-weight: 600; color: var(--t1);
+  margin-bottom: 4px; font-family: 'Lora', serif;
+}
+.settings-section-desc { font-size: 13px; color: var(--t3); margin-bottom: 20px; }
+.settings-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.api-key-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.api-key-row:last-child { margin-bottom: 0; }
+.api-provider-logo {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.api-key-info { flex: 1; min-width: 0; }
+.api-key-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+.api-key-status { font-size: 11px; color: var(--t3); font-family: 'JetBrains Mono', monospace; }
+.api-key-input {
+  flex: 2; border: 1px solid var(--border2); border-radius: var(--radius-md);
+  padding: 7px 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--t2); background: var(--p50); outline: none;
+}
+.api-key-input:focus { border-color: var(--p400); background: white; }
+.api-key-input::placeholder { color: var(--t4); }
+.api-connect-btn {
+  padding: 6px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--p300); background: var(--p50);
+  color: var(--p700); font-size: 12px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: 0.12s;
+  white-space: nowrap;
+}
+.api-connect-btn:hover { background: var(--p100); }
+.api-connect-btn.connected { background: var(--green-bg); border-color: #86EFAC; color: var(--green); }
+
+.settings-toggle-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.settings-toggle-row:last-child { border-bottom: none; }
+.toggle-info { flex: 1; }
+.toggle-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+.toggle-desc { font-size: 11.5px; color: var(--t3); margin-top: 2px; }
+.toggle-switch {
+  width: 36px; height: 20px; background: var(--t4);
+  border-radius: 20px; position: relative; cursor: pointer;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.toggle-switch.on { background: var(--p600); }
+.toggle-switch::after {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; border-radius: 50%; background: white;
+  top: 2px; left: 2px; transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.on::after { left: 18px; }
+
+.model-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.model-card {
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 12px 14px; cursor: pointer; transition: 0.15s;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.model-card:hover { border-color: var(--p300); background: var(--p50); }
+.model-card.selected { border-color: var(--p500); background: var(--p50); }
+.model-card-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--border2); flex-shrink: 0; margin-top: 2px;
+  transition: 0.15s;
+}
+.model-card.selected .model-card-dot { background: var(--p600); border-color: var(--p600); }
+.model-name { font-size: 12.5px; font-weight: 500; color: var(--t1); }
+.model-desc { font-size: 11px; color: var(--t3); margin-top: 2px; }
+
+/* ══════════════════════════════════════════
+   PROMPT LIBRARY
+══════════════════════════════════════════ */
+.prompt-library { flex: 1; overflow-y: auto; padding: 28px 32px; }
+.pl-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.pl-title { font-family: 'Lora', serif; font-size: 22px; font-weight: 600; color: var(--t1); }
+.pl-subtitle { font-size: 13px; color: var(--t3); margin-top: 2px; }
+.pl-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.pl-filter {
+  padding: 5px 14px; border-radius: 20px;
+  border: 1px solid var(--border2); background: white;
+  font-size: 12px; color: var(--t2); cursor: pointer; transition: 0.12s;
+}
+.pl-filter:hover, .pl-filter.active { background: var(--p600); border-color: var(--p600); color: white; }
+.pl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.prompt-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px;
+  cursor: pointer; transition: 0.15s; box-shadow: var(--shadow-card);
+}
+.prompt-card:hover { border-color: var(--p300); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(109,40,217,0.1); }
+.pc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.pc-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.pc-name { font-size: 13.5px; font-weight: 600; color: var(--t1); line-height: 1.3; }
+.pc-category { font-size: 10.5px; color: var(--t3); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.pc-desc { font-size: 12.5px; color: var(--t2); line-height: 1.55; margin-bottom: 12px; }
+.pc-preview {
+  background: var(--p50); border: 1px solid var(--p200); border-radius: 6px;
+  padding: 8px 10px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace;
+  color: var(--p700); line-height: 1.5; margin-bottom: 12px;
+}
+.pc-footer { display: flex; align-items: center; gap: 8px; }
+.pc-uses { font-size: 11px; color: var(--t3); }
+.pc-ai-badges { display: flex; gap: 4px; margin-left: auto; }
+.pc-ai-badge {
+  width: 18px; height: 18px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700; color: white;
+}
+.pc-use-btn {
+  padding: 4px 12px; border-radius: 6px;
+  background: var(--p600); border: none; color: white;
+  font-size: 11.5px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: 0.12s;
+}
+.pc-use-btn:hover { background: var(--p700); }
+
+/* ══════════════════════════════════════════
+   KNOWLEDGE GRAPH
+══════════════════════════════════════════ */
+.graph-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.graph-toolbar {
+  height: var(--toolbar-h); background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 10px; flex-shrink: 0;
+}
+.graph-title { font-size: 14px; font-weight: 600; color: var(--t1); font-family: 'Lora', serif; }
+.graph-subtitle { font-size: 12px; color: var(--t3); }
+.graph-main { flex: 1; display: flex; overflow: hidden; }
+.graph-canvas { flex: 1; position: relative; background: var(--bg); overflow: hidden; }
+#knowledgeGraph { width: 100%; height: 100%; }
+.graph-legend {
+  position: absolute; bottom: 20px; left: 20px;
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 14px;
+  box-shadow: var(--shadow-card);
+}
+.legend-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--t2); margin-bottom: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.graph-info-panel {
+  width: 260px; border-left: 1px solid var(--border);
+  background: var(--surface); padding: 20px; overflow-y: auto; flex-shrink: 0;
+}
+.gip-title { font-size: 15px; font-weight: 600; color: var(--t1); font-family: 'Lora', serif; margin-bottom: 4px; }
+.gip-badge { display: inline-flex; align-items: center; margin-bottom: 12px; }
+.gip-stat { display: flex; gap: 16px; margin-bottom: 16px; }
+.gip-stat-item { text-align: center; }
+.gip-stat-num { font-size: 20px; font-weight: 600; color: var(--p600); font-family: 'Lora', serif; }
+.gip-stat-lbl { font-size: 10px; color: var(--t3); font-family: 'JetBrains Mono', monospace; }
+.gip-connected { margin-top: 4px; }
+.gip-conn-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.gip-conn-item:last-child { border-bottom: none; }
+.gip-conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.gip-conn-name { font-size: 12px; color: var(--t2); flex: 1; }
+.gip-conn-strength { font-size: 10px; color: var(--t4); font-family: 'JetBrains Mono', monospace; }
+
+/* ══════════════════════════════════════════
+   MISC UTILITIES
+══════════════════════════════════════════ */
+.view-header-bar {
+  height: var(--toolbar-h); background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 10px; flex-shrink: 0;
+}
+.view-header-title { font-size: 15px; font-weight: 600; color: var(--t1); font-family: 'Lora', serif; }
+.inline-code { font-family: 'JetBrains Mono', monospace; background: var(--p100); color: var(--p700); padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+
+/* Findings grid */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.findings-box { background: var(--p50); border-radius: var(--radius-md); border: 1px solid var(--p200); padding: 14px; }
+.findings-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); font-family: 'JetBrains Mono', monospace; margin-bottom: 9px; }
+.finding-row { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--t2); padding: 5px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+.finding-row:last-child { border-bottom: none; }
+.finding-num { width: 17px; height: 17px; border-radius: 50%; background: white; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-family: 'JetBrains Mono', monospace; color: var(--t3); flex-shrink: 0; margin-top: 1px; }
+.refs-box { background: #F8F6FF; border-radius: var(--radius-md); border: 1px solid #DDD6FE; padding: 14px; }
+.ref-link { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; color: var(--p700); text-decoration: none; padding: 5px 0; border-bottom: 1px solid #E9E4FD; line-height: 1.4; }
+.ref-link:last-child { border-bottom: none; }
+.ref-link:hover { color: var(--p900); }
+
+.prose-p { font-size: 14px; line-height: 1.75; color: var(--t2); margin-bottom: 14px; }
+.section-mini-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t4); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; margin-top: 16px; }
+.note-tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }
+.note-tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: var(--p100); color: var(--p700); font-family: 'JetBrains Mono', monospace; cursor: pointer; }
+.note-tag:hover { background: var(--p200); }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV RAIL ══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+
+  <button class="nav-btn active" onclick="switchView('notes', this)" title="">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tooltip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts', this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/><path d="M7 17.5A7 7 0 0013.5 3"/></svg>
+    <span class="nav-tooltip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph', this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tooltip">Knowledge Graph</span>
+  </button>
+
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="switchView('settings', this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tooltip">Settings</span>
+  </button>
+
+  <div class="nav-spacer"></div>
+  <div class="nav-user-avatar">H</div>
+</nav>
+
+<!-- ══ SIDEBAR PANEL (Notes list) ══ -->
+<div class="sidebar-panel" id="sidebarPanel">
+  <div class="sidebar-header">
+    <div class="sidebar-title">My Notes</div>
+    <div class="search-box">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <input type="text" placeholder="Search notes…" />
+    </div>
+  </div>
+  <div class="sidebar-note-list">
+    <div class="sidebar-section-label">Research</div>
+    <div class="note-list-item active" onclick="switchNote('transformer')">
+      <div class="nli-top">
+        <span class="nli-badge badge-research">Research</span>
+        <span class="nli-date">Mar 16</span>
+      </div>
+      <div class="nli-title">Transformer Architecture Deep Dive</div>
+      <div class="nli-preview">Attention mechanisms, positional encodings, multi-head attention analysis.</div>
+    </div>
+    <div class="note-list-item" onclick="switchNote('rag')">
+      <div class="nli-top">
+        <span class="nli-badge badge-research">Research</span>
+        <span class="nli-date">Mar 20</span>
+      </div>
+      <div class="nli-title">RAG Architecture Patterns</div>
+      <div class="nli-preview">Hybrid retrieval, chunking strategies, re-ranking with cross-encoders.</div>
+    </div>
+
+    <div class="sidebar-section-label">Journal</div>
+    <div class="note-list-item" onclick="switchNote('journal')">
+      <div class="nli-top">
+        <span class="nli-badge badge-journal">Journal</span>
+        <span class="nli-date">Mar 16</span>
+      </div>
+      <div class="nli-title">Monday — Deep Work Session</div>
+      <div class="nli-preview">Shipped Lore demo data and deployed to Azure. Energy 4/5.</div>
+    </div>
+
+    <div class="sidebar-section-label">Tasks</div>
+    <div class="note-list-item" onclick="switchNote('task')">
+      <div class="nli-top">
+        <span class="nli-badge badge-task">Task</span>
+        <span class="nli-date">Apr 1</span>
+      </div>
+      <div class="nli-title">36-Week AI Roadmap Milestones</div>
+      <div class="nli-preview">Math foundations → classical ML → LLM engineering → deployment.</div>
+    </div>
+
+    <div class="sidebar-section-label">Ideas</div>
+    <div class="note-list-item" onclick="switchNote('idea')">
+      <div class="nli-top">
+        <span class="nli-badge badge-idea">Idea</span>
+        <span class="nli-date">Apr 5</span>
+      </div>
+      <div class="nli-title">Linear Algebra Book — Chapter Structure</div>
+      <div class="nli-preview">Story → Math → Python → Manim animation per chapter.</div>
+    </div>
+
+    <div class="sidebar-section-label">Reference</div>
+    <div class="note-list-item" onclick="switchNote('ref')">
+      <div class="nli-top">
+        <span class="nli-badge badge-reference">Reference</span>
+        <span class="nli-date">Feb 10</span>
+      </div>
+      <div class="nli-title">Indian Equity Research Framework</div>
+      <div class="nli-preview">BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC signals.</div>
+    </div>
+  </div>
+  <button class="sidebar-new-btn">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg>
+    New Note
+  </button>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ══════════ VIEW: NOTES ══════════ -->
+  <div class="view active" id="view-notes">
+    <div class="note-toolbar">
+      <div class="nt-breadcrumb">
+        <span>Research</span><span class="sep">›</span><span class="cur">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="nt-spacer"></div>
+      <div class="ai-pill" onclick="openMentionFromToolbar()">
+        <div class="ai-pill-dot"></div>
+        Ask AI
+      </div>
+      <button class="nt-btn">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l4-4 3 3 5-6"/></svg>
+        Structured
+      </button>
+      <button class="nt-btn primary">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>
+        Edit
+      </button>
+    </div>
+
+    <div class="note-editor-area">
+      <!-- Main editor -->
+      <div class="note-editor-main">
+        <div class="note-type-row">
+          <select class="note-type-select">
+            <option>Research</option>
+            <option>Journal</option>
+            <option>Task</option>
+            <option>Idea</option>
+            <option>Reference</option>
+          </select>
+          <select class="status-select">
+            <option>In Progress</option>
+            <option>Done</option>
+            <option>Draft</option>
+          </select>
+        </div>
+
+        <input class="note-title-input" type="text" value="Transformer Architecture Deep Dive" />
+
+        <div class="note-meta-chips">
+          <div class="meta-chip">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3V2M11 3V2"/></svg>
+            Machine Learning
+          </div>
+          <div class="meta-chip">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>
+            Mar 16, 2026
+          </div>
+          <div class="meta-chip" style="background:var(--green-bg);border-color:#86EFAC;color:var(--green);">
+            + Add field
+          </div>
+        </div>
+
+        <hr class="editor-divider" />
+
+        <div class="callout hyp">
+          <div class="callout-icon">💡</div>
+          <div>
+            <div class="callout-lbl">Hypothesis</div>
+            <div class="callout-text">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</div>
+          </div>
+        </div>
+
+        <div class="section-mini-lbl">Methodology</div>
+        <p class="prose-p">Literature review of "Attention Is All You Need" (Vaswani et al., 2017) and follow-up papers. Implemented a mini transformer on a toy dataset to validate the core claims.</p>
+
+        <div class="two-col">
+          <div class="findings-box">
+            <div class="findings-label">Key Findings</div>
+            <div class="finding-row"><span class="finding-num">1</span><span>Self-attention scales quadratically with sequence length — a key bottleneck.</span></div>
+            <div class="finding-row"><span class="finding-num">2</span><span>Positional encodings are critical; learned vs sinusoidal perform similarly.</span></div>
+            <div class="finding-row"><span class="finding-num">3</span><span>Multi-head attention allows attending to different representation subspaces.</span></div>
+          </div>
+          <div class="refs-box">
+            <div class="findings-label" style="color:var(--p600);">References</div>
+            <a class="ref-link" href="#">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>
+              Attention Is All You Need — Vaswani et al.
+            </a>
+            <a class="ref-link" href="#">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>
+              The Illustrated Transformer — Jay Alammar
+            </a>
+          </div>
+        </div>
+
+        <!-- AI mention example inline -->
+        <div class="section-mini-lbl" style="margin-top:8px;">AI Insights</div>
+        <p class="prose-p">
+          <span class="ai-mention">@claude</span> What are the main architectural differences between encoder-only and decoder-only transformer variants?
+        </p>
+        <div class="ai-response-block">
+          <div class="ai-response-header">
+            <div class="ai-response-logo">C</div>
+            <span class="ai-response-name">Claude · Sonnet 4</span>
+            <span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">just now</span>
+          </div>
+          <div class="ai-response-text">
+            Encoder-only models (BERT, RoBERTa) use bidirectional attention — each token attends to all others — making them ideal for classification and embedding tasks. Decoder-only models (GPT family) use causal/autoregressive attention where tokens only attend to prior tokens, optimized for generation. Encoder-decoder (T5, BART) combines both: the encoder processes input bidirectionally and the decoder generates output attending to encoder states via cross-attention.
+          </div>
+          <div class="ai-response-footer">
+            <button class="ai-resp-btn">📋 Copy</button>
+            <button class="ai-resp-btn">📝 Save as note</button>
+            <button class="ai-resp-btn">🔗 Link to graph</button>
+          </div>
+        </div>
+
+        <div class="callout con" style="margin-top:16px;">
+          <div class="callout-icon">🎯</div>
+          <div>
+            <div class="callout-lbl">Conclusion</div>
+            <div class="callout-text">Transformers are now the dominant architecture for NLP and increasingly vision tasks. Worth investing deep time in understanding the internals before moving to fine-tuning.</div>
+          </div>
+        </div>
+
+        <!-- Editable area for typing -->
+        <div class="section-mini-lbl">Your notes</div>
+        <div id="editorArea" class="note-content-area" contenteditable="true"
+          data-placeholder="Start typing… use @ to mention an AI model">
+          <p>Continue your research notes here. Type <strong style="color:var(--p600);">@</strong> to invoke an AI model inline.</p>
+        </div>
+
+        <!-- @mention dropdown -->
+        <div class="mention-dropdown" id="mentionDropdown">
+          <div class="mention-dd-header">Ask AI — choose a model</div>
+          <div class="mention-item" onclick="insertMention('Claude')">
+            <div class="mention-item-logo" style="background:var(--p600);">C</div>
+            <div>
+              <div class="mention-item-name">Claude</div>
+              <div class="mention-item-desc">Anthropic · Sonnet 4</div>
+            </div>
+            <span class="mention-item-connected">Connected</span>
+          </div>
+          <div class="mention-item" onclick="insertMention('ChatGPT')">
+            <div class="mention-item-logo" style="background:#10A37F;">G</div>
+            <div>
+              <div class="mention-item-name">ChatGPT</div>
+              <div class="mention-item-desc">OpenAI · GPT-4o</div>
+            </div>
+            <span class="mention-item-connected">Connected</span>
+          </div>
+          <div class="mention-item" onclick="insertMention('Gemini')">
+            <div class="mention-item-logo" style="background:#4285F4;">G</div>
+            <div>
+              <div class="mention-item-name">Gemini</div>
+              <div class="mention-item-desc">Google · 1.5 Pro</div>
+            </div>
+          </div>
+          <div class="mention-item" onclick="insertMention('Groq')">
+            <div class="mention-item-logo" style="background:#F55036;">Q</div>
+            <div>
+              <div class="mention-item-name">Groq</div>
+              <div class="mention-item-desc">Groq · Llama 3 70B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note-tags-row">
+          <span class="note-tag">transformers</span>
+          <span class="note-tag">attention</span>
+          <span class="note-tag">NLP</span>
+          <span class="note-tag">deep-learning</span>
+          <span class="note-tag" style="background:white;border:1px dashed var(--p300);color:var(--p600);">+ tag</span>
+        </div>
+      </div>
+
+      <!-- Right context panel -->
+      <div class="note-context-panel">
+        <div class="cp-section">
+          <div class="cp-label">Tags</div>
+          <div class="cp-tags">
+            <span class="cp-tag">transformers</span>
+            <span class="cp-tag">attention</span>
+            <span class="cp-tag">NLP</span>
+            <span class="cp-tag">deep-learning</span>
+          </div>
+        </div>
+
+        <div class="cp-section">
+          <div class="cp-label">AI Models Used</div>
+          <div class="cp-ai-used">
+            <div class="cp-ai-icon" style="background:var(--p600);">C</div>
+            <span class="cp-ai-name">Claude</span>
+            <span class="cp-ai-count">3 exchanges</span>
+          </div>
+          <div class="cp-ai-used">
+            <div class="cp-ai-icon" style="background:#10A37F;">G</div>
+            <span class="cp-ai-name">ChatGPT</span>
+            <span class="cp-ai-count">1 exchange</span>
+          </div>
+        </div>
+
+        <div class="cp-section">
+          <div class="cp-label">Linked Notes</div>
+          <div class="cp-linked-note">
+            <div class="cp-linked-dot" style="background:var(--teal);"></div>
+            <div class="cp-linked-text">RAG Architecture Patterns</div>
+          </div>
+          <div class="cp-linked-note">
+            <div class="cp-linked-dot" style="background:var(--p500);"></div>
+            <div class="cp-linked-text">36-Week AI Roadmap</div>
+          </div>
+          <div class="cp-linked-note">
+            <div class="cp-linked-dot" style="background:var(--amber);"></div>
+            <div class="cp-linked-text">Monday Deep Work Session</div>
+          </div>
+        </div>
+
+        <div class="cp-section">
+          <div class="cp-label">Note Stats</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:600;color:var(--p600);font-family:'Lora',serif;">847</div>
+              <div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;">words</div>
+            </div>
+            <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:600;color:var(--p600);font-family:'Lora',serif;">4</div>
+              <div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;">AI calls</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-section">
+          <div class="cp-label">Prompt Used</div>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--p700);font-family:'JetBrains Mono',monospace;line-height:1.5;">
+            Research Deep Dive · Summarize key architectural insights and tradeoffs
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ VIEW: SETTINGS ══════════ -->
+  <div class="view" id="view-settings">
+    <div class="view-header-bar">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+      <span class="view-header-title">Settings</span>
+      <div style="flex:1;"></div>
+      <button class="nt-btn primary">Save Changes</button>
+    </div>
+    <div class="settings-layout">
+      <div class="settings-sidebar">
+        <div class="settings-nav-item active">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h3"/></svg>
+          AI Providers
+        </div>
+        <div class="settings-nav-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+          Profile
+        </div>
+        <div class="settings-nav-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6"/></svg>
+          Appearance
+        </div>
+        <div class="settings-nav-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4.22 4.22l2.12 2.12M9.66 9.66l2.12 2.12M4.22 11.78l2.12-2.12M9.66 6.34l2.12-2.12"/></svg>
+          AI Behaviour
+        </div>
+        <div class="settings-nav-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/></svg>
+          Sync & Export
+        </div>
+        <div class="settings-nav-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 5h4M6 8h4M6 11h2"/></svg>
+          Templates
+        </div>
+      </div>
+      <div class="settings-content">
+
+        <!-- API Keys Section -->
+        <div class="settings-section">
+          <div class="settings-section-title">AI Provider API Keys</div>
+          <div class="settings-section-desc">Your keys are stored locally and never sent to Lore's servers. Each key enables @mention for that model in notes.</div>
+          <div class="settings-card">
+            <div class="api-key-row">
+              <div class="api-provider-logo" style="background:var(--p600);">C</div>
+              <div class="api-key-info">
+                <div class="api-key-name">Anthropic · Claude</div>
+                <div class="api-key-status">claude-sonnet-4 · Connected ✓</div>
+              </div>
+              <input class="api-key-input" type="password" value="sk-ant-••••••••••••••••••••••••" style="flex:2;" />
+              <button class="api-connect-btn connected">Connected</button>
+            </div>
+            <div class="api-key-row">
+              <div class="api-provider-logo" style="background:#10A37F;">G</div>
+              <div class="api-key-info">
+                <div class="api-key-name">OpenAI · ChatGPT</div>
+                <div class="api-key-status">gpt-4o · Connected ✓</div>
+              </div>
+              <input class="api-key-input" type="password" value="sk-••••••••••••••••••••••••••••" style="flex:2;" />
+              <button class="api-connect-btn connected">Connected</button>
+            </div>
+            <div class="api-key-row">
+              <div class="api-provider-logo" style="background:#4285F4;">G</div>
+              <div class="api-key-info">
+                <div class="api-key-name">Google · Gemini</div>
+                <div class="api-key-status">Not configured</div>
+              </div>
+              <input class="api-key-input" type="text" placeholder="AIza••••••••••••••••••••••" style="flex:2;" />
+              <button class="api-connect-btn">Connect</button>
+            </div>
+            <div class="api-key-row">
+              <div class="api-provider-logo" style="background:#F55036;">Q</div>
+              <div class="api-key-info">
+                <div class="api-key-name">Groq · Llama 3</div>
+                <div class="api-key-status">Not configured</div>
+              </div>
+              <input class="api-key-input" type="text" placeholder="gsk_••••••••••••••••••••••" style="flex:2;" />
+              <button class="api-connect-btn">Connect</button>
+            </div>
+            <div class="api-key-row">
+              <div class="api-provider-logo" style="background:#1A1A2E;">O</div>
+              <div class="api-key-info">
+                <div class="api-key-name">OpenRouter</div>
+                <div class="api-key-status">Access 50+ models</div>
+              </div>
+              <input class="api-key-input" type="text" placeholder="sk-or-••••••••••••••••••" style="flex:2;" />
+              <button class="api-connect-btn">Connect</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Default Model -->
+        <div class="settings-section">
+          <div class="settings-section-title">Default Model</div>
+          <div class="settings-section-desc">Used when you invoke @ai without specifying a provider.</div>
+          <div class="model-select-grid">
+            <div class="model-card selected">
+              <div class="model-card-dot"></div>
+              <div>
+                <div class="model-name">Claude Sonnet 4</div>
+                <div class="model-desc">Best for research & analysis</div>
+              </div>
+            </div>
+            <div class="model-card">
+              <div class="model-card-dot"></div>
+              <div>
+                <div class="model-name">GPT-4o</div>
+                <div class="model-desc">Great for writing & code</div>
+              </div>
+            </div>
+            <div class="model-card">
+              <div class="model-card-dot"></div>
+              <div>
+                <div class="model-name">Gemini 1.5 Pro</div>
+                <div class="model-desc">Long context (1M tokens)</div>
+              </div>
+            </div>
+            <div class="model-card">
+              <div class="model-card-dot"></div>
+              <div>
+                <div class="model-name">Groq · Llama 3 70B</div>
+                <div class="model-desc">Fastest inference</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Behaviour Toggles -->
+        <div class="settings-section">
+          <div class="settings-section-title">AI Behaviour</div>
+          <div class="settings-section-desc">Control how AI integrates with your notes workflow.</div>
+          <div class="settings-card">
+            <div class="settings-toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Auto-link AI responses to Knowledge Graph</div>
+                <div class="toggle-desc">AI replies are automatically parsed and linked as graph nodes</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Save AI exchanges as sub-notes</div>
+                <div class="toggle-desc">Each @mention conversation is saved as a linked child note</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Include note context in AI prompts</div>
+                <div class="toggle-desc">The current note's content is sent as context with each query</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Show token usage per exchange</div>
+                <div class="toggle-desc">Displays estimated token count and cost for each AI call</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Scheduled AI prompts</div>
+                <div class="toggle-desc">Auto-run prompts from the Prompt Library on a schedule</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync -->
+        <div class="settings-section">
+          <div class="settings-section-title">GitHub Gist Sync</div>
+          <div class="settings-section-desc">Sync your notes to a private GitHub Gist — your data, your account.</div>
+          <div class="settings-card" style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:9px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;color:var(--t1);">Connected to GitHub</div>
+              <div style="font-size:11.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;">@harsha · Last synced 2 min ago</div>
+            </div>
+            <button class="api-connect-btn connected">Syncing</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ VIEW: PROMPT LIBRARY ══════════ -->
+  <div class="view" id="view-prompts">
+    <div class="view-header-bar">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/></svg>
+      <div>
+        <div class="view-header-title">Prompt Library</div>
+      </div>
+      <div style="flex:1;"></div>
+      <button class="nt-btn primary">+ New Prompt</button>
+    </div>
+    <div class="prompt-library">
+      <div style="margin-bottom:8px;">
+        <div style="font-size:13px;color:var(--t3);">Reusable prompts with variables. Use in notes with <span class="inline-code">/prompt</span> or pin to schedule.</div>
+      </div>
+      <div class="pl-filters">
+        <div class="pl-filter active">All</div>
+        <div class="pl-filter">Research</div>
+        <div class="pl-filter">Journal</div>
+        <div class="pl-filter">Finance</div>
+        <div class="pl-filter">Coding</div>
+        <div class="pl-filter">Analysis</div>
+        <div class="pl-filter">My Prompts</div>
+      </div>
+      <div class="pl-grid">
+
+        <div class="prompt-card">
+          <div class="pc-top">
+            <div class="pc-icon" style="background:var(--teal-bg);">🔬</div>
+            <div>
+              <div class="pc-name">Research Deep Dive</div>
+              <div class="pc-category">Research · Analysis</div>
+            </div>
+          </div>
+          <div class="pc-desc">Summarise key findings, architectural tradeoffs, and open research questions from your note.</div>
+          <div class="pc-preview">Analyse this research note and extract: (1) core thesis, (2) key findings, (3) open questions, (4) related work gaps. Be concise and use bullet points.</div>
+          <div class="pc-footer">
+            <span class="pc-uses">Used 47 times</span>
+            <div class="pc-ai-badges">
+              <div class="pc-ai-badge" style="background:var(--p600);">C</div>
+              <div class="pc-ai-badge" style="background:#10A37F;">G</div>
+            </div>
+            <button class="pc-use-btn">Use</button>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="pc-top">
+            <div class="pc-icon" style="background:var(--amber-bg);">📔</div>
+            <div>
+              <div class="pc-name">Daily Reflection Prompt</div>
+              <div class="pc-category">Journal · Reflection</div>
+            </div>
+          </div>
+          <div class="pc-desc">Structured daily journal prompt — intention, wins, blockers, and tomorrow's focus.</div>
+          <div class="pc-preview">Today is {{date}}. Help me reflect: What did I accomplish? What blocked me? What's one thing I'll do differently tomorrow?</div>
+          <div class="pc-footer">
+            <span class="pc-uses">Used 124 times</span>
+            <div class="pc-ai-badges">
+              <div class="pc-ai-badge" style="background:var(--p600);">C</div>
+            </div>
+            <button class="pc-use-btn">Use</button>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="pc-top">
+            <div class="pc-icon" style="background:var(--blue-bg);">💻</div>
+            <div>
+              <div class="pc-name">Code Review Summary</div>
+              <div class="pc-category">Coding · Review</div>
+            </div>
+          </div>
+          <div class="pc-desc">Generate a structured code review summary with issues by severity, patterns, and recommendations.</div>
+          <div class="pc-preview">Review this code for: (1) bugs & correctness, (2) performance issues, (3) security concerns, (4) style/readability. Categorise by severity: Critical / High / Medium / Low.</div>
+          <div class="pc-footer">
+            <span class="pc-uses">Used 31 times</span>
+            <div class="pc-ai-badges">
+              <div class="pc-ai-badge" style="background:#10A37F;">G</div>
+              <div class="pc-ai-badge" style="background:var(--p600);">C</div>
+            </div>
+            <button class="pc-use-btn">Use</button>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="pc-top">
+            <div class="pc-icon" style="background:var(--rose-bg);">📈</div>
+            <div>
+              <div class="pc-name">Equity Research Analyst</div>
+              <div class="pc-category">Finance · Analysis</div>
+            </div>
+          </div>
+          <div class="pc-desc">Institutional-grade equity analysis: BRSR signals, Beneish M-Score, ROIC vs WACC, promoter pledges.</div>
+          <div class="pc-preview">Analyse {{company}} stock using: Beneish M-Score forensic signals, ROIC vs WACC spread, promoter pledge %, SEBI LODR compliance flags, and options market sentiment.</div>
+          <div class="pc-footer">
+            <span class="pc-uses">Used 18 times</span>
+            <div class="pc-ai-badges">
+              <div class="pc-ai-badge" style="background:var(--p600);">C</div>
+            </div>
+            <button class="pc-use-btn">Use</button>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="pc-top">
+            <div class="pc-icon" style="background:var(--p100);">🧠</div>
+            <div>
+              <div class="pc-name">Concept Explainer</div>
+              <div class="pc-category">Learning · Education</div>
+            </div>
+          </div>
+          <div class="pc-desc">Explain any complex concept with an analogy, formal definition, worked example, and common misconceptions.</div>
+          <div class="pc-preview">Explain {{concept}} to me as if I have a CS background but am new to this topic. Include: intuition, formal definition, worked example, and 2 common misconceptions.</div>
+          <div class="pc-footer">
+            <span class="pc-uses">Used 89 times</span>
+            <div class="pc-ai-badges">
+              <div class="pc-ai-badge" style="background:var(--p600);">C</div>
+              <div class="pc-ai-badge" style="background:#4285F4;">G</div>
+            </div>
+            <button class="pc-use-btn">Use</button>
+          </div>
+        </div>
+
+        <div class="prompt-card" style="border-style:dashed;border-color:var(--p300);background:var(--p50);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:200px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="var(--p600)" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg>
+          </div>
+          <div style="font-size:13px;font-weight:500;color:var(--p700);">Create Prompt</div>
+          <div style="font-size:11.5px;color:var(--t3);text-align:center;max-width:160px;">Add a custom prompt with variables to your library</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ VIEW: KNOWLEDGE GRAPH ══════════ -->
+  <div class="view" id="view-graph">
+    <div class="graph-view">
+      <div class="graph-toolbar">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+        <div class="graph-title">Knowledge Graph</div>
+        <div class="graph-subtitle" style="font-size:12px;color:var(--t3);margin-left:6px;">6 notes · 12 connections</div>
+        <div style="flex:1;"></div>
+        <button class="nt-btn">Filter by type</button>
+        <button class="nt-btn">Cluster by topic</button>
+        <button class="nt-btn primary">Add note →</button>
+      </div>
+      <div class="graph-main">
+        <div class="graph-canvas">
+          <svg id="knowledgeGraph" viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#C4B5FD" />
+              </marker>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- background grid subtle -->
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E9E4FD" stroke-width="0.5"/>
+            </pattern>
+            <rect width="900" height="580" fill="url(#grid)" />
+
+            <!-- Edges -->
+            <g stroke="#DDD6FE" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+              <line x1="450" y1="230" x2="240" y2="130" />
+              <line x1="450" y1="230" x2="660" y2="140" />
+              <line x1="450" y1="230" x2="180" y2="330" />
+              <line x1="450" y1="230" x2="720" y2="330" />
+              <line x1="450" y1="230" x2="450" y2="420" />
+              <line x1="240" y1="130" x2="660" y2="140" stroke="#F5D0A9" stroke-dasharray="4,3" />
+              <line x1="180" y1="330" x2="450" y2="420" stroke="#DDD6FE" stroke-dasharray="4,3" />
+              <line x1="660" y1="140" x2="720" y2="330" stroke="#BBF7D0" stroke-dasharray="4,3" />
+              <!-- strength indicator: thicker = stronger -->
+              <line x1="450" y1="230" x2="240" y2="130" stroke="#C4B5FD" stroke-width="3" marker-end="none" opacity="0.4"/>
+            </g>
+
+            <!-- ── Central node: Transformer ── -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('transformer')">
+              <circle cx="450" cy="230" r="52" fill="#7C3AED" opacity="0.12" />
+              <circle cx="450" cy="230" r="40" fill="#7C3AED" />
+              <circle cx="450" cy="230" r="40" fill="none" stroke="white" stroke-width="2" opacity="0.3" />
+              <text x="450" y="224" text-anchor="middle" fill="white" font-size="11" font-weight="600" font-family="DM Sans, sans-serif">Transformer</text>
+              <text x="450" y="240" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5" font-family="DM Sans, sans-serif">Architecture</text>
+              <text x="450" y="283" text-anchor="middle" fill="#7C3AED" font-size="9" font-family="JetBrains Mono, monospace">Research</text>
+            </g>
+
+            <!-- ── RAG Architecture ── -->
+            <g style="cursor:pointer;" onclick="selectGraphNode('rag')">
+              <circle cx="240" cy="130" r="32" fill="#0F766E" />
+              <text x="240" y="125" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans, sans-serif">RAG</text>
+              <text x="240" y="140" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans, sans-serif">Patterns</text>
+              <text x="240" y="174" text-anchor="middle" fill="#0F766E" font-size="9" font-family="JetBrains Mono, monospace">Research</text>
+            </g>
+
+            <!-- ── AI Roadmap ── -->
+            <g style="cursor:pointer;">
+              <circle cx="660" cy="140" r="34" fill="#1D4ED8" />
+              <text x="660" y="134" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans, sans-serif">AI Roadmap</text>
+              <text x="660" y="149" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans, sans-serif">36 Weeks</text>
+              <text x="660" y="187" text-anchor="middle" fill="#1D4ED8" font-size="9" font-family="JetBrains Mono, monospace">Task</text>
+            </g>
+
+            <!-- ── Journal ── -->
+            <g style="cursor:pointer;">
+              <circle cx="180" cy="330" r="28" fill="#D97706" />
+              <text x="180" y="324" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Monday</text>
+              <text x="180" y="338" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans, sans-serif">Deep Work</text>
+              <text x="180" y="370" text-anchor="middle" fill="#D97706" font-size="9" font-family="JetBrains Mono, monospace">Journal</text>
+            </g>
+
+            <!-- ── Equity Research ── -->
+            <g style="cursor:pointer;">
+              <circle cx="720" cy="330" r="30" fill="#BE185D" />
+              <text x="720" y="324" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Equity</text>
+              <text x="720" y="338" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans, sans-serif">Research</text>
+              <text x="720" y="372" text-anchor="middle" fill="#BE185D" font-size="9" font-family="JetBrains Mono, monospace">Reference</text>
+            </g>
+
+            <!-- ── Linear Algebra ── -->
+            <g style="cursor:pointer;">
+              <circle cx="450" cy="420" r="30" fill="#7C3AED" opacity="0.75"/>
+              <text x="450" y="414" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Linear</text>
+              <text x="450" y="428" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans, sans-serif">Algebra Book</text>
+              <text x="450" y="463" text-anchor="middle" fill="#7C3AED" font-size="9" font-family="JetBrains Mono, monospace">Idea</text>
+            </g>
+
+            <!-- ── AI clusters (topic clusters faint) ── -->
+            <ellipse cx="380" cy="175" rx="140" ry="90" fill="#7C3AED" opacity="0.04" stroke="#7C3AED" stroke-width="1" stroke-dasharray="5,4" />
+            <text x="270" y="102" fill="#A78BFA" font-size="9.5" font-family="JetBrains Mono, monospace">AI / ML Cluster</text>
+
+            <!-- Graph instructions -->
+            <text x="450" y="555" text-anchor="middle" fill="#BCB6D4" font-size="11" font-family="DM Sans, sans-serif">Click a node to explore connections · Drag to rearrange</text>
+          </svg>
+
+          <div class="graph-legend">
+            <div class="legend-title">Note types</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7C3AED;"></div> Research</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div> Journal</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D4ED8;"></div> Task</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BE185D;"></div> Reference</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#0F766E;"></div> Idea</div>
+          </div>
+        </div>
+
+        <!-- Graph info panel -->
+        <div class="graph-info-panel" id="graphInfoPanel">
+          <div class="cp-label" style="margin-bottom:12px;">Selected Note</div>
+          <div class="gip-title" id="gipTitle">Transformer Architecture</div>
+          <div class="gip-badge" style="margin-bottom:12px;">
+            <span class="nli-badge badge-research" style="font-size:10px;">Research</span>
+          </div>
+          <div class="gip-stat">
+            <div class="gip-stat-item">
+              <div class="gip-stat-num">5</div>
+              <div class="gip-stat-lbl">connections</div>
+            </div>
+            <div class="gip-stat-item">
+              <div class="gip-stat-num">4</div>
+              <div class="gip-stat-lbl">AI calls</div>
+            </div>
+            <div class="gip-stat-item">
+              <div class="gip-stat-num">847</div>
+              <div class="gip-stat-lbl">words</div>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin-bottom:14px;" />
+          <div class="cp-label">Connected Notes</div>
+          <div class="gip-connected">
+            <div class="gip-conn-item">
+              <div class="gip-conn-dot" style="background:#0F766E;"></div>
+              <span class="gip-conn-name">RAG Architecture Patterns</span>
+              <span class="gip-conn-strength">strong</span>
+            </div>
+            <div class="gip-conn-item">
+              <div class="gip-conn-dot" style="background:#1D4ED8;"></div>
+              <span class="gip-conn-name">36-Week AI Roadmap</span>
+              <span class="gip-conn-strength">strong</span>
+            </div>
+            <div class="gip-conn-item">
+              <div class="gip-conn-dot" style="background:#7C3AED;opacity:0.75;"></div>
+              <span class="gip-conn-name">Linear Algebra Book</span>
+              <span class="gip-conn-strength">medium</span>
+            </div>
+            <div class="gip-conn-item">
+              <div class="gip-conn-dot" style="background:#D97706;"></div>
+              <span class="gip-conn-name">Monday Deep Work Session</span>
+              <span class="gip-conn-strength">weak</span>
+            </div>
+            <div class="gip-conn-item">
+              <div class="gip-conn-dot" style="background:#BE185D;"></div>
+              <span class="gip-conn-name">Equity Research Framework</span>
+              <span class="gip-conn-strength">weak</span>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;" />
+          <div class="cp-label">AI Insights on this node</div>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.6;">
+            This note is a <strong style="color:var(--p700);">central hub</strong> in your graph. It connects to 5 other notes and shares strong thematic overlap with RAG patterns and your AI Roadmap.
+          </div>
+          <button class="api-connect-btn" style="width:100%;margin-top:12px;text-align:center;">Open Note →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<script>
+// ── View switcher ──
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  // Show/hide sidebar panel for views that need it
+  const sp = document.getElementById('sidebarPanel');
+  sp.style.display = (name === 'notes') ? '' : 'none';
+}
+
+// ── @mention dropdown ──
+const editorArea = document.getElementById('editorArea');
+const dropdown   = document.getElementById('mentionDropdown');
+let mentionStart = null;
+
+editorArea.addEventListener('keyup', function(e) {
+  const sel  = window.getSelection();
+  const text = sel.anchorNode && sel.anchorNode.textContent || '';
+  const pos  = sel.anchorOffset;
+  const charBefore = text[pos - 1];
+
+  if (charBefore === '@') {
+    mentionStart = { node: sel.anchorNode, offset: pos };
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    const edRect = editorArea.getBoundingClientRect();
+    dropdown.style.top  = (rect.bottom - edRect.top + 6) + 'px';
+    dropdown.style.left = (rect.left - edRect.left) + 'px';
+    dropdown.classList.add('open');
+  } else if (dropdown.classList.contains('open') && e.key === 'Escape') {
+    dropdown.classList.remove('open');
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!dropdown.contains(e.target) && e.target !== editorArea) {
+    dropdown.classList.remove('open');
+  }
+});
+
+function insertMention(model) {
+  dropdown.classList.remove('open');
+  const logos = { Claude:'C', ChatGPT:'G', Gemini:'G', Groq:'Q' };
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const chip = document.createElement('span');
+  chip.className = 'ai-mention';
+  chip.contentEditable = 'false';
+  chip.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:${colors[model]};color:white;font-size:8px;font-weight:700;margin-right:3px;">${logos[model]}</span>@${model}`;
+
+  if (mentionStart) {
+    const range = document.createRange();
+    try {
+      range.setStart(mentionStart.node, mentionStart.offset - 1);
+      range.setEnd(mentionStart.node, mentionStart.offset);
+      range.deleteContents();
+      range.insertNode(chip);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch(e) {}
+    mentionStart = null;
+  }
+
+  // Simulate AI response after a delay
+  setTimeout(() => showAIResponse(model), 600);
+}
+
+function openMentionFromToolbar() {
+  editorArea.focus();
+  document.execCommand('insertText', false, '@');
+  dropdown.style.top = '60px';
+  dropdown.style.left = '20px';
+  dropdown.classList.add('open');
+}
+
+function showAIResponse(model) {
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const block = document.createElement('div');
+  block.className = 'ai-response-block';
+  block.innerHTML = `
+    <div class="ai-response-header">
+      <div class="ai-response-logo" style="background:${colors[model]};">${model[0]}</div>
+      <span class="ai-response-name">${model} · responding…</span>
+      <span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">just now</span>
+    </div>
+    <div class="ai-response-text" style="color:var(--t4);font-style:italic;">Analysing your note context…</div>
+    <div class="ai-response-footer">
+      <button class="ai-resp-btn">📋 Copy</button>
+      <button class="ai-resp-btn">📝 Save as note</button>
+      <button class="ai-resp-btn">🔗 Link to graph</button>
+    </div>
+  `;
+  editorArea.parentNode.insertBefore(block, editorArea.nextSibling);
+}
+
+// ── Model card selector ──
+document.querySelectorAll('.model-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+});
+
+// ── Prompt filter buttons ──
+document.querySelectorAll('.pl-filter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pl-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ── Graph node selection ──
+function selectGraphNode(name) {
+  const titles = {
+    transformer: 'Transformer Architecture',
+    rag: 'RAG Architecture Patterns'
+  };
+  if (titles[name]) {
+    document.getElementById('gipTitle').textContent = titles[name];
+  }
+}
+
+// ── Note list switcher (basic) ──
+function switchNote(name) {
+  document.querySelectorAll('.note-list-item').forEach(i => i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// Placeholder text for contenteditable
+editorArea.addEventListener('focus', function() {
+  if (this.textContent.trim() === '') this.innerHTML = '';
+});
+editorArea.addEventListener('blur', function() {
+  if (this.textContent.trim() === '') {
+    this.innerHTML = '<p style="color:var(--t4)">Start typing… use @ to mention an AI model</p>';
+  }
+});
+</script>
+</body>
+</html>

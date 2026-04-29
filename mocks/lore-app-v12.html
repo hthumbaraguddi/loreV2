@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lore v12 — Final Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sb-bg:#F0EEF9;--sb-border:#E2DEFA;--sb-text:#6B6585;--sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06);--sb-active:rgba(109,40,217,0.1);
+  --nav-bg:#EAE7F7;--nav-border:#DDD8F5;--nav-icon:rgba(80,60,160,0.45);
+  --bg:#FAFAF9;--canvas:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09);--border2:rgba(109,40,217,0.16);
+  --t1:#1C1829;--t2:#4A445F;--t3:#9490AA;--t4:#C4C0D4;
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-l:#FDE68A;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --red:#DC2626;--red-bg:#FEF2F2;
+  --orange:#C2410C;--orange-bg:#FFF7ED;
+  --nav-w:52px;--sb-w:248px;--tb-h:46px;
+  --r-md:8px;--r-lg:12px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+}
+[data-theme="dark"]{
+  --sb-bg:#1E1A2E;--sb-border:#2D2650;--sb-text:#8C84A8;--sb-text-active:#E2DEFA;
+  --sb-hover:rgba(167,139,250,0.08);--sb-active:rgba(167,139,250,0.14);
+  --nav-bg:#17142B;--nav-border:#2D2650;--nav-icon:rgba(167,139,250,0.4);
+  --bg:#13101F;--canvas:#1A1729;--surface:#1E1A2E;--surface2:#17142B;
+  --border:rgba(167,139,250,0.1);--border2:rgba(167,139,250,0.18);
+  --t1:#F0EEFF;--t2:#C4B5FD;--t3:#7B6F9A;--t4:#4A4068;
+  --p50:#1E1A2E;--p100:#2D2650;--p200:#3D3570;--p300:#5B4DB0;
+  --p400:#8B5CF6;--p500:#A78BFA;--p600:#C4B5FD;--p700:#DDD6FE;
+  --amber:#FCD34D;--amber-bg:rgba(253,211,77,0.1);--amber-l:rgba(253,211,77,0.2);
+  --teal:#34D399;--teal-bg:rgba(52,211,153,0.1);
+  --rose:#F472B6;--rose-bg:rgba(244,114,182,0.1);
+  --blue:#60A5FA;--blue-bg:rgba(96,165,250,0.1);
+  --green:#4ADE80;--green-bg:rgba(74,222,128,0.1);
+  --red:#F87171;--red-bg:rgba(248,113,113,0.1);
+  --shadow-float:0 12px 40px rgba(0,0,0,0.5),0 3px 10px rgba(167,139,250,0.15);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;transition:background 0.25s,color 0.25s;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(8px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
+@keyframes slideRight{from{transform:translateX(100%);}to{transform:translateX(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* NAV */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;transition:background 0.25s;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+[data-theme="dark"] .nav-logo{color:#1C1829;}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--nav-icon);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+[data-theme="dark"] .nav-btn:hover,[data-theme="dark"] .nav-btn.active{background:rgba(167,139,250,0.15);color:var(--p400);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:var(--bg);font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:background 0.25s,border-color 0.25s;}
+.sb-top{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 9px;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .sb-search{background:rgba(255,255,255,0.04);}
+.sb-search:hover{border-color:var(--p300);background:var(--surface);}
+.sb-search span{font-size:12.5px;color:var(--t4);flex:1;}
+.sb-search svg{color:var(--t4);width:12px;height:12px;}
+.sb-kbd{font-size:9px;color:var(--t4);background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;font-family:'JetBrains Mono',monospace;}
+.sb-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.5);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+[data-theme="dark"] .sb-btn{background:rgba(255,255,255,0.04);}
+.sb-btn:hover{background:var(--surface);color:var(--p600);}
+.sb-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+.shelf{}.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+[data-theme="dark"] .sh-count{background:rgba(167,139,250,0.1);}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:0.1s;border-left:2px solid transparent;}
+.note-item:hover{background:var(--sb-hover);}
+.note-item.active{background:var(--sb-active);border-left-color:var(--p600);}
+[data-theme="dark"] .note-item.active{border-left-color:var(--p400);}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p600);}
+.badge-html{background:var(--orange-bg);color:var(--orange);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;transition:background 0.25s;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+[data-theme="dark"] .tb-btn.primary{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.tool-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+.tool-pill:hover,.tool-pill.on{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+[data-theme="dark"] .tool-pill:hover,[data-theme="dark"] .tool-pill.on{color:var(--p400);}
+
+/* EDITOR */
+.note-bar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;padding:0 18px;flex-shrink:0;}
+.nb-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.nb-bc a{color:var(--p600);cursor:pointer;font-weight:500;}[data-theme="dark"] .nb-bc a{color:var(--p400);}
+.nb-bc .sep{color:var(--t4);font-size:10px;}.nb-bc .cur{color:var(--t2);font-weight:500;}
+.live-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--green-bg);background:var(--green-bg);color:var(--green);font-size:10.5px;font-family:'JetBrains Mono',monospace;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+
+.editor-wrap{flex:1;display:flex;overflow:hidden;}
+.paper{flex:1;overflow-y:auto;background:var(--canvas);padding:44px 64px 80px;display:flex;flex-direction:column;position:relative;transition:background 0.25s;}
+[data-theme="dark"] .paper{background:#1A1729;}
+.paper-type-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.ptype-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.pt-research{background:var(--teal-bg);color:var(--teal);}
+.pt-journal{background:var(--amber-bg);color:var(--amber);}
+.pt-idea{background:var(--rose-bg);color:var(--rose);}
+.paper-date{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.note-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--t1);line-height:1.2;margin-bottom:16px;letter-spacing:-0.02em;resize:none;overflow:hidden;caret-color:var(--p600);}
+.note-title::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:20px;}
+
+/* BLOCKS */
+.blocks-area{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.block{position:relative;border-radius:var(--r-md);}
+.block.drag-over{border-top:2px solid var(--p600);}
+.blk-handle{position:absolute;left:-22px;top:50%;transform:translateY(-50%);width:16px;height:22px;display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--t4);opacity:0;transition:0.15s;border-radius:4px;}
+.block:hover .blk-handle{opacity:1;}
+.blk-handle:hover{background:var(--p50);color:var(--p600);}
+.blk-handle svg{width:11px;height:11px;}
+.blk-toolbar{position:absolute;top:7px;right:7px;display:flex;gap:2px;opacity:0;transition:0.15s;}
+.block:hover .blk-toolbar{opacity:1;}
+.blk-tbtn{width:20px;height:20px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);transition:0.12s;}
+.blk-tbtn:hover{background:var(--p50);color:var(--p600);}
+.blk-tbtn.rm:hover{background:var(--red-bg);color:var(--red);}
+.blk-tbtn svg{width:11px;height:11px;}
+/* comment dot on block */
+.blk-cdot{position:absolute;top:-5px;right:24px;width:14px;height:14px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:10;}
+/* callouts */
+.blk-callout{display:flex;gap:10px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:11px 52px 11px 13px;}
+.hyp{background:var(--amber-bg);border-color:var(--amber);}
+.con{background:var(--teal-bg);border-color:var(--teal);}
+.note-b{background:var(--p50);border-color:var(--p400);}
+.blk-ico{font-size:14px;flex-shrink:0;margin-top:1px;}
+.blk-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.hyp .blk-lbl{color:var(--amber);}.con .blk-lbl{color:var(--teal);}.note-b .blk-lbl{color:var(--p600);}
+[data-theme="dark"] .note-b .blk-lbl{color:var(--p400);}
+.blk-txt{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-style:italic;line-height:1.65;color:var(--t2);width:100%;resize:none;}
+.blk-txt::placeholder{color:var(--t4);}
+/* keydiff */
+.blk-keydiff{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;padding-right:52px;}
+.kd-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-ch{flex:1;padding:6px 10px;font-size:10.5px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+[data-theme="dark"] .kd-ch{color:var(--p400);}
+.kd-ch:last-child{border-right:none;}
+.kd-ch input{border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:inherit;width:100%;}
+.kd-body{display:flex;}.kd-col{flex:1;border-right:1px solid var(--border2);}.kd-col:last-child{border-right:none;}
+.kd-row{display:flex;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--t2);align-items:flex-start;}.kd-row:last-child{border-bottom:none;}
+.kd-dot{width:5px;height:5px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:7px;}
+.kd-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;line-height:1.6;}
+.kd-inp::placeholder{color:var(--t4);}
+/* findings */
+.blk-findings{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:13px 52px 13px 13px;}
+.blk-findings-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p600);font-family:'JetBrains Mono',monospace;margin-bottom:9px;}
+[data-theme="dark"] .blk-findings-lbl{color:var(--p400);}
+.fi-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}.fi-row:last-child{border-bottom:none;}
+.fi-num{width:17px;height:17px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;margin-top:2px;}
+.fi-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;}
+/* AI response */
+.blk-ai{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:13px 52px 13px 13px;}
+.blk-ai-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.blk-ai-logo{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0;}
+.blk-ai-name{font-size:11px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .blk-ai-name{color:var(--p400);}
+.blk-ai-time{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.blk-ai-text{font-size:14px;color:var(--t2);line-height:1.75;font-family:'Lora',serif;}
+.blk-ai-footer{margin-top:8px;display:flex;gap:5px;}
+.blk-ai-btn{font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.blk-ai-btn:hover{color:var(--p600);border-color:var(--p300);}
+.cursor{display:inline-block;width:2px;height:1em;background:var(--p600);margin-left:2px;vertical-align:text-bottom;animation:blink 0.7s infinite;}
+/* note body, tags */
+.note-body{flex:1;width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:15.5px;line-height:1.85;color:var(--t2);resize:none;min-height:180px;caret-color:var(--p600);}
+.note-body::placeholder{color:var(--t4);font-style:italic;}
+.paper-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.paper-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--p100);color:var(--p600);font-family:'JetBrains Mono',monospace;cursor:pointer;}
+[data-theme="dark"] .paper-tag{background:var(--p200);color:var(--p400);}
+.paper-tag.add{background:transparent;border:1px dashed var(--p300);}
+.slash-hint{display:flex;align-items:center;gap:5px;padding:9px 0 0;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border);}
+.shl{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.shk{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--t3);background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;cursor:pointer;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.shk:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.shk kbd{font-size:9px;color:var(--p600);font-weight:600;background:var(--p50);border:1px solid var(--border2);border-radius:3px;padding:0 4px;font-family:inherit;}
+
+/* ══════════════════════════════
+   NOTE SHARE PANEL
+══════════════════════════════ */
+.share-panel{position:fixed;top:0;right:-400px;bottom:0;width:380px;background:var(--surface);border-left:1px solid var(--border);z-index:700;display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg);}
+.share-panel.open{right:0;}
+.sp-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sp-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;display:flex;align-items:center;gap:7px;}
+.sp-close{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.sp-close:hover{background:var(--p50);}
+.sp-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.share-option{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:15px 16px;margin-bottom:12px;transition:0.15s;}
+.share-option:hover{border-color:var(--p300);}
+.so-hdr{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
+.so-ico{font-size:18px;flex-shrink:0;}
+.so-name{font-size:13px;font-weight:600;color:var(--t1);}
+.so-desc{font-size:11.5px;color:var(--t3);line-height:1.5;margin-bottom:10px;}
+.share-link-row{display:flex;gap:6px;}
+.share-link-inp{flex:1;border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--p50);outline:none;}
+.share-link-inp:focus{border-color:var(--p400);}
+.share-copy-btn{padding:6px 12px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;white-space:nowrap;}
+[data-theme="dark"] .share-copy-btn{background:var(--p400);color:#1C1829;}
+.share-copy-btn:hover{background:var(--p700);}
+.share-link-toggle{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:11.5px;color:var(--t3);}
+.sw{width:32px;height:18px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+[data-theme="dark"] .sw{background:var(--p400);}
+.sw::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:2px;left:16px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.sw.off{background:var(--t4);}
+.sw.off::after{left:2px;}
+.export-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.export-btn{padding:6px 11px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;transition:0.12s;font-family:'DM Sans',sans-serif;}
+.export-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.embed-code{background:#0F0C1A;border-radius:var(--r-md);padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#C4B5FD;line-height:1.6;margin-top:9px;word-break:break-all;}
+
+/* ══════════════════════════════
+   VERSION HISTORY PANEL
+══════════════════════════════ */
+.history-panel{width:0;overflow:hidden;border-left:1px solid var(--border);background:var(--surface2);flex-shrink:0;transition:width 0.25s ease;display:flex;flex-direction:column;}
+.history-panel.open{width:248px;}
+.hp-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:7px;}
+.hp-title{font-size:13px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.hp-close{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);}
+.hp-close:hover{background:var(--p50);color:var(--t1);}
+.hp-save-btn{margin:10px 14px 4px;padding:7px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;text-align:center;transition:0.12s;font-family:'DM Sans',sans-serif;}
+.hp-save-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.hp-body{flex:1;overflow-y:auto;padding:8px 14px 16px;}
+.hp-section-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin:10px 0 6px;}
+.version-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:0.1s;border-radius:var(--r-md);position:relative;}
+.version-item:last-child{border-bottom:none;}
+.version-item:hover{background:var(--p50);padding-left:6px;padding-right:6px;margin:0 -6px;}
+.vi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.vi-dot.current{background:var(--p600);}
+[data-theme="dark"] .vi-dot.current{background:var(--p400);}
+.vi-dot.named{background:var(--green);}
+.vi-dot.auto{background:var(--t4);}
+.vi-info{flex:1;min-width:0;}
+.vi-label{font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vi-date{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.vi-diff{font-size:9.5px;color:var(--green);font-family:'JetBrains Mono',monospace;}
+.vi-restore{font-size:10.5px;color:var(--p600);cursor:pointer;opacity:0;transition:0.15s;white-space:nowrap;flex-shrink:0;padding-top:2px;}
+[data-theme="dark"] .vi-restore{color:var(--p400);}
+.version-item:hover .vi-restore{opacity:1;}
+.version-item.current-v .vi-label::after{content:' · current';font-size:9.5px;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .version-item.current-v .vi-label::after{color:var(--p400);}
+/* version diff preview */
+.vi-preview{font-size:11px;color:var(--t3);line-height:1.4;margin-top:3px;border-left:2px solid var(--border2);padding-left:7px;display:none;}
+.version-item:hover .vi-preview{display:block;}
+
+/* ══════════════════════════════
+   BLOCK COMMENTS PANEL
+══════════════════════════════ */
+.comments-panel{position:fixed;right:-380px;top:0;bottom:0;width:360px;background:var(--surface);border-left:1px solid var(--border);z-index:700;display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg);}
+.comments-panel.open{right:0;}
+.cp-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.cp-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.cp-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;}
+.cp-x{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.cp-x:hover{background:var(--p50);}
+.cp-body{flex:1;overflow-y:auto;padding:14px 16px;}
+.comment-thread{border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:14px;overflow:hidden;transition:0.15s;}
+.comment-thread:hover{border-color:var(--p300);}
+.ct-ref{padding:8px 13px;background:var(--p50);border-bottom:1px solid var(--border);font-size:11px;color:var(--p600);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px;}
+[data-theme="dark"] .ct-ref{color:var(--p400);}
+.ct-ref svg{width:11px;height:11px;opacity:0.6;}
+.comment-item{padding:10px 13px;border-bottom:1px solid var(--border);}
+.comment-item:last-child{border-bottom:none;}
+.ci-hdr{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.ci-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0;}
+.ci-name{font-size:12.5px;font-weight:500;color:var(--t1);flex:1;}
+.ci-time{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.ci-text{font-size:13px;color:var(--t2);line-height:1.5;}
+.ci-actions{display:flex;gap:4px;margin-top:6px;}
+.ci-btn{font-size:10.5px;color:var(--t4);cursor:pointer;padding:2px 6px;border-radius:5px;border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.ci-btn:hover{background:var(--p50);color:var(--p600);}
+.ci-btn.resolve{color:var(--green);}
+.ci-btn.resolve:hover{background:var(--green-bg);}
+.ct-reply-area{padding:9px 13px;border-top:1px solid var(--border);background:var(--surface2);}
+.ct-reply-inp{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);outline:none;background:var(--surface);}
+.ct-reply-inp:focus{border-color:var(--p400);}
+.ct-reply-inp::placeholder{color:var(--t4);}
+.ct-reply-btn{margin-top:6px;padding:5px 12px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:11.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+[data-theme="dark"] .ct-reply-btn{background:var(--p400);color:#1C1829;}
+.cp-add-btn{width:100%;}
+
+/* ══════════════════════════════
+   PROMPT SLIDEOVER
+══════════════════════════════ */
+.prompt-slideover{position:fixed;top:0;right:-420px;bottom:0;width:400px;background:var(--surface);border-left:1px solid var(--border);z-index:700;display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg);}
+.prompt-slideover.open{right:0;}
+.pso-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.pso-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.pso-close{margin-left:auto;width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0;}
+.pso-close:hover{background:var(--p50);}
+.pso-cat{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.pso-body{flex:1;overflow-y:auto;padding:14px 18px;}
+.pso-sec{margin-bottom:18px;}
+.pso-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.pso-prompt-body{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:10px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--p600);line-height:1.6;}
+[data-theme="dark"] .pso-prompt-body{color:var(--p400);}
+/* countdown */
+.pso-countdown{background:var(--amber-bg);border:1px solid var(--amber-l);border-radius:var(--r-md);padding:11px 13px;display:flex;align-items:center;gap:10px;}
+.pso-cd-ico{font-size:18px;}
+.pso-cd-text{font-size:12.5px;color:var(--t2);line-height:1.5;}
+.pso-cd-text strong{color:var(--amber);}
+.cd-chips{display:flex;gap:5px;margin-top:7px;}
+.cd-chip{background:var(--surface);border:1px solid var(--amber-l);border-radius:6px;padding:4px 8px;text-align:center;min-width:38px;}
+.cd-chip-n{font-size:16px;font-weight:600;color:var(--p600);font-family:'Lora',serif;line-height:1;}
+[data-theme="dark"] .cd-chip-n{color:var(--p400);}
+.cd-chip-l{font-size:8.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.cd-sep{font-size:13px;color:var(--t4);padding-top:12px;}
+/* var table */
+.var-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.var-tbl th{text-align:left;padding:5px 9px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);}
+.var-tbl td{padding:5px 9px;border-bottom:1px solid var(--border);}
+.var-tbl tr:last-child td{border-bottom:none;}
+.var-tbl td:first-child{font-family:'JetBrains Mono',monospace;color:var(--p600);font-size:11.5px;background:var(--p50);}
+[data-theme="dark"] .var-tbl td:first-child{color:var(--p400);}
+.var-tbl td input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t2);width:100%;}
+/* provider row */
+.pso-prov-row{display:flex;gap:5px;flex-wrap:wrap;}
+.prov-pill{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:12px;color:var(--t2);transition:0.12s;}
+.prov-pill:hover{border-color:var(--p300);}
+.prov-pill.sel{border-color:var(--p500);background:var(--p50);color:var(--p700);}
+[data-theme="dark"] .prov-pill.sel{color:var(--p400);}
+.prov-logo{width:15px;height:15px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;}
+/* run history */
+.run-hist{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--border);}
+.run-hist:last-child{border-bottom:none;}
+.rh-status{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.rhs-ok{background:var(--green-bg);color:var(--green);}
+.rhs-fail{background:var(--red-bg);color:var(--red);}
+.rh-date{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;flex:1;}
+.rh-out{font-size:11px;color:var(--p600);cursor:pointer;}
+[data-theme="dark"] .rh-out{color:var(--p400);}
+.rh-out:hover{text-decoration:underline;}
+.pso-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:7px;flex-shrink:0;}
+
+/* ══════════════════════════════
+   HTML NOTE FULL VIEWER
+══════════════════════════════ */
+.html-viewer{position:fixed;inset:0;background:var(--bg);z-index:900;display:none;flex-direction:column;}
+.html-viewer.open{display:flex;}
+.hv-toolbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;}
+.hv-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;display:flex;align-items:center;gap:8px;flex:1;}
+.hv-badge{font-size:9.5px;padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;background:var(--orange-bg);color:var(--orange);}
+.hv-btn{height:30px;padding:0 11px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;}
+.hv-btn:hover{background:var(--p50);}
+.hv-btn.primary{background:var(--p600);border-color:var(--p600);color:white;}
+.hv-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.hv-close:hover{background:var(--p50);}
+.hv-zoom-bar{height:36px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
+.hv-zoom-btn{width:26px;height:26px;border-radius:5px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:14px;transition:0.12s;}
+.hv-zoom-btn:hover{border-color:var(--p300);color:var(--p600);}
+.hv-zoom-val{font-size:12px;color:var(--t2);font-family:'JetBrains Mono',monospace;min-width:44px;text-align:center;}
+.hv-body{flex:1;overflow:auto;display:flex;justify-content:center;padding:28px;background:var(--bg);}
+.hv-frame{background:white;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;transition:transform 0.2s;width:900px;min-height:500px;transform-origin:top center;}
+/* HTML report demo content */
+.hv-report{font-family:'DM Sans',sans-serif;padding:40px 48px;}
+.hv-report-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #EDE9FE;}
+.hv-report-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.hv-report-title{font-size:22px;font-weight:700;color:#1C1829;font-family:'Lora',serif;}
+.hv-report-sub{font-size:13px;color:#9490AA;margin-top:3px;}
+.hv-report-badge{font-size:10px;padding:3px 9px;border-radius:20px;background:#F0FDF4;color:#15803D;font-weight:600;border:1px solid #BBF7D0;margin-left:auto;}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.metric-card{background:#F5F3FF;border-radius:10px;padding:15px;text-align:center;}
+.metric-n{font-size:22px;font-weight:700;color:#7C3AED;font-family:'Lora',serif;}
+.metric-l{font-size:11px;color:#9490AA;margin-top:3px;}
+.metric-trend{font-size:11px;margin-top:4px;font-weight:600;}
+.metric-trend.up{color:#15803D;}.metric-trend.dn{color:#DC2626;}
+.hv-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;}
+.hv-table th{text-align:left;padding:10px 11px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#9490AA;border-bottom:2px solid #EDE9FE;}
+.hv-table td{padding:10px 11px;border-bottom:1px solid #F0EEFF;color:#4A445F;vertical-align:middle;}
+.hv-table tr:hover td{background:#F5F3FF;}
+.sig-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;}
+.sig-ok{background:#F0FDF4;color:#15803D;}.sig-warn{background:#FFFBEB;color:#D97706;}.sig-flag{background:#FFF1F2;color:#BE185D;}
+.hv-insight{background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-radius:10px;padding:16px 20px;border-left:4px solid #7C3AED;}
+.hv-insight-lbl{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#7C3AED;margin-bottom:5px;}
+.hv-insight-text{font-size:13px;color:#4A445F;line-height:1.6;}
+.hv-gen-footer{display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid #EDE9FE;font-size:11px;color:#BCB6D4;}
+
+/* PROMPT LIBRARY VIEW */
+.pl-view{flex:1;overflow-y:auto;}
+.pl-toolbar{display:flex;align-items:center;gap:8px;padding:13px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;}
+.pl-search{flex:1;display:flex;align-items:center;gap:7px;background:var(--p50);border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;}
+.pl-search:focus-within{background:var(--surface);border-color:var(--p300);}
+.pl-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);width:100%;outline:none;}
+.pl-search input::placeholder{color:var(--t4);}
+.pl-filters{display:flex;gap:5px;padding:10px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.pl-f{padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.pl-f:hover,.pl-f.active{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .pl-f.active{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.pl-body{padding:18px 24px;}
+.pl-section-lbl{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:12px;margin-bottom:24px;}
+/* prompt card */
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);position:relative;}
+.pc:hover{border-color:var(--p300);transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.pc.sel{border-color:var(--p600);box-shadow:0 0 0 2px var(--p300);}
+.pc-top{display:flex;gap:9px;align-items:flex-start;margin-bottom:8px;}
+.pc-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pc-name{font-size:13px;font-weight:600;color:var(--t1);}
+.pc-cat{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.pc-desc{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px;}
+.pc-preview{background:var(--p50);border:1px solid var(--p200);border-radius:5px;padding:7px 9px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--p600);line-height:1.5;margin-bottom:8px;}
+[data-theme="dark"] .pc-preview{color:var(--p400);}
+.pc-footer{display:flex;align-items:center;gap:8px;}
+.pc-cron-badge{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;border:1px solid var(--amber-l);}
+.pc-use{padding:3px 9px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;margin-left:auto;}
+[data-theme="dark"] .pc-use{background:var(--p400);color:#1C1829;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+[data-theme="dark"] .modal-overlay{background:rgba(8,6,18,0.75);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-x{width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-x:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;}
+.field-group{margin-bottom:13px;}
+.field-label{font-size:11.5px;font-weight:500;color:var(--t2);margin-bottom:5px;display:block;}
+.field-input{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;background:var(--surface);}
+.field-input:focus{border-color:var(--p400);}
+
+/* QC + TOAST */
+.qc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--p600);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(124,58,237,0.4);z-index:500;color:white;transition:all 0.2s;}
+[data-theme="dark"] .qc-fab{background:var(--p400);color:#1C1829;}
+.qc-fab:hover{transform:scale(1.08);}
+.qc-fab svg{width:20px;height:20px;transition:transform 0.2s;}
+.qc-fab.open svg{transform:rotate(45deg);}
+.qc-bubble{position:fixed;bottom:82px;right:24px;width:290px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);box-shadow:var(--shadow-float);z-index:500;display:none;flex-direction:column;overflow:hidden;}
+.qc-bubble.open{display:flex;}
+.qcb-hdr{padding:9px 13px 7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.qcb-t{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.qcb-types{display:flex;gap:3px;}
+.qcb-ty{font-size:9px;padding:2px 6px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'JetBrains Mono',monospace;transition:0.12s;}
+.qcb-ty.on{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .qcb-ty.on{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.qcb-body{padding:9px 13px;}
+.qcb-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-weight:500;color:var(--t1);margin-bottom:5px;}
+.qcb-inp::placeholder{color:var(--t4);}
+.qcb-txt{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13px;line-height:1.65;color:var(--t2);resize:none;min-height:65px;}
+.qcb-txt::placeholder{color:var(--t4);font-style:italic;}
+.qcb-ftr{padding:7px 13px;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.qcb-dest{font-size:11px;color:var(--t4);flex:1;font-family:'JetBrains Mono',monospace;}
+.qcb-save{padding:5px 13px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;}
+[data-theme="dark"] .qcb-save{background:var(--p400);color:#1C1829;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg);border-radius:var(--r-lg);padding:10px 18px;display:none;align-items:center;gap:8px;font-size:13px;font-weight:500;z-index:1000;box-shadow:var(--shadow-lg);white-space:nowrap;}
+.toast.on{display:flex;animation:slideUp 0.3s ease;}
+</style>
+</head>
+<body>
+
+<!-- NAV RAIL -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes  ⌘1</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library  ⌘2</span>
+  </button>
+  <button class="nav-btn" onclick="openHtmlViewer()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5l4 5-4 5M10 15h6"/></svg>
+    <span class="nav-tip">HTML Note Viewer</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="openSharePanel()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 8a3 3 0 100-6 3 3 0 000 6zM5 12a3 3 0 100-6 3 3 0 000 6zM15 18a3 3 0 100-6 3 3 0 000 6zM8 10.5l4 2M12 7.5l-4 2"/></svg>
+    <span class="nav-tip">Share Note  ⌘⇧S</span>
+  </button>
+  <button class="nav-btn" onclick="toggleHistoryPanel()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/><path d="M3 10A7 7 0 012 7M3 10l-2 1.5M3 10l1.5-2"/></svg>
+    <span class="nav-tip">Version History</span>
+  </button>
+  <button class="nav-btn" onclick="toggleDark()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" id="darkIco"><path d="M17.5 12A7.5 7.5 0 118 2.5a5.5 5.5 0 009.5 9.5z"/></svg>
+    <span class="nav-tip">Dark mode  ⌘⇧D</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-top">
+    <div class="sb-search" onclick="showToast('⌘K — Global Search')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <span>Search notes…</span>
+      <span class="sb-kbd">⌘K</span>
+    </div>
+    <button class="sb-btn" onclick="createNote()" title="New note">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+    </button>
+  </div>
+  <div class="sb-tree">
+    <div class="shelf open" id="s1">
+      <div class="shelf-hdr" onclick="toggleShelf('s1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📔</span><span class="nb-name">Transformers</span><span class="nb-count">3</span></div>
+          <div class="nb-body">
+            <div class="note-item active" onclick="openNote(this,'Transformer Architecture Deep Dive','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings, tradeoffs.</div>
+            </div>
+            <div class="note-item" onclick="openNote(this,'BERT vs GPT Analysis','Idea')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-prev">Bidirectional vs autoregressive use cases.</div>
+            </div>
+            <div class="note-item" onclick="openHtmlViewer()">
+              <div class="ni-top"><span class="ni-badge badge-html">HTML</span><span class="ni-date">Apr 20</span></div>
+              <div class="ni-title">Tata Motors Q4 — AI Report</div>
+              <div class="ni-prev">Auto-generated via Equity Monitor cron.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📗</span><span class="nb-name">RAG Patterns</span><span class="nb-count">2</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Hybrid Retrieval Strategies','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense, cross-encoder re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf open" id="s2">
+      <div class="shelf-hdr" onclick="toggleShelf('s2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📒</span><span class="nb-name">Daily Journal</span><span class="nb-count">12</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Monday Deep Work','Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══ NOTES VIEW ══ -->
+  <div class="view active" id="view-notes">
+    <div class="note-bar">
+      <div class="nb-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span><span>Transformers</span><span class="sep"> › </span>
+        <span class="cur" id="bcTitle">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="live-pill"><span class="live-dot"></span>Live AI · Claude</div>
+      <button class="tool-pill" onclick="toggleCommentsPanel()">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg>
+        Comments <span id="cpCount">(2)</span>
+      </button>
+      <button class="tool-pill" onclick="toggleHistoryPanel()" id="histBtn">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 2"/></svg>
+        History
+      </button>
+      <button class="tool-pill" onclick="openSharePanel()">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4a2 2 0 100-4 2 2 0 000 4zM3 8a2 2 0 100-4 2 2 0 000 4zM11 13a2 2 0 100-4 2 2 0 000 4zM5.5 6.5l3 1.5M8.5 5l-3 1.5"/></svg>
+        Share
+      </button>
+      <button class="tb-btn primary" style="font-size:11.5px;" onclick="saveNamedVersion()">Save</button>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="paper" id="paper">
+        <div class="paper-type-row">
+          <button class="ptype-pill pt-research" id="typePill" onclick="cycleType()">
+            <span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>Research
+          </button>
+          <span class="paper-date">Mar 16, 2026</span>
+        </div>
+        <textarea class="note-title" id="noteTitle" rows="1" placeholder="Untitled…" oninput="onTitle(this)">Transformer Architecture Deep Dive</textarea>
+        <hr class="paper-sep"/>
+
+        <div class="blocks-area" id="blocksArea">
+          <!-- BLOCK 1 — Hypothesis with comment dot -->
+          <div class="block" draggable="true" id="blk1">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</textarea></div></div>
+            <div class="blk-cdot" onclick="toggleCommentsPanel()">1</div>
+            <div class="blk-toolbar">
+              <button class="blk-tbtn" onclick="addCommentOnBlock('Hypothesis block')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg></button>
+              <button class="blk-tbtn rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+            </div>
+          </div>
+          <!-- BLOCK 2 — Key Differences -->
+          <div class="block" draggable="true" id="blk2">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-keydiff">
+              <div class="kd-hdr"><div class="kd-ch"><input value="Encoder-only (BERT)"/></div><div class="kd-ch"><input value="Decoder-only (GPT)"/></div></div>
+              <div class="kd-body">
+                <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Bidirectional attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Classification tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Needs fine-tuning</textarea></div></div>
+                <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Causal attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Generation tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Few-shot capable</textarea></div></div>
+              </div>
+            </div>
+            <div class="blk-toolbar">
+              <button class="blk-tbtn" onclick="addCommentOnBlock('Key Differences block')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg></button>
+              <button class="blk-tbtn rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+            </div>
+          </div>
+          <!-- BLOCK 3 — Findings -->
+          <div class="block" draggable="true" id="blk3">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-findings">
+              <div class="blk-findings-lbl">Key Findings</div>
+              <div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1">Self-attention scales quadratically — bottleneck for long sequences.</textarea></div>
+              <div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1">Learned vs sinusoidal positional encodings perform similarly in practice.</textarea></div>
+              <div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1">Multi-head attention attends to different representation subspaces simultaneously.</textarea></div>
+            </div>
+            <div class="blk-toolbar">
+              <button class="blk-tbtn" onclick="addCommentOnBlock('Key Findings block')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg></button>
+              <button class="blk-tbtn rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI block area -->
+        <div id="aiBlockArea"></div>
+
+        <!-- Live Claude ask box -->
+        <div style="background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-lg);padding:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+            <div style="width:22px;height:22px;border-radius:5px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;">C</div>
+            <span style="font-size:12px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;">Ask Claude — Live API</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;">● Connected</span>
+          </div>
+          <textarea id="claudeQ" style="width:100%;border:1px solid var(--p200);background:var(--surface);border-radius:var(--r-md);padding:9px 11px;font-family:'Lora',serif;font-size:14px;color:var(--t2);outline:none;resize:none;" rows="3" placeholder="Ask Claude about this note…&#10;e.g. 'What is FlashAttention and how does it solve the O(n²) bottleneck?' or 'Summarise this note in 3 bullet points'"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <button class="tb-btn primary" id="askBtn" onclick="askClaude()">✦ Ask Claude</button>
+            <button class="tb-btn" onclick="document.getElementById('aiBlockArea').innerHTML='';showToast('Cleared')">Clear</button>
+            <span style="font-size:11px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">Note context auto-included</span>
+          </div>
+        </div>
+
+        <textarea class="note-body" id="noteBody" placeholder="Continue writing… / for blocks  @ for AI" oninput="handleBody(event)" rows="5">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer on a toy dataset to validate core claims about positional encoding behaviour.</textarea>
+
+        <div class="paper-tags" style="margin-top:18px;padding-top:14px;">
+          <span class="paper-tag">transformers</span>
+          <span class="paper-tag">attention</span>
+          <span class="paper-tag">NLP</span>
+          <span class="paper-tag add" onclick="addTag()">+ tag</span>
+        </div>
+        <div class="slash-hint">
+          <span class="shl">Insert:</span>
+          <span class="shk" onclick="insertBlock('hyp')"><kbd>H</kbd> Hypothesis</span>
+          <span class="shk" onclick="insertBlock('con')"><kbd>C</kbd> Conclusion</span>
+          <span class="shk" onclick="insertBlock('keydiff')"><kbd>K</kbd> Key Diff</span>
+          <span class="shk" onclick="insertBlock('findings')"><kbd>F</kbd> Findings</span>
+          <span class="shk" onclick="insertBlock('code')"><kbd>`</kbd> Code</span>
+          <span class="shk" onclick="askClaude()">✦ @Claude</span>
+        </div>
+      </div>
+
+      <!-- HISTORY PANEL (inlined in editor-wrap) -->
+      <div class="history-panel" id="historyPanel">
+        <div class="hp-hdr">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--t3);"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 2"/></svg>
+          <div class="hp-title">Version History</div>
+          <button class="hp-close" onclick="toggleHistoryPanel()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <button class="hp-save-btn" onclick="saveNamedVersion()">💾 Save named snapshot…</button>
+        <div class="hp-body">
+          <div class="hp-section-lbl">Today</div>
+          <div class="version-item current-v">
+            <div class="vi-dot current"></div>
+            <div class="vi-info">
+              <div class="vi-label">Current</div>
+              <div class="vi-date">Just now · Auto-save</div>
+              <div class="vi-diff">+42 words</div>
+              <div class="vi-preview">Added FlashAttention reference to findings block…</div>
+            </div>
+            <span class="vi-restore" style="opacity:0.3;">—</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot named"></div>
+            <div class="vi-info">
+              <div class="vi-label">Before keydiff table</div>
+              <div class="vi-date">14:22 · Named snapshot</div>
+              <div class="vi-diff">+18 words</div>
+              <div class="vi-preview">Note had hypothesis block and body text only…</div>
+            </div>
+            <span class="vi-restore" onclick="restoreVersion(this)">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">13:55</div>
+              <div class="vi-diff">+105 words</div>
+              <div class="vi-preview">Key differences block added with 3 rows each side…</div>
+            </div>
+            <span class="vi-restore" onclick="restoreVersion(this)">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">13:30</div>
+            </div>
+            <span class="vi-restore" onclick="restoreVersion(this)">Restore</span>
+          </div>
+          <div class="hp-section-lbl" style="margin-top:10px;">Yesterday</div>
+          <div class="version-item">
+            <div class="vi-dot named"></div>
+            <div class="vi-info">
+              <div class="vi-label">First draft</div>
+              <div class="vi-date">Mar 15 · 11:04 · Named</div>
+              <div class="vi-preview">Initial hypothesis and literature review sections only…</div>
+            </div>
+            <span class="vi-restore" onclick="restoreVersion(this)">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">Mar 15 · 10:42</div>
+            </div>
+            <span class="vi-restore" onclick="restoreVersion(this)">Restore</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROMPT LIBRARY VIEW ══ -->
+  <div class="view" id="view-prompts">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+      <span class="vhbar-title">Prompt Library</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">+ New Prompt</button>
+      <button class="tb-btn primary">⏱ Scheduled Runs</button>
+    </div>
+    <div class="pl-view">
+      <div class="pl-toolbar">
+        <div class="pl-search"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg><input placeholder="Search prompts…"/></div>
+      </div>
+      <div class="pl-filters">
+        <div class="pl-f active">All</div><div class="pl-f">Research</div><div class="pl-f">Finance</div>
+        <div class="pl-f">Journal</div><div class="pl-f">HTML Reports</div><div class="pl-f">Cron Jobs</div>
+      </div>
+      <div class="pl-body">
+        <div class="pl-section-lbl">Scheduled Prompts (Cron Jobs)</div>
+        <div class="pl-grid">
+          <div class="pc" id="pc-equity" onclick="openPromptSlideover('equity')">
+            <div class="pc-top"><div class="pc-ico" style="background:var(--rose-bg);">📈</div><div><div class="pc-name">Equity Performance Monitor</div><div class="pc-cat">Finance · Cron · HTML Report</div></div></div>
+            <div class="pc-desc">Monitors {{company_list}} weekly. Generates HTML report with M-Score, ROIC/WACC, promoter pledge.</div>
+            <div class="pc-preview">Analyse {{company_list}} for week ending {{date}}. ROIC/WACC, M-Score, analyst consensus. Output HTML report.</div>
+            <div class="pc-footer"><span class="pc-cron-badge">⏱ Mon 08:00 IST</span><div style="display:flex;gap:3px;margin-left:auto;"><div style="width:15px;height:15px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">C</div></div><button class="pc-use" onclick="event.stopPropagation();showToast('Running Equity Monitor…')">▶ Run</button></div>
+          </div>
+          <div class="pc" onclick="openPromptSlideover('journal')">
+            <div class="pc-top"><div class="pc-ico" style="background:var(--amber-bg);">📔</div><div><div class="pc-name">Daily Journal Starter</div><div class="pc-cat">Journal · Cron</div></div></div>
+            <div class="pc-desc">Creates a pre-filled journal note every morning with yesterday's tasks and today's focus.</div>
+            <div class="pc-preview">Today is {{date}}. Create journal note: intention, top 3 tasks from yesterday, energy check-in.</div>
+            <div class="pc-footer"><span class="pc-cron-badge">⏱ Mon–Fri 07:00 IST</span><div style="display:flex;gap:3px;margin-left:auto;"><div style="width:15px;height:15px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">C</div></div><button class="pc-use" onclick="event.stopPropagation();showToast('Running Journal Starter…')">▶ Run</button></div>
+          </div>
+        </div>
+        <div class="pl-section-lbl" style="margin-top:4px;">All Prompts</div>
+        <div class="pl-grid">
+          <div class="pc" onclick="openPromptSlideover('research')">
+            <div class="pc-top"><div class="pc-ico" style="background:var(--teal-bg);">🔬</div><div><div class="pc-name">Research Deep Dive</div><div class="pc-cat">Research · Analysis</div></div></div>
+            <div class="pc-desc">Summarise key findings, tradeoffs, and open questions from your note content.</div>
+            <div class="pc-preview">Analyse: (1) core thesis, (2) findings, (3) open questions, (4) related gaps.</div>
+            <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">47 uses</span><button class="pc-use" onclick="event.stopPropagation();showToast('Used Research Deep Dive!')">Use</button></div>
+          </div>
+          <div class="pc" onclick="openPromptSlideover('html-report')">
+            <div class="pc-top"><div class="pc-ico" style="background:var(--orange-bg);">📄</div><div><div class="pc-name">Generate HTML Report</div><div class="pc-cat">HTML Notes · AI</div></div></div>
+            <div class="pc-desc">Generates a polished, self-contained HTML report from your note. Saved as HTML Note.</div>
+            <div class="pc-preview">Generate HTML report for {{topic}} with executive summary, data table, Chart.js charts.</div>
+            <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">24 uses</span><button class="pc-use" onclick="event.stopPropagation();showToast('Generating HTML Report…')">Use</button></div>
+          </div>
+          <div class="pc" style="border-style:dashed;border-color:var(--p300);background:var(--p50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:180px;cursor:pointer;" onclick="showToast('New Prompt modal — see v6 for full editor')">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--p600)" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg></div>
+            <div style="font-size:13px;font-weight:500;color:var(--p600);">New Prompt</div>
+            <div style="font-size:11px;color:var(--t3);text-align:center;max-width:160px;">Custom prompt with variables, AI provider, cron schedule</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ══════════ NOTE SHARE PANEL ══════════ -->
+<div class="share-panel" id="sharePanel">
+  <div class="sp-hdr">
+    <div class="sp-title">
+      <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4a2 2 0 100-4 2 2 0 000 4zM3 8a2 2 0 100-4 2 2 0 000 4zM11 13a2 2 0 100-4 2 2 0 000 4zM5.5 6.5l3 1.5M8.5 5l-3 1.5"/></svg>
+      Share Note
+    </div>
+    <button class="sp-close" onclick="closeSharePanel()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="sp-body">
+    <!-- Share link -->
+    <div class="share-option">
+      <div class="so-hdr"><div class="so-ico">🔗</div><div class="so-name">Share via link</div></div>
+      <div class="so-desc">Anyone with the link can view this note. Updates sync automatically.</div>
+      <div class="share-link-row">
+        <input class="share-link-inp" value="https://lore.app/share/transformer-deep-dive-x4k9m" readonly/>
+        <button class="share-copy-btn" onclick="copyLink()">Copy</button>
+      </div>
+      <div class="share-link-toggle">
+        <div class="sw" id="linkSw" onclick="toggleShareLink()"></div>
+        <span id="linkStatus">Link active — anyone with URL can view</span>
+      </div>
+    </div>
+    <!-- Export -->
+    <div class="share-option">
+      <div class="so-hdr"><div class="so-ico">📥</div><div class="so-name">Export</div></div>
+      <div class="so-desc">Download in various formats. HTML exports include all blocks and AI responses.</div>
+      <div class="export-row">
+        <button class="export-btn" onclick="showToast('Exported as Markdown!')">📝 Markdown</button>
+        <button class="export-btn" onclick="showToast('Exported as PDF!')">📄 PDF</button>
+        <button class="export-btn" onclick="showToast('Exported as HTML!')">🌐 HTML</button>
+        <button class="export-btn" onclick="showToast('Copied as plain text!')">📋 Text</button>
+        <button class="export-btn" onclick="showToast('Exported as JSON!')">{ } JSON</button>
+      </div>
+    </div>
+    <!-- Embed -->
+    <div class="share-option">
+      <div class="so-hdr"><div class="so-ico">📎</div><div class="so-name">Embed as iframe</div></div>
+      <div class="so-desc">Paste into any website for a read-only embedded view of this note.</div>
+      <div class="embed-code">&lt;iframe<br/>&nbsp;&nbsp;src="https://lore.app/embed/transformer-x4k9m"<br/>&nbsp;&nbsp;width="100%" height="600"<br/>&nbsp;&nbsp;frameborder="0"&gt;<br/>&lt;/iframe&gt;</div>
+      <button class="share-copy-btn" style="margin-top:8px;width:100%;" onclick="showToast('Embed code copied!')">Copy embed code</button>
+    </div>
+    <!-- GitHub Gist -->
+    <div class="share-option">
+      <div class="so-hdr"><div class="so-ico" style="font-size:15px;">🐙</div><div class="so-name">Push to GitHub Gist</div></div>
+      <div class="so-desc">Save to your connected GitHub account as a private or public Gist.</div>
+      <div class="export-row">
+        <button class="export-btn" onclick="showToast('Pushed to private Gist!')">🔒 Private Gist</button>
+        <button class="export-btn" onclick="showToast('Pushed to public Gist!')">🌐 Public Gist</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BLOCK COMMENTS PANEL ══════════ -->
+<div class="comments-panel" id="commentsPanel">
+  <div class="cp-hdr">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--t3);flex-shrink:0;"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg>
+    <div class="cp-title">Block Comments</div>
+    <span class="cp-badge" id="cpBadge">2</span>
+    <button class="cp-x" onclick="toggleCommentsPanel()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="cp-body" id="cpBody">
+    <!-- Thread 1 -->
+    <div class="comment-thread" id="ct1">
+      <div class="ct-ref"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>Hypothesis block</div>
+      <div class="comment-item">
+        <div class="ci-hdr"><div class="ci-av">H</div><span class="ci-name">Harsha</span><span class="ci-time">14:22</span></div>
+        <div class="ci-text">Should this also cover the case where attention IS combined with recurrence? SSMs (Mamba, etc.) do this differently.</div>
+        <div class="ci-actions">
+          <button class="ci-btn resolve" onclick="resolveThread('ct1')">✓ Resolve</button>
+          <button class="ci-btn">Reply</button>
+        </div>
+      </div>
+      <div class="ct-reply-area">
+        <input class="ct-reply-inp" placeholder="Add a reply…" id="r-ct1" onkeydown="if(event.key==='Enter'){submitReply('ct1');event.preventDefault();}"/>
+        <button class="ct-reply-btn" onclick="submitReply('ct1')">Reply</button>
+      </div>
+    </div>
+    <!-- Thread 2 -->
+    <div class="comment-thread" id="ct2">
+      <div class="ct-ref"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>Key Findings block</div>
+      <div class="comment-item">
+        <div class="ci-hdr"><div class="ci-av">H</div><span class="ci-name">Harsha</span><span class="ci-time">13:55</span></div>
+        <div class="ci-text">Finding 3 should mention FlashAttention-3 as state-of-art for the quadratic bottleneck — IO-aware kernel avoids materialising the full attention matrix in HBM.</div>
+        <div class="ci-actions">
+          <button class="ci-btn resolve" onclick="resolveThread('ct2')">✓ Resolve</button>
+          <button class="ci-btn">Reply</button>
+        </div>
+      </div>
+      <div class="ct-reply-area">
+        <input class="ct-reply-inp" placeholder="Add a reply…" id="r-ct2" onkeydown="if(event.key==='Enter'){submitReply('ct2');event.preventDefault();}"/>
+        <button class="ct-reply-btn" onclick="submitReply('ct2')">Reply</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;border-top:1px solid var(--border);flex-shrink:0;">
+    <button class="tb-btn primary cp-add-btn" onclick="addNewThread()">+ Add Comment</button>
+  </div>
+</div>
+
+<!-- ══════════ PROMPT SLIDEOVER ══════════ -->
+<div class="prompt-slideover" id="promptSlideover">
+  <div class="pso-hdr">
+    <div class="pso-title">
+      <span id="psoIco">📈</span>
+      <span id="psoTitle">Equity Performance Monitor</span>
+      <button class="pso-close" onclick="closePromptSlideover()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="pso-cat" id="psoCat">Finance · Cron · HTML Report</div>
+  </div>
+  <div class="pso-body">
+    <!-- Next run countdown -->
+    <div class="pso-sec">
+      <div class="pso-lbl">Next Scheduled Run</div>
+      <div class="pso-countdown">
+        <div class="pso-cd-ico">⏱</div>
+        <div>
+          <div class="pso-cd-text"><strong>Mon Apr 28 · 08:00 IST</strong></div>
+          <div class="cd-chips" style="display:flex;align-items:center;gap:4px;margin-top:6px;">
+            <div class="cd-chip"><div class="cd-chip-n" id="psoD">2</div><div class="cd-chip-l">days</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-chip"><div class="cd-chip-n" id="psoH">14</div><div class="cd-chip-l">hrs</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-chip"><div class="cd-chip-n" id="psoM">32</div><div class="cd-chip-l">min</div></div>
+          </div>
+          <div class="pso-cd-text" style="margin-top:6px;font-size:11px;color:var(--t3);">Every <strong>Monday at 08:00 IST</strong></div>
+        </div>
+      </div>
+    </div>
+    <!-- Prompt body -->
+    <div class="pso-sec">
+      <div class="pso-lbl">Prompt</div>
+      <div class="pso-prompt-body" id="psoPrompt">Analyse {{company_list}} for the week ending {{date}}. Generate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus. Output as a polished HTML report.</div>
+    </div>
+    <!-- Variable values -->
+    <div class="pso-sec">
+      <div class="pso-lbl">Variable Values — editable for this run</div>
+      <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;">
+        <table class="var-tbl">
+          <thead><tr><th>Variable</th><th>Current value</th></tr></thead>
+          <tbody id="psoVars">
+            <tr><td>{{company_list}}</td><td><input value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td></tr>
+            <tr><td>{{date}}</td><td><input value="Auto: current Monday (IST)"/></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- AI Provider -->
+    <div class="pso-sec">
+      <div class="pso-lbl">AI Provider</div>
+      <div class="pso-prov-row">
+        <div class="prov-pill sel" onclick="selProv(this)"><div class="prov-logo" style="background:#7C3AED;">C</div>Claude</div>
+        <div class="prov-pill" onclick="selProv(this)"><div class="prov-logo" style="background:#10A37F;">G</div>GPT-4o</div>
+        <div class="prov-pill" onclick="selProv(this)"><div class="prov-logo" style="background:#4285F4;">G</div>Gemini</div>
+        <div class="prov-pill" onclick="selProv(this)"><div class="prov-logo" style="background:#F55036;">Q</div>Groq</div>
+      </div>
+    </div>
+    <!-- Run history -->
+    <div class="pso-sec">
+      <div class="pso-lbl">Run History</div>
+      <div class="run-hist"><span class="rh-status rhs-ok">✓ Success</span><span class="rh-date">Apr 21 · 08:00 IST</span><a class="rh-out" onclick="openHtmlViewer()">View HTML →</a></div>
+      <div class="run-hist"><span class="rh-status rhs-ok">✓ Success</span><span class="rh-date">Apr 14 · 08:00 IST</span><a class="rh-out" onclick="openHtmlViewer()">View HTML →</a></div>
+      <div class="run-hist"><span class="rh-status rhs-fail">✗ Failed</span><span class="rh-date">Apr 7 · 08:00 IST</span><span style="font-size:11px;color:var(--t4);">API timeout</span></div>
+      <div class="run-hist"><span class="rh-status rhs-ok">✓ Success</span><span class="rh-date">Mar 31 · 08:00 IST</span><a class="rh-out" onclick="openHtmlViewer()">View HTML →</a></div>
+    </div>
+  </div>
+  <div class="pso-footer">
+    <button class="tb-btn primary" style="flex:1;justify-content:center;" onclick="showToast('Running Equity Monitor now…');closePromptSlideover()">▶ Run Now</button>
+    <button class="tb-btn" style="flex:1;justify-content:center;" onclick="closePromptSlideover();showToast('Opening Prompt Editor…')">✏️ Edit</button>
+  </div>
+</div>
+
+<!-- ══════════ HTML VIEWER (full-screen) ══════════ -->
+<div class="html-viewer" id="htmlViewer">
+  <div class="hv-toolbar">
+    <div class="hv-title">
+      📄 Tata Motors Q4 FY2026 Analysis
+      <span class="hv-badge">HTML Note</span>
+    </div>
+    <div class="tb-sp"></div>
+    <button class="hv-btn" onclick="showToast('Linked to Equity Research notebook!')">📎 Link to note</button>
+    <button class="hv-btn" onclick="showToast('Edit source HTML…')">✏️ Edit source</button>
+    <button class="hv-btn" onclick="showToast('Exported!')">📤 Export .html</button>
+    <button class="hv-btn primary" onclick="showToast('Opened in full tab!')">⤢ Full tab</button>
+    <button class="hv-close" onclick="closeHtmlViewer()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="hv-zoom-bar">
+    <button class="hv-zoom-btn" onclick="changeZoom(-10)">−</button>
+    <span class="hv-zoom-val" id="zoomVal">100%</span>
+    <button class="hv-zoom-btn" onclick="changeZoom(10)">+</button>
+    <button class="hv-zoom-btn" onclick="resetZoom()" title="Fit">⤢</button>
+    <div style="flex:1;"></div>
+    <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Generated: Apr 25, 2026 · Claude Sonnet 4 · 84 KB · via Equity Performance Monitor</div>
+  </div>
+  <div class="hv-body">
+    <div class="hv-frame" id="hvFrame">
+      <div class="hv-report">
+        <div class="hv-report-hdr">
+          <div class="hv-report-logo">📊</div>
+          <div>
+            <div class="hv-report-title">Tata Motors Q4 FY2026</div>
+            <div class="hv-report-sub">AI-Generated Financial Analysis · NSE: TATAMOTORS</div>
+          </div>
+          <div class="hv-report-badge">✓ M-Score: Clean</div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-card"><div class="metric-n">₹932</div><div class="metric-l">Current Price</div><div class="metric-trend up">↑ +3.2% WoW</div></div>
+          <div class="metric-card"><div class="metric-n">1.24×</div><div class="metric-l">ROIC / WACC</div><div class="metric-trend up">↑ Value creating</div></div>
+          <div class="metric-card"><div class="metric-n">−0.82</div><div class="metric-l">Beneish M-Score</div><div class="metric-trend up">✓ Below threshold</div></div>
+          <div class="metric-card"><div class="metric-n">4.2%</div><div class="metric-l">Promoter Pledge</div><div class="metric-trend up">↓ Declining</div></div>
+        </div>
+        <table class="hv-table">
+          <thead><tr><th>Company</th><th>Price</th><th>ROIC/WACC</th><th>M-Score</th><th>Promoter %</th><th>Signal</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tata Motors</strong></td><td>₹932</td><td>1.24×</td><td>−0.82</td><td>4.2%</td><td><span class="sig-badge sig-ok">✓ BUY</span></td></tr>
+            <tr><td>Infosys</td><td>₹1,682</td><td>1.68×</td><td>−2.14</td><td>14.9%</td><td><span class="sig-badge sig-ok">✓ BUY</span></td></tr>
+            <tr><td>HDFC Bank</td><td>₹1,824</td><td>0.98×</td><td>−1.24</td><td>0%</td><td><span class="sig-badge sig-warn">⚠ HOLD</span></td></tr>
+            <tr><td>Reliance</td><td>₹2,945</td><td>1.12×</td><td>−0.64</td><td>50.3%</td><td><span class="sig-badge sig-warn">⚠ HOLD</span></td></tr>
+            <tr><td>TCS</td><td>₹3,612</td><td>1.52×</td><td>−1.87</td><td>72.1%</td><td><span class="sig-badge sig-ok">✓ BUY</span></td></tr>
+          </tbody>
+        </table>
+        <div class="hv-insight">
+          <div class="hv-insight-lbl">AI Insight · Claude Sonnet 4</div>
+          <div class="hv-insight-text">Infosys leads on ROIC/WACC spread (1.68×) with the cleanest Beneish M-Score at −2.14, well below the manipulation threshold of −1.78. Tata Motors shows improving fundamentals with declining promoter pledge. HDFC Bank's ROIC/WACC below 1× warrants caution in a high-rate environment. TCS remains a blue-chip compounder with strong cash generation.</div>
+        </div>
+        <div class="hv-gen-footer">
+          <span>Generated by Lore · Equity Performance Monitor · Claude Sonnet 4</span>
+          <span>Apr 25, 2026 · 08:04 IST</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QC + TOAST -->
+<button class="qc-fab" id="qcFab" onclick="toggleQC()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+<div class="qc-bubble" id="qcBubble">
+  <div class="qcb-hdr"><span class="qcb-t">Quick Capture</span><div class="qcb-types"><div class="qcb-ty on" onclick="setQCT(this)">Idea</div><div class="qcb-ty" onclick="setQCT(this)">Task</div><div class="qcb-ty" onclick="setQCT(this)">Research</div></div></div>
+  <div class="qcb-body"><input class="qcb-inp" id="qcTitle" placeholder="Title…" onkeydown="if(event.key==='Enter'){document.getElementById('qcBody').focus();}"/><textarea class="qcb-txt" id="qcBody" placeholder="Thought, link, snippet…"></textarea></div>
+  <div class="qcb-ftr"><span class="qcb-dest">→ Inbox</span><button class="qcb-save" onclick="saveQC()">Save ↵</button></div>
+</div>
+<div class="toast" id="toast"><span id="toastText">Done!</span></div>
+
+<script>
+/* ══ VIEW ══ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+
+/* ══ DARK MODE ══ */
+let dark = false;
+function toggleDark() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const ico = document.getElementById('darkIco');
+  if (ico) ico.innerHTML = dark
+    ? '<circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M10 3v1.5M10 15.5V17M3 10h1.5M15.5 10H17" stroke="currentColor" stroke-width="1.5"/>'
+    : '<path d="M17.5 12A7.5 7.5 0 118 2.5a5.5 5.5 0 009.5 9.5z" stroke="currentColor" stroke-width="1.6" fill="none"/>';
+}
+
+/* ══ SIDEBAR ══ */
+function toggleShelf(id) { document.getElementById(id)?.classList.toggle('open'); }
+function toggleNb(id) { document.getElementById(id)?.classList.toggle('open'); }
+function openNote(el, title, type) {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  el?.classList.add('active');
+  if (title) { document.getElementById('bcTitle').textContent = title; document.getElementById('noteTitle').value = title; autoResize(document.getElementById('noteTitle')); }
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+function createNote() {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  const body = document.querySelector('#nb1 .nb-body');
+  const ni = document.createElement('div'); ni.className = 'note-item active';
+  ni.innerHTML = `<div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Now</span></div><div class="ni-title">Untitled</div>`;
+  ni.onclick = () => openNote(ni,'Untitled','Research');
+  body.prepend(ni);
+  document.getElementById('noteTitle').value = ''; document.getElementById('bcTitle').textContent = 'Untitled';
+  document.getElementById('blocksArea').innerHTML = ''; document.getElementById('aiBlockArea').innerHTML = '';
+  document.getElementById('noteBody').value = '';
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => document.getElementById('noteTitle').focus(), 50);
+}
+
+/* ══ TITLE ══ */
+let td;
+function onTitle(el) {
+  autoResize(el);
+  const v = el.value || 'Untitled';
+  document.getElementById('bcTitle').textContent = v;
+  clearTimeout(td); td = setTimeout(() => { const a = document.querySelector('.note-item.active .ni-title'); if(a) a.textContent=v; addAutoSave(); }, 800);
+}
+function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+/* ══ NOTE TYPE ══ */
+const TYPES = ['research','journal','task','idea','reference'];
+const TYPE_LABELS = {research:'Research',journal:'Journal',task:'Task',idea:'Idea',reference:'Reference'};
+let typeIdx = 0;
+function cycleType() {
+  typeIdx = (typeIdx+1) % TYPES.length;
+  const t = TYPES[typeIdx];
+  const p = document.getElementById('typePill');
+  p.className = 'ptype-pill pt-' + t;
+  p.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>${TYPE_LABELS[t]}`;
+}
+
+/* ══ BLOCKS + DRAG ══ */
+let dragSrc = null;
+function insertBlock(type) {
+  const area = document.getElementById('blocksArea');
+  const w = document.createElement('div'); w.className='block'; w.draggable=true;
+  const handle = `<div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>`;
+  const toolbar = (extra='') => `<div class="blk-toolbar"><button class="blk-tbtn" onclick="addCommentOnBlock('${type} block')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V3a1 1 0 00-1-1z"/></svg></button><button class="blk-tbtn rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>`;
+  let inner='';
+  if(type==='hyp') inner=`<div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2" placeholder="State your hypothesis…"></textarea></div></div>`;
+  else if(type==='con') inner=`<div class="blk-callout con"><div class="blk-ico">🎯</div><div style="flex:1;"><div class="blk-lbl">Conclusion</div><textarea class="blk-txt" rows="2" placeholder="State your conclusion…"></textarea></div></div>`;
+  else if(type==='note-b') inner=`<div class="blk-callout note-b"><div class="blk-ico">📝</div><div style="flex:1;"><div class="blk-lbl">Note</div><textarea class="blk-txt" rows="2" placeholder="Insight…"></textarea></div></div>`;
+  else if(type==='keydiff') inner=`<div class="blk-keydiff"><div class="kd-hdr"><div class="kd-ch"><input value="Option A"/></div><div class="kd-ch"><input value="Option B"/></div></div><div class="kd-body"><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div></div><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div></div></div></div>`;
+  else if(type==='findings') inner=`<div class="blk-findings"><div class="blk-findings-lbl">Key Findings</div><div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1" placeholder="Finding 1…"></textarea></div><div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1" placeholder="Finding 2…"></textarea></div></div>`;
+  else if(type==='code') inner=`<div style="background:#0F0C1A;border-radius:var(--r-md);padding:12px 52px 12px 14px;"><div style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">code</div><textarea style="width:100%;border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;color:#C4B5FD;line-height:1.6;resize:none;" rows="5" placeholder="// code here…"></textarea></div>`;
+  if (!inner) return;
+  w.innerHTML = handle + inner + toolbar();
+  initDrag(w);
+  area.appendChild(w);
+  const first = w.querySelector('textarea,input'); if(first) first.focus();
+  w.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function initDrag(el) {
+  el.addEventListener('dragstart', e => { dragSrc=el; el.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',''); });
+  el.addEventListener('dragend', () => { dragSrc=null; el.classList.remove('dragging'); clearDO(); });
+  el.addEventListener('dragover', e => { e.preventDefault(); clearDO(); if(el!==dragSrc) el.classList.add('drag-over'); });
+  el.addEventListener('drop', e => { e.preventDefault(); clearDO(); if(dragSrc&&el!==dragSrc){ const area=dragSrc.parentElement; const si=[...area.children].indexOf(dragSrc),ti=[...area.children].indexOf(el); area.insertBefore(dragSrc,si<ti?el.nextSibling:el); showToast('Block moved!'); } });
+}
+function clearDO() { document.querySelectorAll('.drag-over').forEach(b=>b.classList.remove('drag-over')); }
+document.querySelectorAll('.block').forEach(initDrag);
+
+/* ══ BODY TRIGGERS ══ */
+function handleBody(e) {
+  const v = e.target.value;
+  if (v.endsWith('@')) { e.target.value=v.slice(0,-1); askClaude(); }
+  else if (v.endsWith('/')) { e.target.value=v.slice(0,-1); const b=prompt('Block: hyp, con, note-b, keydiff, findings, code'); if(b) insertBlock(b.trim()); }
+}
+function addTag() { const t=prompt('Tag:'); if(!t)return; const tags=document.querySelector('.paper-tags'); const add=tags.querySelector('.add'); const s=document.createElement('span'); s.className='paper-tag'; s.textContent=t.trim(); tags.insertBefore(s,add); }
+
+/* ══ LIVE CLAUDE ══ */
+let aiCalls = 0;
+async function askClaude() {
+  const q = document.getElementById('claudeQ').value.trim();
+  if (!q) { showToast('Enter a question first'); return; }
+  const btn = document.getElementById('askBtn');
+  btn.disabled=true; btn.textContent='⟳ Asking…';
+  const noteTitle = document.getElementById('noteTitle').value;
+  const noteBody = document.getElementById('noteBody').value;
+  // Create response block immediately
+  const area = document.getElementById('aiBlockArea');
+  const w = document.createElement('div'); w.className='block'; w.draggable=true;
+  const ts = Date.now();
+  w.innerHTML = `
+    <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/></svg></div>
+    <div class="blk-ai">
+      <div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:#7C3AED;">C</div><span class="blk-ai-name">Claude Sonnet 4</span><span class="blk-ai-time">${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · Live API</span></div>
+      <div style="font-size:11.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;padding:5px 8px;background:var(--surface);border-radius:5px;border:1px solid var(--border2);margin-bottom:8px;">Q: ${q}</div>
+      <div class="blk-ai-text" id="at${ts}"><span class="cursor"></span></div>
+      <div class="blk-ai-footer"><button class="blk-ai-btn" onclick="this.closest('.block').remove()">Remove</button><button class="blk-ai-btn" onclick="showToast('Copied!')">Copy</button></div>
+    </div>
+    <div class="blk-toolbar"><button class="blk-tbtn rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>`;
+  area.appendChild(w); initDrag(w); w.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const textEl = document.getElementById('at'+ts);
+  try {
+    const prompt = `You are a helpful assistant in a notes app. The user is working on a note titled "${noteTitle}". Note content: ${noteBody.slice(0,600)}. Question: ${q}. Respond concisely and helpfully. Focus on insight, not padding.`;
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No response.';
+    streamText(textEl, text);
+  } catch {
+    streamText(textEl, '(Claude API not reachable in this preview context. In the deployed Lore app, this would stream a live response from Claude Sonnet 4 with your note as context.)');
+  }
+  aiCalls++;
+  btn.disabled=false; btn.textContent='✦ Ask Claude';
+  document.getElementById('claudeQ').value='';
+  addAutoSave();
+}
+function streamText(el, text) {
+  let i=0; const speed=Math.max(10,Math.floor(2600/text.length));
+  const iv=setInterval(()=>{if(i>=text.length){clearInterval(iv);el.textContent=text;return;}el.innerHTML=text.slice(0,i++)+'<span class="cursor"></span>';},speed);
+}
+
+/* ══ NOTE SHARE PANEL ══ */
+function openSharePanel() { document.getElementById('sharePanel').classList.add('open'); }
+function closeSharePanel() { document.getElementById('sharePanel').classList.remove('open'); }
+function copyLink() { navigator.clipboard?.writeText('https://lore.app/share/transformer-deep-dive-x4k9m').catch(()=>{}); showToast('Link copied! 🔗'); }
+let linkActive = true;
+function toggleShareLink() {
+  linkActive = !linkActive;
+  const sw = document.getElementById('linkSw');
+  const status = document.getElementById('linkStatus');
+  sw.classList.toggle('off', !linkActive);
+  status.textContent = linkActive ? 'Link active — anyone with URL can view' : 'Link disabled — note is private';
+  showToast(linkActive ? 'Share link activated' : 'Share link disabled');
+}
+
+/* ══ VERSION HISTORY ══ */
+let histOpen = false;
+function toggleHistoryPanel() {
+  histOpen = !histOpen;
+  document.getElementById('historyPanel').classList.toggle('open', histOpen);
+  document.getElementById('histBtn').classList.toggle('on', histOpen);
+}
+function saveNamedVersion() {
+  const name = prompt('Name this version:');
+  if (!name) return;
+  const body = document.querySelector('#historyPanel .hp-body');
+  const item = document.createElement('div'); item.className='version-item';
+  item.innerHTML = `<div class="vi-dot named"></div><div class="vi-info"><div class="vi-label">${name}</div><div class="vi-date">Just now · Named</div></div><span class="vi-restore" onclick="restoreVersion(this)">Restore</span>`;
+  body.prepend(item);
+  showToast(`Version "${name}" saved!`);
+}
+let autoSaveCooldown = false;
+function addAutoSave() {
+  if (autoSaveCooldown) return;
+  autoSaveCooldown = true;
+  setTimeout(() => { autoSaveCooldown=false; }, 8000);
+}
+function restoreVersion(btn) {
+  const label = btn.closest('.version-item').querySelector('.vi-label').textContent;
+  showToast(`Restored: "${label}"`);
+}
+
+/* ══ BLOCK COMMENTS ══ */
+let commentsOpen = false, commentCount = 2;
+function toggleCommentsPanel() {
+  commentsOpen = !commentsOpen;
+  document.getElementById('commentsPanel').classList.toggle('open', commentsOpen);
+}
+function addCommentOnBlock(blockName) {
+  const tid = 'ct'+Date.now();
+  const thread = document.createElement('div'); thread.className='comment-thread'; thread.id=tid;
+  thread.innerHTML = `<div class="ct-ref"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>${blockName}</div><div class="comment-item"><div class="ci-hdr"><div class="ci-av">H</div><span class="ci-name">Harsha</span><span class="ci-time">just now</span></div><div class="ci-text" contenteditable style="outline:none;min-height:18px;">New comment…</div><div class="ci-actions"><button class="ci-btn resolve" onclick="resolveThread('${tid}')">✓ Resolve</button><button class="ci-btn">Reply</button></div></div><div class="ct-reply-area"><input class="ct-reply-inp" placeholder="Add a reply…" id="r-${tid}" onkeydown="if(event.key==='Enter'){submitReply('${tid}');event.preventDefault();}"/><button class="ct-reply-btn" onclick="submitReply('${tid}')">Reply</button></div>`;
+  document.getElementById('cpBody').prepend(thread);
+  commentCount++;
+  document.getElementById('cpBadge').textContent = commentCount;
+  document.getElementById('cpCount').textContent = '('+commentCount+')';
+  if (!commentsOpen) toggleCommentsPanel();
+  showToast('Comment added on '+blockName);
+}
+function resolveThread(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.opacity='0'; el.style.transition='opacity 0.3s';
+  setTimeout(()=>{ el.remove(); commentCount=Math.max(0,commentCount-1); document.getElementById('cpBadge').textContent=commentCount; document.getElementById('cpCount').textContent='('+commentCount+')'; },300);
+  showToast('Comment resolved ✓');
+}
+function submitReply(tid) {
+  const inp = document.getElementById('r-'+tid);
+  if (!inp?.value.trim()) return;
+  const thread = document.getElementById(tid);
+  const reply = document.createElement('div'); reply.className='comment-item';
+  reply.innerHTML = `<div class="ci-hdr"><div class="ci-av">H</div><span class="ci-name">Harsha</span><span class="ci-time">just now</span></div><div class="ci-text">${inp.value}</div>`;
+  thread.querySelector('.ct-reply-area').before(reply);
+  inp.value=''; showToast('Reply added!');
+}
+function addNewThread() {
+  const msg = prompt('Add a comment:');
+  if (!msg) return;
+  const tid='ct'+Date.now(); const thread=document.createElement('div'); thread.className='comment-thread'; thread.id=tid;
+  thread.innerHTML=`<div class="ct-ref"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>Note body</div><div class="comment-item"><div class="ci-hdr"><div class="ci-av">H</div><span class="ci-name">Harsha</span><span class="ci-time">just now</span></div><div class="ci-text">${msg}</div><div class="ci-actions"><button class="ci-btn resolve" onclick="resolveThread('${tid}')">✓ Resolve</button></div></div>`;
+  document.getElementById('cpBody').prepend(thread);
+  commentCount++; document.getElementById('cpBadge').textContent=commentCount; document.getElementById('cpCount').textContent='('+commentCount+')';
+  showToast('Comment added!');
+}
+
+/* ══ PROMPT SLIDEOVER ══ */
+const PROMPT_DATA = {
+  equity:{ico:'📈',title:'Equity Performance Monitor',cat:'Finance · Cron · HTML Report',prompt:'Analyse {{company_list}} for the week ending {{date}}. Generate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus. Output as a polished HTML report.'},
+  journal:{ico:'📔',title:'Daily Journal Starter',cat:'Journal · Cron',prompt:'Today is {{date}}. Create a journal note: intention for today, top 3 tasks from yesterday, energy check-in (1–5).'},
+  research:{ico:'🔬',title:'Research Deep Dive',cat:'Research · Analysis',prompt:'Analyse this research note: (1) core thesis, (2) key findings, (3) open questions, (4) related work gaps. Be concise.'},
+  'html-report':{ico:'📄',title:'Generate HTML Report',cat:'HTML Notes · AI',prompt:'Generate a polished HTML report for {{topic}}. Include: executive summary, data table for {{company_list}}, key insights, Chart.js charts.'},
+};
+function openPromptSlideover(id) {
+  const d = PROMPT_DATA[id] || PROMPT_DATA.equity;
+  document.getElementById('psoIco').textContent = d.ico;
+  document.getElementById('psoTitle').textContent = d.title;
+  document.getElementById('psoCat').textContent = d.cat;
+  document.getElementById('psoPrompt').textContent = d.prompt;
+  document.querySelectorAll('.pc').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('pc-'+id)?.classList.add('sel');
+  document.getElementById('promptSlideover').classList.add('open');
+}
+function closePromptSlideover() { document.getElementById('promptSlideover').classList.remove('open'); document.querySelectorAll('.pc').forEach(c=>c.classList.remove('sel')); }
+function selProv(btn) { btn.closest('.pso-prov-row').querySelectorAll('.prov-pill').forEach(p=>p.classList.remove('sel')); btn.classList.add('sel'); }
+
+/* ══ HTML VIEWER ══ */
+let zoomLevel = 100;
+function openHtmlViewer() { document.getElementById('htmlViewer').classList.add('open'); zoomLevel=100; applyZoom(); }
+function closeHtmlViewer() { document.getElementById('htmlViewer').classList.remove('open'); }
+function changeZoom(d) { zoomLevel=Math.max(50,Math.min(200,zoomLevel+d)); applyZoom(); }
+function resetZoom() { zoomLevel=100; applyZoom(); }
+function applyZoom() { const f=document.getElementById('hvFrame'); f.style.transform=`scale(${zoomLevel/100})`; document.getElementById('zoomVal').textContent=zoomLevel+'%'; }
+
+/* ══ QUICK CAPTURE ══ */
+let qcOpen=false;
+function toggleQC(){qcOpen=!qcOpen;document.getElementById('qcFab').classList.toggle('open',qcOpen);document.getElementById('qcBubble').classList.toggle('open',qcOpen);if(qcOpen)setTimeout(()=>document.getElementById('qcTitle').focus(),80);}
+function setQCT(el){document.querySelectorAll('.qcb-ty').forEach(t=>t.classList.remove('on'));el.classList.add('on');}
+function saveQC(){const t=document.getElementById('qcTitle').value.trim()||'Untitled capture';document.getElementById('qcTitle').value='';document.getElementById('qcBody').value='';toggleQC();showToast(`"${t}" saved to Inbox!`);}
+
+/* ══ TOAST ══ */
+let toastT;
+function showToast(msg){const el=document.getElementById('toast');document.getElementById('toastText').textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2400);}
+
+/* ══ PROMPT LIBRARY FILTER ══ */
+document.querySelectorAll('.pl-f').forEach(f=>f.addEventListener('click',()=>{document.querySelectorAll('.pl-f').forEach(x=>x.classList.remove('active'));f.classList.add('active');}));
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='n'){e.preventDefault();createNote();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='j'){e.preventDefault();toggleQC();}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='D'){e.preventDefault();toggleDark();}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='S'){e.preventDefault();openSharePanel();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='1'){e.preventDefault();switchView('notes',document.querySelectorAll('.nav-btn')[0]);}
+  if((e.metaKey||e.ctrlKey)&&e.key==='2'){e.preventDefault();switchView('prompts',document.querySelectorAll('.nav-btn')[1]);}
+  if(e.key==='Escape'){closeSharePanel();closePromptSlideover();closeHtmlViewer();if(commentsOpen)toggleCommentsPanel();if(qcOpen)toggleQC();}
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#sharePanel')&&!e.target.closest('[onclick*="openSharePanel"]')&&!e.target.closest('.tool-pill'))closeSharePanel();
+  if(!e.target.closest('#promptSlideover')&&!e.target.closest('.pc'))closePromptSlideover();
+  if(!e.target.closest('#commentsPanel')&&!e.target.closest('[onclick*="toggleCommentsPanel"]')&&!e.target.closest('.blk-cdot')&&!e.target.closest('.blk-tbtn')){}
+  if(!e.target.closest('#qcBubble')&&!e.target.closest('#qcFab')&&qcOpen)toggleQC();
+});
+
+/* ══ INIT ══ */
+const nt = document.getElementById('noteTitle');
+if (nt) { autoResize(nt); }
+// countdown tick
+setInterval(()=>{const m=document.getElementById('psoM');if(!m)return;let v=parseInt(m.textContent)-1;if(v<0){v=59;const h=document.getElementById('psoH');h.textContent=Math.max(0,parseInt(h.textContent)-1);}m.textContent=v<10?'0'+v:v;},60000);
+</script>
+</body>
+</html>

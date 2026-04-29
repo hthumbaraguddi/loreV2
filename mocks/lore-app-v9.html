@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lore v9</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sb-bg:#F0EEF9;--sb-border:#E2DEFA;--sb-text:#6B6585;--sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06);--sb-active:rgba(109,40,217,0.1);
+  --nav-bg:#EAE7F7;--nav-border:#DDD8F5;--nav-icon:rgba(80,60,160,0.45);
+  --bg:#FAFAF9;--canvas:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09);--border2:rgba(109,40,217,0.16);
+  --t1:#1C1829;--t2:#4A445F;--t3:#9490AA;--t4:#C4C0D4;
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-light:#FDE68A;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --red:#DC2626;--red-bg:#FEF2F2;
+  --orange:#C2410C;--orange-bg:#FFF7ED;
+  --slate:#475569;--slate-bg:#F8FAFC;
+  --nav-w:52px;--sb-w:250px;--tb-h:46px;--rp-w:240px;
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+}
+[data-theme="dark"]{
+  --sb-bg:#1E1A2E;--sb-border:#2D2650;--sb-text:#8C84A8;--sb-text-active:#E2DEFA;
+  --sb-hover:rgba(167,139,250,0.08);--sb-active:rgba(167,139,250,0.14);
+  --nav-bg:#17142B;--nav-border:#2D2650;--nav-icon:rgba(167,139,250,0.4);
+  --bg:#13101F;--canvas:#1A1729;--surface:#1E1A2E;--surface2:#17142B;
+  --border:rgba(167,139,250,0.1);--border2:rgba(167,139,250,0.18);
+  --t1:#F0EEFF;--t2:#C4B5FD;--t3:#7B6F9A;--t4:#4A4068;
+  --p50:#1E1A2E;--p100:#2D2650;--p200:#3D3570;--p300:#5B4DB0;
+  --p400:#8B5CF6;--p500:#A78BFA;--p600:#C4B5FD;--p700:#DDD6FE;
+  --amber:#FCD34D;--amber-bg:rgba(253,211,77,0.1);--teal:#34D399;--teal-bg:rgba(52,211,153,0.1);
+  --rose:#F472B6;--rose-bg:rgba(244,114,182,0.1);--blue:#60A5FA;--blue-bg:rgba(96,165,250,0.1);
+  --green:#4ADE80;--green-bg:rgba(74,222,128,0.1);--red:#F87171;--red-bg:rgba(248,113,113,0.1);
+  --shadow:0 1px 3px rgba(0,0,0,0.3),0 4px 14px rgba(0,0,0,0.2);
+  --shadow-lg:0 8px 30px rgba(0,0,0,0.4),0 2px 8px rgba(0,0,0,0.3);
+  --shadow-float:0 12px 40px rgba(0,0,0,0.5),0 3px 10px rgba(167,139,250,0.15);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;transition:background 0.25s,color 0.25s;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* NAV RAIL */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;transition:background 0.25s;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);transition:background 0.25s;}
+[data-theme="dark"] .nav-logo{color:#1C1829;}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--nav-icon);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+[data-theme="dark"] .nav-btn:hover,[data-theme="dark"] .nav-btn.active{background:rgba(167,139,250,0.15);color:var(--p400);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:var(--bg);font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:background 0.25s,border-color 0.25s;}
+.sb-top{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 9px;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .sb-search{background:rgba(255,255,255,0.04);}
+.sb-search:hover{border-color:var(--p300);background:var(--surface);}
+.sb-search span{font-size:12.5px;color:var(--t4);flex:1;}
+.sb-search svg{color:var(--t4);width:12px;height:12px;flex-shrink:0;}
+.sb-kbd{font-size:9px;color:var(--t4);background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;font-family:'JetBrains Mono',monospace;}
+.sb-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.5);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+[data-theme="dark"] .sb-btn{background:rgba(255,255,255,0.04);}
+.sb-btn:hover{background:var(--surface);color:var(--p600);}
+.sb-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+.shelf{}.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+[data-theme="dark"] .sh-count{background:rgba(167,139,250,0.1);}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:0.1s;border-left:2px solid transparent;}
+.note-item:hover{background:var(--sb-hover);}
+.note-item.active{background:var(--sb-active);border-left-color:var(--p600);}
+[data-theme="dark"] .note-item.active{border-left-color:var(--p400);}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p600);}
+.badge-html{background:var(--orange-bg);color:var(--orange);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;transition:background 0.25s;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+[data-theme="dark"] .tb-btn.primary{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+
+/* TOOLBAR */
+.note-bar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;padding:0 18px;flex-shrink:0;transition:background 0.25s;}
+.nb-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.nb-bc a{color:var(--p600);cursor:pointer;font-weight:500;}[data-theme="dark"] .nb-bc a{color:var(--p400);}
+.nb-bc .sep{color:var(--t4);font-size:10px;}.nb-bc .cur{color:var(--t2);font-weight:500;}
+.tool-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+.tool-pill:hover,.tool-pill.on{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+[data-theme="dark"] .tool-pill:hover,[data-theme="dark"] .tool-pill.on{color:var(--p400);}
+.ai-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--p300);background:var(--p50);color:var(--p600);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;}
+[data-theme="dark"] .ai-pill{border-color:var(--p400);background:var(--p100);color:var(--p400);}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* EDITOR */
+.editor-wrap{flex:1;display:flex;overflow:hidden;}
+
+/* ════ PAPER ════ */
+.paper{flex:1;overflow-y:auto;background:var(--canvas);padding:44px 60px 80px;display:flex;flex-direction:column;position:relative;transition:background 0.25s;}
+[data-theme="dark"] .paper{background:#1A1729;}
+.paper-type-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.ptype-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.15s;}
+.pt-research{background:var(--teal-bg);color:var(--teal);}
+.pt-journal{background:var(--amber-bg);color:var(--amber);}
+.pt-idea{background:var(--rose-bg);color:var(--rose);}
+.pt-task{background:var(--blue-bg);color:var(--blue);}
+.paper-date{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.note-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--t1);line-height:1.2;margin-bottom:16px;letter-spacing:-0.02em;resize:none;overflow:hidden;caret-color:var(--p600);}
+.note-title::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:20px;}
+
+/* ════ BLOCKS — DRAG-TO-REORDER ════ */
+.blocks-area{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.block{position:relative;border-radius:var(--r-md);transition:opacity 0.15s;}
+.block.dragging{opacity:0.4;}
+.block.drag-over{border-top:2px solid var(--p600);}
+/* drag handle */
+.blk-handle{position:absolute;left:-24px;top:50%;transform:translateY(-50%);width:18px;height:24px;display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--t4);opacity:0;transition:0.15s;border-radius:4px;}
+.block:hover .blk-handle{opacity:1;}
+.blk-handle:hover{background:var(--p50);color:var(--p600);}
+.blk-handle:active{cursor:grabbing;}
+.blk-handle svg{width:12px;height:12px;}
+/* del btn */
+.blk-del{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);opacity:0;transition:0.15s;}
+.block:hover .blk-del{opacity:1;}
+.blk-del:hover{background:var(--rose-bg);color:var(--rose);}
+.blk-del svg{width:10px;height:10px;}
+/* callout */
+.blk-callout{display:flex;gap:10px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:11px 36px 11px 13px;}
+.hyp{background:var(--amber-bg);border-color:var(--amber);}
+.con{background:var(--teal-bg);border-color:var(--teal);}
+.note-b{background:var(--p50);border-color:var(--p400);}
+.warn{background:var(--orange-bg);border-color:var(--orange);}
+.quote-b{background:var(--slate-bg);border-color:var(--slate);}
+.blk-ico{font-size:14px;flex-shrink:0;margin-top:1px;}
+.blk-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.hyp .blk-lbl{color:var(--amber);}.con .blk-lbl{color:var(--teal);}.note-b .blk-lbl{color:var(--p600);}
+[data-theme="dark"] .note-b .blk-lbl{color:var(--p400);}
+.warn .blk-lbl{color:var(--orange);}.quote-b .blk-lbl{color:var(--slate);}
+.blk-txt{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-style:italic;line-height:1.65;color:var(--t2);width:100%;resize:none;}
+.blk-txt::placeholder{color:var(--t4);}
+/* keydiff */
+.blk-keydiff{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;padding-right:36px;}
+.kd-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-col-hdr{flex:1;padding:6px 10px;font-size:10.5px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+[data-theme="dark"] .kd-col-hdr{color:var(--p400);}
+.kd-col-hdr:last-child{border-right:none;}
+.kd-col-hdr input{border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:inherit;width:100%;}
+.kd-body{display:flex;}.kd-col{flex:1;border-right:1px solid var(--border2);}.kd-col:last-child{border-right:none;}
+.kd-row{display:flex;gap:7px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--t2);align-items:flex-start;}.kd-row:last-child{border-bottom:none;}
+.kd-dot{width:5px;height:5px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:7px;}
+.kd-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;line-height:1.6;}
+.kd-inp::placeholder{color:var(--t4);}
+/* findings */
+.blk-findings{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:13px 36px 13px 13px;}
+.blk-findings-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p600);font-family:'JetBrains Mono',monospace;margin-bottom:9px;}
+[data-theme="dark"] .blk-findings-lbl{color:var(--p400);}
+.fi-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}.fi-row:last-child{border-bottom:none;}
+.fi-num{width:17px;height:17px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;margin-top:2px;}
+.fi-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;}
+.fi-inp::placeholder{color:var(--t4);}
+/* code */
+.blk-code{background:#0F0C1A;border-radius:var(--r-md);padding:12px 36px 12px 14px;}
+[data-theme="dark"] .blk-code{background:#080612;}
+.blk-code-lang{font-size:10px;color:rgba(255,255,255,0.3);font-family:'JetBrains Mono',monospace;margin-bottom:5px;}
+.blk-code textarea{width:100%;border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;color:#C4B5FD;line-height:1.6;resize:none;}
+.blk-code textarea::placeholder{color:rgba(255,255,255,0.15);}
+.blk-code .blk-del{color:rgba(255,255,255,0.3);}
+.blk-code .blk-del:hover{background:rgba(255,255,255,0.08);color:white;}
+/* checklist */
+.blk-check{padding-right:36px;}
+.check-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--blue);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:0.15s;}
+.check-box.done{background:var(--blue);border-color:var(--blue);}
+.check-box.done::after{content:'✓';font-size:9px;color:white;font-weight:700;}
+.check-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;color:var(--t2);flex:1;}
+.check-inp.done{text-decoration:line-through;color:var(--t4);}
+/* divider */
+.blk-divider{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.blk-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.blk-divider-dot{width:4px;height:4px;border-radius:50%;background:var(--t4);}
+/* image */
+.blk-image{border:2px dashed var(--border2);border-radius:var(--r-lg);padding:28px;text-align:center;cursor:pointer;color:var(--t4);margin-right:36px;transition:0.15s;}
+.blk-image:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+/* table */
+.blk-table{overflow-x:auto;margin-right:36px;}
+.blk-table table{width:100%;border-collapse:collapse;font-size:13px;}
+.blk-table th{padding:7px 10px;background:var(--p50);color:var(--p600);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-align:left;border:1px solid var(--border2);}
+[data-theme="dark"] .blk-table th{color:var(--p400);}
+.blk-table td{padding:7px 10px;border:1px solid var(--border2);color:var(--t2);}
+.blk-table td[contenteditable]{outline:none;}
+/* ai block */
+.blk-ai{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:13px 36px 13px 13px;}
+.blk-ai-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.blk-ai-logo{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;}
+.blk-ai-lbl{font-size:11px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .blk-ai-lbl{color:var(--p400);}
+.blk-ai-inp{width:100%;border:1px solid var(--p200);background:var(--surface);border-radius:6px;padding:8px;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);outline:none;resize:none;}
+.blk-ai-inp::placeholder{color:var(--t4);font-style:italic;}
+.blk-ai-footer{margin-top:8px;display:flex;gap:5px;}
+.blk-ai-btn{font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:3px 8px;cursor:pointer;}
+.blk-ai-btn.ask{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .blk-ai-btn.ask{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+
+/* @mention inline */
+.ai-mention-chip{display:inline-flex;align-items:center;gap:3px;background:var(--p100);color:var(--p600);border:1px solid var(--p200);border-radius:4px;padding:1px 6px;font-size:12px;font-family:'JetBrains Mono',monospace;cursor:default;vertical-align:middle;}
+[data-theme="dark"] .ai-mention-chip{background:var(--p200);color:var(--p400);}
+/* @mention dropdown */
+.mention-dd{position:absolute;z-index:400;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);box-shadow:var(--shadow-float);width:220px;overflow:hidden;display:none;}
+.mention-dd.open{display:block;}
+.mdd-hdr{padding:8px 12px 6px;font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);}
+.mi{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;transition:0.1s;}
+.mi:hover{background:var(--p50);}
+.mi-logo{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0;}
+.mi-name{font-size:13px;font-weight:500;color:var(--t1);}
+.mi-desc{font-size:11px;color:var(--t3);}
+.mi-badge{margin-left:auto;font-size:8.5px;font-family:'JetBrains Mono',monospace;padding:2px 5px;border-radius:3px;background:var(--green-bg);color:var(--green);}
+/* body textarea */
+.note-body{flex:1;width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:15.5px;line-height:1.85;color:var(--t2);resize:none;min-height:180px;caret-color:var(--p600);}
+.note-body::placeholder{color:var(--t4);font-style:italic;}
+/* tags */
+.paper-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.paper-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--p100);color:var(--p600);font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .paper-tag{background:var(--p200);color:var(--p400);}
+.paper-tag:hover{background:var(--p200);}
+.paper-tag.add{background:transparent;border:1px dashed var(--p300);color:var(--p600);}
+/* slash hint */
+.slash-hint{display:flex;align-items:center;gap:5px;padding:9px 0 0;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border);}
+.shl{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.shk{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--t3);background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;cursor:pointer;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.shk:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.shk kbd{font-family:inherit;font-size:9px;color:var(--p600);font-weight:600;background:var(--p50);border:1px solid var(--border2);border-radius:3px;padding:0 4px;}
+[data-theme="dark"] .shk kbd{background:var(--p100);color:var(--p400);}
+
+/* ════ SLASH PALETTE ════ */
+.slash-palette{position:absolute;z-index:500;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);box-shadow:var(--shadow-float);width:360px;max-height:420px;overflow:hidden;display:none;flex-direction:column;}
+.slash-palette.open{display:flex;}
+.sp-top{padding:12px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sp-search-row{display:flex;align-items:center;gap:7px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;}
+.sp-search-row:focus-within{border-color:var(--p400);}
+.sp-inp{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);width:100%;outline:none;}
+.sp-inp::placeholder{color:var(--t4);}
+.sp-close{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.sp-close:hover{background:var(--p50);}
+.sp-list{flex:1;overflow-y:auto;}
+.sp-cat-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;padding:10px 16px 4px;}
+.sp-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;transition:0.1s;}
+.sp-item:hover,.sp-item.sp-focused{background:var(--p50);}
+.sp-item-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sp-item-name{font-size:13px;font-weight:500;color:var(--t1);}
+.sp-item-desc{font-size:11px;color:var(--t3);margin-top:1px;}
+.sp-item-shortcut{margin-left:auto;font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;background:var(--p50);padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.sp-footer{padding:8px 16px;border-top:1px solid var(--border);display:flex;gap:12px;flex-shrink:0;}
+.sp-footer-hint{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--t4);}
+.sp-footer-hint kbd{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;color:var(--t3);}
+
+/* ════ RIGHT PANEL ════ */
+.right-panel{width:var(--rp-w);border-left:1px solid var(--border);background:var(--surface2);overflow-y:auto;flex-shrink:0;padding:16px 14px;transition:all 0.25s;}
+.right-panel.hidden{width:0;padding:0;overflow:hidden;border:none;}
+.rp-sec{margin-bottom:18px;}
+.rp-lbl{font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.rp-tag{font-size:10.5px;padding:2px 8px;border-radius:20px;background:var(--p100);color:var(--p600);cursor:pointer;font-family:'JetBrains Mono',monospace;border:1px solid var(--p200);transition:0.12s;}
+[data-theme="dark"] .rp-tag{background:var(--p200);color:var(--p400);}
+.rp-tag:hover{background:var(--p200);}
+.rp-lnk{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);cursor:pointer;margin-bottom:4px;transition:0.12s;}
+.rp-lnk:hover{border-color:var(--p300);}
+.rp-lnk-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.rp-lnk-txt{font-size:11px;color:var(--t2);flex:1;}
+.rp-lnk-type{font-size:8.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.stat-box{background:var(--p50);border:1px solid var(--p200);border-radius:7px;padding:7px;text-align:center;}
+.stat-n{font-size:17px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+[data-theme="dark"] .stat-n{color:var(--p400);}
+.stat-l{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+/* Mini graph */
+.mini-graph{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:6px;overflow:hidden;}
+.mini-graph svg{width:100%;height:120px;}
+
+/* ════ NOTE SHARE PANEL ════ */
+.share-panel{position:fixed;right:-380px;top:0;bottom:0;width:360px;background:var(--surface);border-left:1px solid var(--border);z-index:700;display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg);}
+.share-panel.open{right:0;}
+.sp-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sp-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.sp-x{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.sp-x:hover{background:var(--p50);}
+.sp-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.sp-option{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:12px;cursor:pointer;transition:0.15s;}
+.sp-option:hover{border-color:var(--p300);}
+.sp-option-hdr{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
+.sp-option-ico{font-size:18px;flex-shrink:0;}
+.sp-option-name{font-size:13px;font-weight:600;color:var(--t1);}
+.sp-option-desc{font-size:11.5px;color:var(--t3);line-height:1.5;}
+.sp-option-action{margin-top:10px;display:flex;gap:7px;}
+.sp-link-input{flex:1;border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--p50);outline:none;}
+.sp-copy-btn{padding:6px 12px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:0.12s;}
+[data-theme="dark"] .sp-copy-btn{background:var(--p400);color:#1C1829;}
+.sp-copy-btn:hover{background:var(--p700);}
+.sp-export-row{display:flex;gap:6px;margin-top:10px;}
+.sp-export-btn{flex:1;padding:7px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;text-align:center;transition:0.12s;font-family:'DM Sans',sans-serif;}
+.sp-export-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+/* embed code */
+.embed-code{background:#0F0C1A;border-radius:var(--r-md);padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#C4B5FD;line-height:1.6;margin-top:10px;word-break:break-all;}
+
+/* ════ KEYBOARD CHEATSHEET ════ */
+.cheatsheet-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.65);z-index:900;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+[data-theme="dark"] .cheatsheet-overlay{background:rgba(8,6,18,0.8);}
+.cheatsheet-overlay.open{display:flex;}
+.cheatsheet{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);width:620px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;}
+.cs-header{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.cs-title{font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.cs-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.cs-close:hover{background:var(--p50);}
+.cs-body{flex:1;overflow-y:auto;padding:16px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.cs-section-title{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:10px;grid-column:1/-1;}
+.cs-group{display:flex;flex-direction:column;gap:0;}
+.cs-group-title{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:7px;font-family:'DM Sans',sans-serif;}
+.cs-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
+.cs-row:last-child{border-bottom:none;}
+.cs-desc{font-size:12px;color:var(--t2);}
+.cs-keys{display:flex;gap:3px;flex-shrink:0;}
+.cs-key{font-family:'JetBrains Mono',monospace;font-size:10.5px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;color:var(--t2);box-shadow:0 1px 0 var(--border2);}
+.cs-footer{padding:12px 24px;border-top:1px solid var(--border);text-align:center;font-size:11.5px;color:var(--t3);}
+
+/* ════ ONBOARDING ════ */
+.onboarding-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+[data-theme="dark"] .onboarding-overlay{background:rgba(8,6,18,0.85);}
+.onboarding{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);width:560px;overflow:hidden;}
+.ob-steps{display:flex;}
+.ob-step{display:none;flex-direction:column;flex:1;}
+.ob-step.active{display:flex;}
+.ob-hero{padding:36px 36px 24px;text-align:center;}
+.ob-emoji{font-size:48px;margin-bottom:16px;}
+.ob-title{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--t1);margin-bottom:8px;}
+.ob-sub{font-size:14px;color:var(--t3);line-height:1.6;max-width:400px;margin:0 auto;}
+.ob-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 28px 24px;}
+.ob-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 12px;text-align:center;}
+.ob-card-ico{font-size:24px;margin-bottom:8px;}
+.ob-card-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;}
+.ob-card-desc{font-size:11px;color:var(--t3);line-height:1.4;}
+.ob-footer{padding:16px 28px 24px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);}
+.ob-dots{display:flex;gap:5px;flex:1;justify-content:center;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--t4);transition:0.2s;}
+.ob-dot.active{background:var(--p600);width:20px;border-radius:20px;}
+.ob-next-btn{padding:9px 22px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.15s;}
+[data-theme="dark"] .ob-next-btn{background:var(--p400);color:#1C1829;}
+.ob-next-btn:hover{background:var(--p700);}
+.ob-skip{font-size:12px;color:var(--t4);cursor:pointer;padding:6px;}
+.ob-skip:hover{color:var(--t2);}
+/* ob feature list */
+.ob-features{padding:0 28px 20px;display:flex;flex-direction:column;gap:12px;}
+.ob-feat{display:flex;align-items:flex-start;gap:12px;}
+.ob-feat-ico{font-size:20px;flex-shrink:0;width:36px;height:36px;border-radius:10px;background:var(--p50);display:flex;align-items:center;justify-content:center;}
+.ob-feat-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px;}
+.ob-feat-desc{font-size:12px;color:var(--t3);line-height:1.5;}
+/* ob setup */
+.ob-setup{padding:0 28px 20px;display:flex;flex-direction:column;gap:12px;}
+.ob-field{display:flex;flex-direction:column;gap:5px;}
+.ob-label{font-size:12px;font-weight:500;color:var(--t2);}
+.ob-input{border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;background:var(--surface);}
+.ob-input:focus{border-color:var(--p400);}
+.ob-provider-row{display:flex;gap:6px;flex-wrap:wrap;}
+.ob-prov{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:12px;color:var(--t2);transition:0.12s;}
+.ob-prov:hover{border-color:var(--p300);}
+.ob-prov.sel{border-color:var(--p500);background:var(--p50);color:var(--p700);}
+[data-theme="dark"] .ob-prov.sel{color:var(--p400);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;}
+.modal-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-close{width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-close:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg);border-radius:var(--r-lg);padding:10px 18px;display:none;align-items:center;gap:8px;font-size:13px;font-weight:500;z-index:800;box-shadow:var(--shadow-lg);white-space:nowrap;}
+.toast.show{display:flex;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(8px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
+
+/* QC FAB */
+.qc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--p600);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(124,58,237,0.4);z-index:500;color:white;transition:all 0.2s;}
+[data-theme="dark"] .qc-fab{background:var(--p400);color:#1C1829;}
+.qc-fab:hover{transform:scale(1.08);}
+.qc-fab svg{width:20px;height:20px;transition:transform 0.2s;}
+.qc-fab.open svg{transform:rotate(45deg);}
+.qc-bubble{position:fixed;bottom:82px;right:24px;width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);box-shadow:var(--shadow-float);z-index:500;display:none;flex-direction:column;overflow:hidden;}
+.qc-bubble.open{display:flex;}
+.qcb-hdr{padding:10px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.qcb-title{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.qcb-types{display:flex;gap:3px;}
+.qcb-type{font-size:9px;padding:2px 6px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'JetBrains Mono',monospace;transition:0.12s;}
+.qcb-type.active{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .qcb-type.active{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.qcb-body{padding:10px 14px;}
+.qcb-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-weight:500;color:var(--t1);margin-bottom:6px;}
+.qcb-inp::placeholder{color:var(--t4);}
+.qcb-txt{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13px;line-height:1.65;color:var(--t2);resize:none;min-height:70px;}
+.qcb-txt::placeholder{color:var(--t4);font-style:italic;}
+.qcb-footer{padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.qcb-dest{font-size:11px;color:var(--t4);flex:1;font-family:'JetBrains Mono',monospace;}
+.qcb-save{padding:5px 14px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;}
+[data-theme="dark"] .qcb-save{background:var(--p400);color:#1C1829;}
+</style>
+</head>
+<body>
+
+<!-- NAV RAIL -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="openShare()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 8a3 3 0 100-6 3 3 0 000 6zM5 12a3 3 0 100-6 3 3 0 000 6zM15 18a3 3 0 100-6 3 3 0 000 6zM8 10.5l4 2M12 7.5l-4 2"/></svg>
+    <span class="nav-tip">Share Note</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="openCheatsheet()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="8"/><path d="M10 6v0M7 9a3 3 0 016 0c0 2-3 3-3 5"/><circle cx="10" cy="15" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Keyboard Shortcuts  ?</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar" onclick="openOnboarding()">H</div>
+</nav>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-top">
+    <div class="sb-search" onclick="alert('⌘K — Global Search')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <span>Search…</span>
+      <span class="sb-kbd">⌘K</span>
+    </div>
+    <button class="sb-btn" onclick="createNote()" title="New note  ⌘N">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+    </button>
+  </div>
+  <div class="sb-tree">
+    <div class="shelf open" id="s1">
+      <div class="shelf-hdr" onclick="toggleShelf('s1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📔</span><span class="nb-name">Transformers</span><span class="nb-count">3</span></div>
+          <div class="nb-body">
+            <div class="note-item active" id="ni-1" onclick="openNote(this,'Transformer Architecture Deep Dive','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings, tradeoffs.</div>
+            </div>
+            <div class="note-item" id="ni-2" onclick="openNote(this,'BERT vs GPT Analysis','Idea')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-prev">Bidirectional vs autoregressive enterprise use cases.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📗</span><span class="nb-name">RAG Patterns</span><span class="nb-count">2</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Hybrid Retrieval Strategies','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense, re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf open" id="s2">
+      <div class="shelf-hdr" onclick="toggleShelf('s2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📒</span><span class="nb-name">Daily Journal</span><span class="nb-count">12</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Monday — Deep Work Session','Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══ VIEW: NOTES ══ -->
+  <div class="view active" id="view-notes">
+    <div class="note-bar">
+      <div class="nb-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span>
+        <span>Transformers</span><span class="sep"> › </span>
+        <span class="cur" id="bcTitle">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <!-- toolbar pills -->
+      <button class="tool-pill" onclick="toggleDark()" id="darkBtn">🌙 Dark</button>
+      <button class="tool-pill" onclick="openSlashPalette()" title="Block palette  /"><svg style="width:11px;height:11px;margin-right:2px;" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h10M2 7h7M2 11h9"/></svg>/</button>
+      <div class="ai-pill" onclick="openMentionDD()"><div class="ai-dot"></div>@AI</div>
+      <button class="tool-pill on" id="rpToggle" onclick="toggleRP()">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M9 1v12"/></svg>
+        Panel
+      </button>
+      <button class="tool-pill" onclick="openShare()">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5a2 2 0 100-4 2 2 0 000 4zM3 8a2 2 0 100-4 2 2 0 000 4zM11 13a2 2 0 100-4 2 2 0 000 4zM5.5 7l3 1.5M8.5 5.5l-3 1.5"/></svg>
+        Share
+      </button>
+      <button class="tb-btn primary" style="font-size:11.5px;">Save</button>
+    </div>
+
+    <div class="editor-wrap" style="position:relative;">
+
+      <!-- @MENTION DROPDOWN -->
+      <div class="mention-dd" id="mentionDD" style="position:absolute;top:60px;left:80px;z-index:400;">
+        <div class="mdd-hdr">Ask AI — choose model</div>
+        <div class="mi" onclick="insertMention('Claude')"><div class="mi-logo" style="background:#7C3AED;">C</div><div><div class="mi-name">Claude</div><div class="mi-desc">Sonnet 4 · best for analysis</div></div><span class="mi-badge">Connected</span></div>
+        <div class="mi" onclick="insertMention('ChatGPT')"><div class="mi-logo" style="background:#10A37F;">G</div><div><div class="mi-name">ChatGPT</div><div class="mi-desc">GPT-4o · great for code</div></div><span class="mi-badge">Connected</span></div>
+        <div class="mi" onclick="insertMention('Gemini')"><div class="mi-logo" style="background:#4285F4;">G</div><div><div class="mi-name">Gemini</div><div class="mi-desc">1.5 Pro · long context</div></div></div>
+        <div class="mi" onclick="insertMention('Groq')"><div class="mi-logo" style="background:#F55036;">Q</div><div><div class="mi-name">Groq</div><div class="mi-desc">Llama 3 70B · fastest</div></div></div>
+      </div>
+
+      <!-- SLASH PALETTE -->
+      <div class="slash-palette" id="slashPalette">
+        <div class="sp-top">
+          <div class="sp-search-row">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+            <input type="text" class="sp-inp" id="spInput" placeholder="Search blocks…" oninput="filterBlocks(this.value)" onkeydown="spNav(event)"/>
+            <button class="sp-close" onclick="closeSlashPalette()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+        </div>
+        <div class="sp-list" id="spList"></div>
+        <div class="sp-footer">
+          <span class="sp-footer-hint"><kbd>↑↓</kbd> navigate</span>
+          <span class="sp-footer-hint"><kbd>↵</kbd> insert</span>
+          <span class="sp-footer-hint"><kbd>Esc</kbd> close</span>
+        </div>
+      </div>
+
+      <!-- PAPER -->
+      <div class="paper" id="paper">
+        <div class="paper-type-row">
+          <button class="ptype-pill pt-research" id="typePill" onclick="cycleType()">
+            <span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>Research
+          </button>
+          <span class="paper-date">Mar 16, 2026</span>
+        </div>
+        <textarea class="note-title" id="noteTitle" rows="1" placeholder="Untitled…" oninput="onTitle(this)">Transformer Architecture Deep Dive</textarea>
+        <hr class="paper-sep"/>
+
+        <!-- DRAGGABLE BLOCKS AREA -->
+        <div class="blocks-area" id="blocksArea">
+          <!-- BLOCK 1: Hypothesis -->
+          <div class="block" draggable="true" data-id="b1">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</textarea></div></div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+          <!-- BLOCK 2: Key Differences -->
+          <div class="block" draggable="true" data-id="b2">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-keydiff">
+              <div class="kd-hdr"><div class="kd-col-hdr"><input value="Encoder-only (BERT)"/></div><div class="kd-col-hdr"><input value="Decoder-only (GPT)"/></div></div>
+              <div class="kd-body">
+                <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Bidirectional attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Classification tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Needs fine-tuning</textarea></div></div>
+                <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Causal attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Generation tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Few-shot capable</textarea></div></div>
+              </div>
+            </div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+          <!-- BLOCK 3: Findings -->
+          <div class="block" draggable="true" data-id="b3">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-findings">
+              <div class="blk-findings-lbl">Key Findings</div>
+              <div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1">Self-attention scales quadratically — bottleneck for long sequences.</textarea></div>
+              <div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1">Learned vs sinusoidal positional encodings perform similarly.</textarea></div>
+              <div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1">Multi-head attention attends to different representation subspaces simultaneously.</textarea></div>
+            </div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+          <!-- BLOCK 4: Conclusion -->
+          <div class="block" draggable="true" data-id="b4">
+            <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+            <div class="blk-callout con"><div class="blk-ico">🎯</div><div style="flex:1;"><div class="blk-lbl">Conclusion</div><textarea class="blk-txt" rows="2">Transformers dominate NLP and increasingly vision. Master internals before fine-tuning.</textarea></div></div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+        </div>
+
+        <!-- drag-drop hint -->
+        <div style="font-size:11px;color:var(--t4);margin-bottom:12px;display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/></svg>Hover blocks to reveal drag handles — drag to reorder</div>
+
+        <!-- Body with @mention -->
+        <textarea class="note-body" id="noteBody" placeholder="Continue writing… @ for AI · / for blocks · [[ link note" oninput="handleBody(event)">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer on a toy dataset to validate core claims.</textarea>
+
+        <!-- Inline AI responses area -->
+        <div id="inlineAIArea"></div>
+
+        <div class="paper-tags">
+          <span class="paper-tag">transformers</span>
+          <span class="paper-tag">attention</span>
+          <span class="paper-tag">NLP</span>
+          <span class="paper-tag add" onclick="addTag()">+ tag</span>
+        </div>
+        <div class="slash-hint">
+          <span class="shl">Insert:</span>
+          <span class="shk" onclick="insertBlock('hyp')"><kbd>H</kbd> Hypothesis</span>
+          <span class="shk" onclick="insertBlock('con')"><kbd>C</kbd> Conclusion</span>
+          <span class="shk" onclick="insertBlock('keydiff')"><kbd>K</kbd> Key Diff</span>
+          <span class="shk" onclick="insertBlock('findings')"><kbd>F</kbd> Findings</span>
+          <span class="shk" onclick="insertBlock('checklist')"><kbd>T</kbd> Checklist</span>
+          <span class="shk" onclick="insertBlock('code')"><kbd>`</kbd> Code</span>
+          <span class="shk" onclick="insertBlock('table')"><kbd>G</kbd> Table</span>
+          <span class="shk" onclick="openSlashPalette()">/  All blocks</span>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel" id="rightPanel">
+        <div class="rp-sec">
+          <div class="rp-lbl">Location</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);"><div style="width:7px;height:7px;border-radius:50%;background:#7C3AED;flex-shrink:0;"></div>AI &amp; ML <span style="color:var(--t4);font-size:9.5px;"> shelf</span></div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);padding-left:12px;"><span style="font-size:10px;">📔</span> Transformers <span style="color:var(--t4);font-size:9.5px;">notebook</span></div>
+          </div>
+        </div>
+        <div class="rp-sec">
+          <div class="rp-lbl">Tags</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;"><span class="rp-tag">transformers</span><span class="rp-tag">attention</span><span class="rp-tag">NLP</span><span class="rp-tag">deep-learning</span></div>
+        </div>
+        <div class="rp-sec">
+          <div class="rp-lbl">Stats</div>
+          <div class="stat-grid">
+            <div class="stat-box"><div class="stat-n">847</div><div class="stat-l">words</div></div>
+            <div class="stat-box"><div class="stat-n">4</div><div class="stat-l">blocks</div></div>
+            <div class="stat-box"><div class="stat-n">4</div><div class="stat-l">AI calls</div></div>
+            <div class="stat-box"><div class="stat-n">3</div><div class="stat-l">links</div></div>
+          </div>
+        </div>
+        <div class="rp-sec">
+          <div class="rp-lbl">Linked Notes</div>
+          <div class="rp-lnk"><div class="rp-lnk-dot" style="background:var(--teal);"></div><div class="rp-lnk-txt">Hybrid Retrieval Strategies</div><div class="rp-lnk-type">Research</div></div>
+          <div class="rp-lnk"><div class="rp-lnk-dot" style="background:var(--blue);"></div><div class="rp-lnk-txt">36-Week AI Roadmap</div><div class="rp-lnk-type">Task</div></div>
+          <div class="rp-lnk"><div class="rp-lnk-dot" style="background:var(--rose);"></div><div class="rp-lnk-txt">BERT vs GPT Analysis</div><div class="rp-lnk-type">Idea</div></div>
+        </div>
+        <!-- Mini graph -->
+        <div class="rp-sec">
+          <div class="rp-lbl">Note Graph</div>
+          <div class="mini-graph">
+            <svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#DDD6FE" stroke-width="1.2" fill="none">
+                <line x1="110" y1="60" x2="50" y2="30"/><line x1="110" y1="60" x2="170" y2="30"/>
+                <line x1="110" y1="60" x2="50" y2="90"/><line x1="110" y1="60" x2="170" y2="90"/>
+              </g>
+              <g style="cursor:pointer;">
+                <circle cx="110" cy="60" r="18" fill="#7C3AED"/>
+                <text x="110" y="56" text-anchor="middle" fill="white" font-size="7" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text>
+                <text x="110" y="66" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="6" font-family="DM Sans,sans-serif">Architecture</text>
+              </g>
+              <g><circle cx="50" cy="30" r="13" fill="#0F766E"/><text x="50" y="33" text-anchor="middle" fill="white" font-size="6" font-weight="600" font-family="DM Sans,sans-serif">RAG</text></g>
+              <g><circle cx="170" cy="30" r="13" fill="#1D4ED8"/><text x="170" y="33" text-anchor="middle" fill="white" font-size="6" font-weight="600" font-family="DM Sans,sans-serif">Roadmap</text></g>
+              <g><circle cx="50" cy="90" r="12" fill="#D97706"/><text x="50" y="93" text-anchor="middle" fill="white" font-size="6" font-weight="600" font-family="DM Sans,sans-serif">Journal</text></g>
+              <g><circle cx="170" cy="90" r="12" fill="#BE185D"/><text x="170" y="93" text-anchor="middle" fill="white" font-size="6" font-weight="600" font-family="DM Sans,sans-serif">BERT/GPT</text></g>
+            </svg>
+          </div>
+          <div style="font-size:10px;color:var(--t4);text-align:center;margin-top:5px;font-family:'JetBrains Mono',monospace;">5 connections · click to explore</div>
+        </div>
+      </div>
+
+    </div><!-- /editor-wrap -->
+  </div><!-- /view-notes -->
+
+  <!-- ══ VIEW: GRAPH (placeholder) ══ -->
+  <div class="view" id="view-graph">
+    <div class="vhbar"><span class="vhbar-title">Knowledge Graph</span><div class="tb-sp"></div><button class="tool-pill" onclick="toggleDark()">🌙 Dark</button></div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--t3);">
+      <div style="font-size:48px;">🕸️</div>
+      <div style="font-family:'Lora',serif;font-size:18px;color:var(--t2);">Knowledge Graph</div>
+      <div style="font-size:13px;">Full interactive graph in v6 · Mini preview in right panel above</div>
+      <button class="tb-btn primary" onclick="switchView('notes',document.querySelectorAll('.nav-btn')[0])">Back to Notes →</button>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: SETTINGS ══ -->
+  <div class="view" id="view-settings">
+    <div class="vhbar"><span class="vhbar-title">Settings</span><div class="tb-sp"></div><button class="tool-pill" onclick="toggleDark()">🌙 Dark</button><button class="tb-btn primary">Save</button></div>
+    <div style="flex:1;overflow-y:auto;padding:28px 32px;max-width:580px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:14px;box-shadow:var(--shadow);">
+        <div style="font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:12px;">Appearance</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="flex:1;"><div style="font-size:13px;color:var(--t1);">Dark mode</div><div style="font-size:11px;color:var(--t3);">Deep purple canvas for late-night sessions</div></div><div style="width:36px;height:20px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:0.2s;" id="darkSw" onclick="toggleDark()"><div style="position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;" id="darkKnob"></div></div></div>
+        <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:13px;color:var(--t1);">Block drag-to-reorder</div><div style="font-size:11px;color:var(--t3);">Show drag handles when hovering blocks</div></div><div style="width:36px;height:20px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;" onclick=""><div style="position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:18px;box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div></div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:14px;box-shadow:var(--shadow);">
+        <div style="font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:12px;">Editor</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="flex:1;"><div style="font-size:13px;color:var(--t1);">Show right panel by default</div><div style="font-size:11px;color:var(--t3);">Stats, tags, linked notes, and mini graph</div></div><div style="width:36px;height:20px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;"><div style="position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:18px;box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div></div></div>
+        <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:13px;color:var(--t1);">@ triggers AI mention</div><div style="font-size:11px;color:var(--t3);">Opens model picker when @ is typed in note body</div></div><div style="width:36px;height:20px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;"><div style="position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:18px;box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div></div></div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);">Full settings — AI Providers, Profile, Sync &amp; Export, Templates, Cron Jobs — see v5/v6.</div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- SHARE PANEL -->
+<div class="share-panel" id="sharePanel">
+  <div class="sp-hdr">
+    <div style="font-size:16px;">🔗</div>
+    <div class="sp-title">Share Note</div>
+    <button class="sp-x" onclick="closeShare()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="sp-body">
+    <!-- Share link -->
+    <div class="sp-option">
+      <div class="sp-option-hdr"><div class="sp-option-ico">🔗</div><div class="sp-option-name">Share via link</div></div>
+      <div class="sp-option-desc">Anyone with the link can view this note. Updates sync automatically.</div>
+      <div class="sp-option-action">
+        <input class="sp-link-input" value="https://lore.app/share/transformer-deep-dive-x4k9m" readonly/>
+        <button class="sp-copy-btn" onclick="copyLink()">Copy</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:var(--t3);">
+        <div style="display:flex;align-items:center;gap:4px;"><div style="width:28px;height:16px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;"><div style="position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:2px;left:14px;"></div></div>Link active</div>
+        <span style="margin-left:auto;cursor:pointer;color:var(--p600);">Manage access</span>
+      </div>
+    </div>
+    <!-- Export -->
+    <div class="sp-option">
+      <div class="sp-option-hdr"><div class="sp-option-ico">📥</div><div class="sp-option-name">Export</div></div>
+      <div class="sp-option-desc">Download this note in various formats. HTML exports include all blocks.</div>
+      <div class="sp-export-row">
+        <button class="sp-export-btn" onclick="showToast('Exported as Markdown!')">📝 Markdown</button>
+        <button class="sp-export-btn" onclick="showToast('Exported as PDF!')">📄 PDF</button>
+        <button class="sp-export-btn" onclick="showToast('Exported as HTML!')">🌐 HTML</button>
+        <button class="sp-export-btn" onclick="showToast('Copied as text!')">📋 Text</button>
+      </div>
+    </div>
+    <!-- Embed -->
+    <div class="sp-option">
+      <div class="sp-option-hdr"><div class="sp-option-ico">📎</div><div class="sp-option-name">Embed as iframe</div></div>
+      <div class="sp-option-desc">Paste this code into any website to embed this note as a read-only view.</div>
+      <div class="embed-code">&lt;iframe src="https://lore.app/embed/transformer-deep-dive-x4k9m"<br/>&nbsp;&nbsp;width="100%" height="600"<br/>&nbsp;&nbsp;frameborder="0" style="border:none;"&gt;<br/>&lt;/iframe&gt;</div>
+      <button class="sp-copy-btn" style="margin-top:8px;width:100%;" onclick="showToast('Embed code copied!')">Copy embed code</button>
+    </div>
+    <!-- GitHub Gist -->
+    <div class="sp-option">
+      <div class="sp-option-hdr"><div class="sp-option-ico" style="font-size:15px;">🐙</div><div class="sp-option-name">Push to GitHub Gist</div></div>
+      <div class="sp-option-desc">Save to your connected GitHub Gist as a private or public note.</div>
+      <div class="sp-export-row">
+        <button class="sp-export-btn" onclick="showToast('Pushed to private Gist!')">🔒 Private Gist</button>
+        <button class="sp-export-btn" onclick="showToast('Pushed to public Gist!')">🌐 Public Gist</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KEYBOARD CHEATSHEET -->
+<div class="cheatsheet-overlay" id="cheatsheetOverlay" onclick="if(event.target===this)closeCheatsheet()">
+  <div class="cheatsheet">
+    <div class="cs-header">
+      <div class="cs-title">⌨️ Keyboard Shortcuts</div>
+      <span style="font-size:11.5px;color:var(--t3);margin-right:8px;">Press <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;border:1px solid var(--border2);border-radius:3px;padding:1px 5px;background:var(--surface2);">?</kbd> anytime</span>
+      <button class="cs-close" onclick="closeCheatsheet()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="cs-body">
+      <!-- General -->
+      <div class="cs-group">
+        <div class="cs-group-title">General</div>
+        <div class="cs-row"><span class="cs-desc">New note</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">N</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Quick capture</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">J</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Global search</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">K</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Save note</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">S</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Toggle dark mode</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">⇧</span><span class="cs-key">D</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Keyboard shortcuts</span><div class="cs-keys"><span class="cs-key">?</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Close / dismiss</span><div class="cs-keys"><span class="cs-key">Esc</span></div></div>
+      </div>
+      <!-- Editor -->
+      <div class="cs-group">
+        <div class="cs-group-title">Editor</div>
+        <div class="cs-row"><span class="cs-desc">Open block palette</span><div class="cs-keys"><span class="cs-key">/</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Ask AI inline</span><div class="cs-keys"><span class="cs-key">@</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Link a note</span><div class="cs-keys"><span class="cs-key">[[</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Toggle right panel</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">\</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Toggle AI chat</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">⇧</span><span class="cs-key">A</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Share note</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">⇧</span><span class="cs-key">S</span></div></div>
+      </div>
+      <!-- Blocks quick insert -->
+      <div class="cs-group">
+        <div class="cs-group-title">Quick insert (after /)</div>
+        <div class="cs-row"><span class="cs-desc">Hypothesis callout</span><div class="cs-keys"><span class="cs-key">H</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Conclusion callout</span><div class="cs-keys"><span class="cs-key">C</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Key Differences table</span><div class="cs-keys"><span class="cs-key">K</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Key Findings list</span><div class="cs-keys"><span class="cs-key">F</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Checklist</span><div class="cs-keys"><span class="cs-key">T</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Code block</span><div class="cs-keys"><span class="cs-key">`</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Table</span><div class="cs-keys"><span class="cs-key">G</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Divider</span><div class="cs-keys"><span class="cs-key">D</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Image placeholder</span><div class="cs-keys"><span class="cs-key">I</span></div></div>
+        <div class="cs-row"><span class="cs-desc">AI block</span><div class="cs-keys"><span class="cs-key">A</span></div></div>
+      </div>
+      <!-- Navigation -->
+      <div class="cs-group">
+        <div class="cs-group-title">Navigation</div>
+        <div class="cs-row"><span class="cs-desc">Notes view</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">1</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Prompt Library</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">2</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Knowledge Graph</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">3</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Scheduled Runs</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">4</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Split view 1 pane</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">⇧</span><span class="cs-key">1</span></div></div>
+        <div class="cs-row"><span class="cs-desc">Split view 2 panes</span><div class="cs-keys"><span class="cs-key">⌘</span><span class="cs-key">⇧</span><span class="cs-key">2</span></div></div>
+      </div>
+    </div>
+    <div class="cs-footer">All shortcuts shown use ⌘ (Mac) · substitute Ctrl on Windows / Linux</div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboarding">
+    <!-- STEP 1 -->
+    <div class="ob-step active" id="ob-step-1">
+      <div class="ob-hero">
+        <div class="ob-emoji">📔</div>
+        <div class="ob-title">Welcome to Lore</div>
+        <div class="ob-sub">Your AI-powered knowledge base. Notes that think with you — across research, journals, finance, and code.</div>
+      </div>
+      <div class="ob-cards">
+        <div class="ob-card"><div class="ob-card-ico">📚</div><div class="ob-card-name">Shelf</div><div class="ob-card-desc">Top-level organiser for a domain or project</div></div>
+        <div class="ob-card"><div class="ob-card-ico">📔</div><div class="ob-card-name">Notebook</div><div class="ob-card-desc">A collection of related notes within a shelf</div></div>
+        <div class="ob-card"><div class="ob-card-ico">📄</div><div class="ob-card-name">Note</div><div class="ob-card-desc">A single page with blocks, AI, and tags</div></div>
+      </div>
+      <div class="ob-footer">
+        <span class="ob-skip" onclick="closeOnboarding()">Skip</span>
+        <div class="ob-dots">
+          <div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext(2)">Next →</button>
+      </div>
+    </div>
+    <!-- STEP 2 -->
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-hero">
+        <div class="ob-emoji">⚡</div>
+        <div class="ob-title">Rich note blocks</div>
+        <div class="ob-sub">Build structured notes without forms. Type / to insert any block instantly — ideas flow first, structure follows.</div>
+      </div>
+      <div class="ob-features">
+        <div class="ob-feat"><div class="ob-feat-ico">💡</div><div><div class="ob-feat-name">Hypothesis &amp; Conclusion callouts</div><div class="ob-feat-desc">Structured research blocks with colour-coded borders</div></div></div>
+        <div class="ob-feat"><div class="ob-feat-ico">⚡</div><div><div class="ob-feat-name">Key Differences table</div><div class="ob-feat-desc">Side-by-side comparison of concepts, options, or tradeoffs</div></div></div>
+        <div class="ob-feat"><div class="ob-feat-ico">🔑</div><div><div class="ob-feat-name">Key Findings list</div><div class="ob-feat-desc">Numbered evidence list for research and analysis</div></div></div>
+        <div class="ob-feat"><div class="ob-feat-ico">⋮⋮</div><div><div class="ob-feat-name">Drag to reorder</div><div class="ob-feat-desc">Hover any block to reveal the drag handle — rearrange freely</div></div></div>
+      </div>
+      <div class="ob-footer">
+        <span class="ob-skip" onclick="closeOnboarding()">Skip</span>
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+        <button class="ob-next-btn" onclick="obNext(3)">Next →</button>
+      </div>
+    </div>
+    <!-- STEP 3 -->
+    <div class="ob-step" id="ob-step-3">
+      <div class="ob-hero">
+        <div class="ob-emoji">✦</div>
+        <div class="ob-title">AI built into every note</div>
+        <div class="ob-sub">Type @ to ask any AI model inline. Responses save as blocks. Schedule prompts to run automatically on a cron schedule.</div>
+      </div>
+      <div class="ob-features">
+        <div class="ob-feat"><div class="ob-feat-ico">@</div><div><div class="ob-feat-name">@claude, @chatgpt, @gemini, @groq</div><div class="ob-feat-desc">Type @ to pick a model — response appears as an inline block</div></div></div>
+        <div class="ob-feat"><div class="ob-feat-ico">⏱</div><div><div class="ob-feat-name">Scheduled AI Prompts (Cron Jobs)</div><div class="ob-feat-desc">Auto-run equity monitors, journal starters, research summaries</div></div></div>
+        <div class="ob-feat"><div class="ob-feat-ico">📄</div><div><div class="ob-feat-name">HTML Note generation</div><div class="ob-feat-desc">Claude generates rich HTML reports saved directly in your notebook</div></div></div>
+      </div>
+      <div class="ob-footer">
+        <span class="ob-skip" onclick="closeOnboarding()">Skip</span>
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div></div>
+        <button class="ob-next-btn" onclick="obNext(4)">Next →</button>
+      </div>
+    </div>
+    <!-- STEP 4: Setup -->
+    <div class="ob-step" id="ob-step-4">
+      <div class="ob-hero" style="padding-bottom:16px;">
+        <div class="ob-emoji">🚀</div>
+        <div class="ob-title">Quick setup</div>
+        <div class="ob-sub">Add your name and connect an AI provider to start. Keys are stored locally — never sent to Lore's servers.</div>
+      </div>
+      <div class="ob-setup">
+        <div class="ob-field"><label class="ob-label">Your name</label><input class="ob-input" placeholder="e.g. Harsha" value="Harsha"/></div>
+        <div class="ob-field"><label class="ob-label">Connect an AI provider (add key later in Settings)</label>
+          <div class="ob-provider-row">
+            <div class="ob-prov sel" onclick="selObProv(this)"><div style="width:16px;height:16px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;">C</div>Claude</div>
+            <div class="ob-prov" onclick="selObProv(this)"><div style="width:16px;height:16px;border-radius:3px;background:#10A37F;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;">G</div>ChatGPT</div>
+            <div class="ob-prov" onclick="selObProv(this)"><div style="width:16px;height:16px;border-radius:3px;background:#4285F4;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;">G</div>Gemini</div>
+            <div class="ob-prov" onclick="selObProv(this)"><div style="width:16px;height:16px;border-radius:3px;background:#F55036;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;">Q</div>Groq</div>
+          </div>
+        </div>
+        <div class="ob-field"><label class="ob-label">API Key <span style="color:var(--t4);font-weight:400;font-size:10.5px;">(stored locally, never sent to Lore)</span></label><input class="ob-input" type="password" placeholder="sk-ant-••••••••••••••••"/></div>
+      </div>
+      <div class="ob-footer" style="background:var(--p50);border-top:1px solid var(--border);">
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div></div>
+        <button class="ob-next-btn" onclick="closeOnboarding()">🎉 Start using Lore</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK CAPTURE FAB -->
+<button class="qc-fab" id="qcFab" onclick="toggleQC()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+<div class="qc-bubble" id="qcBubble">
+  <div class="qcb-hdr">
+    <span class="qcb-title">Quick Capture</span>
+    <div class="qcb-types">
+      <div class="qcb-type active" onclick="setQCT(this)">Idea</div>
+      <div class="qcb-type" onclick="setQCT(this)">Task</div>
+      <div class="qcb-type" onclick="setQCT(this)">Research</div>
+    </div>
+  </div>
+  <div class="qcb-body">
+    <input class="qcb-inp" id="qcTitle" placeholder="Title…" onkeydown="if(event.key==='Enter'){document.getElementById('qcBody').focus();}"/>
+    <textarea class="qcb-txt" id="qcBody" placeholder="Thought, link, snippet…"></textarea>
+  </div>
+  <div class="qcb-footer">
+    <span class="qcb-dest">→ Inbox</span>
+    <button class="qcb-save" onclick="saveQC()">Save ↵</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastText">Saved!</span></div>
+
+<script>
+/* ══ BLOCK CATALOGUE ══ */
+const BLOCKS = [
+  { id:'hyp',      cat:'Callouts',  ico:'💡', bg:'var(--amber-bg)', name:'Hypothesis',      desc:'State your core assumption',        key:'H' },
+  { id:'con',      cat:'Callouts',  ico:'🎯', bg:'var(--teal-bg)',  name:'Conclusion',       desc:'Summarise your takeaway',           key:'C' },
+  { id:'note-b',   cat:'Callouts',  ico:'📝', bg:'var(--p50)',      name:'Note / Insight',   desc:'A standalone insight',              key:'N' },
+  { id:'warn',     cat:'Callouts',  ico:'⚠️', bg:'var(--orange-bg)',name:'Warning',          desc:'Flag a risk or caveat',             key:'W' },
+  { id:'quote-b',  cat:'Callouts',  ico:'❝',  bg:'var(--slate-bg)', name:'Quote',            desc:'Pull a notable quote',              key:'Q' },
+  { id:'keydiff',  cat:'Structure', ico:'⚡', bg:'var(--p100)',     name:'Key Differences',  desc:'Side-by-side comparison',           key:'K' },
+  { id:'findings', cat:'Structure', ico:'🔑', bg:'var(--p100)',     name:'Key Findings',     desc:'Numbered evidence list',            key:'F' },
+  { id:'checklist',cat:'Structure', ico:'✅', bg:'var(--blue-bg)',  name:'Checklist',        desc:'Interactive to-do list',            key:'T' },
+  { id:'table',    cat:'Structure', ico:'📊', bg:'var(--p50)',      name:'Table',            desc:'2-column comparison grid',          key:'G' },
+  { id:'code',     cat:'Structure', ico:'💻', bg:'#1E1B2E',         name:'Code block',       desc:'Syntax-highlighted code',           key:'`' },
+  { id:'image',    cat:'Media',     ico:'🖼️', bg:'var(--blue-bg)',  name:'Image',            desc:'Upload or paste an image',          key:'I' },
+  { id:'divider',  cat:'Layout',    ico:'—',  bg:'var(--surface2)', name:'Divider',          desc:'Horizontal rule separator',         key:'D' },
+  { id:'ai',       cat:'AI',        ico:'✦',  bg:'var(--p100)',     name:'Ask Claude',       desc:'Inline AI prompt block',            key:'A' },
+  { id:'ai-gpt',   cat:'AI',        ico:'✦',  bg:'rgba(16,163,127,0.1)', name:'Ask ChatGPT', desc:'Inline GPT-4o prompt block',       key:'' },
+];
+let spFocused = -1, spFiltered = [...BLOCKS];
+
+function buildPalette(q) {
+  spFiltered = q ? BLOCKS.filter(b => b.name.toLowerCase().includes(q.toLowerCase()) || b.desc.toLowerCase().includes(q.toLowerCase())) : [...BLOCKS];
+  const cats = [...new Set(spFiltered.map(b => b.cat))];
+  const list = document.getElementById('spList');
+  list.innerHTML = cats.map(cat => {
+    const items = spFiltered.filter(b => b.cat === cat);
+    return `<div class="sp-cat-lbl">${cat}</div>` + items.map((b,i) => `
+      <div class="sp-item" onclick="insertBlock('${b.id}');closeSlashPalette()">
+        <div class="sp-item-ico" style="background:${b.ico==='—'||b.ico==='✦'||b.ico==='❝'?'var(--p50)':b.bg}">${b.ico}</div>
+        <div><div class="sp-item-name">${b.name}</div><div class="sp-item-desc">${b.desc}</div></div>
+        ${b.key ? `<div class="sp-item-shortcut">/${b.key}</div>` : ''}
+      </div>`).join('');
+  }).join('') || `<div style="padding:20px;text-align:center;font-size:12.5px;color:var(--t3);">No blocks found</div>`;
+  spFocused = -1;
+}
+function openSlashPalette() {
+  buildPalette('');
+  document.getElementById('spInput').value = '';
+  document.getElementById('slashPalette').classList.add('open');
+  document.getElementById('slashPalette').style.top = '80px';
+  document.getElementById('slashPalette').style.left = '60px';
+  document.getElementById('spInput').focus();
+}
+function closeSlashPalette() { document.getElementById('slashPalette').classList.remove('open'); }
+function filterBlocks(q) { buildPalette(q); }
+function spNav(e) {
+  const items = document.querySelectorAll('.sp-item');
+  if (e.key === 'ArrowDown') { spFocused = Math.min(spFocused+1, items.length-1); items.forEach((el,i)=>el.classList.toggle('sp-focused',i===spFocused)); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { spFocused = Math.max(spFocused-1, 0); items.forEach((el,i)=>el.classList.toggle('sp-focused',i===spFocused)); e.preventDefault(); }
+  else if (e.key === 'Enter') { if(spFocused>=0&&items[spFocused])items[spFocused].click(); e.preventDefault(); }
+  else if (e.key === 'Escape') closeSlashPalette();
+}
+
+/* ══ INSERT BLOCK ══ */
+function insertBlock(type) {
+  const area = document.getElementById('blocksArea');
+  const w = document.createElement('div');
+  w.className = 'block';
+  w.draggable = true;
+  const handle = `<div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>`;
+  const del = `<button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>`;
+  let inner = '';
+  if(type==='hyp') inner=`<div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2" placeholder="State your hypothesis…"></textarea></div></div>`;
+  else if(type==='con') inner=`<div class="blk-callout con"><div class="blk-ico">🎯</div><div style="flex:1;"><div class="blk-lbl">Conclusion</div><textarea class="blk-txt" rows="2" placeholder="State your conclusion…"></textarea></div></div>`;
+  else if(type==='note-b') inner=`<div class="blk-callout note-b"><div class="blk-ico">📝</div><div style="flex:1;"><div class="blk-lbl">Note</div><textarea class="blk-txt" rows="2" placeholder="Write your insight…"></textarea></div></div>`;
+  else if(type==='warn') inner=`<div class="blk-callout warn"><div class="blk-ico">⚠️</div><div style="flex:1;"><div class="blk-lbl">Warning</div><textarea class="blk-txt" rows="2" placeholder="Describe the risk…"></textarea></div></div>`;
+  else if(type==='quote-b') inner=`<div class="blk-callout quote-b"><div class="blk-ico" style="font-size:20px;color:var(--slate);">❝</div><div style="flex:1;"><div class="blk-lbl">Quote</div><textarea class="blk-txt" rows="2" placeholder="Paste a quote…"></textarea></div></div>`;
+  else if(type==='keydiff') inner=`<div class="blk-keydiff"><div class="kd-hdr"><div class="kd-col-hdr"><input value="Option A"/></div><div class="kd-col-hdr"><input value="Option B"/></div></div><div class="kd-body"><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 2…"></textarea></div></div><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 2…"></textarea></div></div></div></div>`;
+  else if(type==='findings') inner=`<div class="blk-findings"><div class="blk-findings-lbl">Key Findings</div><div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1" placeholder="Finding 1…"></textarea></div><div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1" placeholder="Finding 2…"></textarea></div><div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1" placeholder="Finding 3…"></textarea></div></div>`;
+  else if(type==='checklist') inner=`<div class="blk-check"><div class="check-row"><div class="check-box" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done',this.classList.contains('done'))"></div><input class="check-inp" placeholder="Task 1…"/></div><div class="check-row"><div class="check-box" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done',this.classList.contains('done'))"></div><input class="check-inp" placeholder="Task 2…"/></div></div>`;
+  else if(type==='table') inner=`<div class="blk-table"><table><thead><tr><th contenteditable="true">Column A</th><th contenteditable="true">Column B</th><th contenteditable="true">Column C</th></tr></thead><tbody><tr><td contenteditable="true">Cell</td><td contenteditable="true">Cell</td><td contenteditable="true">Cell</td></tr><tr><td contenteditable="true">Cell</td><td contenteditable="true">Cell</td><td contenteditable="true">Cell</td></tr></tbody></table></div>`;
+  else if(type==='code') inner=`<div class="blk-code"><div class="blk-code-lang">code</div><textarea placeholder="// Paste code here…" rows="5"></textarea></div>`;
+  else if(type==='image') inner=`<div class="blk-image"><div style="font-size:28px;margin-bottom:6px;">🖼️</div><div style="font-size:13px;">Click to upload image</div><div style="font-size:11px;margin-top:3px;font-family:'JetBrains Mono',monospace;">PNG, JPG, SVG · max 10MB</div></div>`;
+  else if(type==='divider') inner=`<div class="blk-divider"><hr/><div class="blk-divider-dot"></div><div class="blk-divider-dot"></div><div class="blk-divider-dot"></div><hr/></div>`;
+  else if(type==='ai'||type==='ai-gpt') {
+    const model=type==='ai-gpt'?'ChatGPT':'Claude', bg=type==='ai-gpt'?'#10A37F':'#7C3AED', ltr=type==='ai-gpt'?'G':'C';
+    inner=`<div class="blk-ai"><div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:${bg};">${ltr}</div><span class="blk-ai-lbl">${model} · Sonnet 4</span></div><textarea class="blk-ai-inp" rows="2" placeholder="Ask ${model} about this note…"></textarea><div class="blk-ai-footer"><button class="blk-ai-btn ask">Ask ${model}</button><button class="blk-ai-btn">Save as note</button></div></div>`;
+  }
+  if (!inner) return;
+  w.innerHTML = handle + inner + del;
+  initDragBlock(w);
+  area.appendChild(w);
+  const first = w.querySelector('textarea,input,[contenteditable]');
+  if (first) first.focus();
+  w.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ══ DRAG-TO-REORDER ══ */
+let dragSrc = null;
+function initDragBlock(el) {
+  el.addEventListener('dragstart', e => {
+    dragSrc = el; el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain','');
+  });
+  el.addEventListener('dragend', () => { dragSrc = null; el.classList.remove('dragging'); clearDragOver(); });
+  el.addEventListener('dragover', e => { e.preventDefault(); clearDragOver(); if(el!==dragSrc)el.classList.add('drag-over'); });
+  el.addEventListener('drop', e => {
+    e.preventDefault(); clearDragOver();
+    if (dragSrc && el !== dragSrc) {
+      const area = document.getElementById('blocksArea');
+      const blocks = [...area.children];
+      const si = blocks.indexOf(dragSrc), ti = blocks.indexOf(el);
+      if (si < ti) area.insertBefore(dragSrc, el.nextSibling);
+      else area.insertBefore(dragSrc, el);
+      showToast('Block reordered!');
+    }
+  });
+}
+function clearDragOver() { document.querySelectorAll('.block.drag-over').forEach(b=>b.classList.remove('drag-over')); }
+// Init existing blocks
+document.querySelectorAll('.block').forEach(initDragBlock);
+
+/* ══ @MENTION ══ */
+let mentionOpen = false;
+function openMentionDD() { document.getElementById('mentionDD').classList.add('open'); mentionOpen = true; }
+function closeMentionDD() { document.getElementById('mentionDD').classList.remove('open'); mentionOpen = false; }
+function insertMention(model) {
+  closeMentionDD();
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const logos  = { Claude:'C', ChatGPT:'G', Gemini:'G', Groq:'Q' };
+  const area   = document.getElementById('inlineAIArea');
+  const wrap   = document.createElement('div');
+  wrap.style.cssText = 'background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:13px 14px;margin-top:10px;';
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+      <div style="width:18px;height:18px;border-radius:4px;background:${colors[model]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${model==='Claude'?'white':'white'}">${logos[model]}</div>
+      <span style="font-size:11px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;">${model} · responding…</span>
+      <span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">just now</span>
+    </div>
+    <div style="font-size:13.5px;color:var(--t4);font-family:'Lora',serif;font-style:italic;" id="aiResp${Date.now()}">Thinking…</div>
+    <div style="margin-top:8px;display:flex;gap:5px;">
+      <button style="font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:3px 8px;cursor:pointer;">📋 Copy</button>
+      <button style="font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:3px 8px;cursor:pointer;" onclick="insertBlock('note-b')">+ Save as block</button>
+    </div>`;
+  area.appendChild(wrap);
+  const rid = Object.keys(wrap.querySelectorAll('[id]')).length > 0 ? wrap.querySelector('[id]')?.id : null;
+  const respEl = wrap.querySelector('div[id]');
+  const responses = [
+    `Based on your note, the O(n²) complexity of standard attention is the dominant scaling challenge. FlashAttention-3 addresses this by restructuring the computation to be IO-aware, avoiding materialising the full N×N attention matrix in slow HBM memory.`,
+    `The key tradeoff in your BERT vs GPT comparison: BERT's bidirectional context makes it superior for understanding tasks (classification, NER, QA), while GPT's autoregressive nature enables generation and few-shot prompting. For enterprise SAP workflows, use BERT-family for routing/classification, Claude/GPT for drafting responses.`
+  ];
+  setTimeout(() => { if(respEl) respEl.textContent = responses[Math.floor(Math.random()*responses.length)]; respEl && (respEl.style.color='var(--t2)'); }, 1000);
+}
+function handleBody(e) {
+  const val = e.target.value;
+  if (val.endsWith('@')) { e.target.value = val.slice(0,-1); openMentionDD(); }
+  else if (val.endsWith('/')) { e.target.value = val.slice(0,-1); openSlashPalette(); }
+  else if (val.endsWith('[[')) { e.target.value = val.slice(0,-2); showToast('[[  Note linker — see v8 for full flow'); }
+}
+
+/* ══ DARK MODE ══ */
+let dark = false;
+function toggleDark() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.querySelectorAll('#darkBtn,#darkSw').forEach(el => {
+    if (el.id==='darkBtn') el.textContent = dark ? '☀️ Light' : '🌙 Dark';
+  });
+  const knob = document.getElementById('darkKnob');
+  const sw   = document.getElementById('darkSw');
+  if (knob) { knob.style.left = dark ? '18px' : '2px'; }
+  if (sw)   { sw.style.background = dark ? 'var(--p600)' : 'var(--t4)'; }
+}
+
+/* ══ TITLE SYNC ══ */
+let td;
+function onTitle(el) {
+  el.style.height='auto'; el.style.height=el.scrollHeight+'px';
+  const v = el.value||'Untitled';
+  document.getElementById('bcTitle').textContent = v;
+  clearTimeout(td);
+  td = setTimeout(()=>{const a=document.querySelector('.note-item.active .ni-title');if(a)a.textContent=v;},400);
+}
+
+/* ══ NOTE ACTIONS ══ */
+const TYPES=['research','journal','task','idea','reference'];
+let typeIdx=0;
+function cycleType(){
+  typeIdx=(typeIdx+1)%TYPES.length;
+  const t=TYPES[typeIdx];const l={research:'Research',journal:'Journal',task:'Task',idea:'Idea',reference:'Reference'};
+  const p=document.getElementById('typePill');
+  p.className='ptype-pill pt-'+t;
+  p.innerHTML=`<span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>${l[t]}`;
+}
+function addTag(){const t=prompt('Add tag:');if(!t)return;const tags=document.querySelector('.paper-tags');const add=tags.querySelector('.add');const s=document.createElement('span');s.className='paper-tag';s.textContent=t.trim();tags.insertBefore(s,add);}
+function openNote(el,title,type){
+  document.querySelectorAll('.note-item').forEach(n=>n.classList.remove('active'));el?.classList.add('active');
+  if(title){document.getElementById('bcTitle').textContent=title;const nt=document.getElementById('noteTitle');if(nt)nt.value=title;}
+  switchView('notes',document.querySelectorAll('.nav-btn')[0]);
+}
+function createNote(){
+  document.querySelectorAll('.note-item').forEach(n=>n.classList.remove('active'));
+  const body=document.querySelector('#nb1 .nb-body');
+  const ni=document.createElement('div');ni.className='note-item active';
+  ni.innerHTML=`<div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Now</span></div><div class="ni-title">Untitled</div>`;
+  ni.onclick=()=>openNote(ni,'Untitled','Research');
+  body.prepend(ni);
+  document.getElementById('noteTitle').value='';
+  document.getElementById('bcTitle').textContent='Untitled';
+  document.getElementById('blocksArea').innerHTML='';
+  document.getElementById('inlineAIArea').innerHTML='';
+  switchView('notes',document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(()=>document.getElementById('noteTitle').focus(),60);
+}
+
+/* ══ SIDEBAR ══ */
+function toggleShelf(id){document.getElementById(id)?.classList.toggle('open');}
+function toggleNb(id){document.getElementById(id)?.classList.toggle('open');}
+
+/* ══ RIGHT PANEL ══ */
+let rpVisible = true;
+function toggleRP(){
+  rpVisible=!rpVisible;
+  document.getElementById('rightPanel').classList.toggle('hidden',!rpVisible);
+  document.getElementById('rpToggle').classList.toggle('on',rpVisible);
+}
+
+/* ══ SHARE PANEL ══ */
+function openShare(){document.getElementById('sharePanel').classList.add('open');}
+function closeShare(){document.getElementById('sharePanel').classList.remove('open');}
+function copyLink(){navigator.clipboard?.writeText('https://lore.app/share/transformer-deep-dive-x4k9m').catch(()=>{});showToast('Link copied!');}
+
+/* ══ CHEATSHEET ══ */
+function openCheatsheet(){document.getElementById('cheatsheetOverlay').classList.add('open');}
+function closeCheatsheet(){document.getElementById('cheatsheetOverlay').classList.remove('open');}
+
+/* ══ ONBOARDING ══ */
+let obStep=1;
+function openOnboarding(){document.getElementById('onboardingOverlay').style.display='flex';obStep=1;document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));document.getElementById('ob-step-1').classList.add('active');}
+function closeOnboarding(){document.getElementById('onboardingOverlay').style.display='none';}
+function obNext(step){
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ob-step-'+step)?.classList.add('active');
+  obStep=step;
+}
+function selObProv(el){document.querySelectorAll('.ob-prov').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
+
+/* ══ QUICK CAPTURE ══ */
+let qcOpen=false;
+function toggleQC(){
+  qcOpen=!qcOpen;
+  document.getElementById('qcFab').classList.toggle('open',qcOpen);
+  document.getElementById('qcBubble').classList.toggle('open',qcOpen);
+  if(qcOpen)setTimeout(()=>document.getElementById('qcTitle').focus(),80);
+}
+function setQCT(el){document.querySelectorAll('.qcb-type').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
+function saveQC(){
+  const t=document.getElementById('qcTitle').value.trim()||'Untitled capture';
+  document.getElementById('qcTitle').value='';document.getElementById('qcBody').value='';
+  toggleQC();showToast(`"${t}" saved to Inbox!`);
+}
+
+/* ══ TOAST ══ */
+let toastT;
+function showToast(msg){
+  const toast=document.getElementById('toast');
+  document.getElementById('toastText').textContent=msg;
+  toast.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toast.classList.remove('show'),2400);
+}
+
+/* ══ VIEW SWITCH ══ */
+function switchView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name)?.classList.add('active');
+  if(btn){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+}
+
+/* ══ KEYBOARD SHORTCUTS ══ */
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='n'){e.preventDefault();createNote();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='j'){e.preventDefault();toggleQC();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='\\'){e.preventDefault();toggleRP();}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='S'){e.preventDefault();openShare();}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='D'){e.preventDefault();toggleDark();}
+  if(e.key==='?'&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){openCheatsheet();}
+  if(e.key==='Escape'){closeSlashPalette();closeMentionDD();closeShare();closeCheatsheet();if(qcOpen)toggleQC();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='1'){e.preventDefault();switchView('notes',document.querySelectorAll('.nav-btn')[0]);}
+  if((e.metaKey||e.ctrlKey)&&e.key==='3'){e.preventDefault();switchView('graph',document.querySelectorAll('.nav-btn')[2]);}
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#slashPalette')&&!e.target.closest('.shk')&&!e.target.closest('.ai-pill')&&!e.target.closest('#mentionDD')){
+    closeSlashPalette();closeMentionDD();
+  }
+  if(!e.target.closest('#qcBubble')&&!e.target.closest('#qcFab')&&qcOpen)toggleQC();
+  if(!e.target.closest('#sharePanel')&&!e.target.closest('[onclick*="openShare"]')){closeShare();}
+});
+
+/* ══ INIT ══ */
+const nt=document.getElementById('noteTitle');
+if(nt){nt.style.height='auto';nt.style.height=nt.scrollHeight+'px';}
+buildPalette('');
+// Show onboarding on first load (comment out for repeat visits)
+setTimeout(()=>openOnboarding(),400);
+</script>
+</body>
+</html>

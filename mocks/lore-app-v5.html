@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lore v5 — Notes App</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sb-bg:#F0EEF9;--sb-border:#E2DEFA;--sb-text:#6B6585;--sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06);--sb-active:rgba(109,40,217,0.1);
+  --nav-bg:#EAE7F7;--nav-border:#DDD8F5;
+  --bg:#FAFAF9;--canvas:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09);--border2:rgba(109,40,217,0.16);
+  --t1:#1C1829;--t2:#4A445F;--t3:#9490AA;--t4:#C4C0D4;
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;
+  --amber:#D97706;--amber-bg:#FFFBEB;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --orange:#C2410C;--orange-bg:#FFF7ED;
+  --nav-w:52px;--sb-w:248px;--toolbar-h:46px;--panel-w:220px;
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* ═══ NAV RAIL ═══ */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(80,60,160,0.45);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:white;font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sb-topbar{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);flex-shrink:0;}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.7);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 8px;transition:all 0.15s;}
+.sb-search:focus-within{background:white;border-color:var(--p300);}
+.sb-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);width:100%;outline:none;}
+.sb-search input::placeholder{color:var(--t4);}
+.sb-search svg{color:var(--t4);flex-shrink:0;width:12px;height:12px;}
+.sb-vt{display:flex;gap:1px;background:var(--sb-border);border-radius:5px;padding:2px;flex-shrink:0;}
+.sb-vt-btn{width:24px;height:20px;border-radius:3px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);transition:0.15s;}
+.sb-vt-btn.active{background:white;color:var(--p600);}
+.sb-vt-btn svg{width:11px;height:11px;}
+.sb-icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+.sb-icon-btn:hover{background:white;color:var(--p600);}
+.sb-icon-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+/* shelf */
+.shelf{}
+.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+/* notebook */
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-hdr:hover .nb-add{opacity:1;}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-add{width:14px;height:14px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.nb-add svg{width:8px;height:8px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+/* note item */
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;position:relative;}
+.note-item:hover{background:rgba(109,40,217,0.05);}
+.note-item.active{background:rgba(109,40,217,0.08);border-left-color:var(--p600);}
+.note-item.open-right{background:rgba(109,40,217,0.04);border-left-color:var(--p300);border-left-style:dashed;}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ni-split-badge{position:absolute;top:5px;right:6px;font-size:8px;background:var(--p200);color:var(--p700);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;}
+/* badge colours */
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p700);}
+.badge-html{background:#FEF3C7;color:#92400E;}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--toolbar-h);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:9px;flex-shrink:0;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+.tb-btn.danger{background:var(--rose-bg);border-color:var(--rose);color:var(--rose);}
+.tb-btn.ghost{border:none;color:var(--t3);}
+
+/* ═══════════════════════════════════
+   SPLIT NOTES VIEW
+═══════════════════════════════════ */
+.notes-split-bar{height:var(--toolbar-h);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;}
+.nsb-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.nsb-bc a{color:var(--p600);font-weight:500;cursor:pointer;}
+.nsb-bc .cur{color:var(--t2);font-weight:500;}
+.nsb-bc .sep{color:var(--t4);}
+.split-toggle-group{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:2px;}
+.split-btn{width:28px;height:24px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.15s;}
+.split-btn.active{background:white;color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.1);}
+.split-btn svg{width:14px;height:14px;}
+.ai-pill-sm{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* split panes */
+.notes-split-body{flex:1;display:flex;overflow:hidden;}
+.note-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.note-pane+.note-pane{border-left:2px solid var(--p200);}
+.note-pane-header{height:38px;background:var(--p50);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;}
+.nph-title{font-size:12px;font-weight:500;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nph-type{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.nph-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;flex-shrink:0;}
+.nph-btn:hover{background:white;color:var(--p600);}
+.nph-btn svg{width:12px;height:12px;}
+.note-pane-body{flex:1;overflow-y:auto;padding:28px 36px;background:white;}
+/* paper elements */
+.paper-title-sm{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--t1);line-height:1.25;margin-bottom:14px;letter-spacing:-0.02em;resize:none;overflow:hidden;}
+.paper-title-sm::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:18px;}
+.paper-body-sm{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--t2);resize:none;min-height:200px;}
+.paper-body-sm::placeholder{color:var(--t4);font-style:italic;}
+/* blocks in split view */
+.blk-callout{display:flex;gap:10px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 12px;margin-bottom:12px;}
+.blk-callout.hyp{background:#FFFBF0;border-color:var(--amber);}
+.blk-callout.con{background:#F0FDF9;border-color:var(--teal);}
+.blk-callout.ai{background:var(--p50);border-color:var(--p400);}
+.blk-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.blk-callout.hyp .blk-lbl{color:var(--amber);}
+.blk-callout.con .blk-lbl{color:var(--teal);}
+.blk-callout.ai .blk-lbl{color:var(--p600);}
+.blk-txt{font-size:13.5px;line-height:1.6;color:var(--t2);font-family:'Lora',serif;font-style:italic;}
+.blk-ico{font-size:13px;flex-shrink:0;margin-top:1px;}
+/* keydiff small */
+.kd-sm{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-bottom:12px;}
+.kd-sm-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-sm-col-hdr{flex:1;padding:6px 10px;font-size:10px;font-weight:600;color:var(--p700);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+.kd-sm-col-hdr:last-child{border-right:none;}
+.kd-sm-body{display:flex;}
+.kd-sm-col{flex:1;border-right:1px solid var(--border2);}
+.kd-sm-col:last-child{border-right:none;}
+.kd-sm-row{display:flex;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--t2);align-items:flex-start;}
+.kd-sm-row:last-child{border-bottom:none;}
+.kd-sm-dot{width:4px;height:4px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:5px;}
+/* html note preview */
+.html-note-preview{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-bottom:12px;}
+.hnp-header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--orange-bg);border-bottom:1px solid var(--border2);}
+.hnp-icon{font-size:14px;}
+.hnp-name{font-size:12px;font-weight:500;color:var(--orange);}
+.hnp-actions{margin-left:auto;display:flex;gap:5px;}
+.hnp-btn{font-size:10.5px;padding:2px 8px;border-radius:5px;border:1px solid var(--border2);background:white;color:var(--t2);cursor:pointer;}
+.hnp-btn:hover{border-color:var(--p300);color:var(--p600);}
+.hnp-iframe-wrap{height:200px;overflow:hidden;background:#f9f9f9;}
+.hnp-iframe-wrap iframe{width:100%;height:100%;border:none;pointer-events:none;transform:scale(0.7);transform-origin:0 0;width:143%;height:143%;}
+/* pane add block bar */
+.pane-insert-bar{display:flex;align-items:center;gap:5px;padding:8px 14px;border-top:1px solid var(--border);background:var(--p50);flex-shrink:0;flex-wrap:wrap;}
+.pib-lbl{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-right:3px;}
+.pib-btn{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--t3);background:white;border:1px solid var(--border2);border-radius:5px;padding:3px 7px;cursor:pointer;transition:0.12s;font-family:'DM Sans',sans-serif;}
+.pib-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.pib-btn.html-btn{border-color:#F59E0B;color:#92400E;background:#FFFBEB;}
+.pib-btn.html-btn:hover{background:#FEF3C7;}
+/* resizer */
+.pane-resizer{width:4px;background:var(--p200);cursor:col-resize;flex-shrink:0;transition:background 0.15s;}
+.pane-resizer:hover,.pane-resizer.active{background:var(--p400);}
+
+/* ═══════════════════════════════════
+   SETTINGS
+═══════════════════════════════════ */
+.settings-wrap{flex:1;display:flex;overflow:hidden;}
+.settings-nav{width:180px;border-right:1px solid var(--border);background:white;padding:12px 0;flex-shrink:0;}
+.snav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:12.5px;color:var(--t2);border-left:2px solid transparent;transition:0.12s;}
+.snav-item:hover{background:var(--p50);color:var(--t1);}
+.snav-item.active{background:var(--p50);color:var(--p700);border-left-color:var(--p600);font-weight:500;}
+.snav-item svg{width:13px;height:13px;opacity:0.7;}
+.snav-divider{border:none;border-top:1px solid var(--border);margin:8px 0;}
+.settings-content{flex:1;overflow-y:auto;padding:24px 32px;}
+.s-panel{display:none;}
+.s-panel.active{display:block;}
+.s-sec{margin-bottom:28px;}
+.s-title{font-size:16px;font-weight:600;color:var(--t1);margin-bottom:3px;font-family:'Lora',serif;}
+.s-desc{font-size:12px;color:var(--t3);margin-bottom:14px;}
+.s-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;box-shadow:var(--shadow);}
+/* profile */
+.profile-avatar-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:white;flex-shrink:0;}
+.profile-avatar-actions{display:flex;flex-direction:column;gap:6px;}
+.form-row{display:flex;gap:12px;margin-bottom:12px;}
+.form-group{flex:1;display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11.5px;font-weight:500;color:var(--t2);}
+.form-input{border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;background:white;transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--p400);}
+.form-input::placeholder{color:var(--t4);}
+.form-textarea{resize:vertical;min-height:70px;font-family:'DM Sans',sans-serif;}
+.form-select{appearance:none;background:white url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239490AA' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;}
+/* toggle */
+.toggle-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.toggle-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.sw{width:32px;height:18px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;margin-top:2px;}
+.sw.on{background:var(--p600);}
+.sw::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.sw.on::after{left:16px;}
+/* select chips */
+.select-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.sel-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.sel-chip:hover{border-color:var(--p300);color:var(--p700);}
+.sel-chip.active{background:var(--p600);border-color:var(--p600);color:white;}
+/* api row */
+.api-row{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.api-row:last-child{margin-bottom:0;}
+.api-logo{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.api-info{flex:1;min-width:0;}
+.api-name{font-size:12px;font-weight:500;color:var(--t1);}
+.api-status{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.api-input{flex:2;border:1px solid var(--border2);border-radius:var(--r-md);padding:5px 9px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--p50);outline:none;}
+.api-input:focus{border-color:var(--p400);background:white;}
+.api-input::placeholder{color:var(--t4);}
+.api-btn{padding:4px 11px;border-radius:var(--r-md);border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;}
+.api-btn.on{background:var(--green-bg);border-color:#86EFAC;color:var(--green);}
+/* model grid */
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px;}
+.model-card{border:1px solid var(--border);border-radius:var(--r-md);padding:9px 11px;cursor:pointer;transition:0.15s;display:flex;gap:7px;}
+.model-card:hover{border-color:var(--p300);background:var(--p50);}
+.model-card.sel{border-color:var(--p500);background:var(--p50);}
+.model-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;margin-top:3px;}
+.model-card.sel .model-dot{background:var(--p600);border-color:var(--p600);}
+.model-name{font-size:12px;font-weight:500;color:var(--t1);}
+.model-desc{font-size:10px;color:var(--t3);margin-top:1px;}
+
+/* ═══ TEMPLATES ═══ */
+.tpl-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:4px;}
+.tpl-card{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;background:white;box-shadow:var(--shadow);}
+.tpl-card:hover{border-color:var(--p300);transform:translateY(-2px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.tpl-card.active-tpl{border-color:var(--p600);box-shadow:0 0 0 2px var(--p300);}
+.tpl-preview{height:100px;display:flex;flex-direction:column;gap:4px;padding:12px;border-bottom:1px solid var(--border);}
+.tpl-preview-line{height:8px;border-radius:20px;background:var(--p100);}
+.tpl-preview-line.h{height:11px;background:var(--p200);width:60%;}
+.tpl-preview-line.w30{width:30%;}
+.tpl-preview-line.w50{width:50%;}
+.tpl-preview-line.w80{width:80%;}
+.tpl-preview-callout{height:24px;border-radius:4px;background:var(--teal-bg);border-left:3px solid var(--teal);margin:4px 0;}
+.tpl-preview-keydiff{height:32px;border:1px solid var(--border2);border-radius:4px;display:flex;overflow:hidden;margin:4px 0;}
+.tpl-preview-keydiff-col{flex:1;padding:4px;border-right:1px solid var(--border2);}
+.tpl-preview-keydiff-col:last-child{border:none;}
+.tpl-preview-keydiff-line{height:5px;border-radius:3px;background:var(--p100);margin-bottom:2px;}
+.tpl-preview-check{height:6px;border-radius:3px;background:var(--blue-bg);margin-bottom:3px;display:flex;align-items:center;gap:3px;}
+.tpl-info{padding:10px 12px;}
+.tpl-name{font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+.tpl-desc{font-size:11px;color:var(--t3);line-height:1.4;}
+.tpl-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;}
+.tpl-tag{font-size:9.5px;padding:2px 6px;border-radius:20px;background:var(--p100);color:var(--p700);font-family:'JetBrains Mono',monospace;}
+/* template detail modal overlay */
+.tpl-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.5);z-index:500;display:none;align-items:center;justify-content:center;}
+.tpl-overlay.open{display:flex;}
+.tpl-modal{background:white;border-radius:var(--r-xl);width:720px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-float);}
+.tpl-modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.tpl-modal-icon{font-size:28px;flex-shrink:0;}
+.tpl-modal-title{font-size:20px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tpl-modal-desc{font-size:13px;color:var(--t3);margin-top:3px;}
+.tpl-modal-close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0;}
+.tpl-modal-close:hover{background:var(--p50);color:var(--t1);}
+.tpl-modal-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;gap:20px;}
+.tpl-modal-preview{flex:1;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;min-width:0;}
+.tpl-preview-header{padding:10px 14px;background:var(--p50);border-bottom:1px solid var(--border);font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.tpl-preview-content{padding:16px;font-size:13px;color:var(--t2);line-height:1.6;}
+.tpl-preview-content h4{font-family:'Lora',serif;font-size:18px;color:var(--t1);margin-bottom:10px;}
+.tpl-block-sm{padding:8px 10px;border-radius:6px;margin-bottom:8px;border-left:3px solid;}
+.tpl-block-sm.hyp{background:#FFFBF0;border-color:var(--amber);}
+.tpl-block-sm.con{background:#F0FDF9;border-color:var(--teal);}
+.tpl-block-sm.find{background:var(--p50);border-color:var(--p400);}
+.tpl-block-lbl{font-size:8.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.tpl-block-sm.hyp .tpl-block-lbl{color:var(--amber);}
+.tpl-block-sm.con .tpl-block-lbl{color:var(--teal);}
+.tpl-block-sm.find .tpl-block-lbl{color:var(--p600);}
+.tpl-block-text{font-size:12px;color:var(--t3);font-style:italic;}
+.tpl-modal-meta{width:200px;flex-shrink:0;}
+.tpl-meta-section{margin-bottom:16px;}
+.tpl-meta-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:6px;}
+.tpl-meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);margin-bottom:4px;}
+.tpl-modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.use-tpl-btn{display:flex;align-items:center;gap:7px;padding:10px 22px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:0.15s;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
+.use-tpl-btn:hover{background:var(--p700);}
+
+/* ═══ PROMPT LIBRARY ═══ */
+.pl-wrap{flex:1;overflow-y:auto;padding:0;}
+.pl-toolbar{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0;background:white;position:sticky;top:0;z-index:10;}
+.pl-search{flex:1;display:flex;align-items:center;gap:7px;background:var(--p50);border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;}
+.pl-search:focus-within{background:white;border-color:var(--p300);}
+.pl-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);width:100%;outline:none;}
+.pl-search input::placeholder{color:var(--t4);}
+.pl-f-row{display:flex;gap:6px;padding:12px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;background:white;position:sticky;top:61px;z-index:9;}
+.pl-f{padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.pl-f:hover,.pl-f.active{background:var(--p600);border-color:var(--p600);color:white;}
+.pl-body{padding:20px 24px;}
+.pl-section-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:24px;}
+/* prompt card */
+.pc{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);position:relative;}
+.pc:hover{border-color:var(--p300);transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.pc-top{display:flex;gap:9px;margin-bottom:8px;align-items:flex-start;}
+.pc-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pc-name{font-size:13px;font-weight:600;color:var(--t1);}
+.pc-cat{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.pc-desc{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px;}
+.pc-preview{background:var(--p50);border:1px solid var(--p200);border-radius:5px;padding:7px 9px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--p700);line-height:1.5;margin-bottom:8px;}
+.pc-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pc-uses{font-size:10.5px;color:var(--t3);}
+.pc-ai-row{display:flex;gap:4px;align-items:center;}
+.pc-badge{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:white;}
+.pc-use{padding:3px 9px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;margin-left:auto;}
+.pc-cron-badge{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;border:1px solid #FDE68A;}
+.pc-edit-btn{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);opacity:0;transition:0.15s;}
+.pc:hover .pc-edit-btn{opacity:1;}
+.pc-edit-btn:hover{background:var(--p50);color:var(--p600);}
+.pc-edit-btn svg{width:11px;height:11px;}
+
+/* ═══ PROMPT EDITOR MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;}
+.modal-sm{width:520px;}
+.modal-lg{width:780px;}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-close:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:20px 22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.field-group{margin-bottom:16px;}
+.field-label{font-size:11.5px;font-weight:500;color:var(--t2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.field-hint{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.field-input{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;}
+.field-input:focus{border-color:var(--p400);}
+.field-textarea{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--t2);outline:none;resize:vertical;min-height:100px;line-height:1.6;}
+.field-textarea:focus{border-color:var(--p400);}
+.field-textarea.large{min-height:160px;}
+/* variable chips */
+.var-chip{display:inline-flex;align-items:center;gap:4px;background:var(--p100);color:var(--p700);border-radius:4px;padding:2px 7px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;margin:2px;}
+.var-chip:hover{background:var(--p200);}
+/* cron section */
+.cron-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.cron-field{}
+.cron-label{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:5px;}
+.cron-select{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);outline:none;background:white;appearance:none;cursor:pointer;}
+.cron-select:focus{border-color:var(--p400);}
+.day-picker{display:flex;gap:4px;flex-wrap:wrap;}
+.day-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);background:white;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.15s;}
+.day-btn:hover{border-color:var(--p300);color:var(--p700);}
+.day-btn.active{background:var(--p600);border-color:var(--p600);color:white;}
+.cron-preview{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;}
+.cron-preview-icon{font-size:18px;}
+.cron-preview-text{font-size:12.5px;color:var(--t2);line-height:1.5;}
+.cron-preview-text strong{color:var(--p700);}
+.cron-preview-next{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+/* variable table */
+.var-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.var-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);}
+.var-table td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.var-table tr:last-child td{border-bottom:none;}
+.var-table input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t2);width:100%;}
+.var-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--p700);background:var(--p50);font-size:11.5px;}
+.var-add-row{text-align:center;padding:8px;font-size:12px;color:var(--t4);cursor:pointer;border-top:1px dashed var(--border2);}
+.var-add-row:hover{color:var(--p600);background:var(--p50);}
+/* ai provider selector in prompt editor */
+.ai-provider-row{display:flex;gap:8px;flex-wrap:wrap;}
+.ai-prov-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-md);border:1px solid var(--border2);background:white;cursor:pointer;font-size:12px;color:var(--t2);transition:0.15s;}
+.ai-prov-btn:hover{border-color:var(--p300);}
+.ai-prov-btn.sel{border-color:var(--p500);background:var(--p50);color:var(--p700);}
+.ai-prov-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border2);}
+.ai-prov-btn.sel .ai-prov-dot{background:var(--p600);border-color:var(--p600);}
+
+/* ═══ HTML NOTES ═══ */
+.html-wrap{flex:1;overflow-y:auto;padding:24px 28px;}
+.html-import-zone{border:2px dashed var(--border2);border-radius:var(--r-xl);padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--p50);margin-bottom:24px;}
+.html-import-zone:hover,.html-import-zone.drag{border-color:var(--p400);background:var(--p100);}
+.html-import-icon{font-size:36px;margin-bottom:10px;}
+.html-import-title{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:4px;}
+.html-import-desc{font-size:13px;color:var(--t3);line-height:1.5;}
+.html-import-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.html-generate-bar{display:flex;gap:10px;align-items:flex-end;margin-bottom:24px;}
+.html-generate-bar .field-group{flex:1;margin-bottom:0;}
+.html-notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.html-card{background:white;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);}
+.html-card:hover{border-color:var(--p300);transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.html-card-preview{height:130px;overflow:hidden;background:#f8f7fc;position:relative;}
+.html-card-preview iframe{width:200%;height:200%;border:none;transform:scale(0.5);transform-origin:0 0;pointer-events:none;}
+.html-card-preview-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--t4);}
+.html-card-body{padding:12px 14px;}
+.html-card-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.html-card-meta{display:flex;align-items:center;gap:8px;}
+.html-card-date{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.html-card-size{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.html-card-actions{display:flex;gap:5px;margin-top:8px;}
+.html-card-btn{flex:1;padding:5px 8px;border-radius:6px;border:1px solid var(--border2);background:white;font-size:11px;color:var(--t2);cursor:pointer;text-align:center;transition:0.12s;}
+.html-card-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.html-card-btn.primary{background:var(--p600);border-color:var(--p600);color:white;}
+.html-card-btn.primary:hover{background:var(--p700);}
+/* html preview modal */
+.html-preview-modal{width:900px;max-height:88vh;}
+.html-preview-frame{width:100%;height:460px;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:white;}
+.html-preview-frame iframe{width:100%;height:100%;border:none;}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV RAIL ═══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('html-notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5l4 5-4 5M10 15h6"/><path d="M8 7l-1-3 9 2-1 3"/></svg>
+    <span class="nav-tip">HTML Notes</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-topbar">
+    <div class="sb-search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <input type="text" placeholder="Search…"/>
+    </div>
+    <div class="sb-vt">
+      <button class="sb-vt-btn" title="Compact"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h12M1 7h8M1 11h10"/></svg></button>
+      <button class="sb-vt-btn active" title="Expanded"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="12" height="4" rx="1"/><rect x="1" y="8" width="12" height="4" rx="1"/></svg></button>
+    </div>
+    <button class="sb-icon-btn" title="New Note"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg></button>
+  </div>
+  <div class="sb-tree">
+    <div class="shelf open" id="shelf1">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📔</span>
+            <span class="nb-name">Transformers</span>
+            <span class="nb-count">3</span>
+            <button class="nb-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item active" id="ni-1" onclick="selectNote('ni-1','left')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings.</div>
+            </div>
+            <div class="note-item open-right" id="ni-2" onclick="selectNote('ni-2','right')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Comparison</div>
+              <div class="ni-prev">Encoder-only vs decoder-only tradeoffs.</div>
+              <span class="ni-split-badge">Right pane</span>
+            </div>
+            <div class="note-item" id="ni-3" onclick="selectNote('ni-3','left')">
+              <div class="ni-top"><span class="ni-badge badge-reference">Reference</span><span class="ni-date">Apr 5</span></div>
+              <div class="ni-title">Tata Motors Q4 Analysis (AI)</div>
+              <div class="ni-prev">HTML report generated by Claude.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📗</span>
+            <span class="nb-name">RAG Patterns</span>
+            <span class="nb-count">2</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" id="ni-4" onclick="selectNote('ni-4','left')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense vectors, re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf open" id="shelf2">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr">
+            <div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📒</span>
+            <span class="nb-name">Daily Journal</span>
+            <span class="nb-count">12</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote('ni-5','left')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- ══ VIEW: NOTES (SPLIT) ══ -->
+  <div class="view active" id="view-notes">
+    <div class="notes-split-bar">
+      <div class="nsb-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span>
+        <span>Transformers</span><span class="sep"> › </span>
+        <span class="cur">Split View</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="split-toggle-group">
+        <button class="split-btn" title="Single pane" onclick="setSplitMode(1)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/></svg>
+        </button>
+        <button class="split-btn active" title="Split 2 panes" onclick="setSplitMode(2)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="12" rx="1"/></svg>
+        </button>
+        <button class="split-btn" title="Split 3 panes" onclick="setSplitMode(3)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="4" height="12" rx="1"/><rect x="6" y="2" width="4" height="12" rx="1"/><rect x="11" y="2" width="4" height="12" rx="1"/></svg>
+        </button>
+      </div>
+      <div class="ai-pill-sm"><div class="ai-dot"></div>Ask AI</div>
+      <button class="tb-btn primary" style="font-size:11.5px;">+ New Note</button>
+    </div>
+
+    <!-- Split body -->
+    <div class="notes-split-body" id="notesSplitBody">
+
+      <!-- PANE LEFT -->
+      <div class="note-pane" id="pane-left">
+        <div class="note-pane-header">
+          <span class="nph-type badge-research">Research</span>
+          <span class="nph-title">Transformer Architecture Deep Dive</span>
+          <button class="nph-btn" title="More options">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <button class="nph-btn" title="Close pane" onclick="closePaneMsg()">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+          </button>
+        </div>
+        <div class="note-pane-body" id="pane-left-body">
+          <textarea class="paper-title-sm" rows="1" style="height:auto;">Transformer Architecture Deep Dive</textarea>
+          <hr class="paper-sep"/>
+          <div class="blk-callout hyp">
+            <div class="blk-ico">💡</div>
+            <div>
+              <div class="blk-lbl">Hypothesis</div>
+              <div class="blk-txt">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</div>
+            </div>
+          </div>
+          <div class="kd-sm">
+            <div class="kd-sm-hdr">
+              <div class="kd-sm-col-hdr">Encoder-only (BERT)</div>
+              <div class="kd-sm-col-hdr">Decoder-only (GPT)</div>
+            </div>
+            <div class="kd-sm-body">
+              <div class="kd-sm-col">
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Bidirectional attention</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Best for classification</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Needs fine-tuning</div>
+              </div>
+              <div class="kd-sm-col">
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Causal attention</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Best for generation</div>
+                <div class="kd-sm-row"><div class="kd-sm-dot"></div>Few-shot capable</div>
+              </div>
+            </div>
+          </div>
+          <textarea class="paper-body-sm" placeholder="Continue writing…" style="margin-top:8px;">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer on a toy dataset to validate core claims about positional encoding and multi-head attention behaviour.</textarea>
+        </div>
+        <div class="pane-insert-bar">
+          <span class="pib-lbl">/</span>
+          <button class="pib-btn">💡 Hypothesis</button>
+          <button class="pib-btn">🎯 Conclusion</button>
+          <button class="pib-btn">⚡ Key Diff</button>
+          <button class="pib-btn">🔑 Findings</button>
+          <button class="pib-btn html-btn" onclick="openHtmlImportModal()">📄 HTML Note</button>
+        </div>
+      </div>
+
+      <!-- RESIZER -->
+      <div class="pane-resizer" id="paneResizer"></div>
+
+      <!-- PANE RIGHT -->
+      <div class="note-pane" id="pane-right">
+        <div class="note-pane-header">
+          <span class="nph-type badge-idea">Idea</span>
+          <span class="nph-title">BERT vs GPT Comparison</span>
+          <button class="nph-btn" title="More options">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <button class="nph-btn" title="Close pane" onclick="closePaneMsg()">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+          </button>
+        </div>
+        <div class="note-pane-body" id="pane-right-body">
+          <textarea class="paper-title-sm" rows="1" style="height:auto;">BERT vs GPT — Enterprise Use Cases</textarea>
+          <hr class="paper-sep"/>
+          <div class="blk-callout ai">
+            <div class="blk-ico">✦</div>
+            <div>
+              <div class="blk-lbl">Claude · Sonnet 4</div>
+              <div class="blk-txt">For sentiment analysis on support tickets, BERT-family models consistently outperform GPT-family by 4–8% F1 score due to bidirectional context. However for generating personalised responses, GPT-4o is significantly better.</div>
+            </div>
+          </div>
+          <!-- HTML note embedded -->
+          <div class="html-note-preview">
+            <div class="hnp-header">
+              <span class="hnp-icon">📄</span>
+              <span class="hnp-name">tata-motors-q4-analysis.html</span>
+              <div class="hnp-actions">
+                <button class="hnp-btn" onclick="openHtmlPreviewModal()">🔍 Preview</button>
+                <button class="hnp-btn">📤 Export</button>
+              </div>
+            </div>
+            <div class="hnp-iframe-wrap" style="height:160px;display:flex;align-items:center;justify-content:center;background:#f5f3ff;">
+              <div style="text-align:center;color:var(--p400);">
+                <div style="font-size:32px;margin-bottom:8px;">📊</div>
+                <div style="font-size:12px;font-weight:500;color:var(--p700);">Tata Motors Q4 FY2026</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:3px;">AI-generated financial report</div>
+                <div style="font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-top:5px;">Generated via Equity Analyst prompt</div>
+              </div>
+            </div>
+          </div>
+          <textarea class="paper-body-sm" placeholder="Add notes about this comparison…">Key insight: for SAP CS enterprise use-cases, use BERT for ticket classification and routing. Use GPT/Claude for response generation and summarisation.</textarea>
+        </div>
+        <div class="pane-insert-bar">
+          <span class="pib-lbl">/</span>
+          <button class="pib-btn">💡 Hypothesis</button>
+          <button class="pib-btn">⚡ Key Diff</button>
+          <button class="pib-btn">✅ Checklist</button>
+          <button class="pib-btn html-btn" onclick="openHtmlGenerateModal()">✦ Generate HTML</button>
+        </div>
+      </div>
+
+    </div><!-- /notes-split-body -->
+  </div><!-- /view-notes -->
+
+  <!-- ══ VIEW: SETTINGS ══ -->
+  <div class="view" id="view-settings">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/></svg>
+      <span class="vhbar-title">Settings</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn primary">Save Changes</button>
+    </div>
+    <div class="settings-wrap">
+      <div class="settings-nav">
+        <div class="snav-item active" onclick="switchSettingsPanel('ai-providers',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 2"/></svg>AI Providers</div>
+        <div class="snav-item" onclick="switchSettingsPanel('profile',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Profile</div>
+        <div class="snav-divider"></div>
+        <div class="snav-item" onclick="switchSettingsPanel('ai-behaviour',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v3M8 11v3M2 8h3M11 8h3"/></svg>AI Behaviour</div>
+        <div class="snav-item" onclick="switchSettingsPanel('sync',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1112 0M14 8l-2-2-2 2"/></svg>Sync &amp; Export</div>
+        <div class="snav-item" onclick="switchSettingsPanel('templates',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 5h6M5 8h4M5 11h5"/></svg>Templates</div>
+        <div class="snav-divider"></div>
+        <div class="snav-item" onclick="switchSettingsPanel('appearance',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>Appearance</div>
+      </div>
+      <div class="settings-content">
+
+        <!-- AI PROVIDERS -->
+        <div class="s-panel active" id="sp-ai-providers">
+          <div class="s-sec">
+            <div class="s-title">AI Provider API Keys</div>
+            <div class="s-desc">Keys stored locally in your browser. Each key enables @mention for that model inline in notes.</div>
+            <div class="s-card">
+              <div class="api-row"><div class="api-logo" style="background:#7C3AED;">C</div><div class="api-info"><div class="api-name">Anthropic · Claude</div><div class="api-status">claude-sonnet-4 · Connected ✓</div></div><input class="api-input" type="password" value="sk-ant-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#10A37F;">G</div><div class="api-info"><div class="api-name">OpenAI · ChatGPT</div><div class="api-status">gpt-4o · Connected ✓</div></div><input class="api-input" type="password" value="sk-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#4285F4;">G</div><div class="api-info"><div class="api-name">Google · Gemini</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="AIza••••••••••••"/><button class="api-btn">Connect</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#F55036;">Q</div><div class="api-info"><div class="api-name">Groq · Llama 3</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="gsk_••••••••••••"/><button class="api-btn">Connect</button></div>
+              <div class="api-row"><div class="api-logo" style="background:#1A1A2E;">O</div><div class="api-info"><div class="api-name">OpenRouter</div><div class="api-status">50+ models via one key</div></div><input class="api-input" type="text" placeholder="sk-or-••••••••••••"/><button class="api-btn">Connect</button></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">Default Model</div>
+            <div class="s-desc">Used when @ai is invoked without specifying a provider.</div>
+            <div class="model-grid">
+              <div class="model-card sel" onclick="selModel(this)"><div class="model-dot"></div><div><div class="model-name">Claude Sonnet 4</div><div class="model-desc">Best for research &amp; analysis</div></div></div>
+              <div class="model-card" onclick="selModel(this)"><div class="model-dot"></div><div><div class="model-name">GPT-4o</div><div class="model-desc">Writing &amp; code</div></div></div>
+              <div class="model-card" onclick="selModel(this)"><div class="model-dot"></div><div><div class="model-name">Gemini 1.5 Pro</div><div class="model-desc">1M token context</div></div></div>
+              <div class="model-card" onclick="selModel(this)"><div class="model-dot"></div><div><div class="model-name">Groq Llama 3</div><div class="model-desc">Fastest inference</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="s-panel" id="sp-profile">
+          <div class="s-sec">
+            <div class="s-title">Your Profile</div>
+            <div class="s-desc">Personalise your Lore experience. Your name appears in AI prompt context.</div>
+            <div class="s-card">
+              <div class="profile-avatar-row">
+                <div class="profile-avatar">H</div>
+                <div class="profile-avatar-actions">
+                  <button class="tb-btn">📷 Change photo</button>
+                  <button class="tb-btn ghost" style="font-size:11px;color:var(--rose);">Remove</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Full name</label><input class="form-input" value="Harsha"/></div>
+                <div class="form-group"><label class="form-label">Display name</label><input class="form-input" value="Harsha"/></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" value="harsha@example.com"/></div>
+                <div class="form-group"><label class="form-label">Timezone</label><select class="form-input form-select"><option>Asia/Kolkata (IST +5:30)</option><option>UTC</option><option>America/New_York</option></select></div>
+              </div>
+              <div class="form-group"><label class="form-label">Bio <span style="color:var(--t4);font-size:10.5px;font-weight:400;">(used as AI context)</span></label><textarea class="form-input form-textarea">AI consultant at enterprise IT firm. Expertise in SAP/S4HANA, ServiceNow, Salesforce, AI/LLM engineering. Building a 36-week AI learning roadmap.</textarea></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">AI Persona Context</div>
+            <div class="s-desc">This context is injected into every AI prompt so models respond with awareness of your background.</div>
+            <div class="s-card">
+              <div class="form-group"><label class="form-label">Professional context</label><textarea class="form-input form-textarea" style="min-height:80px;">Enterprise AI consultant. Working across SAP BTP, ServiceNow Now Assist, Salesforce Einstein. Focus on RAG, LLM fine-tuning, prompt engineering for enterprise workflows.</textarea></div>
+              <div class="form-group"><label class="form-label">Preferred response style</label>
+                <div class="select-chips">
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Concise</div>
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Technical depth</div>
+                  <div class="sel-chip" onclick="this.classList.toggle('active')">With examples</div>
+                  <div class="sel-chip" onclick="this.classList.toggle('active')">ELI5 when needed</div>
+                  <div class="sel-chip active" onclick="this.classList.toggle('active')">Use bullet points</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI BEHAVIOUR -->
+        <div class="s-panel" id="sp-ai-behaviour">
+          <div class="s-sec">
+            <div class="s-title">AI Behaviour</div>
+            <div class="s-desc">Control how AI integrates with your notes, blocks, and knowledge graph.</div>
+            <div class="s-card">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-link AI responses to Knowledge Graph</div><div class="toggle-desc">AI replies are parsed for concepts and linked as graph nodes automatically</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include note context in every AI prompt</div><div class="toggle-desc">The full current note content is sent as context with each @mention query</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include personal bio context</div><div class="toggle-desc">Inject your profile persona into AI system prompts for better responses</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Save AI exchanges as sub-notes</div><div class="toggle-desc">Each @mention conversation is saved as a linked child note in the same notebook</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Show token usage and estimated cost</div><div class="toggle-desc">Display token count and approximate cost per AI call in block footer</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-generate note summary on save</div><div class="toggle-desc">Generates a 2-sentence summary for sidebar preview using the default model</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Scheduled AI prompts (Cron Jobs)</div><div class="toggle-desc">Allow prompts from the Prompt Library to run on a schedule and save output as notes</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">HTML Note Generation</div>
+            <div class="s-desc">Control how AI-generated HTML files are handled and stored.</div>
+            <div class="s-card">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Enable HTML Note generation</div><div class="toggle-desc">Allows AI to produce rich HTML reports saved as special note type</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-save generated HTML to notebook</div><div class="toggle-desc">Saves generated HTML immediately to the current notebook on creation</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Show HTML preview in note sidebar</div><div class="toggle-desc">Renders a scaled iframe preview of linked HTML notes in the context panel</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SYNC & EXPORT -->
+        <div class="s-panel" id="sp-sync">
+          <div class="s-sec">
+            <div class="s-title">GitHub Gist Sync</div>
+            <div class="s-desc">Sync your notes to a private GitHub Gist — your data, your account. Notes are stored as JSON and HTML.</div>
+            <div class="s-card" style="display:flex;align-items:center;gap:14px;">
+              <div style="width:36px;height:36px;border-radius:9px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg></div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--t1);">Connected to GitHub</div><div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">@harsha · Gist: lore-notes-backup · Last sync: 2 min ago</div></div>
+              <button class="api-btn on">Syncing</button>
+            </div>
+            <div class="s-card" style="margin-top:8px;">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-sync on note save</div><div class="toggle-desc">Pushes changes to Gist immediately after saving</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include HTML notes in sync</div><div class="toggle-desc">Saves AI-generated HTML files to the Gist as separate files</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Encrypt sensitive notes before sync</div><div class="toggle-desc">AES-256 encryption applied to notes tagged as private</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">Export Options</div>
+            <div class="s-desc">Download your notes in various formats.</div>
+            <div class="s-card" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export all notes as JSON</div><div style="font-size:11px;color:var(--t3);">Complete data export with metadata, blocks, and AI history</div></div><button class="tb-btn">📦 Export JSON</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export as Markdown</div><div style="font-size:11px;color:var(--t3);">One .md file per note, preserving structure</div></div><button class="tb-btn">📝 Export MD</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export HTML notes as ZIP</div><div style="font-size:11px;color:var(--t3);">All AI-generated HTML files in a single archive</div></div><button class="tb-btn">🗜️ Export ZIP</button></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:500;color:var(--t1);">Import notes from JSON / Markdown</div><div style="font-size:11px;color:var(--t3);">Restore a previous backup or migrate from another app</div></div><button class="tb-btn primary">📥 Import</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEMPLATES -->
+        <div class="s-panel" id="sp-templates">
+          <div class="s-sec">
+            <div class="s-title">Note Templates</div>
+            <div class="s-desc">Choose a template when creating a new note for a pre-structured starting point. Click any template to preview and customise it.</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+              <div class="sel-chip active">All</div>
+              <div class="sel-chip">Research</div>
+              <div class="sel-chip">Journal</div>
+              <div class="sel-chip">Finance</div>
+              <div class="sel-chip">Engineering</div>
+              <div class="sel-chip">My Templates</div>
+            </div>
+            <div class="tpl-gallery">
+              <!-- Template cards -->
+              <div class="tpl-card" onclick="openTplModal('research')">
+                <div class="tpl-preview">
+                  <div class="tpl-preview-line h"></div>
+                  <div class="tpl-preview-callout"></div>
+                  <div class="tpl-preview-line w80"></div>
+                  <div class="tpl-preview-line w50"></div>
+                  <div class="tpl-preview-keydiff"><div class="tpl-preview-keydiff-col"><div class="tpl-preview-keydiff-line"></div><div class="tpl-preview-keydiff-line w30" style="width:60%;"></div></div><div class="tpl-preview-keydiff-col"><div class="tpl-preview-keydiff-line"></div><div class="tpl-preview-keydiff-line" style="width:70%;"></div></div></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Research Deep Dive</div>
+                  <div class="tpl-desc">Hypothesis → Method → Findings → Conclusion</div>
+                  <div class="tpl-tags"><span class="tpl-tag">Research</span><span class="tpl-tag">Analysis</span></div>
+                </div>
+              </div>
+              <div class="tpl-card active-tpl" onclick="openTplModal('journal')">
+                <div class="tpl-preview" style="background:var(--amber-bg);">
+                  <div class="tpl-preview-line h" style="background:#FDE68A;"></div>
+                  <div style="height:14px;border-radius:4px;background:#FEF3C7;margin:4px 0;display:flex;gap:4px;"><div style="width:28px;border-radius:3px;background:#FDE68A;"></div><div style="width:28px;border-radius:3px;background:#FDE68A;"></div><div style="width:28px;border-radius:3px;background:#FDE68A;"></div></div>
+                  <div class="tpl-preview-line w80" style="background:#FDE68A;"></div>
+                  <div class="tpl-preview-line w50" style="background:#FDE68A;"></div>
+                  <div class="tpl-preview-line w80" style="background:#FDE68A;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Daily Journal</div>
+                  <div class="tpl-desc">Intention · Mood · Wins · Blockers · Tomorrow</div>
+                  <div class="tpl-tags"><span class="tpl-tag" style="background:var(--amber-bg);color:var(--amber);">Journal</span></div>
+                </div>
+              </div>
+              <div class="tpl-card" onclick="openTplModal('equity')">
+                <div class="tpl-preview" style="background:var(--rose-bg);">
+                  <div class="tpl-preview-line h" style="background:#FCE7F3;"></div>
+                  <div class="tpl-preview-keydiff" style="margin:4px 0;height:28px;"><div class="tpl-preview-keydiff-col"><div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div></div><div class="tpl-preview-keydiff-col"><div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div></div><div class="tpl-preview-keydiff-col"><div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div></div></div>
+                  <div class="tpl-preview-line w80" style="background:#FCE7F3;"></div>
+                  <div style="height:12px;border-radius:3px;background:#FCE7F3;width:90%;margin-top:4px;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Equity Research</div>
+                  <div class="tpl-desc">BRSR · M-Score · ROIC · Valuation · Signal</div>
+                  <div class="tpl-tags"><span class="tpl-tag" style="background:var(--rose-bg);color:var(--rose);">Finance</span><span class="tpl-tag">AI</span></div>
+                </div>
+              </div>
+              <div class="tpl-card" onclick="openTplModal('sprint')">
+                <div class="tpl-preview" style="background:var(--blue-bg);">
+                  <div class="tpl-preview-line h" style="background:#DBEAFE;"></div>
+                  <div class="tpl-preview-check"><div style="width:8px;height:8px;border-radius:2px;background:#DBEAFE;"></div><div class="tpl-preview-line w80" style="background:#DBEAFE;flex:1;height:5px;"></div></div>
+                  <div class="tpl-preview-check"><div style="width:8px;height:8px;border-radius:2px;background:#93C5FD;"></div><div class="tpl-preview-line" style="background:#DBEAFE;flex:1;height:5px;width:60%;"></div></div>
+                  <div class="tpl-preview-check"><div style="width:8px;height:8px;border-radius:2px;background:#DBEAFE;"></div><div class="tpl-preview-line" style="background:#DBEAFE;flex:1;height:5px;width:70%;"></div></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Sprint Plan</div>
+                  <div class="tpl-desc">Goals · Stories · Tasks · Definition of Done</div>
+                  <div class="tpl-tags"><span class="tpl-tag" style="background:var(--blue-bg);color:var(--blue);">Engineering</span></div>
+                </div>
+              </div>
+              <div class="tpl-card" onclick="openTplModal('code-review')">
+                <div class="tpl-preview" style="background:#1C1829;">
+                  <div class="tpl-preview-line h" style="background:#2D2650;"></div>
+                  <div class="tpl-preview-line w80" style="background:#3D3560;"></div>
+                  <div class="tpl-preview-line w50" style="background:#2D2650;"></div>
+                  <div style="height:22px;border-radius:4px;background:#3D3560;margin-top:6px;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Code Review</div>
+                  <div class="tpl-desc">Severity buckets · Patterns · Actions</div>
+                  <div class="tpl-tags"><span class="tpl-tag" style="background:var(--p100);color:var(--p700);">Engineering</span><span class="tpl-tag">AI</span></div>
+                </div>
+              </div>
+              <div class="tpl-card" onclick="openTplModal('meeting')">
+                <div class="tpl-preview">
+                  <div class="tpl-preview-line h"></div>
+                  <div style="display:flex;gap:4px;margin:4px 0;"><div style="width:40px;height:8px;border-radius:20px;background:var(--p100);"></div><div style="width:40px;height:8px;border-radius:20px;background:var(--teal-bg);"></div></div>
+                  <div class="tpl-preview-line w80"></div>
+                  <div class="tpl-preview-line w50"></div>
+                  <div class="tpl-preview-line w80"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Meeting Notes</div>
+                  <div class="tpl-desc">Attendees · Agenda · Decisions · Actions</div>
+                  <div class="tpl-tags"><span class="tpl-tag">Work</span></div>
+                </div>
+              </div>
+              <!-- Custom template add card -->
+              <div class="tpl-card" style="border-style:dashed;border-color:var(--p300);background:var(--p50);cursor:pointer;" onclick="openTplModal('new')">
+                <div class="tpl-preview" style="background:var(--p50);display:flex;align-items:center;justify-content:center;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#7C3AED" stroke-width="1.8"><path d="M9 4v10M4 9h10"/></svg>
+                  </div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name" style="color:var(--p700);">Create Template</div>
+                  <div class="tpl-desc">Design your own reusable block structure</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPEARANCE -->
+        <div class="s-panel" id="sp-appearance">
+          <div class="s-sec">
+            <div class="s-title">Appearance</div>
+            <div class="s-desc">Customise how Lore looks and feels.</div>
+            <div class="s-card">
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Theme</div></div><div class="select-chips"><div class="sel-chip active">Light</div><div class="sel-chip">Dark</div><div class="sel-chip">System</div></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Note canvas background</div></div><div class="select-chips"><div class="sel-chip active">Plain white</div><div class="sel-chip">Dot grid</div><div class="sel-chip">Square grid</div><div class="sel-chip">Lined</div></div></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Font size</div></div><div class="select-chips"><div class="sel-chip">Small</div><div class="sel-chip active">Medium</div><div class="sel-chip">Large</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: PROMPT LIBRARY ══ -->
+  <div class="view" id="view-prompts">
+    <div class="pl-wrap">
+      <div class="pl-toolbar">
+        <div class="pl-search">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+          <input type="text" placeholder="Search prompts…"/>
+        </div>
+        <div class="tb-sp"></div>
+        <button class="tb-btn" onclick="openPromptModal(null)">+ New Prompt</button>
+        <button class="tb-btn primary">⏱ Scheduled Runs</button>
+      </div>
+      <div class="pl-f-row">
+        <div class="pl-f active">All</div>
+        <div class="pl-f">Research</div>
+        <div class="pl-f">Journal</div>
+        <div class="pl-f">Finance</div>
+        <div class="pl-f">Engineering</div>
+        <div class="pl-f">HTML Reports</div>
+        <div class="pl-f">Cron Jobs</div>
+        <div class="pl-f">My Prompts</div>
+      </div>
+      <div class="pl-body">
+        <div class="pl-section-title">Scheduled / Cron Jobs</div>
+        <div class="pl-grid">
+          <!-- CRON prompt 1 -->
+          <div class="pc" onclick="openPromptModal('equity-cron')">
+            <button class="pc-edit-btn" onclick="event.stopPropagation();openPromptModal('equity-cron')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+            <div class="pc-top">
+              <div class="pc-ico" style="background:var(--rose-bg);">📈</div>
+              <div>
+                <div class="pc-name">Equity Performance Monitor</div>
+                <div class="pc-cat">Finance · Cron · HTML Report</div>
+              </div>
+            </div>
+            <div class="pc-desc">Monitors {{company_list}} performance weekly using NSE data, Beneish M-Score, ROIC vs WACC signals. Generates an HTML report saved to Equity Research notebook.</div>
+            <div class="pc-preview">Analyse {{company_list}} for the week ending {{date}}. Generate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus.</div>
+            <div class="pc-footer">
+              <span class="pc-cron-badge">⏱ Every Monday 08:00 IST</span>
+              <div class="pc-ai-row"><div class="pc-badge" style="background:#7C3AED;">C</div></div>
+              <button class="pc-use" onclick="event.stopPropagation();">Run Now</button>
+            </div>
+          </div>
+          <!-- CRON prompt 2 -->
+          <div class="pc" onclick="openPromptModal('journal-cron')">
+            <button class="pc-edit-btn" onclick="event.stopPropagation();openPromptModal('journal-cron')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+            <div class="pc-top">
+              <div class="pc-ico" style="background:var(--amber-bg);">📔</div>
+              <div>
+                <div class="pc-name">Daily Journal Starter</div>
+                <div class="pc-cat">Journal · Cron</div>
+              </div>
+            </div>
+            <div class="pc-desc">Creates a pre-filled journal note every morning based on yesterday's tasks and today's calendar context.</div>
+            <div class="pc-preview">Today is {{date}}. Create a journal note with: intention for today, top 3 tasks from yesterday, energy check-in.</div>
+            <div class="pc-footer">
+              <span class="pc-cron-badge">⏱ Daily 07:00 IST (Mon-Fri)</span>
+              <div class="pc-ai-row"><div class="pc-badge" style="background:#7C3AED;">C</div></div>
+              <button class="pc-use" onclick="event.stopPropagation();">Run Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pl-section-title" style="margin-top:8px;">All Prompts</div>
+        <div class="pl-grid">
+          <div class="pc" onclick="openPromptModal('research')">
+            <button class="pc-edit-btn" onclick="event.stopPropagation();openPromptModal('research')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+            <div class="pc-top"><div class="pc-ico" style="background:var(--teal-bg);">🔬</div><div><div class="pc-name">Research Deep Dive</div><div class="pc-cat">Research · Analysis</div></div></div>
+            <div class="pc-desc">Summarise key findings, tradeoffs, open questions from your note.</div>
+            <div class="pc-preview">Analyse: (1) core thesis, (2) findings, (3) open questions, (4) related work gaps.</div>
+            <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">47 uses</span><div class="pc-ai-row"><div class="pc-badge" style="background:#7C3AED;">C</div><div class="pc-badge" style="background:#10A37F;">G</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+          </div>
+          <div class="pc" onclick="openPromptModal('html-report')">
+            <button class="pc-edit-btn" onclick="event.stopPropagation();openPromptModal('html-report')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+            <div class="pc-top"><div class="pc-ico" style="background:#FEF3C7;">📄</div><div><div class="pc-name">Generate HTML Report</div><div class="pc-cat">HTML Notes · AI</div></div></div>
+            <div class="pc-desc">Generates a beautiful, self-contained HTML report from your note content. Saved as an HTML Note.</div>
+            <div class="pc-preview">Generate a polished HTML report for: {{topic}}. Include: executive summary, data table for {{company_list}}, key insights, charts using Chart.js.</div>
+            <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">24 uses</span><div class="pc-ai-row"><div class="pc-badge" style="background:#7C3AED;">C</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+          </div>
+          <div class="pc" onclick="openPromptModal('concept')">
+            <button class="pc-edit-btn" onclick="event.stopPropagation();openPromptModal('concept')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+            <div class="pc-top"><div class="pc-ico" style="background:var(--p100);">🧠</div><div><div class="pc-name">Concept Explainer</div><div class="pc-cat">Learning</div></div></div>
+            <div class="pc-desc">Analogy, definition, worked example, misconceptions for any {{concept}}.</div>
+            <div class="pc-preview">Explain {{concept}} to a CS background: intuition + example + 2 misconceptions.</div>
+            <div class="pc-footer"><span style="font-size:10.5px;color:var(--t3);">89 uses</span><div class="pc-ai-row"><div class="pc-badge" style="background:#7C3AED;">C</div><div class="pc-badge" style="background:#4285F4;">G</div></div><button class="pc-use" onclick="event.stopPropagation();">Use</button></div>
+          </div>
+          <div class="pc" style="border-style:dashed;border-color:var(--p300);background:var(--p50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:185px;cursor:pointer;" onclick="openPromptModal(null)">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7C3AED" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg></div>
+            <div style="font-size:13px;font-weight:500;color:var(--p700);">New Prompt</div>
+            <div style="font-size:11px;color:var(--t3);text-align:center;max-width:150px;">Add a custom prompt with variables, AI provider, and optional cron schedule</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: HTML NOTES ══ -->
+  <div class="view" id="view-html-notes">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5l4 5-4 5M10 15h6"/></svg>
+      <span class="vhbar-title">HTML Notes</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn" onclick="openHtmlGenerateModal()">✦ Generate from Prompt</button>
+      <button class="tb-btn primary" onclick="openHtmlImportModal()">📥 Import HTML</button>
+    </div>
+    <div class="html-wrap">
+      <div class="html-generate-bar">
+        <div class="field-group">
+          <label class="field-label">Quick generate — describe the HTML report you want</label>
+          <input class="field-input" placeholder="e.g. Equity report for Tata Motors Q4 FY2026 with charts and financial table…"/>
+        </div>
+        <button class="tb-btn primary" style="height:36px;flex-shrink:0;" onclick="openHtmlGenerateModal()">Generate ✦</button>
+      </div>
+      <div class="html-import-zone" id="importZone" ondragover="this.classList.add('drag')" ondragleave="this.classList.remove('drag')">
+        <div class="html-import-icon">📄</div>
+        <div class="html-import-title">Drag &amp; drop Claude HTML files here</div>
+        <div class="html-import-desc">Or paste HTML code directly. Supports single-file HTML outputs from Claude, ChatGPT, or any AI.<br/>Saved as a special HTML Note type, linked to your notebooks.</div>
+        <button class="html-import-btn" onclick="openHtmlImportModal()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg>
+          Choose or paste HTML
+        </button>
+      </div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:12px;">Saved HTML Notes</div>
+      <div class="html-notes-grid">
+        <!-- HTML note card 1 -->
+        <div class="html-card" onclick="openHtmlPreviewModal()">
+          <div class="html-card-preview">
+            <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#F5F3FF,#EDE9FE);gap:6px;">
+              <div style="font-size:24px;">📊</div>
+              <div style="font-size:11px;font-weight:600;color:var(--p700);">Tata Motors Q4 FY2026</div>
+              <div style="font-size:10px;color:var(--t3);">Financial Analysis Report</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><div style="width:20px;height:4px;border-radius:2px;background:var(--p400);"></div><div style="width:14px;height:4px;border-radius:2px;background:var(--p300);"></div><div style="width:18px;height:4px;border-radius:2px;background:var(--p400);"></div></div>
+            </div>
+          </div>
+          <div class="html-card-body">
+            <div class="html-card-name">Tata Motors Q4 FY2026 Analysis</div>
+            <div class="html-card-meta">
+              <span class="html-card-date">Apr 20, 2026</span>
+              <span class="html-card-size">84 KB</span>
+              <span style="font-size:9.5px;background:var(--amber-bg);color:var(--amber);padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;margin-left:auto;">Auto-generated</span>
+            </div>
+            <div class="html-card-actions">
+              <button class="html-card-btn" onclick="event.stopPropagation();openHtmlPreviewModal()">🔍 Preview</button>
+              <button class="html-card-btn">📎 Link to note</button>
+              <button class="html-card-btn primary">📤 Export</button>
+            </div>
+          </div>
+        </div>
+        <!-- HTML note card 2 -->
+        <div class="html-card">
+          <div class="html-card-preview">
+            <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#F0FDFA,#CCFBF1);gap:6px;">
+              <div style="font-size:24px;">🤖</div>
+              <div style="font-size:11px;font-weight:600;color:var(--teal);">AI Maturity Framework</div>
+              <div style="font-size:10px;color:var(--t3);">Interactive Assessment</div>
+            </div>
+          </div>
+          <div class="html-card-body">
+            <div class="html-card-name">AI Maturity Assessment v2</div>
+            <div class="html-card-meta">
+              <span class="html-card-date">Apr 12, 2026</span>
+              <span class="html-card-size">142 KB</span>
+              <span style="font-size:9.5px;background:var(--blue-bg);color:var(--blue);padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;margin-left:auto;">Imported</span>
+            </div>
+            <div class="html-card-actions">
+              <button class="html-card-btn">🔍 Preview</button>
+              <button class="html-card-btn">📎 Link to note</button>
+              <button class="html-card-btn primary">📤 Export</button>
+            </div>
+          </div>
+        </div>
+        <!-- HTML note card 3 -->
+        <div class="html-card">
+          <div class="html-card-preview">
+            <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);gap:6px;">
+              <div style="font-size:24px;">📝</div>
+              <div style="font-size:11px;font-weight:600;color:var(--amber);">Lore Design Mockup v3</div>
+              <div style="font-size:10px;color:var(--t3);">App Redesign</div>
+            </div>
+          </div>
+          <div class="html-card-body">
+            <div class="html-card-name">Lore App Redesign Mockup</div>
+            <div class="html-card-meta">
+              <span class="html-card-date">Apr 23, 2026</span>
+              <span class="html-card-size">218 KB</span>
+              <span style="font-size:9.5px;background:var(--rose-bg);color:var(--rose);padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;margin-left:auto;">Claude output</span>
+            </div>
+            <div class="html-card-actions">
+              <button class="html-card-btn">🔍 Preview</button>
+              <button class="html-card-btn">📎 Link to note</button>
+              <button class="html-card-btn primary">📤 Export</button>
+            </div>
+          </div>
+        </div>
+        <!-- Add new -->
+        <div class="html-card" style="border-style:dashed;border-color:var(--p300);background:var(--p50);cursor:pointer;" onclick="openHtmlImportModal()">
+          <div class="html-card-preview" style="background:var(--p50);display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;color:var(--p400);"><div style="font-size:28px;margin-bottom:6px;">📄</div><div style="font-size:12px;font-weight:500;color:var(--p700);">Import HTML</div><div style="font-size:10.5px;color:var(--t3);margin-top:2px;">Drag, paste, or generate</div></div>
+          </div>
+          <div class="html-card-body"><div class="html-card-name" style="color:var(--p700);">Add HTML Note</div><div class="html-card-meta"><span class="html-card-date" style="color:var(--t4);">Drop a .html file or generate via AI</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ═══ TEMPLATE MODAL ═══ -->
+<div class="tpl-overlay" id="tplOverlay" onclick="if(event.target===this)closeTplModal()">
+  <div class="tpl-modal">
+    <div class="tpl-modal-header">
+      <div class="tpl-modal-icon" id="tplModalIcon">🔬</div>
+      <div>
+        <div class="tpl-modal-title" id="tplModalTitle">Research Deep Dive</div>
+        <div class="tpl-modal-desc" id="tplModalDesc">Hypothesis → Methodology → Key Findings → Conclusion</div>
+      </div>
+      <button class="tpl-modal-close" onclick="closeTplModal()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+      </button>
+    </div>
+    <div class="tpl-modal-body">
+      <div class="tpl-modal-preview">
+        <div class="tpl-preview-header">📄 Template Preview</div>
+        <div class="tpl-preview-content">
+          <h4 id="tplPreviewTitle">Note Title</h4>
+          <div class="tpl-block-sm hyp"><div class="tpl-block-lbl">Hypothesis</div><div class="tpl-block-text">State your core assumption here…</div></div>
+          <div style="font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin:8px 0 5px;">METHODOLOGY</div>
+          <div style="font-size:12.5px;color:var(--t2);margin-bottom:10px;">Describe your approach and sources…</div>
+          <div class="tpl-block-sm find"><div class="tpl-block-lbl">Key Findings</div><div class="tpl-block-text">1. Finding one<br/>2. Finding two<br/>3. Finding three</div></div>
+          <div class="tpl-block-sm con"><div class="tpl-block-lbl">Conclusion</div><div class="tpl-block-text">Summarise the key takeaway…</div></div>
+        </div>
+      </div>
+      <div class="tpl-modal-meta">
+        <div class="tpl-meta-section">
+          <div class="tpl-meta-lbl">Blocks included</div>
+          <div class="tpl-meta-item">💡 Hypothesis callout</div>
+          <div class="tpl-meta-item">🔑 Key Findings list</div>
+          <div class="tpl-meta-item">⚡ Key Differences table</div>
+          <div class="tpl-meta-item">🎯 Conclusion callout</div>
+          <div class="tpl-meta-item">📎 References box</div>
+        </div>
+        <div class="tpl-meta-section">
+          <div class="tpl-meta-lbl">Best for</div>
+          <div class="tpl-meta-item" style="color:var(--t3);font-size:11.5px;">Research papers, literature reviews, technical deep dives</div>
+        </div>
+        <div class="tpl-meta-section">
+          <div class="tpl-meta-lbl">AI Prompts linked</div>
+          <div class="tpl-meta-item"><div style="width:12px;height:12px;border-radius:3px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:white;flex-shrink:0;">C</div>Research Deep Dive</div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="tb-btn" style="width:100%;justify-content:center;margin-bottom:6px;">✏️ Customise</button>
+          <button class="tb-btn" style="width:100%;justify-content:center;">📋 Duplicate</button>
+        </div>
+      </div>
+    </div>
+    <div class="tpl-modal-footer">
+      <button class="use-tpl-btn" onclick="useTplAndClose()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+        Use This Template
+      </button>
+      <button class="tb-btn" onclick="closeTplModal()">Cancel</button>
+      <span style="font-size:11.5px;color:var(--t3);margin-left:8px;" id="tplUsedCount">Used 47 times</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROMPT EDITOR MODAL ═══ -->
+<div class="modal-overlay" id="promptModal" onclick="if(event.target===this)closePromptModal()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="pmTitle">New Prompt</div>
+      <button class="modal-close" onclick="closePromptModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;gap:20px;">
+      <!-- left: prompt editor -->
+      <div style="flex:1;min-width:0;">
+        <div class="field-group">
+          <label class="field-label">Prompt name</label>
+          <input class="field-input" id="pmName" placeholder="e.g. Equity Performance Monitor"/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Category</label>
+          <div class="select-chips" id="pmCatChips">
+            <div class="sel-chip active" onclick="toggleChip(this)">Research</div>
+            <div class="sel-chip" onclick="toggleChip(this)">Finance</div>
+            <div class="sel-chip" onclick="toggleChip(this)">Journal</div>
+            <div class="sel-chip" onclick="toggleChip(this)">Engineering</div>
+            <div class="sel-chip" onclick="toggleChip(this)">HTML Reports</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            Prompt body
+            <span class="field-hint">Use {{variable}} for dynamic values</span>
+          </label>
+          <textarea class="field-textarea large" id="pmBody" placeholder="Write your prompt here…&#10;&#10;Use {{company_list}} to insert a list of companies&#10;Use {{date}} for today's date&#10;Use {{note_content}} to include the current note&#10;&#10;Example:&#10;Analyse {{company_list}} for the week ending {{date}}.&#10;Generate: price performance, ROIC/WACC, M-Score flags."></textarea>
+        </div>
+        <!-- detected variables -->
+        <div class="field-group">
+          <label class="field-label">Detected variables <span class="field-hint">Click to insert</span></label>
+          <div>
+            <span class="var-chip" onclick="insertVar('{{company_list}}')">{{company_list}}</span>
+            <span class="var-chip" onclick="insertVar('{{date}}')">{{date}}</span>
+            <span class="var-chip" onclick="insertVar('{{note_content}}')">{{note_content}}</span>
+            <span class="var-chip" onclick="insertVar('{{topic}}')">{{topic}}</span>
+            <span class="var-chip" onclick="insertVar('{{concept}}')">{{concept}}</span>
+          </div>
+        </div>
+        <!-- variable value table -->
+        <div class="field-group">
+          <label class="field-label">Variable values <span class="field-hint" style="cursor:pointer;color:var(--p600);" onclick="addVarRow()">+ Add row</span></label>
+          <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;">
+            <table class="var-table">
+              <thead><tr><th>Variable</th><th>Default value / Data source</th><th>Type</th></tr></thead>
+              <tbody id="varTableBody">
+                <tr><td>{{company_list}}</td><td><input value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td><td><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Static list</option><option>Dynamic query</option><option>From note</option></select></td></tr>
+                <tr><td>{{date}}</td><td><input value="Auto: current date (IST)"/></td><td><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Auto date</option><option>Static</option></select></td></tr>
+              </tbody>
+            </table>
+            <div class="var-add-row" onclick="addVarRow()">+ Add variable row</div>
+          </div>
+        </div>
+      </div>
+      <!-- right: provider + cron -->
+      <div style="width:230px;flex-shrink:0;">
+        <div class="field-group">
+          <label class="field-label">AI Provider</label>
+          <div class="ai-provider-row">
+            <div class="ai-prov-btn sel" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">C</div>Claude</div>
+            <div class="ai-prov-btn" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#10A37F;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">G</div>GPT-4o</div>
+            <div class="ai-prov-btn" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#4285F4;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">G</div>Gemini</div>
+            <div class="ai-prov-btn" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#F55036;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">Q</div>Groq</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Output type</label>
+          <div class="select-chips" style="flex-direction:column;gap:5px;">
+            <div class="sel-chip active" onclick="toggleChip(this)" style="justify-content:flex-start;">📝 Save as note</div>
+            <div class="sel-chip" onclick="toggleChip(this)" style="justify-content:flex-start;">📄 Generate HTML report</div>
+            <div class="sel-chip" onclick="toggleChip(this)" style="justify-content:flex-start;">🔔 Send notification</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Save to notebook</label>
+          <select class="field-input" style="font-size:12.5px;padding:6px 10px;">
+            <option>Equity Research</option>
+            <option>Transformers</option>
+            <option>Daily Journal</option>
+            <option>RAG Patterns</option>
+          </select>
+        </div>
+        <!-- CRON SECTION -->
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <label class="field-label" style="margin-bottom:0;">Schedule (Cron Job)</label>
+            <div class="sw on" id="cronToggle" onclick="this.classList.toggle('on');toggleCronSection()"></div>
+          </div>
+          <div id="cronSection">
+            <div class="cron-grid">
+              <div class="cron-field">
+                <div class="cron-label">Frequency</div>
+                <select class="cron-select" id="cronFreq" onchange="updateCronPreview()">
+                  <option>Daily</option>
+                  <option selected>Weekly</option>
+                  <option>Monthly</option>
+                  <option>Hourly</option>
+                </select>
+              </div>
+              <div class="cron-field">
+                <div class="cron-label">Time</div>
+                <select class="cron-select" id="cronTime" onchange="updateCronPreview()">
+                  <option>06:00</option>
+                  <option>07:00</option>
+                  <option selected>08:00</option>
+                  <option>09:00</option>
+                  <option>12:00</option>
+                  <option>18:00</option>
+                  <option>20:00</option>
+                </select>
+              </div>
+            </div>
+            <div class="cron-field" style="margin-bottom:10px;">
+              <div class="cron-label">Days</div>
+              <div class="day-picker" id="dayPicker">
+                <button class="day-btn active" onclick="toggleDay(this)">Mo</button>
+                <button class="day-btn" onclick="toggleDay(this)">Tu</button>
+                <button class="day-btn" onclick="toggleDay(this)">We</button>
+                <button class="day-btn" onclick="toggleDay(this)">Th</button>
+                <button class="day-btn" onclick="toggleDay(this)">Fr</button>
+                <button class="day-btn" onclick="toggleDay(this)">Sa</button>
+                <button class="day-btn" onclick="toggleDay(this)">Su</button>
+              </div>
+            </div>
+            <div class="cron-field" style="margin-bottom:8px;">
+              <div class="cron-label">Timezone</div>
+              <select class="cron-select">
+                <option selected>Asia/Kolkata (IST)</option>
+                <option>UTC</option>
+                <option>America/New_York</option>
+              </select>
+            </div>
+            <div class="cron-preview" id="cronPreview">
+              <div class="cron-preview-icon">⏱</div>
+              <div>
+                <div class="cron-preview-text"><strong>Every Monday at 08:00 IST</strong></div>
+                <div class="cron-preview-next">Next run: Mon Apr 28, 2026 · 08:00 IST</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary" onclick="savePrompt()">💾 Save Prompt</button>
+      <button class="tb-btn" id="pmTestBtn">▶ Test Run</button>
+      <button class="tb-btn" onclick="closePromptModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HTML IMPORT MODAL ═══ -->
+<div class="modal-overlay" id="htmlImportModal" onclick="if(event.target===this)closeHtmlImportModal()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Import HTML Note</div>
+      <button class="modal-close" onclick="closeHtmlImportModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <button class="tb-btn primary" style="font-size:12px;" id="importTabFile" onclick="switchImportTab('file')">📁 Upload file</button>
+        <button class="tb-btn" style="font-size:12px;" id="importTabPaste" onclick="switchImportTab('paste')">📋 Paste HTML</button>
+        <button class="tb-btn" style="font-size:12px;" id="importTabUrl" onclick="switchImportTab('url')">🔗 From URL</button>
+      </div>
+      <div id="importTabContent">
+        <div style="border:2px dashed var(--border2);border-radius:var(--r-lg);padding:32px;text-align:center;background:var(--p50);cursor:pointer;margin-bottom:14px;">
+          <div style="font-size:28px;margin-bottom:8px;">📂</div>
+          <div style="font-size:13px;font-weight:500;color:var(--t2);">Drop your .html file here, or click to browse</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px;">Supports HTML files generated by Claude, ChatGPT, Gemini, or any AI tool</div>
+          <button class="html-import-btn" style="margin-top:12px;">Browse files</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Note title</label>
+        <input class="field-input" placeholder="Auto-detected from HTML or enter manually…"/>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="field-group" style="flex:1;">
+          <label class="field-label">Save to shelf</label>
+          <select class="field-input form-select" style="font-size:12.5px;padding:6px 10px;">
+            <option>AI &amp; Machine Learning</option><option>Personal</option><option>Work &amp; Finance</option>
+          </select>
+        </div>
+        <div class="field-group" style="flex:1;">
+          <label class="field-label">Save to notebook</label>
+          <select class="field-input form-select" style="font-size:12.5px;padding:6px 10px;">
+            <option>Transformers</option><option>Equity Research</option><option>Daily Journal</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary" onclick="closeHtmlImportModal()">📥 Import &amp; Save</button>
+      <button class="tb-btn" onclick="closeHtmlImportModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HTML GENERATE MODAL ═══ -->
+<div class="modal-overlay" id="htmlGenerateModal" onclick="if(event.target===this)closeHtmlGenerateModal()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">✦ Generate HTML Note with AI</div>
+      <button class="modal-close" onclick="closeHtmlGenerateModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Choose an AI model</label>
+        <div class="ai-provider-row">
+          <div class="ai-prov-btn sel" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">C</div>Claude</div>
+          <div class="ai-prov-btn" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#10A37F;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">G</div>GPT-4o</div>
+          <div class="ai-prov-btn" onclick="selProvider(this)"><div class="ai-prov-dot"></div><div style="width:14px;height:14px;border-radius:3px;background:#4285F4;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;">G</div>Gemini</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Use a Prompt Library template <span class="field-hint">optional</span></label>
+        <select class="field-input" style="font-size:12.5px;padding:6px 10px;">
+          <option value="">— start with a blank prompt —</option>
+          <option value="equity">📈 Equity Performance Monitor</option>
+          <option value="html-report">📄 Generate HTML Report</option>
+          <option value="research">🔬 Research Deep Dive</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Your prompt / description <span class="field-hint">Use {{variable}} for dynamic values</span></label>
+        <textarea class="field-textarea large" placeholder="Describe the HTML report or interactive tool you want Claude to generate.&#10;&#10;Examples:&#10;• Generate a financial dashboard for {{company_list}} with Q4 FY2026 performance charts, ROIC vs WACC comparison table, and analyst sentiment.&#10;&#10;• Create an interactive AI maturity assessment for enterprise teams covering 5 stages from Tool to Agentic Workforce.&#10;&#10;• Build a visual knowledge map of transformer architectures with clickable nodes.">Generate a detailed financial report for {{company_list}} covering Q4 FY2026. Include: executive summary, price performance charts, key financial ratios table (ROIC, WACC, PE, PB), Beneish M-Score flags, promoter pledge %, and analyst consensus. Make it visually polished with a purple and white theme.</textarea>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="field-group" style="flex:1;">
+          <label class="field-label">{{company_list}}</label>
+          <input class="field-input" value="Tata Motors, Infosys, HDFC Bank, Reliance"/>
+        </div>
+        <div class="field-group" style="flex:1;">
+          <label class="field-label">Save to notebook</label>
+          <select class="field-input" style="font-size:12.5px;padding:6px 10px;">
+            <option>Equity Research</option><option>Transformers</option><option>Daily Journal</option>
+          </select>
+        </div>
+      </div>
+      <div style="background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+        <div style="font-size:16px;flex-shrink:0;">💡</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6;">
+          <strong>Tip:</strong> For best results, tell Claude to generate a <strong>self-contained single HTML file</strong> with embedded CSS and JS. Claude excels at producing interactive dashboards, tables, charts (using Chart.js), and styled reports — all without leaving Lore.
+          <br/>After generation, the HTML is saved as a special <strong>HTML Note</strong> and can be linked to any note, previewed inline, or exported and shared.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary" style="gap:8px;" onclick="closeHtmlGenerateModal()">
+        <span style="font-size:14px;">✦</span> Generate &amp; Save to Lore
+      </button>
+      <button class="tb-btn" onclick="closeHtmlGenerateModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HTML PREVIEW MODAL ═══ -->
+<div class="modal-overlay" id="htmlPreviewModal" onclick="if(event.target===this)closeHtmlPreviewModal()">
+  <div class="modal html-preview-modal">
+    <div class="modal-header">
+      <div style="font-size:16px;margin-right:4px;">📊</div>
+      <div class="modal-title">Tata Motors Q4 FY2026 Analysis</div>
+      <div style="font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:6px;">84 KB · Apr 20, 2026</div>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">📤 Export</button>
+      <button class="tb-btn">📎 Link to note</button>
+      <button class="modal-close" onclick="closeHtmlPreviewModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body" style="padding:16px;">
+      <div class="html-preview-frame">
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#F5F3FF 0%,#EDE9FE 100%);gap:12px;font-family:'DM Sans',sans-serif;">
+          <div style="font-size:36px;">📊</div>
+          <div style="font-size:18px;font-weight:600;color:#2D2650;font-family:'Lora',serif;">Tata Motors Q4 FY2026</div>
+          <div style="font-size:13px;color:#6B6585;">AI-Generated Financial Analysis Report</div>
+          <div style="display:flex;gap:16px;margin-top:8px;">
+            <div style="text-align:center;background:white;border-radius:10px;padding:12px 20px;box-shadow:0 2px 8px rgba(109,40,217,0.1);"><div style="font-size:22px;font-weight:600;color:#7C3AED;font-family:'Lora',serif;">+14.2%</div><div style="font-size:10px;color:#9490AA;">Q4 Revenue Growth</div></div>
+            <div style="text-align:center;background:white;border-radius:10px;padding:12px 20px;box-shadow:0 2px 8px rgba(109,40,217,0.1);"><div style="font-size:22px;font-weight:600;color:#0F766E;font-family:'Lora',serif;">1.24</div><div style="font-size:10px;color:#9490AA;">ROIC / WACC</div></div>
+            <div style="text-align:center;background:white;border-radius:10px;padding:12px 20px;box-shadow:0 2px 8px rgba(109,40,217,0.1);"><div style="font-size:22px;font-weight:600;color:#D97706;font-family:'Lora',serif;">-0.82</div><div style="font-size:10px;color:#9490AA;">M-Score (Clean)</div></div>
+          </div>
+          <div style="font-size:11px;color:#BCB6D4;font-family:'JetBrains Mono',monospace;margin-top:6px;">Generated by Claude Sonnet 4 via Equity Performance Monitor prompt</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary">🔍 Open Full Screen</button>
+      <button class="tb-btn">✏️ Edit Source</button>
+      <button class="tb-btn" onclick="closeHtmlPreviewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════ VIEW SWITCH ════ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+
+/* ════ SETTINGS PANEL ════ */
+function switchSettingsPanel(id, el) {
+  document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('sp-' + id)?.classList.add('active');
+  document.querySelectorAll('.snav-item').forEach(i => i.classList.remove('active'));
+  el?.classList.add('active');
+}
+
+/* ════ SIDEBAR TREE ════ */
+function toggleShelf(id) { document.getElementById(id)?.classList.toggle('open'); }
+function toggleNb(id) { document.getElementById(id)?.classList.toggle('open'); }
+function selectNote(id, pane) {
+  document.querySelectorAll('.note-item').forEach(n => { n.classList.remove('active','open-right'); const b = n.querySelector('.ni-split-badge'); if(b) b.remove(); });
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (pane === 'left') el.classList.add('active');
+  else { el.classList.add('open-right'); const b = document.createElement('span'); b.className='ni-split-badge'; b.textContent='Right pane'; el.appendChild(b); }
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+
+/* ════ SPLIT MODE ════ */
+function setSplitMode(n) {
+  document.querySelectorAll('.split-btn').forEach((b,i) => b.classList.toggle('active', i === n-1));
+  const body = document.getElementById('notesSplitBody');
+  const right = document.getElementById('pane-right');
+  const resizer = document.getElementById('paneResizer');
+  if (n === 1) { right.style.display = 'none'; resizer.style.display = 'none'; }
+  else { right.style.display = ''; resizer.style.display = ''; }
+}
+function closePaneMsg() { alert('Close this pane? Note remains saved.'); }
+
+/* ════ TEMPLATE MODAL ════ */
+const tplData = {
+  research: { icon:'🔬', title:'Research Deep Dive', desc:'Hypothesis → Methodology → Key Findings → Conclusion', used:'47 times' },
+  journal:  { icon:'📔', title:'Daily Journal',       desc:'Intention · Mood · Wins · Blockers · Tomorrow',      used:'124 times' },
+  equity:   { icon:'📈', title:'Equity Research',     desc:'BRSR · M-Score · ROIC · Valuation · Signal',         used:'18 times' },
+  sprint:   { icon:'✅', title:'Sprint Plan',          desc:'Goals · Stories · Tasks · Definition of Done',        used:'31 times' },
+  'code-review': { icon:'💻', title:'Code Review',    desc:'Severity buckets · Patterns · Actions',               used:'22 times' },
+  meeting:  { icon:'🗓️', title:'Meeting Notes',       desc:'Attendees · Agenda · Decisions · Actions',            used:'56 times' },
+  new:      { icon:'✨', title:'New Custom Template', desc:'Design your own block structure',                      used:'—' },
+};
+function openTplModal(id) {
+  const d = tplData[id] || tplData.research;
+  document.getElementById('tplModalIcon').textContent = d.icon;
+  document.getElementById('tplModalTitle').textContent = d.title;
+  document.getElementById('tplModalDesc').textContent = d.desc;
+  document.getElementById('tplUsedCount').textContent = 'Used ' + d.used;
+  document.getElementById('tplPreviewTitle').textContent = d.title;
+  document.getElementById('tplOverlay').classList.add('open');
+}
+function closeTplModal() { document.getElementById('tplOverlay').classList.remove('open'); }
+function useTplAndClose() { closeTplModal(); switchView('notes', document.querySelectorAll('.nav-btn')[0]); }
+
+/* ════ PROMPT MODAL ════ */
+function openPromptModal(id) {
+  document.getElementById('pmTitle').textContent = id ? 'Edit Prompt' : 'New Prompt';
+  if (id === 'equity-cron') {
+    document.getElementById('pmName').value = 'Equity Performance Monitor';
+    document.getElementById('pmBody').value = 'Analyse {{company_list}} for the week ending {{date}}.\nGenerate: price vs 52w high/low, ROIC/WACC spread, promoter pledge %, M-Score flag, analyst consensus.\nOutput as a polished HTML report with charts.';
+  } else if (id) {
+    document.getElementById('pmName').value = '';
+    document.getElementById('pmBody').value = '';
+  } else {
+    document.getElementById('pmName').value = '';
+    document.getElementById('pmBody').value = '';
+  }
+  document.getElementById('promptModal').classList.add('open');
+}
+function closePromptModal() { document.getElementById('promptModal').classList.remove('open'); }
+function savePrompt() { closePromptModal(); }
+
+/* ════ CRON ════ */
+function toggleDay(btn) { btn.classList.toggle('active'); updateCronPreview(); }
+function toggleCronSection() {
+  const sec = document.getElementById('cronSection');
+  const tog = document.getElementById('cronToggle');
+  sec.style.opacity = tog.classList.contains('on') ? '1' : '0.4';
+  sec.style.pointerEvents = tog.classList.contains('on') ? '' : 'none';
+}
+function updateCronPreview() {
+  const freq = document.getElementById('cronFreq')?.value;
+  const time = document.getElementById('cronTime')?.value;
+  const days = [...document.querySelectorAll('.day-btn.active')].map(d => d.textContent).join(', ');
+  const text = freq === 'Daily' ? `Every day at ${time} IST` : freq === 'Weekly' ? `Every ${days} at ${time} IST` : `Monthly at ${time} IST`;
+  const p = document.getElementById('cronPreview');
+  if (p) p.querySelector('.cron-preview-text').innerHTML = `<strong>${text}</strong>`;
+}
+function addVarRow() {
+  const tb = document.getElementById('varTableBody');
+  if (!tb) return;
+  const row = document.createElement('tr');
+  row.innerHTML = `<td><input placeholder="{{variable}}"/></td><td><input placeholder="Default value…"/></td><td><select style="border:none;background:transparent;font-size:12px;color:var(--t2);outline:none;"><option>Static</option><option>Auto date</option><option>From note</option></select></td>`;
+  tb.appendChild(row);
+}
+function insertVar(v) {
+  const ta = document.getElementById('pmBody');
+  if (!ta) return;
+  const pos = ta.selectionStart;
+  ta.value = ta.value.slice(0,pos) + v + ta.value.slice(pos);
+  ta.focus();
+}
+
+/* ════ PROVIDER SELECT ════ */
+function selProvider(btn) {
+  const parent = btn.closest('.ai-provider-row');
+  if (!parent) return;
+  parent.querySelectorAll('.ai-prov-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function selModel(card) {
+  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+}
+function toggleChip(chip) { chip.classList.toggle('active'); }
+
+/* ════ HTML MODALS ════ */
+function openHtmlImportModal()  { document.getElementById('htmlImportModal').classList.add('open'); }
+function closeHtmlImportModal() { document.getElementById('htmlImportModal').classList.remove('open'); }
+function openHtmlGenerateModal()  { document.getElementById('htmlGenerateModal').classList.add('open'); }
+function closeHtmlGenerateModal() { document.getElementById('htmlGenerateModal').classList.remove('open'); }
+function openHtmlPreviewModal()  { document.getElementById('htmlPreviewModal').classList.add('open'); }
+function closeHtmlPreviewModal() { document.getElementById('htmlPreviewModal').classList.remove('open'); }
+function switchImportTab(t) {
+  ['file','paste','url'].forEach(tab => {
+    const btn = document.getElementById('importTab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (btn) btn.className = tab === t ? 'tb-btn primary' : 'tb-btn';
+  });
+}
+
+/* ════ MISC ════ */
+document.querySelectorAll('.sel-chip[onclick]').forEach(c => {
+  if (!c.getAttribute('onclick')?.includes('toggle')) c.addEventListener('click', () => { c.classList.toggle('active'); });
+});
+document.querySelectorAll('.pl-f').forEach(f => f.addEventListener('click', () => { document.querySelectorAll('.pl-f').forEach(x => x.classList.remove('active')); f.classList.add('active'); }));
+document.querySelectorAll('.snav-item').forEach(i => i.addEventListener('click', () => { document.querySelectorAll('.snav-item').forEach(x => x.classList.remove('active')); i.classList.add('active'); }));
+</script>
+</body>
+</html>

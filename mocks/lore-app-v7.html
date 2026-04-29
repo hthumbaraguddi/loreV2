@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lore v7</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ══════════════════════════════════
+   THEME TOKENS — light / dark
+══════════════════════════════════ */
+:root {
+  /* sidebar */
+  --sb-bg:#F0EEF9; --sb-border:#E2DEFA; --sb-text:#6B6585; --sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06); --sb-active:rgba(109,40,217,0.1);
+  /* nav rail */
+  --nav-bg:#EAE7F7; --nav-border:#DDD8F5; --nav-icon:rgba(80,60,160,0.45);
+  /* canvas */
+  --bg:#FAFAF9; --canvas:#FFFFFF; --surface:#FFFFFF; --surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09); --border2:rgba(109,40,217,0.16);
+  /* text */
+  --t1:#1C1829; --t2:#4A445F; --t3:#9490AA; --t4:#C4C0D4;
+  /* purple accent */
+  --p50:#F5F3FF; --p100:#EDE9FE; --p200:#DDD6FE; --p300:#C4B5FD;
+  --p400:#A78BFA; --p500:#8B5CF6; --p600:#7C3AED; --p700:#6D28D9; --p900:#2E1065;
+  /* semantic */
+  --amber:#D97706; --amber-bg:#FFFBEB; --amber-light:#FDE68A;
+  --teal:#0F766E;  --teal-bg:#F0FDFA;
+  --rose:#BE185D;  --rose-bg:#FFF1F2;
+  --blue:#1D4ED8;  --blue-bg:#EFF6FF;
+  --green:#15803D; --green-bg:#F0FDF4;
+  --red:#DC2626;   --red-bg:#FEF2F2;
+  --orange:#C2410C; --orange-bg:#FFF7ED;
+  /* shadows */
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+  /* dims */
+  --nav-w:52px; --sb-w:248px; --toolbar-h:46px;
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-xl:18px;
+}
+
+/* ── DARK MODE OVERRIDES ── */
+[data-theme="dark"] {
+  --sb-bg:#1E1A2E; --sb-border:#2D2650; --sb-text:#8C84A8; --sb-text-active:#E2DEFA;
+  --sb-hover:rgba(167,139,250,0.08); --sb-active:rgba(167,139,250,0.14);
+  --nav-bg:#17142B; --nav-border:#2D2650; --nav-icon:rgba(167,139,250,0.4);
+  --bg:#13101F; --canvas:#1A1729; --surface:#1E1A2E; --surface2:#17142B;
+  --border:rgba(167,139,250,0.1); --border2:rgba(167,139,250,0.18);
+  --t1:#F0EEFF; --t2:#C4B5FD; --t3:#7B6F9A; --t4:#4A4068;
+  --p50:#1E1A2E; --p100:#2D2650; --p200:#3D3570; --p300:#5B4DB0;
+  --p400:#8B5CF6; --p500:#A78BFA; --p600:#C4B5FD; --p700:#DDD6FE;
+  --amber:#FCD34D; --amber-bg:rgba(253,211,77,0.1); --amber-light:rgba(253,211,77,0.2);
+  --teal:#34D399;  --teal-bg:rgba(52,211,153,0.1);
+  --rose:#F472B6;  --rose-bg:rgba(244,114,182,0.1);
+  --blue:#60A5FA;  --blue-bg:rgba(96,165,250,0.1);
+  --green:#4ADE80; --green-bg:rgba(74,222,128,0.1);
+  --red:#F87171;   --red-bg:rgba(248,113,113,0.1);
+  --shadow:0 1px 3px rgba(0,0,0,0.3),0 4px 14px rgba(0,0,0,0.2);
+  --shadow-lg:0 8px 30px rgba(0,0,0,0.4),0 2px 8px rgba(0,0,0,0.3);
+  --shadow-float:0 12px 40px rgba(0,0,0,0.5),0 3px 10px rgba(167,139,250,0.15);
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  display:flex; height:100vh; overflow:hidden;
+  color:var(--t1); -webkit-font-smoothing:antialiased; font-size:14px;
+  transition:background 0.25s, color 0.25s;
+}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* ══ NAV RAIL ══ */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;transition:background 0.25s;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);transition:background 0.25s;}
+[data-theme="dark"] .nav-logo{background:var(--p400);box-shadow:0 2px 8px rgba(167,139,250,0.3);}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--nav-icon);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+[data-theme="dark"] .nav-btn:hover,[data-theme="dark"] .nav-btn.active{background:rgba(167,139,250,0.15);color:var(--p400);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:var(--bg);font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+/* notif badge */
+.nav-notif-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--rose);border:2px solid var(--nav-bg);}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:background 0.25s,border-color 0.25s;}
+.sb-topbar{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);flex-shrink:0;}
+.sb-search-trigger{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 9px;cursor:pointer;transition:all 0.15s;}
+[data-theme="dark"] .sb-search-trigger{background:rgba(255,255,255,0.04);}
+.sb-search-trigger:hover{border-color:var(--p300);background:var(--surface);}
+.sb-search-trigger span{font-size:12.5px;color:var(--t4);flex:1;}
+.sb-search-trigger svg{color:var(--t4);width:12px;height:12px;flex-shrink:0;}
+.sb-kbd{font-size:9.5px;color:var(--t4);background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.sb-icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.5);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+[data-theme="dark"] .sb-icon-btn{background:rgba(255,255,255,0.04);}
+.sb-icon-btn:hover{background:var(--surface);color:var(--p600);}
+.sb-icon-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+/* shelf/notebook/note – same as v6 */
+.shelf{}.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+[data-theme="dark"] .sh-count{background:rgba(167,139,250,0.1);}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;}
+.note-item:hover{background:var(--sb-hover);}
+.note-item.active{background:var(--sb-active);border-left-color:var(--p600);}
+[data-theme="dark"] .note-item.active{border-left-color:var(--p400);}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p600);}
+.badge-html{background:var(--orange-bg);color:var(--orange);}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--toolbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;transition:background 0.25s,border-color 0.25s;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+[data-theme="dark"] .tb-btn.primary{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+
+/* ══ NOTE TOOLBAR ══ */
+.note-bar{height:var(--toolbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 18px;flex-shrink:0;transition:background 0.25s;}
+.nb-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.nb-bc a{color:var(--p600);cursor:pointer;font-weight:500;}
+[data-theme="dark"] .nb-bc a{color:var(--p400);}
+.nb-bc .sep{color:var(--t4);font-size:10px;}
+.nb-bc .cur{color:var(--t2);font-weight:500;}
+.split-toggle-group{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:2px;}
+.split-btn{width:28px;height:24px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.15s;}
+.split-btn.active{background:var(--surface);color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.1);}
+.split-btn svg{width:14px;height:14px;}
+.ai-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--p300);background:var(--p50);color:var(--p600);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .ai-pill{border-color:var(--p400);background:var(--p100);color:var(--p400);}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+/* version history btn */
+.history-btn{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+.history-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+
+/* ══════════════════════════════════
+   PAPER CANVAS
+══════════════════════════════════ */
+.editor-wrap{flex:1;display:flex;overflow:hidden;}
+.editor-paper{flex:1;overflow-y:auto;background:var(--canvas);padding:48px 64px 80px;display:flex;flex-direction:column;transition:background 0.25s;}
+[data-theme="dark"] .editor-paper{background:#1A1729;}
+.paper-type-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.ptype-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.15s;}
+.ptype-research{background:var(--teal-bg);color:var(--teal);}
+.ptype-journal{background:var(--amber-bg);color:var(--amber);}
+.ptype-idea{background:var(--rose-bg);color:var(--rose);}
+.ptype-reference{background:var(--p100);color:var(--p600);}
+.paper-date{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.paper-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:32px;font-weight:600;color:var(--t1);line-height:1.2;margin-bottom:18px;letter-spacing:-0.02em;resize:none;overflow:hidden;caret-color:var(--p600);}
+.paper-title::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:22px;}
+.blocks-area{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.paper-body{flex:1;width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:16px;line-height:1.85;color:var(--t2);resize:none;min-height:200px;caret-color:var(--p600);}
+.paper-body::placeholder{color:var(--t4);font-style:italic;}
+/* blocks */
+.block{position:relative;}
+.block .blk-del{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);opacity:0;transition:0.15s;}
+.block:hover .blk-del{opacity:1;}
+.block .blk-del:hover{background:var(--rose-bg);color:var(--rose);}
+.block .blk-del svg{width:10px;height:10px;}
+.blk-callout{display:flex;gap:10px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:12px 36px 12px 14px;}
+.blk-callout.hyp{background:var(--amber-bg);border-color:var(--amber);}
+.blk-callout.con{background:var(--teal-bg);border-color:var(--teal);}
+.blk-callout.note-b{background:var(--p50);border-color:var(--p400);}
+.blk-callout.warn{background:var(--orange-bg);border-color:var(--orange);}
+.blk-ico{font-size:14px;flex-shrink:0;margin-top:1px;}
+.blk-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.blk-callout.hyp .blk-lbl{color:var(--amber);}
+.blk-callout.con .blk-lbl{color:var(--teal);}
+.blk-callout.note-b .blk-lbl{color:var(--p600);}
+[data-theme="dark"] .blk-callout.note-b .blk-lbl{color:var(--p400);}
+.blk-callout.warn .blk-lbl{color:var(--orange);}
+.blk-txt{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-style:italic;line-height:1.65;color:var(--t2);width:100%;resize:none;}
+.blk-txt::placeholder{color:var(--t4);}
+/* key differences */
+.blk-keydiff{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;padding-right:36px;}
+.kd-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-col-hdr{flex:1;padding:7px 11px;font-size:10.5px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+[data-theme="dark"] .kd-col-hdr{color:var(--p400);}
+.kd-col-hdr:last-child{border-right:none;}
+.kd-col-hdr input{border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:inherit;width:100%;}
+.kd-body{display:flex;}
+.kd-col{flex:1;border-right:1px solid var(--border2);}
+.kd-col:last-child{border-right:none;}
+.kd-row{display:flex;gap:7px;align-items:flex-start;padding:6px 11px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--t2);}
+.kd-row:last-child{border-bottom:none;}
+.kd-dot{width:5px;height:5px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:6px;}
+.kd-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;}
+.kd-inp::placeholder{color:var(--t4);}
+/* findings */
+.blk-findings{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:14px 36px 14px 14px;}
+.blk-findings-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p600);font-family:'JetBrains Mono',monospace;margin-bottom:10px;}
+[data-theme="dark"] .blk-findings-lbl{color:var(--p400);}
+.fi-row{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);}
+.fi-row:last-child{border-bottom:none;}
+.fi-num{width:17px;height:17px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;margin-top:2px;}
+.fi-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);width:100%;resize:none;}
+.fi-inp::placeholder{color:var(--t4);}
+/* checklist */
+.blk-check{padding-right:36px;}
+.check-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--blue);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:0.15s;}
+.check-box.done{background:var(--blue);border-color:var(--blue);}
+.check-box.done::after{content:'✓';font-size:9px;color:white;font-weight:700;}
+.check-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;color:var(--t2);flex:1;}
+.check-inp.done{text-decoration:line-through;color:var(--t4);}
+/* code */
+.blk-code{background:#0F0C1A;border-radius:var(--r-md);padding:12px 36px 12px 14px;}
+[data-theme="dark"] .blk-code{background:#080612;}
+.blk-code-lang{font-size:10px;color:rgba(255,255,255,0.3);font-family:'JetBrains Mono',monospace;margin-bottom:6px;}
+.blk-code textarea{width:100%;border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;color:#C4B5FD;line-height:1.6;resize:none;}
+.blk-code textarea::placeholder{color:rgba(255,255,255,0.15);}
+.blk-code .blk-del{color:rgba(255,255,255,0.3);}
+.blk-code .blk-del:hover{background:rgba(255,255,255,0.08);color:white;}
+/* divider */
+.blk-divider{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.blk-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.blk-divider-dot{width:4px;height:4px;border-radius:50%;background:var(--t4);}
+/* ai block */
+.blk-ai{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:14px 36px 14px 14px;}
+.blk-ai-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.blk-ai-logo{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;}
+.blk-ai-name{font-size:11px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .blk-ai-name{color:var(--p400);}
+.blk-ai-inp{width:100%;border:1px solid var(--p200);background:var(--surface);border-radius:6px;padding:8px 10px;font-family:'Lora',serif;font-size:13.5px;color:var(--t2);outline:none;resize:none;}
+.blk-ai-inp::placeholder{color:var(--t4);font-style:italic;}
+.blk-ai-footer{margin-top:8px;display:flex;gap:6px;}
+.blk-ai-btn{font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.blk-ai-btn.ask{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .blk-ai-btn.ask{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+/* slash hint */
+.slash-hint{display:flex;align-items:center;gap:6px;padding:10px 0 0;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border);}
+.slash-hint-lbl{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.sh-key{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--t3);background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;cursor:pointer;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.sh-key:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.sh-key kbd{font-family:inherit;font-size:9px;color:var(--p600);font-weight:600;background:var(--p50);border:1px solid var(--border2);border-radius:3px;padding:0 4px;}
+[data-theme="dark"] .sh-key kbd{background:var(--p100);color:var(--p400);}
+/* note tags */
+.paper-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.paper-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--p100);color:var(--p600);font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .paper-tag{background:var(--p200);color:var(--p400);}
+.paper-tag:hover{background:var(--p200);}
+.paper-tag.add{background:transparent;border:1px dashed var(--p300);color:var(--p600);}
+
+/* ══ RIGHT PANEL — version history ══ */
+.history-panel{width:0;overflow:hidden;border-left:1px solid var(--border);background:var(--surface2);flex-shrink:0;transition:width 0.25s ease;display:flex;flex-direction:column;}
+.history-panel.open{width:240px;}
+.hp-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px;}
+.hp-title{font-size:13px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.hp-close{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);}
+.hp-close:hover{background:var(--p50);color:var(--t1);}
+.hp-body{flex:1;overflow-y:auto;padding:12px 14px;}
+.hp-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.version-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
+.version-item:last-child{border-bottom:none;}
+.version-item:hover{background:var(--p50);}
+.vi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.vi-dot.current{background:var(--p600);}
+[data-theme="dark"] .vi-dot.current{background:var(--p400);}
+.vi-dot.auto{background:var(--t4);}
+.vi-dot.named{background:var(--green);}
+.vi-info{flex:1;}
+.vi-label{font-size:12px;font-weight:500;color:var(--t1);}
+.vi-date{font-size:10.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.vi-diff{font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace;}
+.vi-restore{font-size:10.5px;color:var(--p600);cursor:pointer;opacity:0;transition:0.15s;}
+[data-theme="dark"] .vi-restore{color:var(--p400);}
+.version-item:hover .vi-restore{opacity:1;}
+.version-item.current-v .vi-label::after{content:' (current)';font-size:9.5px;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .version-item.current-v .vi-label::after{color:var(--p400);}
+.hp-save-btn{margin:12px 14px;padding:7px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;text-align:center;transition:0.12s;font-family:'DM Sans',sans-serif;}
+.hp-save-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+
+/* ══════════════════════════════════
+   GLOBAL SEARCH OVERLAY
+══════════════════════════════════ */
+.search-overlay{
+  position:fixed;inset:0;background:rgba(28,24,41,0.6);
+  z-index:800;display:none;align-items:flex-start;justify-content:center;
+  padding-top:80px;
+  backdrop-filter:blur(4px);
+}
+.search-overlay.open{display:flex;}
+[data-theme="dark"] .search-overlay{background:rgba(8,6,18,0.8);}
+.search-box{
+  width:680px;background:var(--surface);border-radius:var(--r-xl);
+  box-shadow:var(--shadow-float);overflow:hidden;display:flex;flex-direction:column;
+  max-height:70vh;
+}
+.search-input-row{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.search-main-input{
+  flex:1;border:none;background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:16px;color:var(--t1);outline:none;
+}
+.search-main-input::placeholder{color:var(--t4);}
+.search-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;flex-shrink:0;}
+.search-close:hover{background:var(--p50);}
+.search-filters{display:flex;gap:5px;padding:10px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;}
+.sf{padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;font-size:11.5px;color:var(--t2);cursor:pointer;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.sf:hover{border-color:var(--p300);color:var(--p600);}
+.sf.active{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .sf.active{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.search-results{flex:1;overflow-y:auto;}
+.sr-section-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;padding:12px 18px 6px;}
+.sr-item{display:flex;align-items:flex-start;gap:10px;padding:10px 18px;cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;}
+.sr-item:hover{background:var(--p50);border-left-color:var(--p600);}
+[data-theme="dark"] .sr-item:hover{background:var(--sb-hover);border-left-color:var(--p400);}
+.sri-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.sri-main{flex:1;min-width:0;}
+.sri-title{font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:3px;}
+.sri-title mark{background:var(--p200);color:var(--p700);border-radius:2px;padding:0 2px;}
+[data-theme="dark"] .sri-title mark{background:var(--p300);color:#1C1829;}
+.sri-loc{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.sri-loc-sep{color:var(--t4);}
+.sri-preview{font-size:12px;color:var(--t3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sri-preview mark{background:var(--p100);color:var(--p700);border-radius:2px;padding:0 1px;}
+.sri-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;align-self:center;}
+.sri-date{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex-shrink:0;align-self:center;}
+/* recent items */
+.sr-recent-row{display:flex;gap:8px;padding:8px 18px;flex-wrap:wrap;}
+.sri-recent{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:12px;color:var(--t2);transition:0.12s;}
+.sri-recent:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.search-footer{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:14px;flex-shrink:0;}
+.sf-hint{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t4);}
+.sf-hint kbd{font-family:'JetBrains Mono',monospace;font-size:9.5px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;color:var(--t3);}
+
+/* ══════════════════════════════════
+   NOTIFICATION CENTER
+══════════════════════════════════ */
+.notif-panel{
+  position:fixed;top:0;right:-380px;bottom:0;width:360px;
+  background:var(--surface);border-left:1px solid var(--border);
+  z-index:700;display:flex;flex-direction:column;
+  transition:right 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:var(--shadow-lg);
+}
+.notif-panel.open{right:0;}
+.np-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.np-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.np-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;background:var(--rose-bg);color:var(--rose);font-family:'JetBrains Mono',monospace;}
+.np-close{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.np-close:hover{background:var(--p50);color:var(--t1);}
+.np-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.np-tab{flex:1;padding:8px;font-size:12.5px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;text-align:center;transition:0.15s;}
+.np-tab:hover{color:var(--t2);}
+.np-tab.active{color:var(--p600);border-bottom-color:var(--p600);font-weight:500;}
+[data-theme="dark"] .np-tab.active{color:var(--p400);border-bottom-color:var(--p400);}
+.np-body{flex:1;overflow-y:auto;}
+.notif-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
+.notif-item:hover{background:var(--p50);}
+.notif-item.unread{border-left:3px solid var(--p600);}
+[data-theme="dark"] .notif-item.unread{border-left-color:var(--p400);}
+.ni-top-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.ni-icon{font-size:18px;flex-shrink:0;}
+.ni-content{flex:1;}
+.ni-notif-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;}
+.ni-notif-body{font-size:12px;color:var(--t3);line-height:1.5;}
+.ni-notif-body strong{color:var(--t2);}
+.ni-time{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-top:2px;}
+.notif-actions{display:flex;gap:5px;margin-top:8px;}
+.na-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--t2);cursor:pointer;transition:0.12s;}
+.na-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.na-btn.primary{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .na-btn.primary{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.na-btn.primary:hover{background:var(--p700);}
+.notif-type-badge{font-size:8.5px;font-weight:600;padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;}
+.ntb-cron{background:var(--amber-bg);color:var(--amber);}
+.ntb-ai{background:var(--p100);color:var(--p600);}
+[data-theme="dark"] .ntb-ai{background:var(--p200);color:var(--p400);}
+.ntb-err{background:var(--red-bg);color:var(--red);}
+.ntb-ok{background:var(--green-bg);color:var(--green);}
+
+/* ══════════════════════════════════
+   HTML NOTE VIEWER (full screen)
+══════════════════════════════════ */
+.html-viewer{
+  position:fixed;inset:0;background:var(--bg);z-index:900;
+  display:none;flex-direction:column;
+}
+.html-viewer.open{display:flex;}
+.hv-toolbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;}
+.hv-title{font-size:14px;font-weight:600;color:var(--t1);font-family:'Lora',serif;display:flex;align-items:center;gap:7px;}
+.hv-badge{font-size:9.5px;background:var(--orange-bg);color:var(--orange);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;}
+.hv-sp{flex:1;}
+.hv-btn{height:30px;padding:0 11px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;}
+.hv-btn:hover{background:var(--p50);}
+.hv-btn.primary{background:var(--p600);border-color:var(--p600);color:white;}
+.hv-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.hv-close:hover{background:var(--p50);}
+/* zoom toolbar */
+.hv-zoom-bar{height:36px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
+.hv-zoom-btn{width:26px;height:26px;border-radius:5px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:13px;transition:0.12s;}
+.hv-zoom-btn:hover{border-color:var(--p300);color:var(--p600);}
+.hv-zoom-val{font-size:12px;color:var(--t2);font-family:'JetBrains Mono',monospace;min-width:42px;text-align:center;}
+.hv-body{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px;background:var(--bg);}
+.hv-frame{background:white;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;transition:transform 0.2s;width:900px;min-height:600px;padding:40px 48px;}
+.hv-demo-content{font-family:'DM Sans',sans-serif;}
+.hv-demo-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #EDE9FE;}
+.hv-demo-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.hv-demo-title{font-size:22px;font-weight:700;color:#1C1829;font-family:'Lora',serif;}
+.hv-demo-sub{font-size:13px;color:#9490AA;margin-top:3px;}
+.hv-demo-badge{font-size:10px;padding:3px 9px;border-radius:20px;background:#F0FDF4;color:#15803D;font-weight:600;border:1px solid #BBF7D0;margin-left:auto;}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.metric-card{background:#F5F3FF;border-radius:10px;padding:16px;text-align:center;}
+.metric-n{font-size:24px;font-weight:700;color:#7C3AED;font-family:'Lora',serif;}
+.metric-l{font-size:11px;color:#9490AA;margin-top:3px;}
+.metric-trend{font-size:11px;margin-top:4px;font-weight:600;}
+.metric-trend.up{color:#15803D;} .metric-trend.down{color:#DC2626;}
+.hv-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.hv-table th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#9490AA;border-bottom:2px solid #EDE9FE;}
+.hv-table td{padding:10px 12px;border-bottom:1px solid #F0EEFF;font-size:13px;color:#4A445F;vertical-align:middle;}
+.hv-table tr:hover td{background:#F5F3FF;}
+.signal-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;}
+.signal-clean{background:#F0FDF4;color:#15803D;}.signal-warn{background:#FFFBEB;color:#D97706;}.signal-flag{background:#FFF1F2;color:#BE185D;}
+.hv-insight{background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-radius:10px;padding:16px 20px;border-left:4px solid #7C3AED;}
+.hv-insight-lbl{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#7C3AED;margin-bottom:5px;}
+.hv-insight-text{font-size:13px;color:#4A445F;line-height:1.6;}
+.hv-gen-footer{display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:1px solid #EDE9FE;font-size:11px;color:#BCB6D4;}
+
+/* ══════════════════════════════════
+   QUICK CAPTURE WIDGET
+══════════════════════════════════ */
+.quick-capture-btn{
+  position:fixed;bottom:28px;right:28px;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--p600);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4),0 2px 6px rgba(0,0,0,0.15);
+  z-index:500;transition:all 0.2s;
+  color:white;
+}
+[data-theme="dark"] .quick-capture-btn{background:var(--p400);}
+.quick-capture-btn:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(124,58,237,0.5);}
+.quick-capture-btn svg{width:22px;height:22px;}
+.quick-capture-bubble{
+  position:fixed;bottom:90px;right:28px;
+  width:320px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-xl);box-shadow:var(--shadow-float);
+  z-index:500;display:none;flex-direction:column;overflow:hidden;
+}
+.quick-capture-bubble.open{display:flex;}
+.qcb-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.qcb-title{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.qcb-type-pills{display:flex;gap:4px;}
+.qcb-pill{font-size:9.5px;padding:2px 7px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'JetBrains Mono',monospace;transition:0.12s;}
+.qcb-pill.active{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .qcb-pill.active{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.qcb-body{padding:10px 14px;}
+.qcb-title-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:16px;font-weight:600;color:var(--t1);margin-bottom:8px;}
+.qcb-title-inp::placeholder{color:var(--t4);}
+.qcb-body-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;line-height:1.65;color:var(--t2);resize:none;min-height:90px;}
+.qcb-body-inp::placeholder{color:var(--t4);font-style:italic;}
+.qcb-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.qcb-dest{font-size:11px;color:var(--t3);flex:1;font-family:'JetBrains Mono',monospace;}
+.qcb-save-btn{padding:6px 16px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.qcb-save-btn:hover{background:var(--p700);}
+[data-theme="dark"] .qcb-save-btn{background:var(--p400);color:#1C1829;}
+/* saved toast */
+.save-toast{
+  position:fixed;bottom:90px;right:28px;
+  background:var(--green);color:white;
+  border-radius:var(--r-lg);padding:10px 16px;
+  display:none;align-items:center;gap:8px;
+  font-size:12.5px;font-weight:500;z-index:600;
+  box-shadow:var(--shadow-lg);
+}
+.save-toast.show{display:flex;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* ══ MISC SHARED ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+[data-theme="dark"] .modal-overlay{background:rgba(8,6,18,0.75);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;}
+.modal-sm{width:500px;} .modal-lg{width:720px;}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-close:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:20px 22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:11.5px;font-weight:500;color:var(--t2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.field-input{width:100%;border:1px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);outline:none;background:var(--surface);}
+.field-input:focus{border-color:var(--p400);}
+.field-textarea{resize:vertical;min-height:90px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;}
+/* dark mode toggle chip */
+.theme-toggle{
+  display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--surface);
+  color:var(--t2);font-size:11.5px;cursor:pointer;transition:all 0.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.theme-toggle:hover{border-color:var(--p300);color:var(--p600);}
+[data-theme="dark"] .theme-toggle:hover{color:var(--p400);}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV RAIL ══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="openSearch()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4 4"/></svg>
+    <span class="nav-tip">Search  ⌘K</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="openNotifPanel()" id="notifNavBtn">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 016 6c0 3 1 4 2 5H2c1-1 2-2 2-5a6 6 0 016-6z"/><path d="M8 17a2 2 0 004 0"/></svg>
+    <div class="nav-notif-badge" id="notifDot"></div>
+    <span class="nav-tip">Notifications (3)</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="sb-topbar">
+    <div class="sb-search-trigger" onclick="openSearch()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <span>Search notes…</span>
+      <span class="sb-kbd">⌘K</span>
+    </div>
+    <button class="sb-icon-btn" onclick="openTplModal()" title="New from template">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M4 4h6M4 7h4"/></svg>
+    </button>
+    <button class="sb-icon-btn" onclick="createBlankNote()" title="New note  ⌘N">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+    </button>
+  </div>
+  <div class="sb-tree">
+    <!-- Shelf 1 -->
+    <div class="shelf open" id="s1">
+      <div class="shelf-hdr" onclick="toggleShelf('s1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();createBlankNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📔</span><span class="nb-name">Transformers</span><span class="nb-count">3</span></div>
+          <div class="nb-body">
+            <div class="note-item active" onclick="setNote(this,'Transformer Architecture Deep Dive','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings, tradeoffs.</div>
+            </div>
+            <div class="note-item" onclick="setNote(this,'BERT vs GPT Analysis','Idea')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-prev">Bidirectional vs autoregressive use cases.</div>
+            </div>
+            <div class="note-item" onclick="openHtmlViewer()">
+              <div class="ni-top"><span class="ni-badge badge-html">HTML</span><span class="ni-date">Apr 20</span></div>
+              <div class="ni-title">Tata Motors Q4 — AI Report</div>
+              <div class="ni-prev">Auto-generated via Equity Monitor cron.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📗</span><span class="nb-name">RAG Patterns</span><span class="nb-count">2</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="setNote(this,'Hybrid Retrieval Strategies','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense, cross-encoder re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Shelf 2 -->
+    <div class="shelf open" id="s2">
+      <div class="shelf-hdr" onclick="toggleShelf('s2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();createBlankNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📒</span><span class="nb-name">Daily Journal</span><span class="nb-count">12</span></div>
+          <div class="nb-body">
+            <div class="note-item" onclick="setNote(this,'Monday — Deep Work Session','Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Inbox (quick capture dest) -->
+    <div class="shelf open" id="s3">
+      <div class="shelf-hdr" onclick="toggleShelf('s3')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#9490AA;"></div>
+        <span class="sh-name">Inbox</span>
+        <span class="sh-count">2</span>
+        <button class="sh-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb4">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb4')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📥</span><span class="nb-name">Captured Notes</span><span class="nb-count" id="inboxCount">2</span></div>
+          <div class="nb-body" id="inboxBody">
+            <div class="note-item">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Today</span></div>
+              <div class="ni-title">Idea about GraphRAG implementation</div>
+              <div class="ni-prev">Use entity extraction to build a local graph…</div>
+            </div>
+            <div class="note-item">
+              <div class="ni-top"><span class="ni-badge badge-task">Task</span><span class="ni-date">Today</span></div>
+              <div class="ni-title">Read FlashAttention-3 paper</div>
+              <div class="ni-prev">Published on Arxiv, covers IO-aware attention…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- VIEW: NOTES (paper editor) -->
+  <div class="view active" id="view-notes">
+    <div class="note-bar">
+      <div class="nb-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span>
+        <span>Transformers</span><span class="sep"> › </span>
+        <span class="cur" id="bcTitle">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <!-- dark mode toggle -->
+      <button class="theme-toggle" onclick="toggleDarkMode()" id="themeBtn">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">Dark</span>
+      </button>
+      <div class="split-toggle-group">
+        <button class="split-btn active" title="Single" onclick="setSplit(1,this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/></svg></button>
+        <button class="split-btn" title="2 panes" onclick="setSplit(2,this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="12" rx="1"/></svg></button>
+      </div>
+      <div class="ai-pill"><div class="ai-dot"></div>@AI</div>
+      <button class="history-btn" onclick="toggleHistoryPanel()" id="historyBtn">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/><path d="M2 8A6 6 0 003.5 3.5"/><path d="M2 8l-1.5-2M2 8L.5 6"/></svg>
+        History
+      </button>
+      <button class="tb-btn primary" style="font-size:11.5px;">Save</button>
+    </div>
+
+    <div class="editor-wrap">
+      <!-- PAPER -->
+      <div class="editor-paper" id="editorPaper">
+        <div class="paper-type-row">
+          <button class="ptype-pill ptype-research" id="typePill" onclick="cycleType()">
+            <span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>
+            Research
+          </button>
+          <span class="paper-date">Mar 16, 2026</span>
+        </div>
+
+        <textarea class="paper-title" id="paperTitle" rows="1" placeholder="Untitled…"
+          oninput="onTitle(this)">Transformer Architecture Deep Dive</textarea>
+
+        <hr class="paper-sep"/>
+
+        <div id="blocksArea" class="blocks-area">
+          <!-- Pre-seeded: hypothesis -->
+          <div class="block">
+            <div class="blk-callout hyp">
+              <div class="blk-ico">💡</div>
+              <div style="flex:1;">
+                <div class="blk-lbl">Hypothesis</div>
+                <textarea class="blk-txt" rows="2">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</textarea>
+              </div>
+            </div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+          <!-- Pre-seeded: key diff -->
+          <div class="block">
+            <div class="blk-keydiff">
+              <div class="kd-hdr">
+                <div class="kd-col-hdr"><input value="Encoder-only (BERT)"/></div>
+                <div class="kd-col-hdr"><input value="Decoder-only (GPT)"/></div>
+              </div>
+              <div class="kd-body">
+                <div class="kd-col">
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Bidirectional attention</textarea></div>
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Best for classification</textarea></div>
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Needs fine-tuning</textarea></div>
+                </div>
+                <div class="kd-col">
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Causal attention</textarea></div>
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Best for generation</textarea></div>
+                  <div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Few-shot capable</textarea></div>
+                </div>
+              </div>
+            </div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+          <!-- Pre-seeded: findings -->
+          <div class="block">
+            <div class="blk-findings">
+              <div class="blk-findings-lbl">Key Findings</div>
+              <div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1">Self-attention scales quadratically — key bottleneck for long sequences.</textarea></div>
+              <div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1">Learned vs sinusoidal positional encodings perform similarly in practice.</textarea></div>
+              <div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1">Multi-head attention attends to different representation subspaces simultaneously.</textarea></div>
+            </div>
+            <button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+          </div>
+        </div>
+
+        <textarea class="paper-body" id="paperBody" placeholder="Continue writing… / for blocks · @ for AI · [[ to link note" oninput="handleBodyKey(event)">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer on a toy dataset to validate core claims about positional encoding and multi-head attention behaviour across different sequence lengths.</textarea>
+
+        <div class="paper-tags">
+          <span class="paper-tag">transformers</span>
+          <span class="paper-tag">attention</span>
+          <span class="paper-tag">NLP</span>
+          <span class="paper-tag">deep-learning</span>
+          <span class="paper-tag add" onclick="addTag()">+ tag</span>
+        </div>
+
+        <div class="slash-hint">
+          <span class="slash-hint-lbl">Insert:</span>
+          <span class="sh-key" onclick="insertBlock('hyp')"><kbd>H</kbd> Hypothesis</span>
+          <span class="sh-key" onclick="insertBlock('con')"><kbd>C</kbd> Conclusion</span>
+          <span class="sh-key" onclick="insertBlock('keydiff')"><kbd>K</kbd> Key Diff</span>
+          <span class="sh-key" onclick="insertBlock('findings')"><kbd>F</kbd> Findings</span>
+          <span class="sh-key" onclick="insertBlock('checklist')"><kbd>T</kbd> Checklist</span>
+          <span class="sh-key" onclick="insertBlock('code')"><kbd>`</kbd> Code</span>
+          <span class="sh-key" onclick="insertBlock('ai')">✦ @AI</span>
+          <span class="sh-key" onclick="insertBlock('divider')">— Divider</span>
+          <span class="sh-key" onclick="openSlashPalette()">/  More…</span>
+        </div>
+      </div>
+
+      <!-- VERSION HISTORY PANEL -->
+      <div class="history-panel" id="historyPanel">
+        <div class="hp-header">
+          <div class="hp-title">Version History</div>
+          <button class="hp-close" onclick="toggleHistoryPanel()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <button class="hp-save-btn" onclick="saveNamedVersion()">💾 Save named version…</button>
+        <div class="hp-body">
+          <div class="hp-lbl">Today</div>
+          <div class="version-item current-v">
+            <div class="vi-dot current"></div>
+            <div class="vi-info">
+              <div class="vi-label">Current</div>
+              <div class="vi-date">Just now · Auto-save</div>
+              <div class="vi-diff">+42 words</div>
+            </div>
+            <span class="vi-restore">—</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot named"></div>
+            <div class="vi-info">
+              <div class="vi-label">Before keydiff table</div>
+              <div class="vi-date">14:22 · Named</div>
+              <div class="vi-diff">+18 words</div>
+            </div>
+            <span class="vi-restore" onclick="alert('Restored!')">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">13:55</div>
+              <div class="vi-diff">+105 words</div>
+            </div>
+            <span class="vi-restore" onclick="alert('Restored!')">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">13:30</div>
+            </div>
+            <span class="vi-restore" onclick="alert('Restored!')">Restore</span>
+          </div>
+          <div class="hp-lbl" style="margin-top:12px;">Yesterday</div>
+          <div class="version-item">
+            <div class="vi-dot named"></div>
+            <div class="vi-info">
+              <div class="vi-label">First draft</div>
+              <div class="vi-date">Mar 15 · 11:04 · Named</div>
+            </div>
+            <span class="vi-restore" onclick="alert('Restored!')">Restore</span>
+          </div>
+          <div class="version-item">
+            <div class="vi-dot auto"></div>
+            <div class="vi-info">
+              <div class="vi-label">Auto-save</div>
+              <div class="vi-date">Mar 15 · 10:42</div>
+            </div>
+            <span class="vi-restore" onclick="alert('Restored!')">Restore</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW: PROMPTS (simplified) -->
+  <div class="view" id="view-prompts">
+    <div class="vhbar">
+      <span class="vhbar-title">Prompt Library</span>
+      <div class="tb-sp"></div>
+      <button class="theme-toggle" onclick="toggleDarkMode()"><span id="themeIcon2">🌙</span> Dark</button>
+      <button class="tb-btn primary">+ New Prompt</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow);cursor:pointer;" onclick="openRunModal()">
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--rose-bg);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📈</div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--t1);">Equity Performance Monitor</div><div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">Finance · Cron · HTML Report</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:8px;">Monitors {{company_list}} weekly. Generates HTML report with M-Score, ROIC/WACC, promoter pledge flags.</div>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;border:1px solid var(--amber-light);">⏱ Mon 08:00 IST</span><div style="display:flex;gap:3px;margin-left:auto;"><div style="width:16px;height:16px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:white;">C</div></div><button style="padding:3px 9px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;" onclick="event.stopPropagation();openRunModal()">▶ Run</button></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow);cursor:pointer;">
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><div style="width:32px;height:32px;border-radius:9px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🔬</div><div><div style="font-size:13px;font-weight:600;color:var(--t1);">Research Deep Dive</div><div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">Research · Analysis</div></div></div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:8px;">Summarise key findings, tradeoffs, open questions from your note content.</div>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:10.5px;color:var(--t3);">47 uses</span><div style="display:flex;gap:3px;margin-left:auto;"><div style="width:16px;height:16px;border-radius:3px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:white;">C</div><div style="width:16px;height:16px;border-radius:3px;background:#10A37F;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:white;">G</div></div><button style="padding:3px 9px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;">Use</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: GRAPH (placeholder) -->
+  <div class="view" id="view-graph">
+    <div class="vhbar">
+      <span class="vhbar-title">Knowledge Graph</span>
+      <div class="tb-sp"></div>
+      <button class="theme-toggle" onclick="toggleDarkMode()">🌙 Dark</button>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--t3);">
+      <div style="font-size:48px;">🕸️</div>
+      <div style="font-family:'Lora',serif;font-size:18px;color:var(--t2);">Knowledge Graph</div>
+      <div style="font-size:13px;">Full interactive graph — see v6 for complete implementation</div>
+      <button class="tb-btn primary" onclick="switchView('notes',document.querySelectorAll('.nav-btn')[0])">Back to Notes</button>
+    </div>
+  </div>
+
+  <!-- VIEW: SETTINGS (placeholder) -->
+  <div class="view" id="view-settings">
+    <div class="vhbar">
+      <span class="vhbar-title">Settings</span>
+      <div class="tb-sp"></div>
+      <button class="theme-toggle" onclick="toggleDarkMode()" id="themeBtn3"><span id="themeIcon3">🌙</span> <span id="themeLabel3">Dark mode</span></button>
+      <button class="tb-btn primary">Save</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:32px;max-width:640px;">
+      <div style="margin-bottom:28px;">
+        <div style="font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:4px;">Appearance</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Toggle dark mode for a deep purple canvas experience.</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);">
+          <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--t1);">Dark mode</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px;">Deep purple canvas — matches the Lore login experience</div></div>
+          <div style="width:42px;height:24px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;transition:0.2s;" id="darkToggleSw" onclick="toggleDarkMode()"><div style="position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="darkToggleKnob"></div></div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--t3);">Full settings UI — see v5 for complete AI Providers, Profile, Sync &amp; Export, and Templates panels.</div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ══ GLOBAL SEARCH OVERLAY ══ -->
+<div class="search-overlay" id="searchOverlay" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box">
+    <div class="search-input-row">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="var(--t3)" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3.5 3.5"/></svg>
+      <input class="search-main-input" id="searchInput" type="text" placeholder="Search notes, shelves, tags…" oninput="doSearch(this.value)" onkeydown="searchNav(event)"/>
+      <button class="search-close" onclick="closeSearch()">Esc</button>
+    </div>
+    <div class="search-filters">
+      <div class="sf active" onclick="setSF(this)">All</div>
+      <div class="sf" onclick="setSF(this)">Research</div>
+      <div class="sf" onclick="setSF(this)">Journal</div>
+      <div class="sf" onclick="setSF(this)">Task</div>
+      <div class="sf" onclick="setSF(this)">Idea</div>
+      <div class="sf" onclick="setSF(this)">HTML Notes</div>
+      <div class="sf" onclick="setSF(this)">AI &amp; ML shelf</div>
+      <div class="sf" onclick="setSF(this)">Personal shelf</div>
+    </div>
+    <div class="search-results" id="searchResults">
+      <!-- Recent shown when empty -->
+      <div id="recentSection">
+        <div class="sr-section-lbl">Recently viewed</div>
+        <div class="sr-recent-row">
+          <div class="sri-recent" onclick="closeSearch();setNote(null,'Transformer Architecture Deep Dive','Research')">📔 Transformer Deep Dive</div>
+          <div class="sri-recent" onclick="closeSearch()">📊 Tata Motors Q4</div>
+          <div class="sri-recent" onclick="closeSearch()">🔬 RAG Patterns</div>
+          <div class="sri-recent" onclick="closeSearch()">📔 Monday Journal</div>
+        </div>
+        <div class="sr-section-lbl" style="margin-top:4px;">Recent searches</div>
+        <div class="sr-recent-row">
+          <div class="sri-recent" onclick="document.getElementById('searchInput').value='attention';doSearch('attention')">attention</div>
+          <div class="sri-recent" onclick="document.getElementById('searchInput').value='equity';doSearch('equity')">equity</div>
+          <div class="sri-recent" onclick="document.getElementById('searchInput').value='ROIC';doSearch('ROIC')">ROIC</div>
+        </div>
+      </div>
+      <div id="resultsList" style="display:none;"></div>
+    </div>
+    <div class="search-footer">
+      <div class="sf-hint"><kbd>↑↓</kbd> navigate</div>
+      <div class="sf-hint"><kbd>↵</kbd> open</div>
+      <div class="sf-hint"><kbd>Esc</kbd> close</div>
+      <div class="sf-hint" style="margin-left:auto;"><kbd>⌘K</kbd> search anywhere</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICATION PANEL ══ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="np-header">
+    <div class="np-title">Notifications</div>
+    <div class="np-badge">3 new</div>
+    <button class="np-close" onclick="closeNotifPanel()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="np-tabs">
+    <div class="np-tab active" onclick="setNTab(this)">All</div>
+    <div class="np-tab" onclick="setNTab(this)">Cron</div>
+    <div class="np-tab" onclick="setNTab(this)">AI</div>
+    <div class="np-tab" onclick="setNTab(this)">Errors</div>
+  </div>
+  <div class="np-body">
+
+    <!-- Notif 1: Cron success + HTML generated -->
+    <div class="notif-item unread">
+      <div class="ni-top-row">
+        <div class="ni-icon">📈</div>
+        <div class="ni-content">
+          <div class="ni-notif-title">Equity Monitor ran successfully</div>
+          <div class="ni-notif-body"><strong>Equity-Apr25-2026.html</strong> generated · 5 companies analysed · Tata Motors flagged M-Score warning ⚠️</div>
+        </div>
+        <div class="ni-time">08:04</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;">
+        <span class="notif-type-badge ntb-cron">⏱ Cron</span>
+        <span class="notif-type-badge ntb-ok">✓ Success</span>
+      </div>
+      <div class="notif-actions">
+        <button class="na-btn primary" onclick="openHtmlViewer();closeNotifPanel()">🔍 View HTML Report</button>
+        <button class="na-btn" onclick="this.closest('.notif-item').style.opacity='0.5'">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- Notif 2: AI response saved -->
+    <div class="notif-item unread">
+      <div class="ni-top-row">
+        <div class="ni-icon">✦</div>
+        <div class="ni-content">
+          <div class="ni-notif-title">Claude responded in Transformer note</div>
+          <div class="ni-notif-body">Response saved as sub-note · <strong>Encoder vs Decoder comparison</strong> · 247 tokens used</div>
+        </div>
+        <div class="ni-time">14:22</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;">
+        <span class="notif-type-badge ntb-ai">✦ AI</span>
+        <span class="notif-type-badge ntb-ok">Saved</span>
+      </div>
+      <div class="notif-actions">
+        <button class="na-btn primary" onclick="setNote(null,'Transformer Architecture Deep Dive','Research');closeNotifPanel()">Open Note</button>
+        <button class="na-btn">View sub-note</button>
+      </div>
+    </div>
+
+    <!-- Notif 3: Cron error -->
+    <div class="notif-item unread">
+      <div class="ni-top-row">
+        <div class="ni-icon">⚠️</div>
+        <div class="ni-content">
+          <div class="ni-notif-title">Daily Journal Starter — API timeout</div>
+          <div class="ni-notif-body">Run failed at <strong>07:00 IST</strong> · Claude API returned 504 · Will retry in 30 min</div>
+        </div>
+        <div class="ni-time">07:02</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;">
+        <span class="notif-type-badge ntb-cron">⏱ Cron</span>
+        <span class="notif-type-badge ntb-err">✗ Failed</span>
+      </div>
+      <div class="notif-actions">
+        <button class="na-btn primary" onclick="openRunModal()">▶ Retry Now</button>
+        <button class="na-btn">View logs</button>
+        <button class="na-btn" onclick="this.closest('.notif-item').style.opacity='0.5'">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- Notif 4: older, read -->
+    <div class="notif-item" style="opacity:0.65;">
+      <div class="ni-top-row">
+        <div class="ni-icon">📈</div>
+        <div class="ni-content">
+          <div class="ni-notif-title">Equity Monitor ran successfully</div>
+          <div class="ni-notif-body">Equity-Apr21-2026.html generated · 5 companies</div>
+        </div>
+        <div class="ni-time">Apr 21</div>
+      </div>
+      <div style="display:flex;gap:5px;"><span class="notif-type-badge ntb-cron">⏱ Cron</span><span class="notif-type-badge ntb-ok">✓ Success</span></div>
+    </div>
+    <div class="notif-item" style="opacity:0.65;">
+      <div class="ni-top-row">
+        <div class="ni-icon">🔬</div>
+        <div class="ni-content">
+          <div class="ni-notif-title">Research Summary ran</div>
+          <div class="ni-notif-body">Weekly research digest saved to Transformers notebook</div>
+        </div>
+        <div class="ni-time">Apr 20</div>
+      </div>
+      <div style="display:flex;gap:5px;"><span class="notif-type-badge ntb-cron">⏱ Cron</span><span class="notif-type-badge ntb-ok">✓ Success</span></div>
+    </div>
+  </div>
+  <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;">
+    <button class="tb-btn" style="flex:1;justify-content:center;font-size:12px;" onclick="closeNotifPanel()">Mark all read</button>
+    <button class="tb-btn primary" style="flex:1;justify-content:center;font-size:12px;" onclick="switchView('runs',null);closeNotifPanel()">View all runs →</button>
+  </div>
+</div>
+
+<!-- ══ HTML VIEWER (full-screen) ══ -->
+<div class="html-viewer" id="htmlViewer">
+  <div class="hv-toolbar">
+    <div class="hv-title">
+      📄 Tata Motors Q4 FY2026 Analysis
+      <span class="hv-badge">HTML Note</span>
+    </div>
+    <div class="hv-sp"></div>
+    <button class="hv-btn" onclick="alert('Linked to Equity Research notebook!')">📎 Link to note</button>
+    <button class="hv-btn" onclick="alert('Edit source HTML…')">✏️ Edit source</button>
+    <button class="hv-btn" onclick="alert('Exported!')">📤 Export .html</button>
+    <button class="hv-btn primary" onclick="alert('Opened in new tab!')">⤢ Full tab</button>
+    <button class="hv-close" onclick="closeHtmlViewer()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+  </div>
+  <div class="hv-zoom-bar">
+    <button class="hv-zoom-btn" onclick="zoom(-10)">−</button>
+    <span class="hv-zoom-val" id="zoomVal">100%</span>
+    <button class="hv-zoom-btn" onclick="zoom(10)">+</button>
+    <button class="hv-zoom-btn" onclick="resetZoom()" title="Reset">⤢</button>
+    <div style="flex:1;"></div>
+    <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Generated: Apr 25, 2026 · Claude Sonnet 4 · 84 KB</div>
+    <div style="font-size:11px;color:var(--t3);margin-left:12px;">via Equity Performance Monitor prompt</div>
+  </div>
+  <div class="hv-body">
+    <div class="hv-frame" id="hvFrame">
+      <div class="hv-demo-content">
+        <div class="hv-demo-header">
+          <div class="hv-demo-logo">📊</div>
+          <div>
+            <div class="hv-demo-title">Tata Motors Q4 FY2026</div>
+            <div class="hv-demo-sub">AI-Generated Financial Analysis · NSE: TATAMOTORS</div>
+          </div>
+          <div class="hv-demo-badge">✓ M-Score: Clean</div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-card"><div class="metric-n">₹932</div><div class="metric-l">Current Price</div><div class="metric-trend up">↑ +3.2% WoW</div></div>
+          <div class="metric-card"><div class="metric-n">1.24×</div><div class="metric-l">ROIC / WACC</div><div class="metric-trend up">↑ Value creating</div></div>
+          <div class="metric-card"><div class="metric-n">−0.82</div><div class="metric-l">Beneish M-Score</div><div class="metric-trend up">✓ Below −1.78</div></div>
+          <div class="metric-card"><div class="metric-n">4.2%</div><div class="metric-l">Promoter Pledge</div><div class="metric-trend up">↓ Declining</div></div>
+        </div>
+        <table class="hv-table">
+          <thead><tr><th>Company</th><th>Price</th><th>ROIC/WACC</th><th>M-Score</th><th>Promoter %</th><th>Signal</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tata Motors</strong></td><td>₹932</td><td>1.24×</td><td>−0.82</td><td>4.2%</td><td><span class="signal-badge signal-clean">✓ BUY</span></td></tr>
+            <tr><td>Infosys</td><td>₹1,682</td><td>1.68×</td><td>−2.14</td><td>14.9%</td><td><span class="signal-badge signal-clean">✓ BUY</span></td></tr>
+            <tr><td>HDFC Bank</td><td>₹1,824</td><td>0.98×</td><td>−1.24</td><td>0%</td><td><span class="signal-badge signal-warn">⚠ HOLD</span></td></tr>
+            <tr><td>Reliance</td><td>₹2,945</td><td>1.12×</td><td>−0.64</td><td>50.3%</td><td><span class="signal-badge signal-warn">⚠ HOLD</span></td></tr>
+            <tr><td>TCS</td><td>₹3,612</td><td>1.52×</td><td>−1.87</td><td>72.1%</td><td><span class="signal-badge signal-clean">✓ BUY</span></td></tr>
+          </tbody>
+        </table>
+        <div class="hv-insight">
+          <div class="hv-insight-lbl">AI Insight · Claude Sonnet 4</div>
+          <div class="hv-insight-text">Infosys leads on ROIC/WACC spread (1.68×) and has the cleanest Beneish M-Score at −2.14, well below the manipulation threshold. Tata Motors shows improving fundamentals with declining promoter pledge. HDFC Bank's ROIC/WACC below 1× warrants caution in a high-rate environment.</div>
+        </div>
+        <div class="hv-gen-footer">
+          <span>Generated by Lore · Equity Performance Monitor · Claude Sonnet 4</span>
+          <span>Apr 25, 2026 · 08:04 IST · NSE data via AI context</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUICK CAPTURE ══ -->
+<button class="quick-capture-btn" id="qcBtn" onclick="toggleQuickCapture()" title="Quick capture  ⌘J">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+<div class="quick-capture-bubble" id="qcBubble">
+  <div class="qcb-header">
+    <div class="qcb-title">Quick Capture</div>
+    <div class="qcb-type-pills">
+      <div class="qcb-pill active" onclick="setQCType(this,'Idea')">Idea</div>
+      <div class="qcb-pill" onclick="setQCType(this,'Task')">Task</div>
+      <div class="qcb-pill" onclick="setQCType(this,'Research')">Research</div>
+      <div class="qcb-pill" onclick="setQCType(this,'Journal')">Journal</div>
+    </div>
+  </div>
+  <div class="qcb-body">
+    <input class="qcb-title-inp" id="qcTitle" type="text" placeholder="Title…" onkeydown="if(event.key==='Enter'){document.getElementById('qcBody').focus();}"/>
+    <textarea class="qcb-body-inp" id="qcBody" placeholder="Idea, thought, link… type freely"></textarea>
+  </div>
+  <div class="qcb-footer">
+    <span class="qcb-dest">→ Inbox / Captured Notes</span>
+    <button class="qcb-save-btn" onclick="saveCapture()">Save  ↵</button>
+  </div>
+</div>
+<div class="save-toast" id="saveToast">
+  <span>✓</span>
+  <span id="toastMsg">Saved to Inbox!</span>
+</div>
+
+<!-- ══ TEMPLATE PICKER MODAL ══ -->
+<div class="modal-overlay" id="tplModal" onclick="if(event.target===this)closeTplModal()">
+  <div class="modal" style="width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">Start from a Template</div>
+      <button class="modal-close" onclick="closeTplModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--t3);margin-bottom:16px;">Note opens instantly with blocks pre-loaded — no forms, just type and flow.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);" onclick="useTpl('Research Deep Dive');closeTplModal()" onmouseover="this.style.borderColor='var(--p300)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="height:70px;background:var(--teal-bg);padding:10px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);"><div style="height:9px;border-radius:20px;background:rgba(15,118,110,0.3);width:55%;"></div><div style="height:16px;border-radius:3px;background:rgba(15,118,110,0.15);border-left:2px solid var(--teal);"></div><div style="height:7px;border-radius:20px;background:rgba(15,118,110,0.2);width:80%;"></div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--t1);">Research Deep Dive</div><div style="font-size:10.5px;color:var(--t3);">Hypothesis · Findings · Conclusion</div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);" onclick="useTpl('Daily Journal');closeTplModal()" onmouseover="this.style.borderColor='var(--p300)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="height:70px;background:var(--amber-bg);padding:10px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);"><div style="height:9px;border-radius:20px;background:rgba(217,119,6,0.3);width:55%;"></div><div style="height:7px;border-radius:20px;background:rgba(217,119,6,0.2);width:80%;"></div><div style="height:7px;border-radius:20px;background:rgba(217,119,6,0.2);width:65%;"></div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--t1);">Daily Journal</div><div style="font-size:10.5px;color:var(--t3);">Intention · Wins · Blockers</div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);" onclick="useTpl('Equity Research');closeTplModal()" onmouseover="this.style.borderColor='var(--p300)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="height:70px;background:var(--rose-bg);padding:10px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);"><div style="height:9px;border-radius:20px;background:rgba(190,24,93,0.25);width:55%;"></div><div style="display:flex;height:20px;border:1px solid rgba(190,24,93,0.2);border-radius:3px;overflow:hidden;"><div style="flex:1;border-right:1px solid rgba(190,24,93,0.2);"></div><div style="flex:1;border-right:1px solid rgba(190,24,93,0.2);"></div><div style="flex:1;"></div></div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--t1);">Equity Research</div><div style="font-size:10.5px;color:var(--t3);">BRSR · M-Score · ROIC · Signal</div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);" onclick="useTpl('Sprint Plan');closeTplModal()" onmouseover="this.style.borderColor='var(--p300)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="height:70px;background:var(--blue-bg);padding:10px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);"><div style="height:9px;border-radius:20px;background:rgba(29,78,216,0.25);width:55%;"></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:7px;height:7px;border-radius:2px;background:rgba(29,78,216,0.3);"></div><div style="height:6px;border-radius:20px;background:rgba(29,78,216,0.2);flex:1;"></div></div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--t1);">Sprint Plan</div><div style="font-size:10.5px;color:var(--t3);">Goals · Tasks · Done criteria</div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);" onclick="useTpl('AI Conversation');closeTplModal()" onmouseover="this.style.borderColor='var(--p300)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="height:70px;background:var(--p50);padding:10px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border);"><div style="height:9px;border-radius:20px;background:var(--p200);width:55%;"></div><div style="height:18px;border-radius:3px;background:var(--p100);border-left:2px solid var(--p400);"></div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--t1);">AI Conversation</div><div style="font-size:10.5px;color:var(--t3);">Pre-loaded @claude prompt</div></div>
+        </div>
+        <div style="border:1px dashed var(--p300);background:var(--p50);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;" onclick="createBlankNote();closeTplModal()">
+          <div style="height:70px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);"><div style="font-size:24px;">📄</div></div>
+          <div style="padding:8px 10px;"><div style="font-size:12px;font-weight:600;color:var(--p600);">Blank Note</div><div style="font-size:10.5px;color:var(--t3);">Plain paper, no blocks</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="tb-btn" onclick="closeTplModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- ══ RUN NOW MODAL ══ -->
+<div class="modal-overlay" id="runModal" onclick="if(event.target===this)closeRunModal()">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" id="runModalTitle">▶ Run: Equity Monitor</div>
+      <button class="modal-close" onclick="closeRunModal()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="gen-state active" id="rs1">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6;">Running <strong>Equity Performance Monitor</strong> with Claude Sonnet 4.</div>
+        <div style="border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;margin-bottom:14px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:var(--p50);"><th style="text-align:left;padding:5px 10px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);">Variable</th><th style="text-align:left;padding:5px 10px;font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);">Value</th></tr></thead>
+            <tbody>
+              <tr><td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;color:var(--p600);font-size:11px;background:var(--p50);">{{company_list}}</td><td style="padding:5px 10px;"><input style="border:none;background:transparent;outline:none;font-size:12px;color:var(--t2);width:100%;" value="Tata Motors, Infosys, HDFC Bank, Reliance, TCS"/></td></tr>
+              <tr><td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;color:var(--p600);font-size:11px;background:var(--p50);">{{date}}</td><td style="padding:5px 10px;font-size:12px;color:var(--t2);">Apr 25, 2026 (today)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:12px;color:var(--t3);">Output saved as HTML Note in <strong style="color:var(--t2);">Equity Research</strong> notebook.</div>
+      </div>
+      <div class="gen-state" id="rs2">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:12px;">Generating…</div>
+        <div style="height:4px;background:var(--p100);border-radius:2px;overflow:hidden;margin-bottom:14px;"><div style="height:100%;background:linear-gradient(90deg,var(--p400),var(--p600));border-radius:2px;transition:width 0.5s;" id="gFill" style="width:0%;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);"><div style="width:20px;height:20px;border-radius:50%;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</div><div style="font-size:12.5px;color:var(--green);">Sent prompt to Claude Sonnet 4</div></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);" id="gs2row"><div id="gs2i" style="width:20px;height:20px;border-radius:50%;background:var(--p100);color:var(--p600);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;animation:pulse 1s infinite;">⟳</div><div id="gs2t" style="font-size:12.5px;color:var(--t2);">Analysing 5 companies…</div></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);" id="gs3row"><div id="gs3i" style="width:20px;height:20px;border-radius:50%;background:var(--t4);opacity:0.3;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:white;">3</div><div id="gs3t" style="font-size:12.5px;color:var(--t4);">Build HTML report</div></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;" id="gs4row"><div id="gs4i" style="width:20px;height:20px;border-radius:50%;background:var(--t4);opacity:0.3;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:white;">4</div><div id="gs4t" style="font-size:12.5px;color:var(--t4);">Save to notebook</div></div>
+        </div>
+      </div>
+      <div class="gen-state" id="rs3">
+        <div style="text-align:center;padding:8px 0 16px;">
+          <div style="font-size:40px;margin-bottom:10px;">🎉</div>
+          <div style="font-size:16px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:6px;">HTML Report Ready!</div>
+          <div style="font-size:12.5px;color:var(--t3);margin-bottom:16px;">Saved as <strong style="color:var(--p600);">Equity-Apr25-2026.html</strong><br/>in the Equity Research notebook</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="tb-btn primary" style="flex:1;justify-content:center;" onclick="openHtmlViewer();closeRunModal()">🔍 View Report</button>
+          <button class="tb-btn" style="flex:1;justify-content:center;" onclick="closeRunModal()">📤 Export</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="runModalFooter">
+      <button class="tb-btn primary" onclick="startGen()">▶ Run Now</button>
+      <button class="tb-btn" onclick="closeRunModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════ DARK MODE ════ */
+let dark = false;
+function toggleDarkMode() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const icons = ['themeIcon','themeIcon2','themeIcon3'];
+  const labels = ['themeLabel','themeLabel3'];
+  icons.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = dark ? '☀️' : '🌙'; });
+  labels.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = dark ? 'Light' : 'Dark'; });
+  // update dark toggle switch in settings
+  const knob = document.getElementById('darkToggleKnob');
+  const sw = document.getElementById('darkToggleSw');
+  if (knob && sw) {
+    knob.style.left = dark ? '22px' : '2px';
+    sw.style.background = dark ? 'var(--p600)' : '#E2DEFA';
+  }
+}
+
+/* ════ VIEW ════ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+
+/* ════ SIDEBAR ════ */
+function toggleShelf(id) { document.getElementById(id)?.classList.toggle('open'); }
+function toggleNb(id) { document.getElementById(id)?.classList.toggle('open'); }
+function setNote(el, title, type) {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  el?.classList.add('active');
+  if (title) { document.getElementById('bcTitle').textContent = title; document.getElementById('paperTitle').value = title; }
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+
+/* ════ NEW NOTE ════ */
+function createBlankNote() {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  const nb1 = document.querySelector('#nb1 .nb-body');
+  const ni = document.createElement('div');
+  ni.className = 'note-item active';
+  ni.innerHTML = `<div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Now</span></div><div class="ni-title">Untitled</div>`;
+  ni.onclick = () => setNote(ni,'Untitled','Research');
+  nb1.prepend(ni);
+  const t = document.getElementById('paperTitle');
+  t.value = '';
+  document.getElementById('bcTitle').textContent = 'Untitled';
+  document.getElementById('blocksArea').innerHTML = '';
+  document.getElementById('paperBody').value = '';
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => t.focus(), 50);
+}
+
+/* ════ TITLE SYNC ════ */
+let tDebounce;
+function onTitle(el) {
+  el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
+  const v = el.value || 'Untitled';
+  document.getElementById('bcTitle').textContent = v;
+  clearTimeout(tDebounce);
+  tDebounce = setTimeout(() => {
+    const active = document.querySelector('.note-item.active .ni-title');
+    if (active) active.textContent = v;
+    // auto-add version
+    addAutoSave();
+  }, 1500);
+}
+
+/* ════ VERSION HISTORY ════ */
+function toggleHistoryPanel() {
+  const p = document.getElementById('historyPanel');
+  const b = document.getElementById('historyBtn');
+  p.classList.toggle('open');
+  b.style.color = p.classList.contains('open') ? 'var(--p600)' : '';
+}
+function saveNamedVersion() {
+  const name = prompt('Name this version:');
+  if (!name) return;
+  const body = document.querySelector('#historyPanel .hp-body');
+  const item = document.createElement('div');
+  item.className = 'version-item';
+  item.innerHTML = `<div class="vi-dot named"></div><div class="vi-info"><div class="vi-label">${name}</div><div class="vi-date">Just now · Named</div></div><span class="vi-restore" onclick="alert('Restored!')">Restore</span>`;
+  body.prepend(item);
+}
+let autoSaveCooldown = false;
+function addAutoSave() {
+  if (autoSaveCooldown) return;
+  autoSaveCooldown = true;
+  setTimeout(() => { autoSaveCooldown = false; }, 10000);
+}
+
+/* ════ INSERT BLOCKS ════ */
+const noteTypes = ['research','journal','task','idea','reference'];
+let typeIdx = 0;
+function cycleType() {
+  typeIdx = (typeIdx + 1) % noteTypes.length;
+  const t = noteTypes[typeIdx];
+  const labels = {research:'Research',journal:'Journal',task:'Task',idea:'Idea',reference:'Reference'};
+  const pill = document.getElementById('typePill');
+  pill.className = 'ptype-pill ptype-' + t;
+  pill.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>${labels[t]}`;
+}
+
+function insertBlock(type) {
+  const area = document.getElementById('blocksArea');
+  const wrap = document.createElement('div');
+  wrap.className = 'block';
+  const del = `<button class="blk-del" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>`;
+  let inner = '';
+  if (type==='hyp') inner=`<div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2" placeholder="State your hypothesis…"></textarea></div></div>`;
+  else if (type==='con') inner=`<div class="blk-callout con"><div class="blk-ico">🎯</div><div style="flex:1;"><div class="blk-lbl">Conclusion</div><textarea class="blk-txt" rows="2" placeholder="State your conclusion…"></textarea></div></div>`;
+  else if (type==='note-b') inner=`<div class="blk-callout note-b"><div class="blk-ico">📝</div><div style="flex:1;"><div class="blk-lbl">Note</div><textarea class="blk-txt" rows="2" placeholder="Write your insight…"></textarea></div></div>`;
+  else if (type==='warn') inner=`<div class="blk-callout warn"><div class="blk-ico">⚠️</div><div style="flex:1;"><div class="blk-lbl">Warning</div><textarea class="blk-txt" rows="2" placeholder="Describe the risk…"></textarea></div></div>`;
+  else if (type==='keydiff') inner=`<div class="blk-keydiff"><div class="kd-hdr"><div class="kd-col-hdr"><input value="Option A"/></div><div class="kd-col-hdr"><input value="Option B"/></div></div><div class="kd-body"><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 2…"></textarea></div></div><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 2…"></textarea></div></div></div></div>`;
+  else if (type==='findings') inner=`<div class="blk-findings"><div class="blk-findings-lbl">Key Findings</div><div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1" placeholder="Finding 1…"></textarea></div><div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1" placeholder="Finding 2…"></textarea></div><div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1" placeholder="Finding 3…"></textarea></div></div>`;
+  else if (type==='checklist') inner=`<div class="blk-check"><div class="check-row"><div class="check-box" onclick="toggleCheck(this)"></div><input class="check-inp" placeholder="Task 1…"/></div><div class="check-row"><div class="check-box" onclick="toggleCheck(this)"></div><input class="check-inp" placeholder="Task 2…"/></div></div>`;
+  else if (type==='code') inner=`<div class="blk-code"><div class="blk-code-lang">code</div><textarea placeholder="// Paste code here…" rows="5"></textarea></div>`;
+  else if (type==='divider') inner=`<div class="blk-divider"><hr/><div class="blk-divider-dot"></div><div class="blk-divider-dot"></div><div class="blk-divider-dot"></div><hr/></div>`;
+  else if (type==='ai') inner=`<div class="blk-ai"><div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:#7C3AED;">C</div><span class="blk-ai-name">Claude · Sonnet 4</span></div><textarea class="blk-ai-inp" rows="2" placeholder="Ask Claude about this note…"></textarea><div class="blk-ai-footer"><button class="blk-ai-btn ask">Ask Claude</button><button class="blk-ai-btn">Save as note</button></div></div>`;
+  else if (type==='image') inner=`<div style="border:2px dashed var(--border2);border-radius:var(--r-lg);padding:24px;text-align:center;cursor:pointer;color:var(--t4);">🖼️<br/><span style="font-size:13px;">Click to upload image</span></div>`;
+  if (!inner) return;
+  wrap.innerHTML = inner + del;
+  area.appendChild(wrap);
+  const first = wrap.querySelector('textarea,input');
+  if (first) first.focus();
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function toggleCheck(box) {
+  box.classList.toggle('done');
+  const inp = box.nextElementSibling;
+  if (inp) inp.classList.toggle('done', box.classList.contains('done'));
+}
+
+function handleBodyKey(e) {
+  const body = document.getElementById('paperBody');
+  const val = body.value;
+  if (val.endsWith('/')) { body.value = val.slice(0,-1); openSlashPalette(); }
+}
+
+function openSlashPalette() {
+  const block = prompt('Insert block — type: hyp, con, keydiff, findings, checklist, code, ai, divider, image');
+  if (block) insertBlock(block.trim());
+}
+
+/* ════ TEMPLATES ════ */
+function openTplModal()  { document.getElementById('tplModal').classList.add('open'); }
+function closeTplModal() { document.getElementById('tplModal').classList.remove('open'); }
+
+function useTpl(name) {
+  createBlankNote();
+  document.getElementById('paperTitle').placeholder = name + ' — type your title…';
+  const area = document.getElementById('blocksArea');
+  if (name === 'Research Deep Dive') {
+    insertBlock('hyp'); insertBlock('keydiff'); insertBlock('findings');
+  } else if (name === 'Daily Journal') {
+    insertBlock('hyp'); // Intention
+  } else if (name === 'Equity Research') {
+    insertBlock('keydiff'); insertBlock('findings');
+  } else if (name === 'Sprint Plan') {
+    insertBlock('checklist');
+  } else if (name === 'AI Conversation') {
+    insertBlock('ai');
+  }
+  document.getElementById('bcTitle').textContent = name;
+  document.getElementById('paperTitle').value = name;
+}
+
+/* ════ SPLIT PANES ════ */
+function setSplit(n, btn) {
+  document.querySelectorAll('.split-btn').forEach((b,i) => b.classList.toggle('active', i === n-1));
+}
+
+/* ════ GLOBAL SEARCH ════ */
+const ALL = [
+  { title:'Transformer Architecture Deep Dive', type:'Research', shelf:'AI & ML', nb:'Transformers', icon:'📔', prev:'Attention mechanisms, positional encodings, multi-head attention.' },
+  { title:'BERT vs GPT Analysis', type:'Idea', shelf:'AI & ML', nb:'Transformers', icon:'📔', prev:'Bidirectional vs autoregressive enterprise use cases.' },
+  { title:'Tata Motors Q4 — AI Report', type:'HTML', shelf:'AI & ML', nb:'Transformers', icon:'📄', prev:'Auto-generated financial report with M-Score and ROIC analysis.' },
+  { title:'Hybrid Retrieval Strategies', type:'Research', shelf:'AI & ML', nb:'RAG Patterns', icon:'📗', prev:'BM25 + dense vectors, cross-encoder re-ranking.' },
+  { title:'Monday — Deep Work Session', type:'Journal', shelf:'Personal', nb:'Daily Journal', icon:'📒', prev:'Shipped Lore demo. Energy 4/5.' },
+  { title:'Indian Equity Framework', type:'Reference', shelf:'Work', nb:'Equity Research', icon:'📊', prev:'BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.' },
+];
+const BADGE_COLORS = { Research:'badge-research', Idea:'badge-idea', Journal:'badge-journal', HTML:'badge-html', Reference:'badge-reference', Task:'badge-task' };
+let searchFocusIdx = -1;
+
+function openSearch() {
+  document.getElementById('searchOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('searchInput').focus(), 50);
+}
+function closeSearch() { document.getElementById('searchOverlay').classList.remove('open'); }
+function setSF(el) { document.querySelectorAll('.sf').forEach(f => f.classList.remove('active')); el.classList.add('active'); }
+function doSearch(q) {
+  const list = document.getElementById('resultsList');
+  const recent = document.getElementById('recentSection');
+  if (!q.trim()) { recent.style.display=''; list.style.display='none'; return; }
+  recent.style.display = 'none'; list.style.display = '';
+  const results = ALL.filter(n => n.title.toLowerCase().includes(q.toLowerCase()) || n.prev.toLowerCase().includes(q.toLowerCase()));
+  if (!results.length) { list.innerHTML = `<div style="padding:28px;text-align:center;font-size:13px;color:var(--t3);">No results for "${q}"</div>`; return; }
+  list.innerHTML = `<div class="sr-section-lbl">${results.length} result${results.length>1?'s':''}</div>` + results.map(n => `
+    <div class="sr-item" onclick="setNote(null,'${n.title}','${n.type}');closeSearch()">
+      <div class="sri-icon">${n.icon}</div>
+      <div class="sri-main">
+        <div class="sri-title">${hl(n.title,q)}</div>
+        <div class="sri-loc"><span>${n.shelf}</span><span class="sri-loc-sep">›</span><span>${n.nb}</span></div>
+        <div class="sri-preview">${hl(n.prev,q)}</div>
+      </div>
+      <span class="sri-badge ${BADGE_COLORS[n.type]||''}">${n.type}</span>
+    </div>`).join('');
+}
+function hl(text, q) {
+  return text.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+}
+function searchNav(e) {
+  if (e.key === 'Escape') closeSearch();
+}
+
+/* ════ NOTIFICATIONS ════ */
+function openNotifPanel() { document.getElementById('notifPanel').classList.add('open'); document.getElementById('notifDot').style.display='none'; }
+function closeNotifPanel() { document.getElementById('notifPanel').classList.remove('open'); }
+function setNTab(el) { document.querySelectorAll('.np-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+
+/* ════ HTML VIEWER ════ */
+let zoomLevel = 100;
+function openHtmlViewer()  { document.getElementById('htmlViewer').classList.add('open'); zoomLevel=100; applyZoom(); }
+function closeHtmlViewer() { document.getElementById('htmlViewer').classList.remove('open'); }
+function zoom(d) { zoomLevel = Math.max(50, Math.min(200, zoomLevel + d)); applyZoom(); }
+function resetZoom() { zoomLevel = 100; applyZoom(); }
+function applyZoom() {
+  document.getElementById('hvFrame').style.transform = `scale(${zoomLevel/100})`;
+  document.getElementById('hvFrame').style.transformOrigin = 'top center';
+  document.getElementById('zoomVal').textContent = zoomLevel + '%';
+}
+
+/* ════ QUICK CAPTURE ════ */
+let qcOpen = false;
+function toggleQuickCapture() {
+  qcOpen = !qcOpen;
+  const b = document.getElementById('qcBubble');
+  if (qcOpen) {
+    b.classList.add('open');
+    // rotate fab
+    document.querySelector('.quick-capture-btn svg').style.transform = 'rotate(45deg)';
+    setTimeout(() => document.getElementById('qcTitle').focus(), 80);
+  } else {
+    b.classList.remove('open');
+    document.querySelector('.quick-capture-btn svg').style.transform = '';
+  }
+}
+function setQCType(el, type) {
+  document.querySelectorAll('.qcb-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+function saveCapture() {
+  const title = document.getElementById('qcTitle').value.trim() || 'Untitled capture';
+  const body = document.getElementById('qcBody').value.trim();
+  const type = document.querySelector('.qcb-pill.active')?.textContent || 'Idea';
+  // Add to inbox sidebar
+  const inboxBody = document.getElementById('inboxBody');
+  const ni = document.createElement('div');
+  ni.className = 'note-item';
+  const badgeClass = 'badge-' + type.toLowerCase();
+  ni.innerHTML = `<div class="ni-top"><span class="ni-badge ${badgeClass}">${type}</span><span class="ni-date">Now</span></div><div class="ni-title">${title}</div><div class="ni-prev">${body.slice(0,80)||'(no body)'}</div>`;
+  inboxBody.prepend(ni);
+  // Update count
+  const cnt = document.getElementById('inboxCount');
+  cnt.textContent = parseInt(cnt.textContent||0)+1;
+  // Clear
+  document.getElementById('qcTitle').value = '';
+  document.getElementById('qcBody').value = '';
+  // Close and show toast
+  toggleQuickCapture();
+  const toast = document.getElementById('saveToast');
+  document.getElementById('toastMsg').textContent = `"${title}" saved to Inbox!`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+/* ════ RUN MODAL ════ */
+let genT;
+function openRunModal()  { document.getElementById('rs1').className='gen-state active'; document.getElementById('rs2').className='gen-state'; document.getElementById('rs3').className='gen-state'; document.getElementById('runModalFooter').style.display=''; document.getElementById('gFill').style.width='0%'; document.getElementById('runModal').classList.add('open'); }
+function closeRunModal() { document.getElementById('runModal').classList.remove('open'); clearInterval(genT); }
+function startGen() {
+  document.getElementById('rs1').className='gen-state';
+  document.getElementById('rs2').className='gen-state active';
+  document.getElementById('runModalFooter').style.display='none';
+  let p = 0;
+  const fill = document.getElementById('gFill');
+  genT = setInterval(() => {
+    p = Math.min(p+2, 100);
+    fill.style.width = p + '%';
+    if (p >= 40 && document.getElementById('gs2i').style.animation) {
+      document.getElementById('gs2i').style.animation='none';
+      document.getElementById('gs2i').textContent='✓';
+      document.getElementById('gs2i').style.background='var(--green-bg)';
+      document.getElementById('gs2i').style.color='var(--green)';
+      document.getElementById('gs2t').textContent='Analysed 5 companies ✓';
+      document.getElementById('gs2t').style.color='var(--green)';
+      document.getElementById('gs3i').style.opacity='1';
+      document.getElementById('gs3i').style.background='var(--p100)';
+      document.getElementById('gs3i').style.color='var(--p600)';
+      document.getElementById('gs3i').textContent='⟳';
+      document.getElementById('gs3t').style.color='var(--t2)';
+      document.getElementById('gs3t').textContent='Building HTML report…';
+    }
+    if (p >= 80 && document.getElementById('gs3i').textContent==='⟳') {
+      document.getElementById('gs3i').textContent='✓';
+      document.getElementById('gs3i').style.background='var(--green-bg)';
+      document.getElementById('gs3i').style.color='var(--green)';
+      document.getElementById('gs3t').textContent='HTML report built ✓';
+      document.getElementById('gs3t').style.color='var(--green)';
+      document.getElementById('gs4i').style.opacity='1';
+      document.getElementById('gs4i').style.background='var(--p100)';
+      document.getElementById('gs4i').style.color='var(--p600)';
+      document.getElementById('gs4i').textContent='⟳';
+      document.getElementById('gs4t').style.color='var(--t2)';
+      document.getElementById('gs4t').textContent='Saving to notebook…';
+    }
+    if (p >= 100) {
+      clearInterval(genT);
+      document.getElementById('gs4i').textContent='✓';
+      document.getElementById('gs4i').style.background='var(--green-bg)';
+      document.getElementById('gs4i').style.color='var(--green)';
+      document.getElementById('gs4t').textContent='Saved to Equity Research ✓';
+      document.getElementById('gs4t').style.color='var(--green)';
+      setTimeout(() => { document.getElementById('rs2').className='gen-state'; document.getElementById('rs3').className='gen-state active'; }, 500);
+    }
+  }, 40);
+}
+
+/* ════ KEYBOARD SHORTCUTS ════ */
+document.addEventListener('keydown', e => {
+  if ((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openSearch(); }
+  if ((e.metaKey||e.ctrlKey) && e.key==='n') { e.preventDefault(); createBlankNote(); }
+  if ((e.metaKey||e.ctrlKey) && e.key==='j') { e.preventDefault(); toggleQuickCapture(); }
+  if (e.key==='Escape') { closeSearch(); closeHtmlViewer(); if(qcOpen)toggleQuickCapture(); }
+});
+
+/* ════ INIT ════ */
+const pt = document.getElementById('paperTitle');
+if (pt) { pt.style.height='auto'; pt.style.height=pt.scrollHeight+'px'; }
+// Show notif dot initially
+document.getElementById('notifDot').style.display='block';
+
+function addTag() {
+  const t = prompt('Add tag:');
+  if (!t) return;
+  const tags = document.querySelector('.paper-tags');
+  const add = tags.querySelector('.add');
+  const s = document.createElement('span');
+  s.className='paper-tag'; s.textContent=t.trim();
+  tags.insertBefore(s,add);
+}
+
+// Gen state class helper
+document.querySelectorAll('.gen-state').forEach(s => s.classList.remove('active'));
+document.getElementById('rs1').classList.add('active');
+
+function switchView_runs(btn) { switchView('runs',btn); }
+</script>
+</body>
+</html>

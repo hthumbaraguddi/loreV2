@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lore v11 — Master Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sb-bg:#F0EEF9;--sb-border:#E2DEFA;--sb-text:#6B6585;--sb-text-active:#2D2650;
+  --sb-hover:rgba(109,40,217,0.06);--sb-active:rgba(109,40,217,0.1);
+  --nav-bg:#EAE7F7;--nav-border:#DDD8F5;--nav-icon:rgba(80,60,160,0.45);
+  --bg:#FAFAF9;--canvas:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.09);--border2:rgba(109,40,217,0.16);
+  --t1:#1C1829;--t2:#4A445F;--t3:#9490AA;--t4:#C4C0D4;
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-light:#FDE68A;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --red:#DC2626;--red-bg:#FEF2F2;
+  --orange:#C2410C;--orange-bg:#FFF7ED;
+  --nav-w:52px;--sb-w:248px;--tb-h:46px;
+  --r-md:8px;--r-lg:12px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(109,40,217,0.05),0 4px 14px rgba(109,40,217,0.04);
+  --shadow-lg:0 8px 30px rgba(109,40,217,0.15),0 2px 8px rgba(0,0,0,0.06);
+  --shadow-float:0 12px 40px rgba(109,40,217,0.2),0 3px 10px rgba(0,0,0,0.08);
+  --dot-color:rgba(109,40,217,0.07);
+}
+[data-theme="dark"]{
+  --sb-bg:#1E1A2E;--sb-border:#2D2650;--sb-text:#8C84A8;--sb-text-active:#E2DEFA;
+  --sb-hover:rgba(167,139,250,0.08);--sb-active:rgba(167,139,250,0.14);
+  --nav-bg:#17142B;--nav-border:#2D2650;--nav-icon:rgba(167,139,250,0.4);
+  --bg:#13101F;--canvas:#1A1729;--surface:#1E1A2E;--surface2:#17142B;
+  --border:rgba(167,139,250,0.1);--border2:rgba(167,139,250,0.18);
+  --t1:#F0EEFF;--t2:#C4B5FD;--t3:#7B6F9A;--t4:#4A4068;
+  --p50:#1E1A2E;--p100:#2D2650;--p200:#3D3570;--p300:#5B4DB0;
+  --p400:#8B5CF6;--p500:#A78BFA;--p600:#C4B5FD;--p700:#DDD6FE;
+  --amber:#FCD34D;--amber-bg:rgba(253,211,77,0.1);
+  --teal:#34D399;--teal-bg:rgba(52,211,153,0.1);
+  --rose:#F472B6;--rose-bg:rgba(244,114,182,0.1);
+  --blue:#60A5FA;--blue-bg:rgba(96,165,250,0.1);
+  --green:#4ADE80;--green-bg:rgba(74,222,128,0.1);
+  --red:#F87171;--red-bg:rgba(248,113,113,0.1);
+  --dot-color:rgba(167,139,250,0.12);
+  --shadow-float:0 12px 40px rgba(0,0,0,0.5),0 3px 10px rgba(167,139,250,0.15);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;transition:background 0.25s,color 0.25s;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* ══ NAV RAIL ══ */
+.nav-rail{width:var(--nav-w);background:var(--nav-bg);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;gap:2px;flex-shrink:0;z-index:20;transition:background 0.25s;}
+.nav-logo{width:32px;height:32px;background:var(--p600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:15px;font-weight:600;color:white;margin-bottom:14px;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+[data-theme="dark"] .nav-logo{color:#1C1829;}
+.nav-spacer{flex:1;}
+.nav-btn{width:36px;height:36px;border-radius:9px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--nav-icon);transition:all 0.15s;position:relative;}
+.nav-btn:hover,.nav-btn.active{background:rgba(124,58,237,0.12);color:var(--p600);}
+[data-theme="dark"] .nav-btn:hover,[data-theme="dark"] .nav-btn.active{background:rgba(167,139,250,0.15);color:var(--p400);}
+.nav-btn svg{width:17px;height:17px;}
+.nav-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--t1);color:var(--bg);font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:0.15s;z-index:300;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:24px;height:1px;background:var(--nav-border);margin:4px 0;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p600));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;cursor:pointer;margin-top:6px;}
+.nav-notif{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--rose);border:2px solid var(--nav-bg);}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width 0.3s,background 0.25s;}
+.sidebar.zen{width:0;}
+.sb-top{display:flex;align-items:center;gap:5px;padding:9px 10px 7px;border-bottom:1px solid var(--sb-border);}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);border:1px solid var(--sb-border);border-radius:var(--r-md);padding:5px 9px;cursor:pointer;transition:0.15s;}
+[data-theme="dark"] .sb-search{background:rgba(255,255,255,0.04);}
+.sb-search:hover{border-color:var(--p300);background:var(--surface);}
+.sb-search span{font-size:12.5px;color:var(--t4);flex:1;}
+.sb-search svg{color:var(--t4);width:12px;height:12px;}
+.sb-kbd{font-size:9px;color:var(--t4);background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;font-family:'JetBrains Mono',monospace;}
+.sb-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--sb-border);background:rgba(255,255,255,0.5);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sb-text);transition:0.15s;flex-shrink:0;}
+[data-theme="dark"] .sb-btn{background:rgba(255,255,255,0.04);}
+.sb-btn:hover{background:var(--surface);color:var(--p600);}
+.sb-btn svg{width:12px;height:12px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+.shelf{}.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 5px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.shelf-hdr:hover{background:var(--sb-hover);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chev{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chev svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chev{transform:rotate(90deg);}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin:0 6px 0 2px;}
+.sh-name{font-size:11.5px;font-weight:600;color:var(--sb-text-active);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:rgba(109,40,217,0.07);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+[data-theme="dark"] .sh-count{background:rgba(167,139,250,0.1);}
+.sh-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:9px;height:9px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:3px 8px 3px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:0.12s;user-select:none;}
+.nb-hdr:hover{background:var(--sb-hover);}
+.nb-chev{width:13px;height:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chev svg{width:8px;height:8px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chev{transform:rotate(90deg);}
+.nb-icon{font-size:11px;margin:0 5px 0 1px;flex-shrink:0;}
+.nb-name{font-size:12px;color:var(--sb-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-count{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+.note-item{margin:0 4px 0 18px;padding:5px 8px 5px 7px;border-radius:var(--r-md);cursor:pointer;transition:0.1s;border-left:2px solid transparent;position:relative;}
+.note-item:hover{background:var(--sb-hover);}
+.note-item.active{background:var(--sb-active);border-left-color:var(--p600);}
+[data-theme="dark"] .note-item.active{border-left-color:var(--p400);}
+.note-item.in-right{border-left-color:var(--p300);border-left-style:dashed;}
+.ni-pane-tag{position:absolute;top:5px;right:5px;font-size:8px;background:var(--p200);color:var(--p700);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.ni-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.ni-title{font-size:12px;font-weight:500;color:var(--sb-text-active);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-prev{font-size:10.5px;color:var(--sb-text);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p600);}
+.badge-html{background:var(--orange-bg);color:var(--orange);}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+.vhbar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;transition:background 0.25s;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+[data-theme="dark"] .tb-btn.primary{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.tb-btn.success{background:var(--green-bg);border-color:#86EFAC;color:var(--green);}
+
+/* ══════════════════════
+   SPLIT NOTES VIEW
+══════════════════════ */
+.split-bar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;transition:height 0.3s,opacity 0.3s,background 0.25s;}
+.split-bar.zen{height:0;overflow:hidden;opacity:0;padding:0;}
+.sbar-bc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t3);}
+.sbar-bc a{color:var(--p600);cursor:pointer;font-weight:500;}
+[data-theme="dark"] .sbar-bc a{color:var(--p400);}
+.sbar-bc .sep{color:var(--t4);font-size:10px;}.sbar-bc .cur{color:var(--t2);font-weight:500;}
+.split-tgl{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:2px;}
+.stb{width:28px;height:24px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.15s;}
+.stb.active{background:var(--surface);color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.1);}
+.stb svg{width:14px;height:14px;}
+.tool-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);font-size:10.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:0.15s;}
+.tool-pill:hover,.tool-pill.on{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+[data-theme="dark"] .tool-pill:hover,[data-theme="dark"] .tool-pill.on{color:var(--p400);}
+.ai-live-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:20px;border:1px solid var(--green-bg);background:var(--green-bg);color:var(--green);font-size:10.5px;font-family:'JetBrains Mono',monospace;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* Split body */
+.split-body{flex:1;display:flex;overflow:hidden;}
+.pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:240px;}
+.pane+.pane{border-left:2px solid var(--p200);}
+.pane-header{height:38px;background:var(--p50);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:7px;flex-shrink:0;}
+.pane-type{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.pane-title{font-size:12px;font-weight:500;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pane-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;}
+.pane-btn:hover{background:var(--surface);color:var(--p600);}
+.pane-btn svg{width:12px;height:12px;}
+.pane-body{flex:1;overflow-y:auto;position:relative;transition:background 0.25s;}
+/* CANVAS BACKGROUNDS */
+.pane-body.canvas-plain{background:var(--canvas);}
+.pane-body.canvas-dot{background:var(--canvas);background-image:radial-gradient(circle,var(--dot-color) 1px,transparent 1px);background-size:24px 24px;}
+.pane-body.canvas-grid{background:var(--canvas);background-image:linear-gradient(var(--dot-color) 1px,transparent 1px),linear-gradient(90deg,var(--dot-color) 1px,transparent 1px);background-size:24px 24px;}
+.pane-body.canvas-lines{background:var(--canvas);background-image:linear-gradient(var(--dot-color) 1px,transparent 1px);background-size:100% 28px;}
+.paper-scroll{padding:28px 36px 60px;}
+.paper-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--t1);line-height:1.25;margin-bottom:13px;letter-spacing:-0.01em;resize:none;overflow:hidden;caret-color:var(--p600);}
+.paper-title::placeholder{color:var(--t4);}
+.paper-sep{border:none;border-top:1px solid var(--border);margin-bottom:16px;}
+.blocks{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+/* blocks */
+.block{position:relative;border-radius:var(--r-md);}
+.block.drag-over-b{border-top:2px solid var(--p600);}
+.blk-handle{position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:15px;height:20px;display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--t4);opacity:0;transition:0.15s;border-radius:4px;}
+.block:hover .blk-handle{opacity:1;}
+.blk-handle:hover{background:var(--p50);color:var(--p600);}
+.blk-handle svg{width:10px;height:10px;}
+.blk-tools{position:absolute;top:7px;right:7px;display:flex;gap:2px;opacity:0;transition:0.15s;}
+.block:hover .blk-tools{opacity:1;}
+.blk-tool{width:18px;height:18px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);transition:0.12s;}
+.blk-tool:hover{background:var(--p50);color:var(--p600);}
+.blk-tool.rm:hover{background:var(--red-bg);color:var(--red);}
+.blk-tool svg{width:10px;height:10px;}
+.blk-callout{display:flex;gap:9px;border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 44px 10px 11px;}
+.hyp{background:var(--amber-bg);border-color:var(--amber);}
+.con{background:var(--teal-bg);border-color:var(--teal);}
+.note-b{background:var(--p50);border-color:var(--p400);}
+.blk-ico{font-size:13px;flex-shrink:0;margin-top:1px;}
+.blk-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.hyp .blk-lbl{color:var(--amber);}.con .blk-lbl{color:var(--teal);}.note-b .blk-lbl{color:var(--p600);}
+[data-theme="dark"] .note-b .blk-lbl{color:var(--p400);}
+.blk-txt{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13.5px;font-style:italic;line-height:1.6;color:var(--t2);width:100%;resize:none;}
+.blk-txt::placeholder{color:var(--t4);}
+.blk-keydiff{border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;padding-right:44px;}
+.kd-hdr{display:flex;background:var(--p50);border-bottom:1px solid var(--border2);}
+.kd-ch{flex:1;padding:5px 9px;font-size:10px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border2);}
+[data-theme="dark"] .kd-ch{color:var(--p400);}
+.kd-ch:last-child{border-right:none;}
+.kd-ch input{border:none;background:transparent;outline:none;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:inherit;width:100%;}
+.kd-body{display:flex;}.kd-col{flex:1;border-right:1px solid var(--border2);}.kd-col:last-child{border-right:none;}
+.kd-row{display:flex;gap:6px;padding:5px 9px;border-bottom:1px solid var(--border);font-size:13px;color:var(--t2);align-items:flex-start;}.kd-row:last-child{border-bottom:none;}
+.kd-dot{width:4px;height:4px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:7px;}
+.kd-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13px;color:var(--t2);width:100%;resize:none;line-height:1.55;}
+.kd-inp::placeholder{color:var(--t4);}
+.blk-findings{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:11px 44px 11px 11px;}
+.blk-findings-lbl{font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p600);font-family:'JetBrains Mono',monospace;margin-bottom:7px;}
+[data-theme="dark"] .blk-findings-lbl{color:var(--p400);}
+.fi-row{display:flex;gap:7px;padding:4px 0;border-bottom:1px solid var(--border);}.fi-row:last-child{border-bottom:none;}
+.fi-num{width:16px;height:16px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:8.5px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;margin-top:2px;}
+.fi-inp{border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13px;color:var(--t2);width:100%;resize:none;}
+.blk-ai{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:11px 44px 11px 11px;}
+.blk-ai-hdr{display:flex;align-items:center;gap:5px;margin-bottom:7px;}
+.blk-ai-logo{width:17px;height:17px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0;}
+.blk-ai-name{font-size:10.5px;font-weight:600;color:var(--p600);font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .blk-ai-name{color:var(--p400);}
+.blk-ai-time{font-size:9.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.blk-ai-text{font-size:13.5px;color:var(--t2);line-height:1.7;font-family:'Lora',serif;}
+.blk-ai-footer{margin-top:8px;display:flex;gap:4px;}
+.blk-ai-btn{font-size:11px;color:var(--t3);border:1px solid var(--border2);background:var(--surface);border-radius:5px;padding:2px 7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.blk-ai-btn:hover{color:var(--p600);border-color:var(--p300);}
+/* backlink chips in body area */
+.backlink-area{display:flex;flex-wrap:wrap;gap:4px;padding:0;min-height:0;}
+.bl-chip{display:inline-flex;align-items:center;gap:4px;background:var(--p100);color:var(--p600);border:1px solid var(--p200);border-radius:5px;padding:2px 8px;font-size:11.5px;font-family:'JetBrains Mono',monospace;cursor:pointer;vertical-align:middle;}
+[data-theme="dark"] .bl-chip{background:var(--p200);color:var(--p400);}
+.bl-chip:hover{background:var(--p200);}
+.bl-chip svg{width:9px;height:9px;opacity:0.6;}
+/* note body */
+.note-body{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:15px;line-height:1.85;color:var(--t2);resize:none;min-height:160px;caret-color:var(--p600);}
+.note-body::placeholder{color:var(--t4);font-style:italic;}
+/* tags */
+.paper-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);}
+.paper-tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--p100);color:var(--p600);font-family:'JetBrains Mono',monospace;cursor:pointer;}
+[data-theme="dark"] .paper-tag{background:var(--p200);color:var(--p400);}
+.paper-tag.add{background:transparent;border:1px dashed var(--p300);}
+/* pane insert bar */
+.pane-ins{display:flex;align-items:center;gap:4px;padding:7px 12px;border-top:1px solid var(--border);background:var(--p50);flex-shrink:0;flex-wrap:wrap;}
+.pane-ins-lbl{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-right:2px;}
+.pane-ins-btn{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--t3);background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;cursor:pointer;transition:0.12s;}
+.pane-ins-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.pane-ins-btn.ai-btn{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+/* pane resizer */
+.pane-resizer{width:4px;background:var(--p200);cursor:col-resize;flex-shrink:0;transition:background 0.15s;}
+.pane-resizer:hover,.pane-resizer.active{background:var(--p500);}
+/* [[link picker */
+.link-picker{position:absolute;z-index:400;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);box-shadow:var(--shadow-float);width:290px;max-height:310px;overflow:hidden;display:none;flex-direction:column;}
+.link-picker.open{display:flex;}
+.lp-hdr{padding:9px 13px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.lp-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:5px;}
+.lp-search{display:flex;align-items:center;gap:5px;background:var(--p50);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;}
+.lp-search:focus-within{border-color:var(--p400);}
+.lp-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);width:100%;outline:none;}
+.lp-search input::placeholder{color:var(--t4);}
+.lp-search svg{color:var(--t4);width:11px;height:11px;}
+.lp-list{flex:1;overflow-y:auto;}
+.lp-item{display:flex;align-items:center;gap:7px;padding:7px 13px;cursor:pointer;transition:0.1s;border-left:2px solid transparent;}
+.lp-item:hover,.lp-item.focused{background:var(--p50);border-left-color:var(--p600);}
+.lp-item-ico{font-size:13px;flex-shrink:0;}
+.lp-item-name{font-size:12.5px;font-weight:500;color:var(--t1);flex:1;}
+.lp-item-name mark{background:var(--p200);color:var(--p700);border-radius:2px;padding:0 1px;}
+.lp-item-loc{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.lp-item-badge{font-size:8px;font-weight:600;padding:1px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.lp-footer{padding:7px 13px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;}
+.lp-hint{font-size:10px;color:var(--t4);display:flex;align-items:center;gap:3px;}
+.lp-hint kbd{font-family:'JetBrains Mono',monospace;font-size:8.5px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:0 3px;color:var(--t3);}
+/* streaming cursor */
+.cursor{display:inline-block;width:2px;height:1em;background:var(--p600);margin-left:2px;vertical-align:text-bottom;animation:blink 0.7s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ══════════════════════
+   SCHEDULED RUNS VIEW
+══════════════════════ */
+.runs-layout{flex:1;display:flex;overflow:hidden;}
+.runs-main{flex:1;overflow-y:auto;}
+.runs-topbar{display:flex;align-items:center;gap:7px;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;}
+.runs-stats{display:flex;gap:10px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;box-shadow:var(--shadow);}
+.sc-ico{font-size:18px;flex-shrink:0;}
+.sc-n{font-size:20px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.sc-l{font-size:11px;color:var(--t3);}
+.sc-badge{font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:5px;flex-shrink:0;}
+.sc-badge.up{background:var(--green-bg);color:var(--green);}
+.sc-badge.dn{background:var(--red-bg);color:var(--red);}
+.runs-table-wrap{padding:18px 24px;}
+.rtable{width:100%;border-collapse:collapse;font-size:13px;}
+.rtable th{text-align:left;padding:8px 10px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;border-bottom:2px solid var(--border);background:var(--surface);position:sticky;top:0;}
+.rtable td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.rtable tr:hover td{background:var(--p50);}
+.run-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.run-sub{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.run-status{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+.rs-ok{background:var(--green-bg);color:var(--green);}
+.rs-fail{background:var(--red-bg);color:var(--red);}
+.rs-run{background:var(--p100);color:var(--p600);}
+.rs-pause{background:var(--amber-bg);color:var(--amber);}
+.rs-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.rs-run .rs-dot{animation:pulse 1s infinite;}
+.run-sched{font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;}
+.run-next{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.run-out{font-size:11.5px;color:var(--p600);cursor:pointer;}
+.run-out:hover{text-decoration:underline;}
+.run-toggle{width:30px;height:17px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;}
+.run-toggle.on{background:var(--p600);}
+[data-theme="dark"] .run-toggle.on{background:var(--p400);}
+.run-toggle::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15);}
+.run-toggle.on::after{left:15px;}
+.run-act-btn{width:24px;height:24px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;}
+.run-act-btn:hover{background:var(--p50);color:var(--p600);}
+.run-act-btn svg{width:12px;height:12px;}
+/* next runs sidebar */
+.runs-sidebar{width:280px;border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0;padding:18px 16px;}
+.rs-title{font-size:13px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.nrc{border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 13px;margin-bottom:10px;transition:0.15s;}
+.nrc:hover{border-color:var(--p300);}
+.nrc-top{display:flex;align-items:flex-start;gap:7px;margin-bottom:8px;}
+.nrc-ico{font-size:16px;flex-shrink:0;}
+.nrc-name{font-size:12px;font-weight:500;color:var(--t1);}
+.nrc-toggle{margin-left:auto;width:26px;height:15px;background:var(--p600);border-radius:20px;position:relative;cursor:pointer;}
+[data-theme="dark"] .nrc-toggle{background:var(--p400);}
+.nrc-toggle::after{content:'';position:absolute;width:11px;height:11px;border-radius:50%;background:white;top:2px;left:13px;}
+.countdown-row{display:flex;align-items:center;gap:5px;margin-bottom:6px;}
+.cc{background:var(--p50);border:1px solid var(--p200);border-radius:6px;padding:3px 7px;text-align:center;min-width:38px;}
+.cc-n{font-size:15px;font-weight:600;color:var(--p700);font-family:'Lora',serif;line-height:1;}
+[data-theme="dark"] .cc-n{color:var(--p400);}
+.cc-l{font-size:8px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.cc-sep{font-size:13px;color:var(--t4);margin-bottom:8px;}
+.nrc-sched{font-size:10.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.nrc-vars{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;}
+.nrc-var{font-size:9.5px;background:var(--p100);color:var(--p600);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;}
+[data-theme="dark"] .nrc-var{background:var(--p200);color:var(--p400);}
+.nrc-run{width:100%;margin-top:7px;padding:5px;border-radius:6px;border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.nrc-run:hover{background:var(--p100);}
+
+/* ══════════════════════
+   KNOWLEDGE GRAPH VIEW
+══════════════════════ */
+.graph-layout{flex:1;display:flex;overflow:hidden;}
+.graph-canvas-wrap{flex:1;position:relative;background:var(--bg);overflow:hidden;}
+#kg{width:100%;height:100%;}
+.graph-controls{position:absolute;bottom:18px;right:18px;display:flex;flex-direction:column;gap:4px;}
+.graph-ctrl{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:14px;box-shadow:var(--shadow);transition:0.12s;}
+.graph-ctrl:hover{border-color:var(--p300);color:var(--p600);}
+.graph-legend{position:absolute;bottom:18px;left:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 13px;box-shadow:var(--shadow);}
+.gl-lbl{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:7px;}
+.gl-item{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t2);margin-bottom:4px;}
+.gl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.gl-dash{width:16px;height:0;border-top:2px dashed;flex-shrink:0;}
+.graph-info{width:260px;border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0;padding:16px;}
+.gi-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:3px;}
+.gi-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;display:inline-flex;margin-bottom:11px;}
+.gi-stats{display:flex;gap:12px;margin-bottom:13px;}
+.gi-stat-n{font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+[data-theme="dark"] .gi-stat-n{color:var(--p400);}
+.gi-stat-l{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.gi-conn{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.gi-conn:last-child{border-bottom:none;}
+.gi-cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.gi-cname{font-size:12px;color:var(--t2);flex:1;}
+.gi-cstr{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.gi-insight{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:10px 11px;font-size:12.5px;color:var(--t2);line-height:1.6;margin-top:11px;}
+
+/* ══════════════════════
+   ADVANCED SEARCH
+══════════════════════ */
+.adv-search{position:fixed;inset:0;background:rgba(28,24,41,0.65);z-index:800;display:none;align-items:flex-start;justify-content:center;padding-top:70px;backdrop-filter:blur(4px);}
+[data-theme="dark"] .adv-search{background:rgba(8,6,18,0.8);}
+.adv-search.open{display:flex;}
+.as-box{width:680px;background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);overflow:hidden;display:flex;flex-direction:column;max-height:72vh;}
+.as-top{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--border);}
+.as-inp{flex:1;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--t1);outline:none;}
+.as-inp::placeholder{color:var(--t4);}
+.as-x{width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.as-x:hover{background:var(--p50);}
+.as-filters{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.as-fg{display:flex;align-items:center;gap:4px;}
+.as-fl{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.as-chips{display:flex;gap:3px;}
+.as-chip{padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:11px;color:var(--t2);cursor:pointer;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.as-chip:hover{border-color:var(--p300);color:var(--p600);}
+.as-chip.on{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .as-chip.on{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.as-date{border:1px solid var(--border2);border-radius:5px;padding:3px 7px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--t2);background:var(--surface);outline:none;}
+.as-results{flex:1;overflow-y:auto;}
+.as-sec{font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;padding:12px 18px 5px;}
+.as-item{display:flex;align-items:flex-start;gap:9px;padding:9px 18px;cursor:pointer;transition:0.1s;border-left:2px solid transparent;}
+.as-item:hover{background:var(--p50);border-left-color:var(--p600);}
+[data-theme="dark"] .as-item:hover{background:var(--sb-hover);}
+.asi-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.asi-body{flex:1;min-width:0;}
+.asi-title{font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:2px;}
+.asi-title mark{background:var(--p200);color:var(--p700);border-radius:2px;padding:0 1px;}
+[data-theme="dark"] .asi-title mark{background:var(--p300);color:#1C1829;}
+.asi-loc{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:2px;}
+.asi-prev{font-size:12px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.asi-badge{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;align-self:center;}
+.as-footer{padding:9px 18px;border-top:1px solid var(--border);display:flex;gap:12px;}
+.as-hint{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t4);}
+.as-hint kbd{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;color:var(--t3);}
+
+/* ══ CANVAS PICKER MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,24,41,0.55);z-index:600;display:none;align-items:center;justify-content:center;}
+[data-theme="dark"] .modal-overlay{background:rgba(8,6,18,0.75);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-float);display:flex;flex-direction:column;max-height:90vh;overflow:hidden;width:420px;}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;flex:1;}
+.modal-x{width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
+.modal-x:hover{background:var(--p50);}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;}
+/* canvas option cards */
+.canvas-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.canvas-opt{border:2px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:0.15s;}
+.canvas-opt:hover{border-color:var(--p300);}
+.canvas-opt.sel{border-color:var(--p600);box-shadow:0 0 0 2px var(--p300);}
+.canvas-opt-preview{height:60px;}
+.canvas-preview-plain{background:white;border-bottom:1px solid var(--border2);}
+.canvas-preview-dot{background:white;background-image:radial-gradient(circle,rgba(109,40,217,0.15) 1px,transparent 1px);background-size:16px 16px;border-bottom:1px solid var(--border2);}
+.canvas-preview-grid{background:white;background-image:linear-gradient(rgba(109,40,217,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(109,40,217,0.1) 1px,transparent 1px);background-size:16px 16px;border-bottom:1px solid var(--border2);}
+.canvas-preview-lines{background:white;background-image:linear-gradient(rgba(109,40,217,0.12) 1px,transparent 1px);background-size:100% 16px;border-bottom:1px solid var(--border2);}
+.canvas-opt-label{padding:7px 10px;font-size:12.5px;font-weight:500;color:var(--t1);}
+
+/* ZEN BAR */
+.zen-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);box-shadow:var(--shadow-float);padding:7px 14px;display:none;align-items:center;gap:9px;z-index:500;}
+.zen-bar.on{display:flex;}
+.zb-item{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--t3);cursor:pointer;padding:4px 8px;border-radius:8px;transition:0.12s;font-family:'JetBrains Mono',monospace;}
+.zb-item:hover{background:var(--p50);color:var(--p600);}
+.zb-sep{width:1px;height:16px;background:var(--border);}
+.zb-wc{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+
+/* QC FAB */
+.qc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--p600);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(124,58,237,0.4);z-index:500;color:white;transition:all 0.2s;}
+[data-theme="dark"] .qc-fab{background:var(--p400);color:#1C1829;}
+.qc-fab:hover{transform:scale(1.08);}
+.qc-fab svg{width:20px;height:20px;transition:transform 0.2s;}
+.qc-fab.open svg{transform:rotate(45deg);}
+.qc-bubble{position:fixed;bottom:82px;right:24px;width:290px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);box-shadow:var(--shadow-float);z-index:500;display:none;flex-direction:column;overflow:hidden;}
+.qc-bubble.open{display:flex;}
+.qcb-hdr{padding:9px 13px 7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.qcb-t{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.qcb-types{display:flex;gap:3px;}
+.qcb-ty{font-size:9px;padding:2px 6px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'JetBrains Mono',monospace;transition:0.12s;}
+.qcb-ty.on{background:var(--p600);border-color:var(--p600);color:white;}
+[data-theme="dark"] .qcb-ty.on{background:var(--p400);border-color:var(--p400);color:#1C1829;}
+.qcb-body{padding:9px 13px;}
+.qcb-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:14px;font-weight:500;color:var(--t1);margin-bottom:5px;}
+.qcb-inp::placeholder{color:var(--t4);}
+.qcb-txt{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:13px;line-height:1.65;color:var(--t2);resize:none;min-height:65px;}
+.qcb-txt::placeholder{color:var(--t4);font-style:italic;}
+.qcb-ftr{padding:7px 13px;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.qcb-dest{font-size:11px;color:var(--t4);flex:1;font-family:'JetBrains Mono',monospace;}
+.qcb-save{padding:5px 13px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;}
+[data-theme="dark"] .qcb-save{background:var(--p400);color:#1C1829;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg);border-radius:var(--r-lg);padding:10px 18px;display:none;align-items:center;gap:8px;font-size:13px;font-weight:500;z-index:900;box-shadow:var(--shadow-lg);white-space:nowrap;}
+.toast.on{display:flex;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(8px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
+</style>
+</head>
+<body>
+
+<!-- NAV RAIL -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes  ⌘1</span>
+  </button>
+  <button class="nav-btn" onclick="openSearch()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4 4"/></svg>
+    <span class="nav-tip">Search  ⌘K</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('runs',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/><path d="M6.5 3.5A7 7 0 003 10"/></svg>
+    <span class="nav-tip">Scheduled Runs  ⌘2</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph  ⌘3</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="openCanvasPicker()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 3v14" opacity=".3"/></svg>
+    <span class="nav-tip">Canvas background</span>
+  </button>
+  <button class="nav-btn" onclick="toggleDark()">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" id="darkIco"><path d="M17.5 12A7.5 7.5 0 118 2.5a5.5 5.5 0 009.5 9.5z"/></svg>
+    <span class="nav-tip">Dark mode  ⌘⇧D</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-search" onclick="openSearch()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <span>Search notes…</span>
+      <span class="sb-kbd">⌘K</span>
+    </div>
+    <button class="sb-btn" onclick="createNote()" title="New note  ⌘N">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>
+    </button>
+  </div>
+  <div class="sb-tree">
+    <!-- Shelf 1 -->
+    <div class="shelf open" id="s1">
+      <div class="shelf-hdr" onclick="toggleShelf('s1')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📔</span><span class="nb-name">Transformers</span><span class="nb-count">3</span></div>
+          <div class="nb-body">
+            <div class="note-item active" id="ni-1" onclick="loadNoteLeft(this,'Transformer Architecture Deep Dive','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-prev">Attention mechanisms, positional encodings, tradeoffs.</div>
+            </div>
+            <div class="note-item" id="ni-2" onclick="loadNoteLeft(this,'BERT vs GPT Analysis','Idea')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-prev">Bidirectional vs autoregressive enterprise tradeoffs.</div>
+            </div>
+            <div class="note-item" id="ni-3" onclick="loadNoteLeft(this,'Tata Motors Q4 Report','html')">
+              <div class="ni-top"><span class="ni-badge badge-html">HTML</span><span class="ni-date">Apr 20</span></div>
+              <div class="ni-title">Tata Motors Q4 — AI Report</div>
+              <div class="ni-prev">Auto-generated via Equity Monitor cron.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📗</span><span class="nb-name">RAG Patterns</span><span class="nb-count">2</span></div>
+          <div class="nb-body">
+            <div class="note-item" id="ni-4" onclick="loadNoteLeft(this,'Hybrid Retrieval Strategies','Research')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-prev">BM25 + dense, cross-encoder re-ranking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Shelf 2 -->
+    <div class="shelf open" id="s2">
+      <div class="shelf-hdr" onclick="toggleShelf('s2')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📒</span><span class="nb-name">Daily Journal</span><span class="nb-count">12</span></div>
+          <div class="nb-body">
+            <div class="note-item" id="ni-5" onclick="loadNoteLeft(this,'Monday Deep Work','Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-prev">Shipped Lore demo. Energy 4/5.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Shelf 3 -->
+    <div class="shelf" id="s3">
+      <div class="shelf-hdr" onclick="toggleShelf('s3')">
+        <div class="sh-chev"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#0F766E;"></div>
+        <span class="sh-name">Work &amp; Finance</span>
+        <span class="sh-count">6</span>
+        <button class="sh-add" onclick="event.stopPropagation();createNote()"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb4">
+          <div class="nb-hdr"><div class="nb-chev" onclick="toggleNb('nb4')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div><span class="nb-icon">📊</span><span class="nb-name">Equity Research</span><span class="nb-count">4</span></div>
+          <div class="nb-body">
+            <div class="note-item" id="ni-6" onclick="loadNoteLeft(this,'Indian Equity Framework','Reference')">
+              <div class="ni-top"><span class="ni-badge badge-reference">Reference</span><span class="ni-date">Feb 10</span></div>
+              <div class="ni-title">Indian Equity Framework</div>
+              <div class="ni-prev">BRSR, Beneish M-Score, ROIC vs WACC.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══ VIEW: NOTES (split) ══ -->
+  <div class="view active" id="view-notes">
+    <div class="split-bar" id="splitBar">
+      <div class="sbar-bc">
+        <a>AI &amp; ML</a><span class="sep"> › </span>
+        <span>Transformers</span><span class="sep"> › </span>
+        <span class="cur" id="leftBcTitle">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="ai-live-pill"><span class="live-dot"></span>Live AI</div>
+      <!-- split toggle -->
+      <div class="split-tgl">
+        <button class="stb active" title="1 pane" onclick="setSplit(1,this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/></svg></button>
+        <button class="stb" title="2 panes" onclick="setSplit(2,this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="12" rx="1"/></svg></button>
+        <button class="stb" title="3 panes" onclick="setSplit(3,this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="4" height="12" rx="1"/><rect x="6" y="2" width="4" height="12" rx="1"/><rect x="11" y="2" width="4" height="12" rx="1"/></svg></button>
+      </div>
+      <button class="tool-pill" onclick="toggleZen()" id="zenBtn">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4M9 9l4 4M13 1l-4 4M5 9l-4 4"/></svg>
+        Focus
+      </button>
+      <button class="tool-pill" onclick="openCanvasPicker()">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="12" height="12" rx="1.5"/><path d="M1 5h12M5 1v12" opacity=".4"/></svg>
+        Canvas
+      </button>
+      <button class="tb-btn primary" style="font-size:11.5px;" onclick="showToast('Saved!')">Save</button>
+    </div>
+
+    <div class="split-body" id="splitBody">
+      <!-- ═ PANE LEFT ═ -->
+      <div class="pane" id="pane-L">
+        <div class="pane-header">
+          <span class="pane-type badge-research" id="leftType">Research</span>
+          <span class="pane-title" id="leftPaneTitle">Transformer Architecture Deep Dive</span>
+          <button class="pane-btn" title="More"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg></button>
+        </div>
+        <div class="pane-body canvas-plain" id="pane-L-body">
+          <!-- [[link picker for left pane -->
+          <div class="link-picker" id="lp-L" style="top:80px;left:10px;">
+            <div class="lp-hdr">
+              <div class="lp-lbl">Link a note</div>
+              <div class="lp-search">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="5.5" r="4"/><path d="M8.5 8.5l3 3"/></svg>
+                <input type="text" placeholder="Search notes…" id="lp-L-inp" oninput="filterLP('L',this.value)" onkeydown="lpKeydown(event,'L')"/>
+              </div>
+            </div>
+            <div class="lp-list" id="lp-L-list"></div>
+            <div class="lp-footer">
+              <div class="lp-hint"><kbd>↑↓</kbd> navigate</div>
+              <div class="lp-hint"><kbd>↵</kbd> link</div>
+              <div class="lp-hint"><kbd>Esc</kbd> close</div>
+            </div>
+          </div>
+          <div class="paper-scroll">
+            <textarea class="paper-title" id="titleL" rows="1" oninput="syncTitle(this,'leftBcTitle','leftPaneTitle')">Transformer Architecture Deep Dive</textarea>
+            <hr class="paper-sep"/>
+            <div class="blocks" id="blocks-L">
+              <div class="block" draggable="true">
+                <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+                <div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</textarea></div></div>
+                <div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>
+              </div>
+              <div class="block" draggable="true">
+                <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+                <div class="blk-keydiff">
+                  <div class="kd-hdr"><div class="kd-ch"><input value="Encoder-only (BERT)"/></div><div class="kd-ch"><input value="Decoder-only (GPT)"/></div></div>
+                  <div class="kd-body">
+                    <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Bidirectional attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Classification tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Needs fine-tuning</textarea></div></div>
+                    <div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Causal attention</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Generation tasks</textarea></div><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1">Few-shot capable</textarea></div></div>
+                  </div>
+                </div>
+                <div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>
+              </div>
+            </div>
+            <div id="ai-resp-L"></div>
+            <textarea class="note-body" id="bodyL" placeholder="Type… / for blocks · [[ to link · @ for AI" oninput="handleBody(event,'L')" rows="5">Literature review of "Attention Is All You Need" (Vaswani et al., 2017). Implemented a mini transformer to validate claims about positional encoding.</textarea>
+            <div class="backlink-area" id="bl-L" style="margin-top:8px;"></div>
+            <div class="paper-tags" style="margin-top:14px;padding-top:12px;">
+              <span class="paper-tag">transformers</span>
+              <span class="paper-tag">attention</span>
+              <span class="paper-tag add" onclick="addTag('L')">+ tag</span>
+            </div>
+          </div>
+        </div>
+        <div class="pane-ins">
+          <span class="pane-ins-lbl">/</span>
+          <button class="pane-ins-btn" onclick="addBlock('L','hyp')">💡 Hyp</button>
+          <button class="pane-ins-btn" onclick="addBlock('L','con')">🎯 Con</button>
+          <button class="pane-ins-btn" onclick="addBlock('L','keydiff')">⚡ KeyDiff</button>
+          <button class="pane-ins-btn" onclick="addBlock('L','findings')">🔑 Findings</button>
+          <button class="pane-ins-btn" onclick="openLP('L')"><kbd style="font-size:9px;">[[ </kbd>Link</button>
+          <button class="pane-ins-btn ai-btn" onclick="askClaudePane('L')">✦ Ask Claude</button>
+        </div>
+      </div>
+
+      <!-- Resizer 1 -->
+      <div class="pane-resizer" id="resizer1" style="display:none;"></div>
+
+      <!-- ═ PANE CENTER ═ -->
+      <div class="pane" id="pane-C" style="display:none;">
+        <div class="pane-header">
+          <span class="pane-type badge-idea" id="centerType">Idea</span>
+          <span class="pane-title" id="centerPaneTitle">BERT vs GPT Analysis</span>
+          <button class="pane-btn" onclick="setSplit(1,document.querySelectorAll('.stb')[0])"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <div class="pane-body canvas-plain" id="pane-C-body">
+          <div class="link-picker" id="lp-C" style="top:80px;left:10px;">
+            <div class="lp-hdr">
+              <div class="lp-lbl">Link a note</div>
+              <div class="lp-search"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="5.5" r="4"/><path d="M8.5 8.5l3 3"/></svg><input type="text" placeholder="Search notes…" id="lp-C-inp" oninput="filterLP('C',this.value)" onkeydown="lpKeydown(event,'C')"/></div>
+            </div>
+            <div class="lp-list" id="lp-C-list"></div>
+            <div class="lp-footer"><div class="lp-hint"><kbd>↑↓</kbd> nav</div><div class="lp-hint"><kbd>↵</kbd> link</div><div class="lp-hint"><kbd>Esc</kbd> close</div></div>
+          </div>
+          <div class="paper-scroll">
+            <textarea class="paper-title" id="titleC" rows="1" oninput="syncTitle(this,'centerBcTitle','centerPaneTitle')">BERT vs GPT — Enterprise Use Cases</textarea>
+            <hr class="paper-sep"/>
+            <div class="blocks" id="blocks-C">
+              <div class="block" draggable="true">
+                <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+                <div class="blk-ai">
+                  <div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:#7C3AED;">C</div><span class="blk-ai-name">Claude Sonnet 4</span><span class="blk-ai-time">14:22</span></div>
+                  <div class="blk-ai-text">For SAP CS support ticket classification, BERT-family models outperform GPT-family by 4–8% F1 due to bidirectional context. For generating personalised responses, Claude / GPT-4o are significantly better.</div>
+                  <div class="blk-ai-footer"><button class="blk-ai-btn">Copy</button><button class="blk-ai-btn" onclick="this.closest('.block').remove()">Remove</button></div>
+                </div>
+                <div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>
+              </div>
+            </div>
+            <div id="ai-resp-C"></div>
+            <textarea class="note-body" id="bodyC" placeholder="Type… / · [[ · @" oninput="handleBody(event,'C')" rows="5">Key insight: for enterprise NLP, use BERT-family for classification and routing, use Claude/GPT for drafting and generation.</textarea>
+            <div class="backlink-area" id="bl-C" style="margin-top:8px;"></div>
+            <div class="paper-tags" style="margin-top:14px;padding-top:12px;"><span class="paper-tag">BERT</span><span class="paper-tag">GPT</span><span class="paper-tag add" onclick="addTag('C')">+ tag</span></div>
+          </div>
+        </div>
+        <div class="pane-ins">
+          <span class="pane-ins-lbl">/</span>
+          <button class="pane-ins-btn" onclick="addBlock('C','hyp')">💡</button>
+          <button class="pane-ins-btn" onclick="addBlock('C','findings')">🔑</button>
+          <button class="pane-ins-btn" onclick="openLP('C')"><kbd style="font-size:9px;">[[ </kbd></button>
+          <button class="pane-ins-btn ai-btn" onclick="askClaudePane('C')">✦ Claude</button>
+        </div>
+      </div>
+
+      <!-- Resizer 2 -->
+      <div class="pane-resizer" id="resizer2" style="display:none;"></div>
+
+      <!-- ═ PANE RIGHT ═ -->
+      <div class="pane" id="pane-R" style="display:none;">
+        <div class="pane-header">
+          <span class="pane-type badge-reference" id="rightType">Reference</span>
+          <span class="pane-title" id="rightPaneTitle">Indian Equity Framework</span>
+          <button class="pane-btn" onclick="setSplit(2,document.querySelectorAll('.stb')[1])"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+        </div>
+        <div class="pane-body canvas-plain" id="pane-R-body">
+          <div class="link-picker" id="lp-R" style="top:80px;left:10px;">
+            <div class="lp-hdr">
+              <div class="lp-lbl">Link a note</div>
+              <div class="lp-search"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="5.5" r="4"/><path d="M8.5 8.5l3 3"/></svg><input type="text" placeholder="Search…" id="lp-R-inp" oninput="filterLP('R',this.value)" onkeydown="lpKeydown(event,'R')"/></div>
+            </div>
+            <div class="lp-list" id="lp-R-list"></div>
+            <div class="lp-footer"><div class="lp-hint"><kbd>↑↓</kbd> nav</div><div class="lp-hint"><kbd>↵</kbd> link</div><div class="lp-hint"><kbd>Esc</kbd> close</div></div>
+          </div>
+          <div class="paper-scroll">
+            <textarea class="paper-title" id="titleR" rows="1" oninput="syncTitle(this,'rightBcTitle','rightPaneTitle')">Indian Equity Framework</textarea>
+            <hr class="paper-sep"/>
+            <div class="blocks" id="blocks-R">
+              <div class="block" draggable="true">
+                <div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>
+                <div class="blk-findings">
+                  <div class="blk-findings-lbl">Key Signals</div>
+                  <div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1">Beneish M-Score &lt; −1.78 → clean; &gt; −1.78 → manipulation risk</textarea></div>
+                  <div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1">ROIC / WACC &gt; 1.0x → value creating</textarea></div>
+                  <div class="fi-row"><span class="fi-num">3</span><textarea class="fi-inp" rows="1">Promoter pledge % declining → bullish signal</textarea></div>
+                </div>
+                <div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>
+              </div>
+            </div>
+            <div id="ai-resp-R"></div>
+            <textarea class="note-body" id="bodyR" placeholder="Type… / · [[ · @" oninput="handleBody(event,'R')" rows="5">BRSR, SEBI LODR compliance checks, promoter pledge tracking, ROIC vs WACC spread.</textarea>
+            <div class="backlink-area" id="bl-R" style="margin-top:8px;"></div>
+            <div class="paper-tags" style="margin-top:14px;padding-top:12px;"><span class="paper-tag">equity</span><span class="paper-tag">ROIC</span><span class="paper-tag add" onclick="addTag('R')">+ tag</span></div>
+          </div>
+        </div>
+        <div class="pane-ins">
+          <span class="pane-ins-lbl">/</span>
+          <button class="pane-ins-btn" onclick="addBlock('R','findings')">🔑</button>
+          <button class="pane-ins-btn" onclick="openLP('R')"><kbd style="font-size:9px;">[[ </kbd></button>
+          <button class="pane-ins-btn ai-btn" onclick="askClaudePane('R')">✦ Claude</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZEN BAR -->
+    <div class="zen-bar" id="zenBar">
+      <div class="zb-item" onclick="toggleZen()"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 9l-4 4M9 5l4-4M13 9l-4-4M5 5L1 1"/></svg>Exit Focus</div>
+      <div class="zb-sep"></div>
+      <div class="zb-item" onclick="addBlock('L','hyp')">💡 Hyp</div>
+      <div class="zb-item" onclick="addBlock('L','con')">🎯 Con</div>
+      <div class="zb-item" onclick="addBlock('L','keydiff')">⚡ KeyDiff</div>
+      <div class="zb-item" onclick="askClaudePane('L')">✦ Ask Claude</div>
+      <div class="zb-sep"></div>
+      <div class="zb-wc" id="zenWC">847 words</div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: SCHEDULED RUNS ══ -->
+  <div class="view" id="view-runs">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/></svg>
+      <span class="vhbar-title">Scheduled Runs</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">Export log</button>
+      <button class="tb-btn primary">+ New Cron Prompt</button>
+    </div>
+    <div class="runs-layout">
+      <div class="runs-main">
+        <div class="runs-topbar">
+          <div style="font-size:12px;color:var(--t3);">5 active cron jobs · Last run: <strong style="color:var(--t2);">8 mins ago</strong></div>
+          <div class="tb-sp"></div>
+          <button class="tb-btn">Filter</button>
+        </div>
+        <div class="runs-stats">
+          <div class="stat-card"><div class="sc-ico">✅</div><div><div class="sc-n">47</div><div class="sc-l">Runs this month</div></div><div class="sc-badge up">↑ 12%</div></div>
+          <div class="stat-card"><div class="sc-ico">📄</div><div><div class="sc-n">18</div><div class="sc-l">HTML reports generated</div></div><div class="sc-badge up">↑ 6%</div></div>
+          <div class="stat-card"><div class="sc-ico">✗</div><div><div class="sc-n">2</div><div class="sc-l">Failed this month</div></div><div class="sc-badge dn">API timeout</div></div>
+          <div class="stat-card"><div class="sc-ico">⏱</div><div><div class="sc-n">5</div><div class="sc-l">Active schedules</div></div></div>
+        </div>
+        <div class="runs-table-wrap">
+          <table class="rtable">
+            <thead>
+              <tr><th>Prompt</th><th>Schedule</th><th>Last Run</th><th>Status</th><th>Output</th><th>Active</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;margin-right:5px;">📈</span>Equity Performance Monitor</div><div class="run-sub">Claude · Finance · HTML Report</div></td>
+                <td><div class="run-sched">Mon 08:00 IST</div><div class="run-next">Next: Apr 28</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 21 08:00</div><div style="font-size:10px;color:var(--t4);">2m 14s</div></td>
+                <td><span class="run-status rs-ok"><span class="rs-dot"></span>Success</span></td>
+                <td><a class="run-out" onclick="showToast('Opening HTML report…')">Equity-Apr21.html</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td style="white-space:nowrap;">
+                  <button class="run-act-btn" title="Run now" onclick="showToast('Running now…')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-act-btn" title="Edit"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;margin-right:5px;">📔</span>Daily Journal Starter</div><div class="run-sub">Claude · Journal · Note</div></td>
+                <td><div class="run-sched">Mon–Fri 07:00 IST</div><div class="run-next">Next: Apr 28</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 25 07:00</div><div style="font-size:10px;color:var(--t4);">0m 38s</div></td>
+                <td><span class="run-status rs-ok"><span class="rs-dot"></span>Success</span></td>
+                <td><a class="run-out">Journal-Apr25.note</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td style="white-space:nowrap;">
+                  <button class="run-act-btn" onclick="showToast('Running now…')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-act-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;margin-right:5px;">🔬</span>Research Summary</div><div class="run-sub">GPT-4o · Research · Note</div></td>
+                <td><div class="run-sched">Sunday 09:00 IST</div><div class="run-next">Next: Apr 27</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 20 09:00</div><div style="font-size:10px;color:var(--t4);">1m 52s</div></td>
+                <td><span class="run-status rs-ok"><span class="rs-dot"></span>Success</span></td>
+                <td><a class="run-out">Research-Summary.note</a></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td style="white-space:nowrap;">
+                  <button class="run-act-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-act-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="run-name"><span style="font-size:14px;margin-right:5px;">📈</span>Equity Performance Monitor</div><div class="run-sub">Claude · Finance · HTML Report</div></td>
+                <td><div class="run-sched">Mon 08:00 IST</div></td>
+                <td><div style="font-size:12px;color:var(--t2);">Apr 7 08:00</div><div style="font-size:10px;color:var(--t4);">—</div></td>
+                <td><span class="run-status rs-fail"><span class="rs-dot"></span>Failed</span></td>
+                <td><span style="font-size:11px;color:var(--t4);">API timeout</span></td>
+                <td><div class="run-toggle on" onclick="this.classList.toggle('on')"></div></td>
+                <td style="white-space:nowrap;">
+                  <button class="run-act-btn" onclick="showToast('Retrying…')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button>
+                  <button class="run-act-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg></button>
+                </td>
+              </tr>
+              <tr style="opacity:0.5;">
+                <td><div class="run-name"><span style="font-size:14px;margin-right:5px;">🧠</span>Weekly AI News Digest</div><div class="run-sub">Gemini · Research · Note</div></td>
+                <td><div class="run-sched" style="color:var(--t4);">Fri 18:00 IST</div><div class="run-next">Paused</div></td>
+                <td><div style="font-size:12px;color:var(--t4);">Apr 18</div></td>
+                <td><span class="run-status rs-pause"><span class="rs-dot"></span>Paused</span></td>
+                <td>—</td>
+                <td><div class="run-toggle" onclick="this.classList.toggle('on')"></div></td>
+                <td style="white-space:nowrap;"><button class="run-act-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Next runs sidebar -->
+      <div class="runs-sidebar">
+        <div class="rs-title"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>Upcoming Runs</div>
+        <div class="nrc">
+          <div class="nrc-top"><div class="nrc-ico">📔</div><div><div class="nrc-name">Daily Journal Starter</div></div><div class="nrc-toggle"></div></div>
+          <div class="countdown-row"><div class="cc"><div class="cc-n">0</div><div class="cc-l">days</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n" id="cd1h">3</div><div class="cc-l">hrs</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n" id="cd1m">42</div><div class="cc-l">min</div></div></div>
+          <div class="nrc-sched">Mon Apr 28 · 07:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{date}}</span></div>
+          <button class="nrc-run" onclick="showToast('Running Daily Journal Starter…')">▶ Run Now</button>
+        </div>
+        <div class="nrc">
+          <div class="nrc-top"><div class="nrc-ico">📈</div><div><div class="nrc-name">Equity Performance Monitor</div></div><div class="nrc-toggle"></div></div>
+          <div class="countdown-row"><div class="cc"><div class="cc-n">2</div><div class="cc-l">days</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n">14</div><div class="cc-l">hrs</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n">18</div><div class="cc-l">min</div></div></div>
+          <div class="nrc-sched">Mon Apr 28 · 08:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{company_list}}</span><span class="nrc-var">{{date}}</span></div>
+          <button class="nrc-run" onclick="showToast('Running Equity Monitor…')">▶ Run Now</button>
+        </div>
+        <div class="nrc">
+          <div class="nrc-top"><div class="nrc-ico">🔬</div><div><div class="nrc-name">Research Summary</div></div><div class="nrc-toggle"></div></div>
+          <div class="countdown-row"><div class="cc"><div class="cc-n">1</div><div class="cc-l">day</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n">20</div><div class="cc-l">hrs</div></div><div class="cc-sep">:</div><div class="cc"><div class="cc-n">07</div><div class="cc-l">min</div></div></div>
+          <div class="nrc-sched">Sun Apr 27 · 09:00 IST</div>
+          <div class="nrc-vars"><span class="nrc-var">{{topic}}</span></div>
+          <button class="nrc-run" onclick="showToast('Running Research Summary…')">▶ Run Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: KNOWLEDGE GRAPH ══ -->
+  <div class="view" id="view-graph">
+    <div class="vhbar">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+      <span class="vhbar-title">Knowledge Graph</span>
+      <span style="font-size:11.5px;color:var(--t3);margin-left:4px;">13 notes · 18 connections</span>
+      <div class="tb-sp"></div>
+      <button class="tb-btn">Filter by shelf</button>
+      <button class="tb-btn primary" onclick="createNote();switchView('notes',document.querySelectorAll('.nav-btn')[0])">+ New Note</button>
+    </div>
+    <div class="graph-layout">
+      <div class="graph-canvas-wrap">
+        <svg id="kg" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg">
+          <pattern id="grid-bg" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--dot-color)" stroke-width="0.5"/></pattern>
+          <rect width="860" height="520" fill="url(#grid-bg)"/>
+          <!-- Shelf cluster outlines -->
+          <ellipse cx="380" cy="185" rx="178" ry="115" fill="var(--p600)" opacity="0.03" stroke="var(--p600)" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="225" y="88" fill="var(--p400)" font-size="10" font-family="JetBrains Mono,monospace" opacity="0.7">📚 AI &amp; ML shelf</text>
+          <ellipse cx="195" cy="375" rx="115" ry="68" fill="#D97706" opacity="0.03" stroke="#D97706" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="118" y="450" fill="#FCD34D" font-size="10" font-family="JetBrains Mono,monospace" opacity="0.7">📚 Personal</text>
+          <ellipse cx="682" cy="368" rx="105" ry="72" fill="#0F766E" opacity="0.03" stroke="#0F766E" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="618" y="448" fill="#34D399" font-size="10" font-family="JetBrains Mono,monospace" opacity="0.7">📚 Work</text>
+          <!-- Edges -->
+          <g stroke="var(--p200)" stroke-width="1.5" fill="none">
+            <line x1="400" y1="188" x2="242" y2="115"/><line x1="400" y1="188" x2="558" y2="122"/>
+            <line x1="400" y1="188" x2="195" y2="368"/><line x1="400" y1="188" x2="682" y2="368"/>
+            <line x1="400" y1="188" x2="400" y2="378"/>
+            <line x1="400" y1="188" x2="312" y2="228" stroke="var(--p300)" stroke-width="2"/>
+            <line x1="242" y1="115" x2="558" y2="122" stroke="var(--p100)" stroke-dasharray="5,4"/>
+            <line x1="195" y1="368" x2="400" y2="378" stroke="var(--amber)" stroke-dasharray="5,4" opacity="0.6"/>
+            <line x1="558" y1="122" x2="682" y2="368" stroke="var(--teal)" stroke-dasharray="5,4" opacity="0.6"/>
+            <!-- cron arrow -->
+            <path d="M612 192 Q650 178 682 368" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow)"/>
+          </g>
+          <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="var(--amber)" opacity="0.8"/></marker></defs>
+          <!-- Central: Transformer -->
+          <g style="cursor:pointer;" onclick="selectNode('transformer')">
+            <circle cx="400" cy="188" r="52" fill="var(--p600)" opacity="0.08"/>
+            <circle cx="400" cy="188" r="39" fill="var(--p600)"/>
+            <text x="400" y="183" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text>
+            <text x="400" y="197" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="DM Sans,sans-serif">Architecture</text>
+            <text x="400" y="240" text-anchor="middle" fill="var(--p400)" font-size="9" font-family="JetBrains Mono,monospace">Research · 5 links</text>
+          </g>
+          <!-- RAG -->
+          <g style="cursor:pointer;" onclick="selectNode('rag')">
+            <circle cx="242" cy="115" r="28" fill="#0F766E"/>
+            <text x="242" y="110" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">RAG</text>
+            <text x="242" y="124" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">Patterns</text>
+            <text x="242" y="155" text-anchor="middle" fill="#0F766E" font-size="8.5" font-family="JetBrains Mono,monospace">Research · 2</text>
+          </g>
+          <!-- AI Roadmap -->
+          <g style="cursor:pointer;" onclick="selectNode('roadmap')">
+            <circle cx="558" cy="122" r="30" fill="#1D4ED8"/>
+            <text x="558" y="117" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">AI Roadmap</text>
+            <text x="558" y="130" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">36 Weeks</text>
+            <text x="558" y="165" text-anchor="middle" fill="#1D4ED8" font-size="8.5" font-family="JetBrains Mono,monospace">Task · 3</text>
+          </g>
+          <!-- BERT/GPT -->
+          <g style="cursor:pointer;" onclick="selectNode('bert')">
+            <circle cx="312" cy="228" r="24" fill="#BE185D"/>
+            <text x="312" y="224" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="DM Sans,sans-serif">BERT/GPT</text>
+            <text x="312" y="238" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" font-family="DM Sans,sans-serif">Analysis</text>
+            <text x="312" y="264" text-anchor="middle" fill="#BE185D" font-size="8.5" font-family="JetBrains Mono,monospace">Idea</text>
+          </g>
+          <!-- Journal -->
+          <g style="cursor:pointer;" onclick="selectNode('journal')">
+            <circle cx="195" cy="368" r="26" fill="#D97706"/>
+            <text x="195" y="362" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Monday</text>
+            <text x="195" y="375" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8.5" font-family="DM Sans,sans-serif">Journal</text>
+            <text x="195" y="404" text-anchor="middle" fill="#D97706" font-size="8.5" font-family="JetBrains Mono,monospace">Journal</text>
+          </g>
+          <!-- Equity -->
+          <g style="cursor:pointer;" onclick="selectNode('equity')">
+            <circle cx="682" cy="368" r="28" fill="#0F766E"/>
+            <text x="682" y="362" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Equity</text>
+            <text x="682" y="376" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="8.5" font-family="DM Sans,sans-serif">Research</text>
+            <text x="682" y="406" text-anchor="middle" fill="#0F766E" font-size="8.5" font-family="JetBrains Mono,monospace">Reference · 3</text>
+          </g>
+          <!-- HTML Note (cron output) -->
+          <g style="cursor:pointer;" onclick="selectNode('tata')">
+            <circle cx="612" cy="192" r="22" fill="#92400E"/>
+            <text x="612" y="187" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="DM Sans,sans-serif">Tata Q4</text>
+            <text x="612" y="199" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7.5" font-family="DM Sans,sans-serif">HTML</text>
+            <text x="612" y="224" text-anchor="middle" fill="#92400E" font-size="8" font-family="JetBrains Mono,monospace">HTML Note</text>
+          </g>
+          <!-- Linear Algebra -->
+          <g style="cursor:pointer;" onclick="selectNode('linalg')">
+            <circle cx="400" cy="378" r="26" fill="var(--p600)" opacity="0.75"/>
+            <text x="400" y="372" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="DM Sans,sans-serif">Linear</text>
+            <text x="400" y="385" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8.5" font-family="DM Sans,sans-serif">Algebra</text>
+            <text x="400" y="415" text-anchor="middle" fill="var(--p400)" font-size="8.5" font-family="JetBrains Mono,monospace">Idea</text>
+          </g>
+          <!-- Cron label -->
+          <text x="648" y="278" fill="var(--amber)" font-size="9" font-family="JetBrains Mono,monospace" opacity="0.8">⏱ cron</text>
+          <!-- footer hint -->
+          <text x="430" y="500" text-anchor="middle" fill="var(--t4)" font-size="11" font-family="DM Sans,sans-serif">Click any node to inspect · Shelf clusters shown as dashed outlines · Cron output shown as amber dashed arrow</text>
+        </svg>
+        <div class="graph-controls">
+          <button class="graph-ctrl" title="Zoom in">+</button>
+          <button class="graph-ctrl" title="Zoom out">−</button>
+          <button class="graph-ctrl" title="Reset" onclick="showToast('Graph reset')">⤢</button>
+        </div>
+        <div class="graph-legend">
+          <div class="gl-lbl">Node types</div>
+          <div class="gl-item"><div class="gl-dot" style="background:var(--p600);"></div>Research</div>
+          <div class="gl-item"><div class="gl-dot" style="background:#D97706;"></div>Journal</div>
+          <div class="gl-item"><div class="gl-dot" style="background:#1D4ED8;"></div>Task</div>
+          <div class="gl-item"><div class="gl-dot" style="background:#0F766E;"></div>Reference</div>
+          <div class="gl-item"><div class="gl-dot" style="background:#BE185D;"></div>Idea</div>
+          <div class="gl-item"><div class="gl-dot" style="background:#92400E;"></div>HTML Note</div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:7px 0;"/>
+          <div class="gl-item"><div class="gl-dash" style="border-color:var(--p200);"></div>Manual link</div>
+          <div class="gl-item"><div class="gl-dash" style="border-color:var(--amber);"></div>Cron output</div>
+        </div>
+      </div>
+      <!-- Graph info panel -->
+      <div class="graph-info" id="graphInfo">
+        <div style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:9px;">Selected Note</div>
+        <div class="gi-title" id="giTitle">Transformer Architecture</div>
+        <div style="margin:5px 0 10px;"><span class="gi-badge badge-research">Research</span></div>
+        <div class="gi-stats">
+          <div><div class="gi-stat-n">5</div><div class="gi-stat-l">links</div></div>
+          <div><div class="gi-stat-n">4</div><div class="gi-stat-l">AI calls</div></div>
+          <div><div class="gi-stat-n">847</div><div class="gi-stat-l">words</div></div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin-bottom:10px;"/>
+        <div style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:7px;">Connected Notes</div>
+        <div id="giConns">
+          <div class="gi-conn"><div class="gi-cdot" style="background:#0F766E;"></div><span class="gi-cname">RAG Patterns</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#1D4ED8;"></div><span class="gi-cname">AI Roadmap</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#BE185D;"></div><span class="gi-cname">BERT vs GPT</span><span class="gi-cstr">medium</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:var(--p600);opacity:0.7;"></div><span class="gi-cname">Linear Algebra</span><span class="gi-cstr">medium</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#D97706;"></div><span class="gi-cname">Monday Journal</span><span class="gi-cstr">weak</span></div>
+        </div>
+        <div class="gi-insight" id="giInsight">Central hub — 5 connections. Strong thematic overlap with RAG and AI Roadmap. Transformer content is the most-linked in AI &amp; ML shelf.</div>
+        <button class="tb-btn" style="width:100%;margin-top:10px;justify-content:center;" onclick="loadNoteLeft(null,'Transformer Architecture Deep Dive','Research');switchView('notes',document.querySelectorAll('.nav-btn')[0])">Open Note →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- CANVAS PICKER MODAL -->
+<div class="modal-overlay" id="canvasModal" onclick="if(event.target===this)closeCanvasPicker()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Canvas Background</div>
+      <button class="modal-x" onclick="closeCanvasPicker()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--t3);margin-bottom:16px;">Choose a background for all note panes.</p>
+      <div class="canvas-options">
+        <div class="canvas-opt sel" id="cv-plain" onclick="setCanvas('plain')">
+          <div class="canvas-opt-preview canvas-preview-plain"></div>
+          <div class="canvas-opt-label">Plain white</div>
+        </div>
+        <div class="canvas-opt" id="cv-dot" onclick="setCanvas('dot')">
+          <div class="canvas-opt-preview canvas-preview-dot"></div>
+          <div class="canvas-opt-label">Dot grid</div>
+        </div>
+        <div class="canvas-opt" id="cv-grid" onclick="setCanvas('grid')">
+          <div class="canvas-opt-preview canvas-preview-grid"></div>
+          <div class="canvas-opt-label">Square grid</div>
+        </div>
+        <div class="canvas-opt" id="cv-lines" onclick="setCanvas('lines')">
+          <div class="canvas-opt-preview canvas-preview-lines"></div>
+          <div class="canvas-opt-label">Lined</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn primary" onclick="closeCanvasPicker()">Apply</button>
+      <button class="tb-btn" onclick="closeCanvasPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED SEARCH -->
+<div class="adv-search" id="advSearch" onclick="if(event.target===this)closeSearch()">
+  <div class="as-box">
+    <div class="as-top">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="var(--t3)" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3.5 3.5"/></svg>
+      <input class="as-inp" id="asInp" type="text" placeholder="Search all notes, blocks, tags…" oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape')closeSearch()"/>
+      <button class="as-x" onclick="closeSearch()">Esc</button>
+    </div>
+    <div class="as-filters">
+      <div class="as-fg"><span class="as-fl">Type:</span><div class="as-chips"><div class="as-chip on" onclick="toggleChip(this)">All</div><div class="as-chip" onclick="toggleChip(this)">Research</div><div class="as-chip" onclick="toggleChip(this)">Journal</div><div class="as-chip" onclick="toggleChip(this)">Idea</div><div class="as-chip" onclick="toggleChip(this)">HTML</div></div></div>
+      <div class="as-fg"><span class="as-fl">Shelf:</span><div class="as-chips"><div class="as-chip on" onclick="toggleChip(this)">All</div><div class="as-chip" onclick="toggleChip(this)">AI &amp; ML</div><div class="as-chip" onclick="toggleChip(this)">Personal</div><div class="as-chip" onclick="toggleChip(this)">Work</div></div></div>
+      <div class="as-fg"><span class="as-fl">Date:</span><div style="display:flex;align-items:center;gap:5px;"><input class="as-date" type="date"/><span style="font-size:11px;color:var(--t4);">–</span><input class="as-date" type="date"/></div></div>
+    </div>
+    <div class="as-results" id="asResults"></div>
+    <div class="as-footer">
+      <div class="as-hint"><kbd>↑↓</kbd> navigate</div>
+      <div class="as-hint"><kbd>↵</kbd> open</div>
+      <div class="as-hint"><kbd>Esc</kbd> close</div>
+      <div class="as-hint" style="margin-left:auto;"><kbd>⌘K</kbd> search anywhere</div>
+    </div>
+  </div>
+</div>
+
+<!-- QC FAB -->
+<button class="qc-fab" id="qcFab" onclick="toggleQC()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+<div class="qc-bubble" id="qcBubble">
+  <div class="qcb-hdr"><span class="qcb-t">Quick Capture</span><div class="qcb-types"><div class="qcb-ty on" onclick="setQCT(this)">Idea</div><div class="qcb-ty" onclick="setQCT(this)">Task</div><div class="qcb-ty" onclick="setQCT(this)">Research</div></div></div>
+  <div class="qcb-body"><input class="qcb-inp" id="qcTitle" placeholder="Title…" onkeydown="if(event.key==='Enter'){document.getElementById('qcBody').focus();}"/><textarea class="qcb-txt" id="qcBody" placeholder="Thought, link, snippet…"></textarea></div>
+  <div class="qcb-ftr"><span class="qcb-dest">→ Inbox</span><button class="qcb-save" onclick="saveQC()">Save ↵</button></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText">Saved!</span></div>
+
+<script>
+/* ══ DATA ══ */
+const NOTES = [
+  { title:'Transformer Architecture Deep Dive', type:'Research', shelf:'AI & ML', nb:'Transformers', icon:'📔', prev:'Attention mechanisms, positional encodings, multi-head attention.' },
+  { title:'BERT vs GPT Analysis', type:'Idea', shelf:'AI & ML', nb:'Transformers', icon:'📔', prev:'Bidirectional vs autoregressive enterprise use cases.' },
+  { title:'Tata Motors Q4 — AI Report', type:'HTML', shelf:'AI & ML', nb:'Equity Research', icon:'📊', prev:'Auto-generated via Equity Monitor cron · M-Score clean · ROIC 1.24×.' },
+  { title:'Hybrid Retrieval Strategies', type:'Research', shelf:'AI & ML', nb:'RAG Patterns', icon:'📗', prev:'BM25 + dense vectors, cross-encoder re-ranking for enterprise search.' },
+  { title:'Monday — Deep Work Session', type:'Journal', shelf:'Personal', nb:'Daily Journal', icon:'📒', prev:'Shipped Lore demo. Energy 4/5.' },
+  { title:'36-Week AI Learning Roadmap', type:'Task', shelf:'Personal', nb:'Learning', icon:'📐', prev:'Three-lane: Sunday deep builds, morning podcasts, post-gym blog.' },
+  { title:'Indian Equity Framework', type:'Reference', shelf:'Work', nb:'Equity Research', icon:'📊', prev:'BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC spread.' },
+  { title:'Context Window Management', type:'Task', shelf:'AI & ML', nb:'RAG Patterns', icon:'📗', prev:'Token budgeting for long-context LLM calls.' },
+];
+const BADGE = { Research:'badge-research', Idea:'badge-idea', Journal:'badge-journal', HTML:'badge-html', Reference:'badge-reference', Task:'badge-task' };
+
+/* ══ VIEW ══ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+
+/* ══ DARK MODE ══ */
+let dark = false;
+function toggleDark() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const ico = document.getElementById('darkIco');
+  if (ico) ico.innerHTML = dark
+    ? '<circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M10 3v1.5M10 15.5V17M3 10h1.5M15.5 10H17M5.05 5.05l1.06 1.06M13.89 13.89l1.06 1.06" stroke="currentColor" stroke-width="1.5"/>'
+    : '<path d="M17.5 12A7.5 7.5 0 118 2.5a5.5 5.5 0 009.5 9.5z" stroke="currentColor" stroke-width="1.6" fill="none"/>';
+}
+
+/* ══ SIDEBAR ══ */
+function toggleShelf(id) { document.getElementById(id)?.classList.toggle('open'); }
+function toggleNb(id) { document.getElementById(id)?.classList.toggle('open'); }
+function loadNoteLeft(el, title, type) {
+  document.querySelectorAll('.note-item').forEach(n => { n.classList.remove('active'); const t = n.querySelector('.ni-pane-tag'); if(t)t.remove(); });
+  el?.classList.add('active');
+  if (title) {
+    document.getElementById('leftBcTitle').textContent = title;
+    document.getElementById('leftPaneTitle').textContent = title;
+    const t = document.getElementById('titleL'); if(t){ t.value = title; t.style.height='auto'; t.style.height=t.scrollHeight+'px'; }
+  }
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+function createNote() {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  const body = document.querySelector('#nb1 .nb-body');
+  const ni = document.createElement('div'); ni.className = 'note-item active';
+  ni.innerHTML = `<div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Now</span></div><div class="ni-title">Untitled</div>`;
+  ni.onclick = () => loadNoteLeft(ni,'Untitled','Research');
+  body.prepend(ni);
+  document.getElementById('leftBcTitle').textContent = 'Untitled';
+  document.getElementById('leftPaneTitle').textContent = 'Untitled';
+  const t = document.getElementById('titleL'); if(t){ t.value=''; t.style.height='auto'; }
+  document.getElementById('blocks-L').innerHTML = '';
+  document.getElementById('bodyL').value = '';
+  document.getElementById('bl-L').innerHTML = '';
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => document.getElementById('titleL')?.focus(), 50);
+}
+function syncTitle(el, bcId, phId) {
+  el.style.height='auto'; el.style.height=el.scrollHeight+'px';
+  const v = el.value || 'Untitled';
+  document.getElementById(bcId).textContent = v;
+  document.getElementById(phId).textContent = v;
+  const a = document.querySelector('.note-item.active .ni-title');
+  if (a) a.textContent = v;
+}
+
+/* ══ SPLIT PANES ══ */
+let splitMode = 1;
+function setSplit(n, btn) {
+  splitMode = n;
+  document.querySelectorAll('.stb').forEach((b,i) => b.classList.toggle('active', i===n-1));
+  const pC = document.getElementById('pane-C');
+  const pR = document.getElementById('pane-R');
+  const r1 = document.getElementById('resizer1');
+  const r2 = document.getElementById('resizer2');
+  pC.style.display  = n>=2 ? '' : 'none';
+  r1.style.display  = n>=2 ? '' : 'none';
+  pR.style.display  = n>=3 ? '' : 'none';
+  r2.style.display  = n>=3 ? '' : 'none';
+  // when activating pane C/R, update their sidebar indicators
+  if (n >= 2) markPaneNote('ni-2','C');
+  if (n >= 3) markPaneNote('ni-6','R');
+}
+function markPaneNote(niId, pane) {
+  const ni = document.getElementById(niId);
+  if (!ni) return;
+  ni.classList.add('in-right');
+  const tag = document.createElement('span');
+  tag.className = 'ni-pane-tag';
+  tag.textContent = pane==='C'?'Ctr':'Rgt';
+  if (!ni.querySelector('.ni-pane-tag')) ni.appendChild(tag);
+}
+
+/* ══ ZEN MODE ══ */
+let zen = false;
+function toggleZen() {
+  zen = !zen;
+  document.getElementById('sidebar').classList.toggle('zen', zen);
+  document.getElementById('splitBar').classList.toggle('zen', zen);
+  document.getElementById('zenBar').classList.toggle('on', zen);
+  document.getElementById('zenBtn').classList.toggle('on', zen);
+  ['L','C','R'].forEach(p => {
+    const body = document.getElementById('pane-'+p+'-body');
+    if (body) body.style.padding = zen ? '80px 15%' : '';
+  });
+  updateZenWC();
+}
+function updateZenWC() {
+  const b = document.getElementById('bodyL')?.value || '';
+  document.getElementById('zenWC').textContent = b.trim().split(/\s+/).filter(Boolean).length + ' words';
+}
+
+/* ══ CANVAS ══ */
+let canvasStyle = 'plain';
+function openCanvasPicker() { document.getElementById('canvasModal').classList.add('open'); }
+function closeCanvasPicker() { document.getElementById('canvasModal').classList.remove('open'); }
+function setCanvas(style) {
+  canvasStyle = style;
+  document.querySelectorAll('.canvas-opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById('cv-'+style)?.classList.add('sel');
+  ['L','C','R'].forEach(p => {
+    const body = document.getElementById('pane-'+p+'-body');
+    if (body) { body.className = 'pane-body canvas-'+style; }
+  });
+  showToast('Canvas: ' + style);
+}
+
+/* ══ [[ LINK PICKER ══ */
+let lpPane = null, lpFocused = {L:-1,C:-1,R:-1}, lpFiltered = {L:[],C:[],R:[]};
+function openLP(pane) {
+  lpPane = pane;
+  ['L','C','R'].forEach(p => document.getElementById('lp-'+p)?.classList.remove('open'));
+  lpFiltered[pane] = [...NOTES];
+  renderLP(pane,'');
+  document.getElementById('lp-'+pane)?.classList.add('open');
+  document.getElementById('lp-'+pane+'-inp').value = '';
+  document.getElementById('lp-'+pane+'-inp').focus();
+}
+function closeLP(pane) { document.getElementById('lp-'+pane)?.classList.remove('open'); lpPane = null; lpFocused[pane]=-1; }
+function filterLP(pane, q) {
+  lpFiltered[pane] = q ? NOTES.filter(n => n.title.toLowerCase().includes(q.toLowerCase())) : [...NOTES];
+  renderLP(pane, q);
+  lpFocused[pane] = -1;
+}
+function renderLP(pane, q) {
+  const list = document.getElementById('lp-'+pane+'-list');
+  if (!list) return;
+  if (!lpFiltered[pane].length) { list.innerHTML = `<div style="padding:14px;text-align:center;font-size:12px;color:var(--t3);">No notes found</div>`; return; }
+  list.innerHTML = lpFiltered[pane].map((n,i) => `
+    <div class="lp-item ${i===lpFocused[pane]?'focused':''}" onclick="insertLink('${pane}','${n.title}','${n.type}')">
+      <span class="lp-item-ico">${n.icon}</span>
+      <div style="flex:1;min-width:0;"><div class="lp-item-name">${q ? n.title.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>') : n.title}</div><div class="lp-item-loc">${n.shelf} › ${n.nb}</div></div>
+      <span class="lp-item-badge ${BADGE[n.type]||''}">${n.type}</span>
+    </div>`).join('');
+}
+function lpKeydown(e, pane) {
+  const items = document.querySelectorAll('#lp-'+pane+'-list .lp-item');
+  if (e.key === 'ArrowDown') { lpFocused[pane]=Math.min(lpFocused[pane]+1,items.length-1); renderLP(pane,document.getElementById('lp-'+pane+'-inp').value); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { lpFocused[pane]=Math.max(lpFocused[pane]-1,0); renderLP(pane,document.getElementById('lp-'+pane+'-inp').value); e.preventDefault(); }
+  else if (e.key === 'Enter') { if(lpFocused[pane]>=0&&lpFiltered[pane][lpFocused[pane]])insertLink(pane,lpFiltered[pane][lpFocused[pane]].title,lpFiltered[pane][lpFocused[pane]].type); e.preventDefault(); }
+  else if (e.key === 'Escape') closeLP(pane);
+}
+function insertLink(pane, title, type) {
+  closeLP(pane);
+  const area = document.getElementById('bl-'+pane);
+  const chip = document.createElement('span');
+  chip.className = 'bl-chip';
+  chip.innerHTML = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1V5M8 1h3v3M11 1L6 6"/></svg>${title}`;
+  chip.title = 'Linked: '+title;
+  chip.onclick = () => { loadNoteLeft(null,title,type); };
+  area.appendChild(chip);
+  showToast(`Linked → "${title}"`);
+}
+
+/* ══ BODY TRIGGERS ══ */
+function handleBody(e, pane) {
+  const v = e.target.value;
+  if (v.endsWith('[[')) { e.target.value=v.slice(0,-2); openLP(pane); }
+  else if (v.endsWith('/')) { e.target.value=v.slice(0,-1); const b=prompt('Block (hyp/con/keydiff/findings/note-b/ai):'); if(b)addBlock(pane,b.trim()); }
+  else if (v.endsWith('@')) { e.target.value=v.slice(0,-1); askClaudePane(pane); }
+  updateZenWC();
+}
+function addTag(pane) {
+  const t = prompt('Tag name:'); if (!t) return;
+  const tags = document.querySelector('#pane-'+pane+'-body .paper-tags');
+  const add = tags?.querySelector('.add');
+  if (!add) return;
+  const s = document.createElement('span'); s.className='paper-tag'; s.textContent=t.trim();
+  tags.insertBefore(s, add);
+}
+
+/* ══ BLOCKS ══ */
+function addBlock(pane, type) {
+  const area = document.getElementById('blocks-'+pane);
+  if (!area) return;
+  const w = document.createElement('div'); w.className='block'; w.draggable=true;
+  const handle = `<div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="9" cy="12" r="1"/></svg></div>`;
+  const del = `<div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>`;
+  let inner='';
+  if(type==='hyp') inner=`<div class="blk-callout hyp"><div class="blk-ico">💡</div><div style="flex:1;"><div class="blk-lbl">Hypothesis</div><textarea class="blk-txt" rows="2" placeholder="State your hypothesis…"></textarea></div></div>`;
+  else if(type==='con') inner=`<div class="blk-callout con"><div class="blk-ico">🎯</div><div style="flex:1;"><div class="blk-lbl">Conclusion</div><textarea class="blk-txt" rows="2" placeholder="State your conclusion…"></textarea></div></div>`;
+  else if(type==='note-b') inner=`<div class="blk-callout note-b"><div class="blk-ico">📝</div><div style="flex:1;"><div class="blk-lbl">Note</div><textarea class="blk-txt" rows="2" placeholder="Insight…"></textarea></div></div>`;
+  else if(type==='keydiff') inner=`<div class="blk-keydiff"><div class="kd-hdr"><div class="kd-ch"><input value="Option A"/></div><div class="kd-ch"><input value="Option B"/></div></div><div class="kd-body"><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div></div><div class="kd-col"><div class="kd-row"><div class="kd-dot"></div><textarea class="kd-inp" rows="1" placeholder="Point 1…"></textarea></div></div></div></div>`;
+  else if(type==='findings') inner=`<div class="blk-findings"><div class="blk-findings-lbl">Key Findings</div><div class="fi-row"><span class="fi-num">1</span><textarea class="fi-inp" rows="1" placeholder="Finding 1…"></textarea></div><div class="fi-row"><span class="fi-num">2</span><textarea class="fi-inp" rows="1" placeholder="Finding 2…"></textarea></div></div>`;
+  else if(type==='ai') inner=`<div class="blk-ai"><div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:#7C3AED;">C</div><span class="blk-ai-name">Ask Claude</span></div><textarea style="width:100%;border:1px solid var(--p200);background:var(--surface);border-radius:6px;padding:7px;font-family:'Lora',serif;font-size:13px;color:var(--t2);outline:none;resize:none;" rows="2" placeholder="Ask Claude…"></textarea><div class="blk-ai-footer"><button class="blk-ai-btn" onclick="showToast('AI call sent!')">Ask</button></div></div>`;
+  if (!inner) return;
+  w.innerHTML = handle + inner + del;
+  initDrag(w, area);
+  area.appendChild(w);
+  const first = w.querySelector('textarea,input'); if(first) first.focus();
+  w.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ══ DRAG REORDER ══ */
+let dragSrc=null, dragArea=null;
+function initDrag(el, area) {
+  el.addEventListener('dragstart', e => { dragSrc=el; dragArea=area; el.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',''); });
+  el.addEventListener('dragend', () => { dragSrc=null; dragArea=null; el.classList.remove('dragging'); clearDO(); });
+  el.addEventListener('dragover', e => { e.preventDefault(); clearDO(); if(el!==dragSrc)el.classList.add('drag-over-b'); });
+  el.addEventListener('drop', e => { e.preventDefault(); clearDO(); if(dragSrc&&el!==dragSrc){ const si=[...area.children].indexOf(dragSrc),ti=[...area.children].indexOf(el); area.insertBefore(dragSrc,si<ti?el.nextSibling:el); showToast('Block reordered!'); } });
+}
+function clearDO(){document.querySelectorAll('.drag-over-b').forEach(b=>b.classList.remove('drag-over-b'));}
+document.querySelectorAll('.block').forEach(b => {
+  const area = b.closest('.blocks');
+  if (area) initDrag(b, area);
+});
+
+/* ══ LIVE CLAUDE API ══ */
+let aiCallCount = 0;
+async function askClaudePane(pane) {
+  const q = prompt('Ask Claude about this note:');
+  if (!q) return;
+  const title = document.getElementById('title'+pane)?.value || 'Untitled';
+  const body = document.getElementById('body'+pane)?.value || '';
+  const respArea = document.getElementById('ai-resp-'+pane);
+  if (!respArea) return;
+  // Show thinking block
+  const w = document.createElement('div'); w.className='block'; w.draggable=true;
+  const handle = `<div class="blk-handle"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1"/><circle cx="9" cy="4" r="1"/><circle cx="5" cy="8" r="1"/><circle cx="9" cy="8" r="1"/></svg></div>`;
+  const del = `<div class="blk-tools"><button class="blk-tool rm" onclick="this.closest('.block').remove()"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg></button></div>`;
+  w.innerHTML = handle + `<div class="blk-ai"><div class="blk-ai-hdr"><div class="blk-ai-logo" style="background:#7C3AED;">C</div><span class="blk-ai-name">Claude Sonnet 4</span><span class="blk-ai-time">Live API</span></div><div style="font-size:11.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;padding:5px 8px;background:var(--surface);border-radius:5px;border:1px solid var(--border2);margin-bottom:7px;">Q: ${q}</div><div class="blk-ai-text" id="ai-txt-${Date.now()}"><span class="cursor"></span></div><div class="blk-ai-footer"><button class="blk-ai-btn" onclick="this.closest('.block').remove()">Remove</button><button class="blk-ai-btn" onclick="showToast('Copied!')">Copy</button></div></div>` + del;
+  respArea.appendChild(w);
+  initDrag(w, respArea);
+  w.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const textEl = w.querySelector('.blk-ai-text');
+  try {
+    const prompt = `You are a helpful assistant in a notes app. The note is titled "${title}". Content: ${body.slice(0,500)}. User question: ${q}. Be concise and helpful.`;
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No response received.';
+    streamText(textEl, text);
+  } catch {
+    streamText(textEl, '(Claude API not reachable from this context. In the deployed Lore app, this would call the live Claude Sonnet 4 API with your note as context.)');
+  }
+  aiCallCount++;
+}
+function streamText(el, text) {
+  let i = 0;
+  const speed = Math.max(12, Math.floor(2800/text.length));
+  const iv = setInterval(() => {
+    if (i >= text.length) { clearInterval(iv); el.textContent = text; return; }
+    el.innerHTML = text.slice(0,i++) + '<span class="cursor"></span>';
+  }, speed);
+}
+
+/* ══ GRAPH NODE ══ */
+const GRAPH_DATA = {
+  transformer:{ title:'Transformer Architecture Deep Dive', badge:'badge-research', conns:[{dot:'#0F766E',name:'RAG Patterns',str:'strong'},{dot:'#1D4ED8',name:'AI Roadmap',str:'strong'},{dot:'#BE185D',name:'BERT vs GPT',str:'medium'},{dot:'var(--p600)',name:'Linear Algebra',str:'medium'},{dot:'#D97706',name:'Monday Journal',str:'weak'}], insight:'Central hub — 5 connections. Strong thematic overlap with RAG and AI Roadmap. Most-linked note in AI & ML shelf.'},
+  rag:{ title:'Hybrid Retrieval Strategies', badge:'badge-research', conns:[{dot:'var(--p600)',name:'Transformer Architecture',str:'strong'},{dot:'#1D4ED8',name:'AI Roadmap',str:'medium'}], insight:'2 connections. Key supporting research for the Transformer hub.' },
+  roadmap:{ title:'36-Week AI Roadmap', badge:'badge-task', conns:[{dot:'var(--p600)',name:'Transformer Architecture',str:'strong'},{dot:'#0F766E',name:'RAG Patterns',str:'medium'}], insight:'3 connections. Planning note bridging multiple shelf areas.' },
+  bert:{ title:'BERT vs GPT Analysis', badge:'badge-idea', conns:[{dot:'var(--p600)',name:'Transformer Architecture',str:'strong'}], insight:'Idea note tightly coupled to the Transformer research hub.' },
+  equity:{ title:'Indian Equity Framework', badge:'badge-reference', conns:[{dot:'#92400E',name:'Tata Q4 HTML',str:'cron output'}], insight:'Reference note with cron output connection. 3 linked notes in Work shelf.' },
+  tata:{ title:'Tata Motors Q4 HTML', badge:'badge-html', conns:[{dot:'#0F766E',name:'Indian Equity Framework',str:'cron source'}], insight:'Auto-generated HTML note via Equity Monitor cron job.' },
+  linalg:{ title:'Linear Algebra Book Outline', badge:'badge-idea', conns:[{dot:'var(--p600)',name:'Transformer Architecture',str:'medium'}], insight:'Personal project with conceptual link to core AI research notes.' },
+  journal:{ title:'Monday — Deep Work Session', badge:'badge-journal', conns:[{dot:'var(--p600)',name:'Transformer Architecture',str:'weak'}], insight:'Daily journal with weak contextual connection to current research.' },
+};
+function selectNode(id) {
+  const d = GRAPH_DATA[id];
+  if (!d) return;
+  document.getElementById('giTitle').textContent = d.title;
+  document.getElementById('giInsight').textContent = d.insight;
+  document.getElementById('giConns').innerHTML = d.conns.map(c =>
+    `<div class="gi-conn"><div class="gi-cdot" style="background:${c.dot};"></div><span class="gi-cname">${c.name}</span><span class="gi-cstr">${c.str}</span></div>`).join('');
+}
+
+/* ══ ADVANCED SEARCH ══ */
+function openSearch() { document.getElementById('advSearch').classList.add('open'); setTimeout(()=>document.getElementById('asInp').focus(),50); showSearchDefault(); }
+function closeSearch() { document.getElementById('advSearch').classList.remove('open'); }
+function showSearchDefault() {
+  const r = document.getElementById('asResults');
+  r.innerHTML = '<div class="as-sec">Recently viewed</div>' + NOTES.slice(0,5).map(n=>asItem(n,'')).join('');
+}
+function doSearch(q) {
+  const r = document.getElementById('asResults');
+  if (!q.trim()) { showSearchDefault(); return; }
+  const m = NOTES.filter(n => n.title.toLowerCase().includes(q.toLowerCase()) || n.prev.toLowerCase().includes(q.toLowerCase()));
+  r.innerHTML = (m.length ? `<div class="as-sec">${m.length} result${m.length>1?'s':''}</div>` : `<div style="padding:24px;text-align:center;font-size:13px;color:var(--t3);">No results for "${q}"</div>`) + m.map(n=>asItem(n,q)).join('');
+}
+function asItem(n,q) {
+  const hl=(s,q)=>q?s.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>'):s;
+  return `<div class="as-item" onclick="loadNoteLeft(null,'${n.title}','${n.type}');closeSearch()">
+    <span class="asi-icon">${n.icon}</span>
+    <div class="asi-body"><div class="asi-title">${hl(n.title,q)}</div><div class="asi-loc">${n.shelf} › ${n.nb}</div><div class="asi-prev">${hl(n.prev,q)}</div></div>
+    <span class="asi-badge ${BADGE[n.type]||''}">${n.type}</span>
+  </div>`;
+}
+function toggleChip(el) { el.classList.toggle('on'); }
+
+/* ══ QUICK CAPTURE ══ */
+let qcOpen=false;
+function toggleQC(){qcOpen=!qcOpen;document.getElementById('qcFab').classList.toggle('open',qcOpen);document.getElementById('qcBubble').classList.toggle('open',qcOpen);if(qcOpen)setTimeout(()=>document.getElementById('qcTitle').focus(),80);}
+function setQCT(el){document.querySelectorAll('.qcb-ty').forEach(t=>t.classList.remove('on'));el.classList.add('on');}
+function saveQC(){const t=document.getElementById('qcTitle').value.trim()||'Untitled capture';document.getElementById('qcTitle').value='';document.getElementById('qcBody').value='';toggleQC();showToast(`"${t}" saved to Inbox!`);}
+
+/* ══ TOAST ══ */
+let toastT;
+function showToast(msg){const el=document.getElementById('toast');document.getElementById('toastText').textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2400);}
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='n'){e.preventDefault();createNote();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openSearch();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='j'){e.preventDefault();toggleQC();}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='D'){e.preventDefault();toggleDark();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='1'){e.preventDefault();switchView('notes',document.querySelectorAll('.nav-btn')[0]);}
+  if((e.metaKey||e.ctrlKey)&&e.key==='2'){e.preventDefault();switchView('runs',document.querySelectorAll('.nav-btn')[2]);}
+  if((e.metaKey||e.ctrlKey)&&e.key==='3'){e.preventDefault();switchView('graph',document.querySelectorAll('.nav-btn')[3]);}
+  if(e.key==='Escape'){closeSearch();['L','C','R'].forEach(p=>closeLP(p));if(qcOpen)toggleQC();}
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#advSearch')&&!e.target.closest('.sb-search'))closeSearch();
+  if(!e.target.closest('#qcBubble')&&!e.target.closest('#qcFab')&&qcOpen)toggleQC();
+  ['L','C','R'].forEach(p=>{if(!e.target.closest('#lp-'+p)&&!e.target.closest('.pane-ins'))closeLP(p);});
+});
+
+/* ══ INIT ══ */
+['L','C','R'].forEach(p=>{const t=document.getElementById('title'+p);if(t){t.style.height='auto';t.style.height=t.scrollHeight+'px';}});
+showSearchDefault();
+// Countdown tick
+setInterval(()=>{
+  const m=document.getElementById('cd1m'); if(!m)return;
+  let v=parseInt(m.textContent)-1; if(v<0){v=59;const h=document.getElementById('cd1h');h.textContent=Math.max(0,parseInt(h.textContent)-1);}
+  m.textContent=v<10?'0'+v:v;
+},60000);
+</script>
+</body>
+</html>

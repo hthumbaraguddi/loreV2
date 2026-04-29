@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lore v3 — Your AI-Powered Knowledge Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --p50:#F5F3FF;--p100:#EDE9FE;--p200:#DDD6FE;--p300:#C4B5FD;
+  --p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;--p700:#6D28D9;--p900:#2E1065;
+  --bg:#F8F7FC;--surface:#FFFFFF;--surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.1);--border2:rgba(109,40,217,0.18);
+  --t1:#1A1529;--t2:#4B4568;--t3:#8C84A8;--t4:#BCB6D4;
+  --amber:#D97706;--amber-bg:#FFFBEB;
+  --teal:#0F766E;--teal-bg:#F0FDFA;
+  --rose:#BE185D;--rose-bg:#FFF1F2;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;
+  --green:#15803D;--green-bg:#F0FDF4;
+  --nav-w:56px;--sb-w:268px;--toolbar-h:48px;
+  --r-sm:5px;--r-md:9px;--r-lg:14px;
+  --shadow:0 1px 3px rgba(109,40,217,0.06),0 4px 16px rgba(109,40,217,0.05);
+  --shadow-lg:0 8px 32px rgba(109,40,217,0.18),0 2px 8px rgba(0,0,0,0.08);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t1);-webkit-font-smoothing:antialiased;font-size:14px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--p200);border-radius:3px;}
+
+/* ══ NAV RAIL ══ */
+.nav-rail{width:var(--nav-w);background:var(--p900);display:flex;flex-direction:column;align-items:center;padding:12px 0 16px;gap:4px;flex-shrink:0;z-index:20;}
+.nav-logo{width:34px;height:34px;background:var(--p600);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:16px;font-weight:600;color:white;margin-bottom:16px;box-shadow:0 0 0 3px rgba(139,92,246,0.3);cursor:pointer;}
+.nav-spacer{flex:1;}
+.nav-btn{width:40px;height:40px;border-radius:10px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.4);transition:all 0.15s;position:relative;}
+.nav-btn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.85);}
+.nav-btn.active{background:var(--p600);color:white;}
+.nav-btn svg{width:18px;height:18px;}
+.nav-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--t1);color:white;font-size:11px;white-space:nowrap;padding:4px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:200;}
+.nav-btn:hover .nav-tip{opacity:1;}
+.nav-divider{width:28px;height:1px;background:rgba(255,255,255,0.08);margin:6px 0;}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--p400),var(--p700));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;cursor:pointer;margin-top:8px;box-shadow:0 0 0 2px rgba(255,255,255,0.1);}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sb-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width 0.2s;}
+.sb-topbar{display:flex;align-items:center;gap:6px;padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-search{flex:1;display:flex;align-items:center;gap:6px;background:var(--p50);border:1px solid var(--border);border-radius:var(--r-md);padding:5px 9px;transition:border-color 0.15s;}
+.sb-search:focus-within{border-color:var(--p400);}
+.sb-search input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t1);width:100%;outline:none;}
+.sb-search input::placeholder{color:var(--t4);}
+.sb-search svg{color:var(--t4);flex-shrink:0;width:12px;height:12px;}
+.sb-vt{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border);border-radius:6px;padding:2px;flex-shrink:0;}
+.sb-vt-btn{width:26px;height:22px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);transition:0.15s;}
+.sb-vt-btn.active{background:white;color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.12);}
+.sb-vt-btn svg{width:13px;height:13px;}
+.sb-new{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;border:none;background:var(--p600);color:white;cursor:pointer;flex-shrink:0;transition:0.15s;}
+.sb-new:hover{background:var(--p700);}
+.sb-new svg{width:14px;height:14px;}
+.sb-tree{flex:1;overflow-y:auto;padding:6px 0 16px;}
+
+/* Search results overlay */
+.sb-search-results{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--surface);z-index:50;display:none;flex-direction:column;}
+.sb-search-results.open{display:flex;}
+.sbsr-header{padding:12px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sbsr-query{font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.sbsr-query strong{color:var(--p700);}
+.sbsr-close{margin-left:auto;width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);}
+.sbsr-close:hover{background:var(--p50);color:var(--t1);}
+.sbsr-list{flex:1;overflow-y:auto;padding:6px 0;}
+.sbsr-item{padding:8px 12px;cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;}
+.sbsr-item:hover{background:var(--p50);}
+.sbsr-item.active{background:var(--p50);border-left-color:var(--p600);}
+.sbsr-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.sbsr-title{font-size:12.5px;font-weight:500;color:var(--t1);}
+.sbsr-title mark{background:var(--p200);color:var(--p700);border-radius:2px;padding:0 2px;}
+.sbsr-loc{font-size:10.5px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.sbsr-preview{font-size:11px;color:var(--t3);line-height:1.4;}
+.sbsr-preview mark{background:var(--p100);color:var(--p700);border-radius:2px;padding:0 1px;}
+
+/* ─ SHELF ─ */
+.shelf{}
+.shelf-hdr{display:flex;align-items:center;padding:5px 8px 5px 6px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;position:relative;user-select:none;}
+.shelf-hdr:hover{background:var(--p50);}
+.shelf-hdr:hover .sh-add{opacity:1;}
+.sh-chevron{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.sh-chevron svg{width:9px;height:9px;color:var(--t4);}
+.shelf.open>.shelf-hdr>.sh-chevron{transform:rotate(90deg);}
+.sh-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin:0 7px 0 1px;}
+.sh-name{font-size:12px;font-weight:600;color:var(--t1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-name input.rename-input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--t1);outline:none;width:100%;border-bottom:1px solid var(--p400);}
+.sh-count{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t4);background:var(--p50);padding:1px 5px;border-radius:3px;margin-right:2px;flex-shrink:0;}
+.sh-add{width:18px;height:18px;border-radius:4px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.sh-add:hover{color:var(--p600);background:var(--p100);}
+.sh-add svg{width:10px;height:10px;}
+.shelf-body{overflow:hidden;max-height:0;transition:max-height 0.25s ease;}
+.shelf.open>.shelf-body{max-height:3000px;}
+
+/* ─ NOTEBOOK ─ */
+.notebook{margin-left:8px;}
+.nb-hdr{display:flex;align-items:center;padding:4px 8px 4px 4px;cursor:pointer;border-radius:6px;margin:1px 4px;transition:background 0.12s;user-select:none;position:relative;}
+.nb-hdr:hover{background:var(--p50);}
+.nb-hdr:hover .nb-add{opacity:1;}
+.nb-hdr.nb-selected{background:var(--p100);border-radius:6px;}
+.nb-chevron{width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.2s;}
+.nb-chevron svg{width:9px;height:9px;color:var(--t4);}
+.notebook.open>.nb-hdr>.nb-chevron{transform:rotate(90deg);}
+.nb-icon{font-size:12px;margin:0 5px 0 1px;flex-shrink:0;line-height:1;}
+.nb-name{font-size:12.5px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nb-name input.rename-input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--t2);outline:none;width:100%;border-bottom:1px solid var(--p400);}
+.nb-count{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t4);flex-shrink:0;margin-right:2px;}
+.nb-add{width:16px;height:16px;border-radius:3px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t4);opacity:0;transition:0.15s;flex-shrink:0;}
+.nb-add:hover{color:var(--p600);}
+.nb-add svg{width:9px;height:9px;}
+.nb-body{overflow:hidden;max-height:0;transition:max-height 0.22s ease;}
+.notebook.open>.nb-body{max-height:600px;}
+
+/* ─ NOTE ITEM (expanded) ─ */
+.note-item{margin:1px 4px 1px 18px;padding:7px 10px 7px 8px;border-radius:var(--r-md);cursor:pointer;transition:background 0.1s;border-left:2px solid transparent;}
+.note-item:hover{background:var(--p50);}
+.note-item.active{background:var(--p50);border-left-color:var(--p600);}
+.ni-top{display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.ni-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.ni-date{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;flex-shrink:0;}
+.ni-title{font-size:12.5px;font-weight:500;color:var(--t1);line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-preview{font-size:11px;color:var(--t3);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+/* compact */
+.ni-line{display:none;align-items:center;gap:7px;}
+.ni-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ni-ctitle{font-size:12.5px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-cdate{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+body.compact .ni-top,.body.compact .ni-title,.body.compact .ni-preview{display:none;}
+body.compact .ni-line{display:flex;}
+body.compact .note-item{padding:4px 10px 4px 8px;margin:0 4px 0 18px;border-radius:5px;}
+
+/* badge colours */
+.badge-research{background:var(--teal-bg);color:var(--teal);}
+.badge-journal{background:var(--amber-bg);color:var(--amber);}
+.badge-task{background:var(--blue-bg);color:var(--blue);}
+.badge-idea{background:var(--rose-bg);color:var(--rose);}
+.badge-reference{background:var(--p100);color:var(--p700);}
+.dot-research{background:var(--teal);}
+.dot-journal{background:var(--amber);}
+.dot-task{background:var(--blue);}
+.dot-idea{background:var(--rose);}
+.dot-reference{background:var(--p500);}
+
+/* ══ CONTEXT MENU ══ */
+.ctx-menu{position:fixed;z-index:1000;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:6px;min-width:170px;display:none;}
+.ctx-menu.open{display:block;}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-md);cursor:pointer;font-size:12.5px;color:var(--t2);transition:background 0.1s;}
+.ctx-item:hover{background:var(--p50);color:var(--t1);}
+.ctx-item.danger:hover{background:#FFF1F2;color:var(--rose);}
+.ctx-item svg{width:13px;height:13px;opacity:0.6;flex-shrink:0;}
+.ctx-divider{border:none;border-top:1px solid var(--border);margin:4px 0;}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+
+/* toolbar */
+.toolbar{height:var(--toolbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 20px;flex-shrink:0;}
+.tb-bc{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--t3);}
+.tb-bc .sep{color:var(--t4);font-size:11px;}
+.tb-bc .cur{color:var(--t2);font-weight:500;}
+.tb-bc .shelf-lnk{color:var(--p600);font-weight:500;cursor:pointer;}
+.tb-bc .nb-lnk{color:var(--t2);cursor:pointer;}
+.tb-bc .nb-lnk:hover,.tb-bc .shelf-lnk:hover{text-decoration:underline;}
+.tb-sp{flex:1;}
+.tb-btn{height:28px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.12s;white-space:nowrap;}
+.tb-btn:hover{background:var(--p50);}
+.tb-btn.primary{background:var(--p600);border-color:var(--p600);color:white;font-weight:500;}
+.tb-btn.primary:hover{background:var(--p700);}
+.ai-pill{height:26px;padding:0 10px;border-radius:20px;border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px;cursor:pointer;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--p500);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.loc-pill{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t3);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-family:'JetBrains Mono',monospace;}
+.loc-pill span{color:var(--p600);}
+
+/* ══ NOTEBOOK GRID VIEW ══ */
+#view-notebook{background:var(--bg);}
+.nb-view-header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px 0;flex-shrink:0;}
+.nbv-shelf-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--p700);background:var(--p100);border-radius:20px;padding:3px 10px;font-family:'JetBrains Mono',monospace;margin-bottom:10px;cursor:pointer;}
+.nbv-shelf-tag:hover{background:var(--p200);}
+.nbv-title{font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.nbv-subtitle{font-size:13px;color:var(--t3);margin-bottom:16px;}
+.nbv-tabs{display:flex;gap:0;border-bottom:none;}
+.nbv-tab{padding:8px 16px;font-size:13px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:0.15s;}
+.nbv-tab:hover{color:var(--t2);}
+.nbv-tab.active{color:var(--p700);border-bottom-color:var(--p600);font-weight:500;}
+.nbv-stats{display:flex;gap:20px;margin-left:auto;align-items:center;padding-bottom:2px;}
+.nbv-stat{text-align:center;}
+.nbv-stat-n{font-size:16px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+.nbv-stat-l{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+
+.nbv-body{flex:1;overflow-y:auto;padding:24px 32px;}
+.nbv-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.nbv-filter{padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.nbv-filter:hover,.nbv-filter.active{background:var(--p600);border-color:var(--p600);color:white;}
+.nbv-sort{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.nbv-sort select{border:1px solid var(--border2);border-radius:var(--r-md);background:white;font-size:12px;color:var(--t2);padding:4px 8px;outline:none;cursor:pointer;}
+.nbv-layout-btns{display:flex;gap:2px;background:var(--p50);border:1px solid var(--border);border-radius:6px;padding:2px;}
+.nbv-layout-btn{width:26px;height:22px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);transition:0.15s;}
+.nbv-layout-btn.active{background:white;color:var(--p600);box-shadow:0 1px 3px rgba(109,40,217,0.12);}
+.nbv-layout-btn svg{width:12px;height:12px;}
+
+/* Note card grid */
+.note-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.note-card-grid.list-view{grid-template-columns:1fr;}
+.nc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);position:relative;}
+.nc:hover{border-color:var(--p300);transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,0.1);}
+.nc.list-view{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-radius:var(--r-md);}
+.nc-top{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.nc.list-view .nc-top{flex-direction:column;align-items:flex-start;margin-bottom:0;min-width:80px;flex-shrink:0;}
+.nc-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+.nc-date{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.nc.list-view .nc-date{margin-left:0;}
+.nc-title{font-family:'Lora',serif;font-size:14px;font-weight:600;color:var(--t1);line-height:1.35;margin-bottom:6px;}
+.nc.list-view .nc-title{font-size:13.5px;margin-bottom:4px;}
+.nc-preview{font-size:12px;color:var(--t3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px;}
+.nc.list-view .nc-preview{-webkit-line-clamp:2;margin-bottom:6px;}
+.nc-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.nc-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--p100);color:var(--p700);font-family:'JetBrains Mono',monospace;}
+.nc-ai-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);margin-left:auto;}
+.nc-ai-count{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.nc-more-btn{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);opacity:0;transition:0.15s;}
+.nc:hover .nc-more-btn{opacity:1;}
+.nc-more-btn:hover{background:var(--p100);color:var(--p700);}
+.nc-more-btn svg{width:12px;height:12px;}
+/* add new card */
+.nc-add{border:1px dashed var(--p300);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;color:var(--p600);}
+.nc-add:hover{background:var(--p50);border-style:solid;transform:translateY(-1px);}
+.nc-add-icon{width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;}
+.nc-add-icon svg{width:16px;height:16px;}
+.nc-add-lbl{font-size:13px;font-weight:500;}
+.nc-add-sub{font-size:11px;color:var(--t3);}
+
+/* ══ NOTE EDITOR VIEW ══ */
+.note-editor-wrap{flex:1;display:flex;overflow:hidden;}
+.ne-main{flex:1;overflow-y:auto;padding:36px 48px 48px;}
+.ne-type-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.ne-type-sel,.ne-status-sel{appearance:none;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);padding:4px 10px;cursor:pointer;outline:none;}
+.ne-status-sel{border-radius:20px;background:var(--p50);color:var(--p700);font-family:'JetBrains Mono',monospace;font-size:11px;}
+.ne-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:28px;font-weight:600;color:var(--t1);line-height:1.3;margin-bottom:14px;letter-spacing:-0.02em;}
+.ne-title::placeholder{color:var(--t4);}
+.ne-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.meta-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--p50);border:1px solid var(--border);font-size:11px;color:var(--p700);font-family:'JetBrains Mono',monospace;cursor:pointer;}
+.meta-chip:hover{background:var(--p100);}
+.ne-divider{border:none;border-top:1px solid var(--border);margin-bottom:20px;}
+.callout{border-left:3px solid;border-radius:0 var(--r-md) var(--r-md) 0;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;}
+.callout.hyp{background:#FFFBF0;border-color:var(--amber);}
+.callout.con{background:#F0FDF9;border-color:var(--teal);}
+.callout.ai{background:var(--p50);border-color:var(--p400);}
+.callout-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.callout-lbl{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.callout.hyp .callout-lbl{color:var(--amber);}
+.callout.con .callout-lbl{color:var(--teal);}
+.callout.ai  .callout-lbl{color:var(--p600);}
+.callout-text{font-size:13.5px;line-height:1.65;color:var(--t2);font-family:'Lora',serif;font-style:italic;}
+.callout-input{border:none;background:transparent;outline:none;font-size:13.5px;line-height:1.65;color:var(--t2);font-family:'Lora',serif;font-style:italic;width:100%;resize:none;}
+.section-lbl{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;margin-top:16px;}
+.prose{font-size:14px;line-height:1.75;color:var(--t2);margin-bottom:14px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.fbox{background:var(--p50);border-radius:var(--r-md);border:1px solid var(--p200);padding:14px;}
+.fbox-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:9px;}
+.frow{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--t2);padding:5px 0;border-bottom:1px solid var(--border);line-height:1.5;}
+.frow:last-child{border-bottom:none;}
+.fnum{width:17px;height:17px;border-radius:50%;background:white;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;margin-top:1px;}
+.rbox{background:#F8F6FF;border-radius:var(--r-md);border:1px solid #DDD6FE;padding:14px;}
+.rlink{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:var(--p700);text-decoration:none;padding:5px 0;border-bottom:1px solid #E9E4FD;line-height:1.4;}
+.rlink:last-child{border-bottom:none;}
+.ne-content{font-size:14.5px;line-height:1.75;color:var(--t2);outline:none;min-height:160px;position:relative;}
+.ne-content p{margin-bottom:10px;}
+.ai-mention{display:inline-flex;align-items:center;gap:4px;background:var(--p100);color:var(--p700);border-radius:4px;padding:1px 6px;font-size:12.5px;font-family:'JetBrains Mono',monospace;font-weight:500;}
+.ai-block{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:14px 16px;margin:12px 0;}
+.ai-block-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.ai-logo{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;}
+.ai-name-lbl{font-size:11px;font-weight:600;color:var(--p700);font-family:'JetBrains Mono',monospace;}
+.ai-block-text{font-size:13.5px;color:var(--t2);line-height:1.65;}
+.ai-block-footer{margin-top:8px;display:flex;gap:6px;}
+.ai-resp-btn{font-size:11px;color:var(--t3);border:1px solid var(--border2);background:white;border-radius:5px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.ai-resp-btn:hover{color:var(--p600);border-color:var(--p300);}
+.ne-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border);}
+.ne-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--p100);color:var(--p700);font-family:'JetBrains Mono',monospace;cursor:pointer;}
+.ne-tag:hover{background:var(--p200);}
+
+/* @mention dropdown */
+.mention-dd{position:absolute;z-index:200;background:white;border:1px solid var(--border2);border-radius:var(--r-md);box-shadow:var(--shadow-lg);width:220px;overflow:hidden;display:none;}
+.mention-dd.open{display:block;}
+.mention-dd-hdr{padding:8px 12px 6px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);}
+.mi{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;transition:background 0.1s;}
+.mi:hover{background:var(--p50);}
+.mi-logo{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+.mi-name{font-size:13px;font-weight:500;color:var(--t1);}
+.mi-desc{font-size:11px;color:var(--t3);}
+.mi-connected{margin-left:auto;font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 5px;border-radius:3px;background:var(--green-bg);color:var(--green);}
+
+/* right context panel */
+.ne-panel{width:236px;border-left:1px solid var(--border);background:var(--surface2);padding:18px 14px;overflow-y:auto;flex-shrink:0;}
+.cp-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.cp-sec{margin-bottom:18px;}
+.cp-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.cp-tag{font-size:10.5px;padding:2px 8px;border-radius:20px;background:var(--p100);color:var(--p700);cursor:pointer;font-family:'JetBrains Mono',monospace;border:1px solid var(--p200);}
+.cp-lnk{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r-md);border:1px solid var(--border);background:white;cursor:pointer;margin-bottom:5px;transition:0.12s;}
+.cp-lnk:hover{border-color:var(--p300);}
+.cp-lnk-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cp-lnk-txt{font-size:11.5px;color:var(--t2);flex:1;}
+.cp-ai{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:var(--p50);border:1px solid var(--p200);margin-bottom:4px;}
+.cp-ai-ico{width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;}
+.cp-ai-name{font-size:11px;color:var(--p700);font-family:'JetBrains Mono',monospace;}
+.cp-ai-cnt{margin-left:auto;font-size:10px;color:var(--t4);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.stat-box{background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:8px;text-align:center;}
+.stat-n{font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+.stat-l{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+
+/* ══ NEW NOTE VIEW ══ */
+.nn-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.nn-topbar{height:var(--toolbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;}
+.nn-topbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+.nn-close{margin-left:auto;width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:0.12s;}
+.nn-close:hover{background:var(--p50);color:var(--t1);}
+.nn-body{flex:1;overflow-y:auto;}
+.nn-step{padding:28px 48px 20px;}
+.nn-step-lbl{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.nn-step-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.nn-types{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.nn-type{border:2px solid var(--border);border-radius:var(--r-lg);padding:16px 10px 12px;cursor:pointer;text-align:center;background:var(--surface);transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;}
+.nn-type:hover{border-color:var(--p300);transform:translateY(-2px);box-shadow:0 4px 16px rgba(109,40,217,0.1);}
+.nn-type.sel{border-color:var(--p600);background:var(--p50);}
+.nn-type.sel::after{content:'✓';position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;background:var(--p600);color:white;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.nn-type-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.nn-type-name{font-size:13px;font-weight:600;color:var(--t1);}
+.nn-type-desc{font-size:11px;color:var(--t3);text-align:center;line-height:1.4;}
+.nn-step2{padding:0 48px 20px;border-top:1px solid var(--border);}
+.nn-title-inp{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--t1);line-height:1.3;padding:24px 0 14px;letter-spacing:-0.02em;border-bottom:2px solid var(--p200);margin-bottom:20px;transition:border-color 0.2s;}
+.nn-title-inp:focus{border-bottom-color:var(--p600);}
+.nn-title-inp::placeholder{color:var(--t4);}
+.nn-loc-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.nn-loc-lbl{font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;width:72px;flex-shrink:0;}
+.nn-arrow{color:var(--t4);font-size:13px;}
+.nn-sel{flex:1;appearance:none;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t1);padding:7px 12px;cursor:pointer;outline:none;}
+.nn-sel:focus{border-color:var(--p400);}
+.nn-tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
+.nn-tpl{border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px;cursor:pointer;background:var(--surface);transition:all 0.12s;display:flex;align-items:center;gap:8px;}
+.nn-tpl:hover{border-color:var(--p300);background:var(--p50);}
+.nn-tpl.sel{border-color:var(--p600);background:var(--p50);}
+.nn-tpl-ico{font-size:15px;flex-shrink:0;}
+.nn-tpl-name{font-size:12px;font-weight:500;color:var(--t1);}
+.nn-tpl-desc{font-size:10.5px;color:var(--t3);margin-top:1px;}
+.nn-cta{padding:18px 48px 28px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.nn-create{display:flex;align-items:center;gap:8px;padding:10px 26px;border-radius:var(--r-md);background:var(--p600);border:none;color:white;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:0.15s;box-shadow:0 4px 14px rgba(124,58,237,0.35);}
+.nn-create:hover{background:var(--p700);}
+.nn-preview{font-size:12px;color:var(--t3);line-height:1.5;}
+.nn-preview strong{color:var(--t2);}
+
+/* ══ BLANK NOTE (after creation) ══ */
+.blank-canvas{flex:1;overflow-y:auto;padding:40px 56px 48px;display:flex;flex-direction:column;}
+.bc-type-bar{display:flex;align-items:center;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.bc-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;font-size:12px;color:var(--t2);background:var(--surface);transition:0.12s;}
+.bc-chip.active{background:var(--p600);border-color:var(--p600);color:white;}
+.bc-title{width:100%;border:none;background:transparent;outline:none;font-family:'Lora',serif;font-size:32px;font-weight:600;color:var(--t1);line-height:1.25;margin-bottom:8px;letter-spacing:-0.02em;}
+.bc-title::placeholder{color:var(--t4);}
+.bc-sub{width:100%;border:none;background:transparent;outline:none;font-size:15px;color:var(--t4);font-family:'Lora',serif;font-style:italic;margin-bottom:20px;}
+.bc-sub::placeholder{color:var(--t4);}
+.bc-divider{border:none;border-top:1px solid var(--border);margin-bottom:20px;}
+/* Inserted blocks container */
+.bc-blocks{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.bc-body{width:100%;border:none;background:transparent;outline:none;font-size:15px;line-height:1.8;color:var(--t2);font-family:'Lora',serif;resize:none;min-height:160px;}
+.bc-body::placeholder{color:var(--t4);}
+.bc-insert-bar{display:flex;align-items:center;gap:5px;padding:10px 0 0;border-top:1px solid var(--border);margin-top:12px;flex-wrap:wrap;}
+.bc-lbl{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-right:3px;}
+.bc-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;border:1px solid var(--border2);background:white;font-size:11.5px;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.12s;}
+.bc-btn:hover{border-color:var(--p300);color:var(--p600);background:var(--p50);}
+.bc-btn.ai-btn{border-color:var(--p300);background:var(--p50);color:var(--p700);font-family:'JetBrains Mono',monospace;}
+/* inserted callout block with delete */
+.ins-block{position:relative;}
+.ins-block .del-block{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t4);opacity:0;transition:0.15s;}
+.ins-block:hover .del-block{opacity:1;}
+.ins-block .del-block:hover{background:var(--rose-bg);color:var(--rose);}
+.ins-block .del-block svg{width:10px;height:10px;}
+/* findings block */
+.findings-insert{background:var(--p50);border:1px solid var(--p200);border-radius:var(--r-md);padding:14px;}
+.fi-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;}
+.fi-row{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);}
+.fi-row:last-child{border-bottom:none;}
+.fi-num{width:17px;height:17px;border-radius:50%;background:white;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);flex-shrink:0;}
+.fi-inp{border:none;background:transparent;outline:none;font-size:13px;color:var(--t2);width:100%;font-family:'DM Sans',sans-serif;}
+.fi-inp::placeholder{color:var(--t4);}
+
+/* ══ SETTINGS ══ */
+.settings-wrap{flex:1;display:flex;overflow:hidden;}
+.settings-nav{width:185px;border-right:1px solid var(--border);background:var(--surface);padding:14px 0;flex-shrink:0;}
+.snav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;font-size:13px;color:var(--t2);border-left:2px solid transparent;transition:0.12s;}
+.snav-item:hover{background:var(--p50);color:var(--t1);}
+.snav-item.active{background:var(--p50);color:var(--p700);border-left-color:var(--p600);font-weight:500;}
+.snav-item svg{width:14px;height:14px;opacity:0.7;}
+.settings-content{flex:1;overflow-y:auto;padding:26px 34px;}
+.s-sec{margin-bottom:30px;}
+.s-sec-title{font-size:16px;font-weight:600;color:var(--t1);margin-bottom:3px;font-family:'Lora',serif;}
+.s-sec-desc{font-size:12.5px;color:var(--t3);margin-bottom:14px;}
+.s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:10px;box-shadow:var(--shadow);}
+.api-row{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.api-row:last-child{margin-bottom:0;}
+.api-logo{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.api-info{flex:1;min-width:0;}
+.api-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.api-status{font-size:10.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.api-input{flex:2;border:1px solid var(--border2);border-radius:var(--r-md);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t2);background:var(--p50);outline:none;}
+.api-input:focus{border-color:var(--p400);background:white;}
+.api-btn{padding:5px 12px;border-radius:var(--r-md);border:1px solid var(--p300);background:var(--p50);color:var(--p700);font-size:11.5px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;}
+.api-btn.on{background:var(--green-bg);border-color:#86EFAC;color:var(--green);}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-name{font-size:12.5px;font-weight:500;color:var(--t1);}
+.toggle-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.sw{width:34px;height:19px;background:var(--t4);border-radius:20px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.sw.on{background:var(--p600);}
+.sw::after{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.sw.on::after{left:17px;}
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.model-card{border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px;cursor:pointer;transition:0.15s;display:flex;gap:8px;}
+.model-card:hover{border-color:var(--p300);background:var(--p50);}
+.model-card.sel{border-color:var(--p500);background:var(--p50);}
+.model-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;margin-top:3px;}
+.model-card.sel .model-dot{background:var(--p600);border-color:var(--p600);}
+.model-name{font-size:12px;font-weight:500;color:var(--t1);}
+.model-desc{font-size:10.5px;color:var(--t3);margin-top:1px;}
+
+/* ══ PROMPT LIBRARY ══ */
+.pl-wrap{flex:1;overflow-y:auto;padding:22px 28px;}
+.pl-filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.pl-f{padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:white;font-size:12px;color:var(--t2);cursor:pointer;transition:0.12s;}
+.pl-f:hover,.pl-f.active{background:var(--p600);border-color:var(--p600);color:white;}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px;}
+.pc{background:white;border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:0.15s;box-shadow:var(--shadow);}
+.pc:hover{border-color:var(--p300);transform:translateY(-1px);}
+.pc-top{display:flex;gap:10px;margin-bottom:8px;}
+.pc-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pc-name{font-size:13px;font-weight:600;color:var(--t1);}
+.pc-cat{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.pc-desc{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:9px;}
+.pc-preview{background:var(--p50);border:1px solid var(--p200);border-radius:5px;padding:7px 9px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--p700);line-height:1.5;margin-bottom:9px;}
+.pc-footer{display:flex;align-items:center;gap:8px;}
+.pc-uses{font-size:11px;color:var(--t3);}
+.pc-badges{display:flex;gap:4px;margin-left:auto;}
+.pc-badge{width:17px;height:17px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;}
+.pc-use{padding:3px 10px;border-radius:5px;background:var(--p600);border:none;color:white;font-size:11px;font-weight:500;cursor:pointer;}
+
+/* ══ KNOWLEDGE GRAPH ══ */
+.gv{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.graph-wrap{flex:1;display:flex;overflow:hidden;}
+.graph-canvas{flex:1;position:relative;background:var(--bg);overflow:hidden;}
+#kg{width:100%;height:100%;}
+.graph-legend{position:absolute;bottom:20px;left:20px;background:white;border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;box-shadow:var(--shadow);}
+.gl-title{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.gl-item{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t2);margin-bottom:4px;}
+.gl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.graph-info{width:248px;border-left:1px solid var(--border);background:var(--surface);padding:18px;overflow-y:auto;flex-shrink:0;}
+.gi-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;margin-bottom:4px;}
+.gi-stats{display:flex;gap:12px;margin-bottom:14px;}
+.gi-stat-n{font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;}
+.gi-stat-l{font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.gi-conn{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.gi-conn:last-child{border-bottom:none;}
+.gi-cdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.gi-cname{font-size:12px;color:var(--t2);flex:1;}
+.gi-cstr{font-size:10px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.vhbar{height:var(--toolbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;flex-shrink:0;}
+.vhbar-title{font-size:15px;font-weight:600;color:var(--t1);font-family:'Lora',serif;}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV RAIL ══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-topbar">
+    <div class="sb-search" id="searchBox">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <input type="text" placeholder="Search notes…" id="searchInput" oninput="handleSearch(this.value)" />
+    </div>
+    <div class="sb-vt">
+      <button class="sb-vt-btn" id="btnC" onclick="setMode('compact')" title="Compact">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+      </button>
+      <button class="sb-vt-btn active" id="btnE" onclick="setMode('expanded')" title="Expanded">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="4" rx="1"/><rect x="2" y="9" width="12" height="4" rx="1"/></svg>
+      </button>
+    </div>
+    <button class="sb-new" onclick="switchView('newnote',null)" title="New Note">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+    </button>
+  </div>
+
+  <!-- Search results overlay -->
+  <div class="sb-search-results" id="searchResults" style="position:absolute;top:48px;left:0;right:0;bottom:0;">
+    <div class="sbsr-header">
+      <span class="sbsr-query">Results for <strong id="searchQuery">""</strong></span>
+      <button class="sbsr-close" onclick="clearSearch()">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+      </button>
+    </div>
+    <div class="sbsr-list" id="searchResultsList"></div>
+  </div>
+
+  <!-- Tree -->
+  <div class="sb-tree" id="sbTree">
+
+    <!-- ── SHELF: AI & Machine Learning ── -->
+    <div class="shelf open" id="shelf1">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf1')" oncontextmenu="showCtx(event,'shelf','AI &amp; Machine Learning','shelf1')">
+        <div class="sh-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#7C3AED;"></div>
+        <span class="sh-name" id="sh-name-shelf1">AI &amp; Machine Learning</span>
+        <span class="sh-count">8</span>
+        <button class="sh-add" onclick="event.stopPropagation();switchView('newnote',null)">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg>
+        </button>
+      </div>
+      <div class="shelf-body">
+
+        <!-- Notebook: Transformers -->
+        <div class="notebook open" id="nb1">
+          <div class="nb-hdr" oncontextmenu="showCtx(event,'notebook','Transformers','nb1')">
+            <div class="nb-chevron" onclick="toggleNb('nb1')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📔</span>
+            <span class="nb-name" id="nb-name-nb1" onclick="openNotebook('nb1','Transformers','AI &amp; Machine Learning','#7C3AED')">Transformers</span>
+            <span class="nb-count">3</span>
+            <button class="nb-add" onclick="switchView('newnote',null)"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item active" onclick="openNote(this,'Transformer Architecture Deep Dive','Research','AI &amp; Machine Learning','Transformers')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Transformer Architecture Deep Dive</div>
+              <div class="ni-preview">Attention mechanisms, positional encodings, multi-head attention tradeoffs.</div>
+              <div class="ni-line"><div class="ni-dot dot-research"></div><span class="ni-ctitle">Transformer Architecture Deep Dive</span><span class="ni-cdate">Mar 16</span></div>
+            </div>
+            <div class="note-item" onclick="openNote(this,'Attention Mechanisms Survey','Research','AI &amp; Machine Learning','Transformers')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title">Attention Mechanisms Survey</div>
+              <div class="ni-preview">Scaled dot-product, sparse, local, and flash attention variants compared.</div>
+              <div class="ni-line"><div class="ni-dot dot-research"></div><span class="ni-ctitle">Attention Mechanisms Survey</span><span class="ni-cdate">Mar 18</span></div>
+            </div>
+            <div class="note-item" onclick="openNote(this,'BERT vs GPT Analysis','Idea','AI &amp; Machine Learning','Transformers')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 22</span></div>
+              <div class="ni-title">BERT vs GPT Analysis</div>
+              <div class="ni-preview">Bidirectional vs autoregressive — enterprise use case comparison.</div>
+              <div class="ni-line"><div class="ni-dot dot-idea"></div><span class="ni-ctitle">BERT vs GPT Analysis</span><span class="ni-cdate">Mar 22</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notebook: RAG Patterns -->
+        <div class="notebook" id="nb2">
+          <div class="nb-hdr" oncontextmenu="showCtx(event,'notebook','RAG Patterns','nb2')">
+            <div class="nb-chevron" onclick="toggleNb('nb2')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📗</span>
+            <span class="nb-name" onclick="openNotebook('nb2','RAG Patterns','AI &amp; Machine Learning','#0F766E')">RAG Patterns</span>
+            <span class="nb-count">2</span>
+            <button class="nb-add" onclick="switchView('newnote',null)"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Hybrid Retrieval Strategies','Research','AI &amp; Machine Learning','RAG Patterns')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title">Hybrid Retrieval Strategies</div>
+              <div class="ni-preview">BM25 + dense vectors, cross-encoder re-ranking.</div>
+              <div class="ni-line"><div class="ni-dot dot-research"></div><span class="ni-ctitle">Hybrid Retrieval Strategies</span><span class="ni-cdate">Mar 20</span></div>
+            </div>
+            <div class="note-item" onclick="openNote(this,'Context Window Management','Task','AI &amp; Machine Learning','RAG Patterns')">
+              <div class="ni-top"><span class="ni-badge badge-task">Task</span><span class="ni-date">Mar 25</span></div>
+              <div class="ni-title">Context Window Management</div>
+              <div class="ni-preview">Token budgeting strategies for long-context LLM calls.</div>
+              <div class="ni-line"><div class="ni-dot dot-task"></div><span class="ni-ctitle">Context Window Management</span><span class="ni-cdate">Mar 25</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHELF: Personal ── -->
+    <div class="shelf open" id="shelf2">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf2')" oncontextmenu="showCtx(event,'shelf','Personal','shelf2')">
+        <div class="sh-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#D97706;"></div>
+        <span class="sh-name" id="sh-name-shelf2">Personal</span>
+        <span class="sh-count">5</span>
+        <button class="sh-add" onclick="event.stopPropagation();">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg>
+        </button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb3">
+          <div class="nb-hdr" oncontextmenu="showCtx(event,'notebook','Daily Journal','nb3')">
+            <div class="nb-chevron" onclick="toggleNb('nb3')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📒</span>
+            <span class="nb-name" onclick="openNotebook('nb3','Daily Journal','Personal','#D97706')">Daily Journal</span>
+            <span class="nb-count">12</span>
+            <button class="nb-add" onclick="switchView('newnote',null)"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Monday — Deep Work Session','Journal','Personal','Daily Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title">Monday — Deep Work Session</div>
+              <div class="ni-preview">Shipped Lore demo. Azure deployed. Energy 4/5.</div>
+              <div class="ni-line"><div class="ni-dot dot-journal"></div><span class="ni-ctitle">Monday — Deep Work Session</span><span class="ni-cdate">Mar 16</span></div>
+            </div>
+            <div class="note-item" onclick="openNote(this,'Weekly Review · Week 12','Journal','Personal','Daily Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 22</span></div>
+              <div class="ni-title">Weekly Review · Week 12</div>
+              <div class="ni-preview">Roadmap milestones hit, gym 6/6, two blog posts drafted.</div>
+              <div class="ni-line"><div class="ni-dot dot-journal"></div><span class="ni-ctitle">Weekly Review · Week 12</span><span class="ni-cdate">Mar 22</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="notebook" id="nb4">
+          <div class="nb-hdr" oncontextmenu="showCtx(event,'notebook','Linear Algebra Book','nb4')">
+            <div class="nb-chevron" onclick="toggleNb('nb4')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📐</span>
+            <span class="nb-name" onclick="openNotebook('nb4','Linear Algebra Book','Personal','#BE185D')">Linear Algebra Book</span>
+            <span class="nb-count">3</span>
+            <button class="nb-add" onclick="switchView('newnote',null)"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Chapter Structure & Outline','Idea','Personal','Linear Algebra Book')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Apr 5</span></div>
+              <div class="ni-title">Chapter Structure &amp; Outline</div>
+              <div class="ni-preview">Story → Math → Python → Manim. 3B1B-style.</div>
+              <div class="ni-line"><div class="ni-dot dot-idea"></div><span class="ni-ctitle">Chapter Structure &amp; Outline</span><span class="ni-cdate">Apr 5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHELF: Work & Finance ── -->
+    <div class="shelf" id="shelf3">
+      <div class="shelf-hdr" onclick="toggleShelf('shelf3')" oncontextmenu="showCtx(event,'shelf','Work &amp; Finance','shelf3')">
+        <div class="sh-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="sh-dot" style="background:#0F766E;"></div>
+        <span class="sh-name">Work &amp; Finance</span>
+        <span class="sh-count">4</span>
+        <button class="sh-add" onclick="event.stopPropagation();"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb5">
+          <div class="nb-hdr">
+            <div class="nb-chevron" onclick="toggleNb('nb5')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📊</span>
+            <span class="nb-name" onclick="openNotebook('nb5','Equity Research','Work &amp; Finance','#BE185D')">Equity Research</span>
+            <span class="nb-count">4</span>
+            <button class="nb-add"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg></button>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="openNote(this,'Indian Equity Framework','Reference','Work &amp; Finance','Equity Research')">
+              <div class="ni-top"><span class="ni-badge badge-reference">Reference</span><span class="ni-date">Feb 10</span></div>
+              <div class="ni-title">Indian Equity Framework</div>
+              <div class="ni-preview">BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.</div>
+              <div class="ni-line"><div class="ni-dot dot-reference"></div><span class="ni-ctitle">Indian Equity Framework</span><span class="ni-cdate">Feb 10</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.sb-tree -->
+</div><!-- /.sidebar -->
+
+<!-- ══ CONTEXT MENU ══ -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item" id="ctx-open"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 10h4"/></svg><span id="ctx-open-lbl">Open</span></div>
+  <div class="ctx-item" id="ctx-rename" onclick="startRename()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>Rename</div>
+  <div class="ctx-item" id="ctx-new-nb" style="display:none;" onclick="closeCtx();switchView('newnote',null)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>New Notebook</div>
+  <div class="ctx-item" id="ctx-new-note" onclick="closeCtx();switchView('newnote',null)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M8 5v6M5 8h6"/></svg>New Note</div>
+  <hr class="ctx-divider"/>
+  <div class="ctx-item" id="ctx-color"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 3v2M8 11v2M3 8h2M11 8h2"/></svg>Change colour</div>
+  <hr class="ctx-divider"/>
+  <div class="ctx-item danger" id="ctx-delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4v9a1 1 0 001 1h4a1 1 0 001-1V4"/></svg>Delete</div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ── VIEW: NOTE EDITOR ── -->
+  <div class="view active" id="view-notes">
+    <div class="toolbar">
+      <div class="tb-bc">
+        <span class="shelf-lnk" id="bc-shelf">AI &amp; Machine Learning</span>
+        <span class="sep">›</span>
+        <span class="nb-lnk" id="bc-nb" onclick="openNotebook('nb1','Transformers','AI &amp; Machine Learning','#7C3AED')">Transformers</span>
+        <span class="sep">›</span>
+        <span class="cur" id="bc-note">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="loc-pill"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 5h4M6 8h4"/></svg><span id="loc-nb">Transformers</span> notebook</div>
+      <div class="ai-pill"><div class="ai-dot"></div>Ask AI</div>
+      <button class="tb-btn">Structured</button>
+      <button class="tb-btn primary">Edit</button>
+    </div>
+    <div class="note-editor-wrap">
+      <div class="ne-main">
+        <div class="ne-type-row">
+          <select class="ne-type-sel"><option>Research</option><option>Journal</option><option>Task</option><option>Idea</option><option>Reference</option></select>
+          <select class="ne-status-sel"><option>In Progress</option><option>Done</option><option>Draft</option></select>
+        </div>
+        <input class="ne-title" type="text" value="Transformer Architecture Deep Dive"/>
+        <div class="ne-meta">
+          <div class="meta-chip"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3V2M11 3V2"/></svg>Machine Learning</div>
+          <div class="meta-chip"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>Mar 16, 2026</div>
+          <div class="meta-chip" style="background:var(--green-bg);border-color:#86EFAC;color:var(--green);">+ Add field</div>
+        </div>
+        <hr class="ne-divider"/>
+        <div class="callout hyp"><div class="callout-icon">💡</div><div><div class="callout-lbl">Hypothesis</div><div class="callout-text">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</div></div></div>
+        <div class="section-lbl">Methodology</div>
+        <p class="prose">Literature review of "Attention Is All You Need" (Vaswani et al., 2017) and follow-up papers. Implemented a mini transformer on a toy dataset to validate the core claims.</p>
+        <div class="two-col">
+          <div class="fbox"><div class="fbox-lbl">Key Findings</div><div class="frow"><span class="fnum">1</span><span>Self-attention scales quadratically with sequence length — a key bottleneck.</span></div><div class="frow"><span class="fnum">2</span><span>Positional encodings are critical; learned vs sinusoidal perform similarly.</span></div><div class="frow"><span class="fnum">3</span><span>Multi-head attention allows attending to different representation subspaces.</span></div></div>
+          <div class="rbox"><div class="fbox-lbl" style="color:var(--p600);">References</div><a class="rlink" href="#"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>Attention Is All You Need — Vaswani et al.</a><a class="rlink" href="#"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>The Illustrated Transformer — Jay Alammar</a></div>
+        </div>
+        <p class="prose"><span class="ai-mention"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:var(--p600);color:white;font-size:8px;font-weight:700;margin-right:3px;">C</span>@claude</span> What are the main differences between encoder-only and decoder-only transformers?</p>
+        <div class="ai-block"><div class="ai-block-hdr"><div class="ai-logo" style="background:var(--p600);">C</div><span class="ai-name-lbl">Claude · Sonnet 4</span><span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">just now</span></div><div class="ai-block-text">Encoder-only models (BERT) use bidirectional attention — ideal for classification and embeddings. Decoder-only (GPT family) use causal attention, optimized for generation. Encoder-decoder (T5, BART) combines both via cross-attention.</div><div class="ai-block-footer"><button class="ai-resp-btn">📋 Copy</button><button class="ai-resp-btn">📝 Save as note</button><button class="ai-resp-btn">🔗 Link to graph</button></div></div>
+        <div class="callout con" style="margin-top:14px;"><div class="callout-icon">🎯</div><div><div class="callout-lbl">Conclusion</div><div class="callout-text">Transformers are now dominant for NLP and increasingly vision tasks. Worth mastering internals before fine-tuning.</div></div></div>
+        <div class="section-lbl">Your notes</div>
+        <div id="editorArea" class="ne-content" contenteditable="true"><p style="color:var(--t4)">Continue here… type @ to mention an AI model</p></div>
+        <div class="mention-dd" id="mentionDD">
+          <div class="mention-dd-hdr">Ask AI — choose a model</div>
+          <div class="mi" onclick="insertMention('Claude')"><div class="mi-logo" style="background:var(--p600);">C</div><div><div class="mi-name">Claude</div><div class="mi-desc">Sonnet 4</div></div><span class="mi-connected">Connected</span></div>
+          <div class="mi" onclick="insertMention('ChatGPT')"><div class="mi-logo" style="background:#10A37F;">G</div><div><div class="mi-name">ChatGPT</div><div class="mi-desc">GPT-4o</div></div><span class="mi-connected">Connected</span></div>
+          <div class="mi" onclick="insertMention('Gemini')"><div class="mi-logo" style="background:#4285F4;">G</div><div><div class="mi-name">Gemini</div><div class="mi-desc">1.5 Pro</div></div></div>
+          <div class="mi" onclick="insertMention('Groq')"><div class="mi-logo" style="background:#F55036;">Q</div><div><div class="mi-name">Groq</div><div class="mi-desc">Llama 3 70B</div></div></div>
+        </div>
+        <div class="ne-tags"><span class="ne-tag">transformers</span><span class="ne-tag">attention</span><span class="ne-tag">NLP</span><span class="ne-tag">deep-learning</span><span class="ne-tag" style="background:white;border:1px dashed var(--p300);color:var(--p600);">+ tag</span></div>
+      </div>
+      <div class="ne-panel">
+        <div class="cp-sec"><div class="cp-lbl">Location</div><div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2);"><div style="width:8px;height:8px;border-radius:50%;background:var(--p600);flex-shrink:0;"></div>AI &amp; ML <span style="color:var(--t4);font-size:10px;">shelf</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2);padding-left:14px;"><span style="font-size:11px;">📔</span> Transformers <span style="color:var(--t4);font-size:10px;">notebook</span></div></div></div>
+        <div class="cp-sec"><div class="cp-lbl">Tags</div><div class="cp-tags"><span class="cp-tag">transformers</span><span class="cp-tag">attention</span><span class="cp-tag">NLP</span></div></div>
+        <div class="cp-sec"><div class="cp-lbl">AI Used</div><div class="cp-ai"><div class="cp-ai-ico" style="background:var(--p600);">C</div><span class="cp-ai-name">Claude</span><span class="cp-ai-cnt">3 calls</span></div></div>
+        <div class="cp-sec"><div class="cp-lbl">Linked Notes</div><div class="cp-lnk"><div class="cp-lnk-dot" style="background:var(--teal);"></div><div class="cp-lnk-txt">Hybrid Retrieval Strategies</div></div><div class="cp-lnk"><div class="cp-lnk-dot" style="background:var(--blue);"></div><div class="cp-lnk-txt">36-Week Learning Plan</div></div></div>
+        <div class="cp-sec"><div class="cp-lbl">Stats</div><div class="stat-grid"><div class="stat-box"><div class="stat-n">847</div><div class="stat-l">words</div></div><div class="stat-box"><div class="stat-n">4</div><div class="stat-l">AI calls</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: NOTEBOOK GRID ── -->
+  <div class="view" id="view-notebook">
+    <div class="nb-view-header">
+      <div class="nbv-shelf-tag" id="nbv-shelf-tag" onclick="switchView('notes',null)">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+        <span id="nbv-shelf-name">AI &amp; Machine Learning</span>
+      </div>
+      <div class="nbv-title">
+        <span id="nbv-nb-icon">📔</span>
+        <span id="nbv-nb-name">Transformers</span>
+        <div style="flex:1;"></div>
+        <button class="tb-btn primary" onclick="switchView('newnote',null)">+ New Note</button>
+      </div>
+      <div class="nbv-subtitle" id="nbv-subtitle">3 notes · Last updated Mar 22, 2026</div>
+      <div style="display:flex;align-items:flex-end;gap:0;">
+        <div class="nbv-tabs">
+          <div class="nbv-tab active">All Notes</div>
+          <div class="nbv-tab">Research</div>
+          <div class="nbv-tab">In Progress</div>
+          <div class="nbv-tab">Tagged</div>
+        </div>
+        <div class="nbv-stats">
+          <div class="nbv-stat"><div class="nbv-stat-n" id="nbv-n-notes">3</div><div class="nbv-stat-l">notes</div></div>
+          <div class="nbv-stat"><div class="nbv-stat-n">8</div><div class="nbv-stat-l">AI calls</div></div>
+          <div class="nbv-stat"><div class="nbv-stat-n">5</div><div class="nbv-stat-l">links</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="nbv-body">
+      <div class="nbv-toolbar">
+        <div class="nbv-filter active">All</div>
+        <div class="nbv-filter">Research</div>
+        <div class="nbv-filter">Idea</div>
+        <div class="nbv-filter">Draft</div>
+        <div class="nbv-sort">
+          <select><option>Sort: Recent</option><option>Sort: Title</option><option>Sort: Type</option></select>
+        </div>
+        <div class="nbv-layout-btns">
+          <button class="nbv-layout-btn active" id="lBtn-grid" onclick="setNbLayout('grid')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg></button>
+          <button class="nbv-layout-btn" id="lBtn-list" onclick="setNbLayout('list')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h12M1 7h12M1 11h12"/></svg></button>
+        </div>
+      </div>
+
+      <div class="note-card-grid" id="noteCardGrid">
+        <!-- Card 1 -->
+        <div class="nc" onclick="openNote(null,'Transformer Architecture Deep Dive','Research','AI &amp; Machine Learning','Transformers')">
+          <button class="nc-more-btn" onclick="event.stopPropagation();showCtx(event,'note','Transformer Architecture Deep Dive','')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <div class="nc-top"><span class="nc-badge badge-research">Research</span><span class="nc-date">Mar 16</span></div>
+          <div class="nc-title">Transformer Architecture Deep Dive</div>
+          <div class="nc-preview">Attention mechanisms, positional encodings, multi-head attention tradeoffs and their implications for enterprise NLP deployment.</div>
+          <div class="nc-footer"><span class="nc-tag">attention</span><span class="nc-tag">NLP</span><div class="nc-ai-dot"></div><span class="nc-ai-count">4 AI calls</span></div>
+        </div>
+        <!-- Card 2 -->
+        <div class="nc" onclick="openNote(null,'Attention Mechanisms Survey','Research','AI &amp; Machine Learning','Transformers')">
+          <button class="nc-more-btn" onclick="event.stopPropagation();">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <div class="nc-top"><span class="nc-badge badge-research">Research</span><span class="nc-date">Mar 18</span></div>
+          <div class="nc-title">Attention Mechanisms Survey</div>
+          <div class="nc-preview">Scaled dot-product, sparse, local, and flash attention variants compared across compute and memory budgets.</div>
+          <div class="nc-footer"><span class="nc-tag">attention</span><span class="nc-tag">flash</span><div class="nc-ai-dot"></div><span class="nc-ai-count">2 AI calls</span></div>
+        </div>
+        <!-- Card 3 -->
+        <div class="nc" onclick="openNote(null,'BERT vs GPT Analysis','Idea','AI &amp; Machine Learning','Transformers')">
+          <button class="nc-more-btn" onclick="event.stopPropagation();">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="13" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <div class="nc-top"><span class="nc-badge badge-idea">Idea</span><span class="nc-date">Mar 22</span></div>
+          <div class="nc-title">BERT vs GPT Analysis</div>
+          <div class="nc-preview">Bidirectional vs autoregressive — when to use which for enterprise tasks like classification vs generation.</div>
+          <div class="nc-footer"><span class="nc-tag">BERT</span><span class="nc-tag">GPT</span><div class="nc-ai-dot"></div><span class="nc-ai-count">1 AI call</span></div>
+        </div>
+        <!-- Add new -->
+        <div class="nc nc-add" onclick="switchView('newnote',null)">
+          <div class="nc-add-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg></div>
+          <div class="nc-add-lbl">New Note</div>
+          <div class="nc-add-sub">Add to this notebook</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: NEW NOTE ── -->
+  <div class="view" id="view-newnote">
+    <div class="nn-wrap">
+      <div class="nn-topbar">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="var(--p600)" stroke-width="1.8"><path d="M10 3v14M3 10h14"/></svg>
+        <span class="nn-topbar-title">New Note</span>
+        <div style="flex:1;"></div>
+        <button class="nn-close" onclick="switchView('notes',document.querySelectorAll('.nav-btn')[0])">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+        </button>
+      </div>
+      <div class="nn-body">
+        <div class="nn-step">
+          <div class="nn-step-lbl">1 — Choose note type</div>
+          <div class="nn-types">
+            <div class="nn-type sel" onclick="selType(this)"><div class="nn-type-ico" style="background:var(--teal-bg);">🔬</div><div class="nn-type-name">Research</div><div class="nn-type-desc">Hypotheses, findings, references</div></div>
+            <div class="nn-type" onclick="selType(this)"><div class="nn-type-ico" style="background:var(--amber-bg);">📔</div><div class="nn-type-name">Journal</div><div class="nn-type-desc">Daily reflections</div></div>
+            <div class="nn-type" onclick="selType(this)"><div class="nn-type-ico" style="background:var(--blue-bg);">✅</div><div class="nn-type-name">Task</div><div class="nn-type-desc">Action items</div></div>
+            <div class="nn-type" onclick="selType(this)"><div class="nn-type-ico" style="background:var(--rose-bg);">💡</div><div class="nn-type-name">Idea</div><div class="nn-type-desc">Creative sparks</div></div>
+            <div class="nn-type" onclick="selType(this)"><div class="nn-type-ico" style="background:var(--p100);">📎</div><div class="nn-type-name">Reference</div><div class="nn-type-desc">Links &amp; resources</div></div>
+          </div>
+        </div>
+        <div class="nn-step2">
+          <input class="nn-title-inp" type="text" placeholder="Give your note a title…" id="nnTitle"/>
+          <div class="nn-loc-row"><span class="nn-loc-lbl">Shelf</span><span class="nn-arrow">›</span><select class="nn-sel"><option>AI &amp; Machine Learning</option><option>Personal</option><option>Work &amp; Finance</option><option>+ New Shelf</option></select></div>
+          <div class="nn-loc-row"><span class="nn-loc-lbl">Notebook</span><span class="nn-arrow">›</span><select class="nn-sel"><option>Transformers</option><option>RAG Patterns</option><option>Daily Journal</option><option>+ New Notebook</option></select></div>
+          <div class="nn-step-lbl" style="margin-top:22px;">3 — Start from a template <span style="font-size:10px;color:var(--t4);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></div>
+          <div class="nn-tpls">
+            <div class="nn-tpl sel" onclick="selTpl(this)"><span class="nn-tpl-ico">📄</span><div><div class="nn-tpl-name">Blank</div><div class="nn-tpl-desc">Start fresh</div></div></div>
+            <div class="nn-tpl" onclick="selTpl(this)"><span class="nn-tpl-ico">🔬</span><div><div class="nn-tpl-name">Research Notes</div><div class="nn-tpl-desc">Hypothesis → Findings</div></div></div>
+            <div class="nn-tpl" onclick="selTpl(this)"><span class="nn-tpl-ico">🗓️</span><div><div class="nn-tpl-name">Daily Journal</div><div class="nn-tpl-desc">Intention, wins, blockers</div></div></div>
+            <div class="nn-tpl" onclick="selTpl(this)"><span class="nn-tpl-ico">✅</span><div><div class="nn-tpl-name">Sprint Plan</div><div class="nn-tpl-desc">Goals, tasks, milestones</div></div></div>
+            <div class="nn-tpl" onclick="selTpl(this)"><span class="nn-tpl-ico">📊</span><div><div class="nn-tpl-name">Literature Review</div><div class="nn-tpl-desc">Summary, critique, gaps</div></div></div>
+            <div class="nn-tpl" onclick="selTpl(this)"><span class="nn-tpl-ico">💬</span><div><div class="nn-tpl-name">AI Conversation</div><div class="nn-tpl-desc">Pre-loaded @claude</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="nn-cta">
+        <button class="nn-create" onclick="createNote()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>Start Writing</button>
+        <div class="nn-preview">Creating a <strong>Research</strong> note in <strong>Transformers</strong> notebook<br/>inside the <strong>AI &amp; Machine Learning</strong> shelf.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: BLANK NOTE (post-creation) ── -->
+  <div class="view" id="view-blanknote">
+    <div class="toolbar">
+      <div class="tb-bc">
+        <span class="shelf-lnk">AI &amp; Machine Learning</span><span class="sep">›</span>
+        <span class="nb-lnk">Transformers</span><span class="sep">›</span>
+        <span class="cur" id="bn-bc">Untitled</span>
+      </div>
+      <div class="tb-sp"></div>
+      <div class="loc-pill"><span style="color:var(--t3);">📔</span>&nbsp;<span>Transformers</span></div>
+      <button class="tb-btn" style="border-color:rgba(30,20,10,0.08);color:var(--t4);">Draft</button>
+      <button class="tb-btn primary">Save</button>
+    </div>
+    <div class="blank-canvas">
+      <div class="bc-type-bar">
+        <div class="bc-chip active">🔬 Research</div>
+        <div class="bc-chip">📔 Journal</div>
+        <div class="bc-chip">✅ Task</div>
+        <div class="bc-chip">💡 Idea</div>
+        <div class="bc-chip">📎 Reference</div>
+      </div>
+      <input class="bc-title" type="text" placeholder="Note title…" id="bcTitle" oninput="document.getElementById('bn-bc').textContent=this.value||'Untitled'"/>
+      <input class="bc-sub" type="text" placeholder="Subtitle or brief context (optional)…"/>
+      <hr class="bc-divider"/>
+      <!-- Inserted blocks render here -->
+      <div id="bcBlocks" class="bc-blocks"></div>
+      <!-- Body textarea -->
+      <textarea class="bc-body" id="bcBody" placeholder="Start writing…&#10;&#10;Type @ to ask an AI model inline&#10;Type / to insert a block&#10;Type [[ to link another note"></textarea>
+      <!-- Insert bar -->
+      <div class="bc-insert-bar">
+        <span class="bc-lbl">Insert</span>
+        <button class="bc-btn" onclick="insertBlock('hyp')">💡 Hypothesis</button>
+        <button class="bc-btn" onclick="insertBlock('con')">🎯 Conclusion</button>
+        <button class="bc-btn" onclick="insertBlock('findings')">🔑 Key Findings</button>
+        <button class="bc-btn" onclick="insertBlock('ref')">📎 Reference</button>
+        <button class="bc-btn" onclick="insertBlock('divider')">— Divider</button>
+        <button class="bc-btn ai-btn" onclick="insertBlock('ai-claude')">✦ @claude</button>
+        <button class="bc-btn ai-btn" onclick="insertBlock('ai-chatgpt')">✦ @chatgpt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: SETTINGS ── -->
+  <div class="view" id="view-settings">
+    <div class="vhbar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/></svg><span class="vhbar-title">Settings</span><div style="flex:1;"></div><button class="tb-btn primary">Save Changes</button></div>
+    <div class="settings-wrap">
+      <div class="settings-nav">
+        <div class="snav-item active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h3"/></svg>AI Providers</div>
+        <div class="snav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Profile</div>
+        <div class="snav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6"/></svg>Appearance</div>
+        <div class="snav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v3M8 11v3"/></svg>AI Behaviour</div>
+        <div class="snav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/></svg>Sync &amp; Export</div>
+        <div class="snav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 5h4M6 8h4"/></svg>Templates</div>
+      </div>
+      <div class="settings-content">
+        <div class="s-sec"><div class="s-sec-title">AI Provider API Keys</div><div class="s-sec-desc">Keys are stored locally. Each key unlocks @mention for that model in your notes.</div>
+          <div class="s-card">
+            <div class="api-row"><div class="api-logo" style="background:var(--p600);">C</div><div class="api-info"><div class="api-name">Anthropic · Claude</div><div class="api-status">claude-sonnet-4 · Connected ✓</div></div><input class="api-input" type="password" value="sk-ant-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+            <div class="api-row"><div class="api-logo" style="background:#10A37F;">G</div><div class="api-info"><div class="api-name">OpenAI · ChatGPT</div><div class="api-status">gpt-4o · Connected ✓</div></div><input class="api-input" type="password" value="sk-••••••••••••••••"/><button class="api-btn on">Connected</button></div>
+            <div class="api-row"><div class="api-logo" style="background:#4285F4;">G</div><div class="api-info"><div class="api-name">Google · Gemini</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="AIza••••••••••••"/><button class="api-btn">Connect</button></div>
+            <div class="api-row"><div class="api-logo" style="background:#F55036;">Q</div><div class="api-info"><div class="api-name">Groq · Llama 3</div><div class="api-status">Not configured</div></div><input class="api-input" type="text" placeholder="gsk_••••••••••••"/><button class="api-btn">Connect</button></div>
+            <div class="api-row"><div class="api-logo" style="background:#1A1A2E;">O</div><div class="api-info"><div class="api-name">OpenRouter</div><div class="api-status">50+ models</div></div><input class="api-input" type="text" placeholder="sk-or-••••••••••••"/><button class="api-btn">Connect</button></div>
+          </div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">Default Model</div><div class="s-sec-desc">Used when @ai is invoked without specifying a provider.</div>
+          <div class="model-grid">
+            <div class="model-card sel"><div class="model-dot"></div><div><div class="model-name">Claude Sonnet 4</div><div class="model-desc">Best for research</div></div></div>
+            <div class="model-card"><div class="model-dot"></div><div><div class="model-name">GPT-4o</div><div class="model-desc">Writing &amp; code</div></div></div>
+            <div class="model-card"><div class="model-dot"></div><div><div class="model-name">Gemini 1.5 Pro</div><div class="model-desc">1M token context</div></div></div>
+            <div class="model-card"><div class="model-dot"></div><div><div class="model-name">Groq Llama 3</div><div class="model-desc">Fastest inference</div></div></div>
+          </div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">AI Behaviour</div><div class="s-card">
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-link AI responses to Knowledge Graph</div><div class="toggle-desc">Replies parsed and linked as graph nodes</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Save AI exchanges as sub-notes</div><div class="toggle-desc">Conversations saved as linked child notes</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include note context in AI prompts</div><div class="toggle-desc">Current note content sent with each query</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Scheduled AI prompts</div><div class="toggle-desc">Auto-run prompts from Prompt Library</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: PROMPT LIBRARY ── -->
+  <div class="view" id="view-prompts">
+    <div class="vhbar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg><span class="vhbar-title">Prompt Library</span><div style="flex:1;"></div><button class="tb-btn primary">+ New Prompt</button></div>
+    <div class="pl-wrap">
+      <div class="pl-filters"><div class="pl-f active">All</div><div class="pl-f">Research</div><div class="pl-f">Journal</div><div class="pl-f">Finance</div><div class="pl-f">Coding</div><div class="pl-f">My Prompts</div></div>
+      <div class="pl-grid">
+        <div class="pc"><div class="pc-top"><div class="pc-ico" style="background:var(--teal-bg);">🔬</div><div><div class="pc-name">Research Deep Dive</div><div class="pc-cat">Research · Analysis</div></div></div><div class="pc-desc">Summarise key findings, tradeoffs, and open questions from your note.</div><div class="pc-preview">Analyse: (1) core thesis, (2) findings, (3) open questions, (4) gaps.</div><div class="pc-footer"><span class="pc-uses">Used 47×</span><div class="pc-badges"><div class="pc-badge" style="background:var(--p600);">C</div><div class="pc-badge" style="background:#10A37F;">G</div></div><button class="pc-use">Use</button></div></div>
+        <div class="pc"><div class="pc-top"><div class="pc-ico" style="background:var(--amber-bg);">📔</div><div><div class="pc-name">Daily Reflection</div><div class="pc-cat">Journal · Reflection</div></div></div><div class="pc-desc">Structured daily journal — intention, wins, blockers, and tomorrow's focus.</div><div class="pc-preview">Today is {{date}}. Wins? Blockers? What changes tomorrow?</div><div class="pc-footer"><span class="pc-uses">Used 124×</span><div class="pc-badges"><div class="pc-badge" style="background:var(--p600);">C</div></div><button class="pc-use">Use</button></div></div>
+        <div class="pc"><div class="pc-top"><div class="pc-ico" style="background:var(--rose-bg);">📈</div><div><div class="pc-name">Equity Research Analyst</div><div class="pc-cat">Finance · Analysis</div></div></div><div class="pc-desc">Institutional analysis: BRSR, Beneish M-Score, ROIC vs WACC, promoter pledges.</div><div class="pc-preview">Analyse {{company}}: M-Score, ROIC/WACC spread, promoter pledge %, SEBI flags.</div><div class="pc-footer"><span class="pc-uses">Used 18×</span><div class="pc-badges"><div class="pc-badge" style="background:var(--p600);">C</div></div><button class="pc-use">Use</button></div></div>
+        <div class="pc"><div class="pc-top"><div class="pc-ico" style="background:var(--p100);">🧠</div><div><div class="pc-name">Concept Explainer</div><div class="pc-cat">Learning · Education</div></div></div><div class="pc-desc">Analogy, definition, worked example, and common misconceptions.</div><div class="pc-preview">Explain {{concept}} to someone with CS background: intuition + example + misconceptions.</div><div class="pc-footer"><span class="pc-uses">Used 89×</span><div class="pc-badges"><div class="pc-badge" style="background:var(--p600);">C</div><div class="pc-badge" style="background:#4285F4;">G</div></div><button class="pc-use">Use</button></div></div>
+        <div class="pc"><div class="pc-top"><div class="pc-ico" style="background:var(--blue-bg);">💻</div><div><div class="pc-name">Code Review</div><div class="pc-cat">Coding · Review</div></div></div><div class="pc-desc">Structured code review with issues by severity, patterns, and recommendations.</div><div class="pc-preview">Review for: bugs, performance, security, style. Categorise: Critical / High / Medium / Low.</div><div class="pc-footer"><span class="pc-uses">Used 31×</span><div class="pc-badges"><div class="pc-badge" style="background:#10A37F;">G</div><div class="pc-badge" style="background:var(--p600);">C</div></div><button class="pc-use">Use</button></div></div>
+        <div class="pc" style="border-style:dashed;border-color:var(--p300);background:var(--p50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;"><div style="width:38px;height:38px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--p600)" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg></div><div style="font-size:13px;font-weight:500;color:var(--p700);">Create Prompt</div><div style="font-size:11px;color:var(--t3);">Add your own template</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: KNOWLEDGE GRAPH ── -->
+  <div class="view" id="view-graph">
+    <div class="gv">
+      <div class="vhbar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg><span class="vhbar-title">Knowledge Graph</span><span style="font-size:12px;color:var(--t3);margin-left:6px;">13 notes · 18 connections</span><div style="flex:1;"></div><button class="tb-btn">Filter</button><button class="tb-btn primary">Add note →</button></div>
+      <div class="graph-wrap">
+        <div class="graph-canvas">
+          <svg id="kg" viewBox="0 0 860 500" xmlns="http://www.w3.org/2000/svg">
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#EDE9FE" stroke-width="0.5"/></pattern>
+            <rect width="860" height="500" fill="url(#grid)"/>
+            <g stroke="#DDD6FE" stroke-width="1.5" fill="none">
+              <line x1="430" y1="200" x2="220" y2="110"/><line x1="430" y1="200" x2="640" y2="110"/>
+              <line x1="430" y1="200" x2="160" y2="300"/><line x1="430" y1="200" x2="700" y2="300"/>
+              <line x1="430" y1="200" x2="430" y2="370"/>
+              <line x1="220" y1="110" x2="640" y2="110" stroke="#E9E4FD" stroke-dasharray="5,4"/>
+              <line x1="160" y1="300" x2="430" y2="370" stroke="#E9E4FD" stroke-dasharray="5,4"/>
+            </g>
+            <g style="cursor:pointer;"><circle cx="430" cy="200" r="48" fill="#7C3AED" opacity="0.1"/><circle cx="430" cy="200" r="36" fill="#7C3AED"/><text x="430" y="195" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text><text x="430" y="209" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="DM Sans,sans-serif">Architecture</text><text x="430" y="249" text-anchor="middle" fill="#8B5CF6" font-size="9" font-family="JetBrains Mono,monospace">Research</text></g>
+            <g style="cursor:pointer;"><circle cx="220" cy="110" r="29" fill="#0F766E"/><text x="220" y="105" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">RAG</text><text x="220" y="119" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">Patterns</text><text x="220" y="152" text-anchor="middle" fill="#0F766E" font-size="9" font-family="JetBrains Mono,monospace">Research</text></g>
+            <g style="cursor:pointer;"><circle cx="640" cy="110" r="31" fill="#1D4ED8"/><text x="640" y="105" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">AI Roadmap</text><text x="640" y="119" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">36 Weeks</text><text x="640" y="154" text-anchor="middle" fill="#1D4ED8" font-size="9" font-family="JetBrains Mono,monospace">Task</text></g>
+            <g style="cursor:pointer;"><circle cx="160" cy="300" r="26" fill="#D97706"/><text x="160" y="295" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Monday</text><text x="160" y="308" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans,sans-serif">Journal</text><text x="160" y="338" text-anchor="middle" fill="#D97706" font-size="9" font-family="JetBrains Mono,monospace">Journal</text></g>
+            <g style="cursor:pointer;"><circle cx="700" cy="300" r="27" fill="#BE185D"/><text x="700" y="295" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Equity</text><text x="700" y="308" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">Research</text><text x="700" y="340" text-anchor="middle" fill="#BE185D" font-size="9" font-family="JetBrains Mono,monospace">Reference</text></g>
+            <g style="cursor:pointer;"><circle cx="430" cy="370" r="27" fill="#7C3AED" opacity="0.75"/><text x="430" y="365" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Linear</text><text x="430" y="378" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans,sans-serif">Algebra Book</text><text x="430" y="409" text-anchor="middle" fill="#7C3AED" font-size="9" font-family="JetBrains Mono,monospace">Idea</text></g>
+            <rect x="95" y="56" width="190" height="18" rx="4" fill="#EDE9FE" opacity="0.7"/><text x="190" y="69" text-anchor="middle" fill="#7C3AED" font-size="9" font-family="JetBrains Mono,monospace">📚 AI &amp; Machine Learning shelf</text>
+            <text x="430" y="478" text-anchor="middle" fill="#BCB6D4" font-size="11" font-family="DM Sans,sans-serif">Click a node to explore · Scroll to zoom</text>
+          </svg>
+          <div class="graph-legend"><div class="gl-title">Note types</div><div class="gl-item"><div class="gl-dot" style="background:#7C3AED;"></div>Research</div><div class="gl-item"><div class="gl-dot" style="background:#D97706;"></div>Journal</div><div class="gl-item"><div class="gl-dot" style="background:#1D4ED8;"></div>Task</div><div class="gl-item"><div class="gl-dot" style="background:#BE185D;"></div>Reference</div><div class="gl-item"><div class="gl-dot" style="background:var(--rose);"></div>Idea</div></div>
+        </div>
+        <div class="graph-info">
+          <div class="cp-lbl" style="margin-bottom:10px;">Selected Node</div>
+          <div class="gi-title">Transformer Architecture</div>
+          <div style="margin:6px 0 12px;"><span class="ni-badge badge-research" style="font-size:10px;">Research</span></div>
+          <div class="gi-stats"><div><div class="gi-stat-n">5</div><div class="gi-stat-l">links</div></div><div><div class="gi-stat-n">4</div><div class="gi-stat-l">AI calls</div></div><div><div class="gi-stat-n">847</div><div class="gi-stat-l">words</div></div></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin-bottom:12px;"/>
+          <div class="cp-lbl">Connected Notes</div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#0F766E;"></div><span class="gi-cname">RAG Hybrid Retrieval</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#1D4ED8;"></div><span class="gi-cname">36-Week AI Roadmap</span><span class="gi-cstr">strong</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#7C3AED;opacity:0.7;"></div><span class="gi-cname">Linear Algebra Book</span><span class="gi-cstr">medium</span></div>
+          <div class="gi-conn"><div class="gi-cdot" style="background:#D97706;"></div><span class="gi-cname">Monday Deep Work</span><span class="gi-cstr">weak</span></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;"/>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.6;">Central hub — connects to 5 notes with strong thematic overlap across RAG, Roadmap, and Math.</div>
+          <button class="api-btn" style="width:100%;margin-top:10px;text-align:center;">Open Note →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<script>
+/* ════════════════════════════════
+   VIEW SWITCHING
+════════════════════════════════ */
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + name);
+  if (el) el.classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  // Hide sidebar when creating a note
+  const sb = document.getElementById('sidebar');
+  sb.style.display = (name === 'newnote') ? 'none' : '';
+}
+
+/* ════════════════════════════════
+   SIDEBAR COMPACT / EXPANDED
+════════════════════════════════ */
+function setMode(m) {
+  document.getElementById('btnC').classList.toggle('active', m === 'compact');
+  document.getElementById('btnE').classList.toggle('active', m === 'expanded');
+  document.body.classList.toggle('compact', m === 'compact');
+}
+
+/* ════════════════════════════════
+   SHELF & NOTEBOOK TOGGLE
+════════════════════════════════ */
+function toggleShelf(id) { document.getElementById(id).classList.toggle('open'); }
+function toggleNb(id) { document.getElementById(id).classList.toggle('open'); }
+
+/* ════════════════════════════════
+   OPEN A NOTE FROM SIDEBAR OR CARD
+════════════════════════════════ */
+function openNote(el, title, type, shelf, notebook) {
+  if (el) {
+    document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  document.getElementById('bc-note').textContent = title;
+  document.getElementById('bc-shelf').textContent = shelf;
+  document.getElementById('bc-nb').textContent = notebook;
+  document.getElementById('loc-nb').textContent = notebook;
+  switchView('notes', document.querySelectorAll('.nav-btn')[0]);
+}
+
+/* ════════════════════════════════
+   OPEN NOTEBOOK GRID VIEW
+════════════════════════════════ */
+function openNotebook(nbId, nbName, shelfName, color) {
+  document.getElementById('nbv-nb-name').textContent = nbName;
+  document.getElementById('nbv-shelf-name').textContent = shelfName;
+  document.getElementById('nbv-shelf-tag').style.background = color + '18';
+  document.getElementById('nbv-shelf-tag').style.color = color;
+
+  // Mark selected in sidebar
+  document.querySelectorAll('.nb-hdr').forEach(h => h.classList.remove('nb-selected'));
+  const hdr = document.querySelector('#' + nbId + ' .nb-hdr');
+  if (hdr) hdr.classList.add('nb-selected');
+
+  switchView('notebook', null);
+  // keep nav btn active as notes
+  document.querySelectorAll('.nav-btn')[0].classList.add('active');
+}
+
+/* ════════════════════════════════
+   NOTEBOOK GRID LAYOUT TOGGLE
+════════════════════════════════ */
+function setNbLayout(mode) {
+  const grid = document.getElementById('noteCardGrid');
+  document.getElementById('lBtn-grid').classList.toggle('active', mode === 'grid');
+  document.getElementById('lBtn-list').classList.toggle('active', mode === 'list');
+  if (mode === 'list') {
+    grid.classList.add('list-view');
+    grid.querySelectorAll('.nc').forEach(c => c.classList.add('list-view'));
+  } else {
+    grid.classList.remove('list-view');
+    grid.querySelectorAll('.nc').forEach(c => c.classList.remove('list-view'));
+  }
+}
+
+/* ════════════════════════════════
+   NOTEBOOK FILTER PILLS
+════════════════════════════════ */
+document.querySelectorAll('.nbv-filter').forEach(f => f.addEventListener('click', () => {
+  document.querySelectorAll('.nbv-filter').forEach(x => x.classList.remove('active'));
+  f.classList.add('active');
+}));
+document.querySelectorAll('.nbv-tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.nbv-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+}));
+
+/* ════════════════════════════════
+   SEARCH
+════════════════════════════════ */
+const allNotes = [
+  { title:'Transformer Architecture Deep Dive', type:'Research', shelf:'AI & ML', nb:'Transformers', preview:'Attention mechanisms, positional encodings, multi-head attention.' },
+  { title:'Attention Mechanisms Survey', type:'Research', shelf:'AI & ML', nb:'Transformers', preview:'Scaled dot-product, sparse, local, flash attention variants.' },
+  { title:'BERT vs GPT Analysis', type:'Idea', shelf:'AI & ML', nb:'Transformers', preview:'Bidirectional vs autoregressive enterprise use cases.' },
+  { title:'Hybrid Retrieval Strategies', type:'Research', shelf:'AI & ML', nb:'RAG Patterns', preview:'BM25 + dense vectors, cross-encoder re-ranking.' },
+  { title:'Context Window Management', type:'Task', shelf:'AI & ML', nb:'RAG Patterns', preview:'Token budgeting for long-context LLM calls.' },
+  { title:'Monday — Deep Work Session', type:'Journal', shelf:'Personal', nb:'Daily Journal', preview:'Shipped Lore demo. Azure deployed.' },
+  { title:'Weekly Review · Week 12', type:'Journal', shelf:'Personal', nb:'Daily Journal', preview:'Roadmap milestones, gym 6/6, two blog posts.' },
+  { title:'Chapter Structure & Outline', type:'Idea', shelf:'Personal', nb:'Linear Algebra Book', preview:'Story → Math → Python → Manim.' },
+  { title:'Indian Equity Framework', type:'Reference', shelf:'Work & Finance', nb:'Equity Research', preview:'BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.' },
+];
+
+function handleSearch(q) {
+  const sr = document.getElementById('searchResults');
+  if (!q.trim()) { sr.classList.remove('open'); return; }
+  document.getElementById('searchQuery').textContent = '"' + q + '"';
+  const list = document.getElementById('searchResultsList');
+  const results = allNotes.filter(n =>
+    n.title.toLowerCase().includes(q.toLowerCase()) ||
+    n.preview.toLowerCase().includes(q.toLowerCase())
+  );
+  list.innerHTML = results.length ? results.map(n => `
+    <div class="sbsr-item" onclick="openNote(null,'${n.title}','${n.type}','${n.shelf}','${n.nb}');clearSearch()">
+      <div class="sbsr-top">
+        <span class="ni-badge badge-${n.type.toLowerCase()}" style="font-size:9px;">${n.type}</span>
+        <span class="sbsr-title">${highlight(n.title,q)}</span>
+        <span class="sbsr-loc">${n.nb}</span>
+      </div>
+      <div class="sbsr-preview">${highlight(n.preview,q)}</div>
+    </div>`).join('')
+    : `<div style="padding:20px;text-align:center;font-size:12.5px;color:var(--t3);">No notes found for "${q}"</div>`;
+  sr.classList.add('open');
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').classList.remove('open');
+}
+
+/* ════════════════════════════════
+   CONTEXT MENU
+════════════════════════════════ */
+let ctxTarget = null, ctxId = null;
+function showCtx(e, type, name, id) {
+  e.preventDefault(); e.stopPropagation();
+  ctxTarget = { type, name, id };
+  const menu = document.getElementById('ctxMenu');
+  document.getElementById('ctx-open-lbl').textContent = type === 'shelf' ? 'Expand / Collapse' : type === 'notebook' ? 'Open Notebook' : 'Open Note';
+  document.getElementById('ctx-new-nb').style.display = type === 'shelf' ? 'flex' : 'none';
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 190) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 200) + 'px';
+  menu.classList.add('open');
+}
+function closeCtx() { document.getElementById('ctxMenu').classList.remove('open'); }
+document.addEventListener('click', closeCtx);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCtx(); stopRename(); } });
+
+/* ── Inline rename ── */
+function startRename() {
+  closeCtx();
+  if (!ctxTarget) return;
+  const nameEl = ctxTarget.type === 'shelf'
+    ? document.getElementById('sh-name-' + ctxTarget.id)
+    : document.getElementById('nb-name-' + ctxTarget.id);
+  if (!nameEl) return;
+  const cur = nameEl.textContent;
+  nameEl.innerHTML = '';
+  const inp = document.createElement('input');
+  inp.className = 'rename-input';
+  inp.value = cur;
+  nameEl.appendChild(inp);
+  inp.focus(); inp.select();
+  inp.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') { commitRename(nameEl, inp); ev.preventDefault(); }
+    if (ev.key === 'Escape') { cancelRename(nameEl, cur); ev.preventDefault(); }
+    ev.stopPropagation();
+  });
+  inp.addEventListener('blur', () => commitRename(nameEl, inp));
+}
+function commitRename(el, inp) {
+  el.textContent = inp.value || el.textContent;
+}
+function cancelRename(el, original) {
+  el.textContent = original;
+}
+function stopRename() {}
+
+/* ════════════════════════════════
+   NEW NOTE — type / template select
+════════════════════════════════ */
+function selType(card) {
+  document.querySelectorAll('.nn-type').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+}
+function selTpl(card) {
+  document.querySelectorAll('.nn-tpl').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+}
+function createNote() {
+  const title = document.getElementById('nnTitle').value;
+  if (title) document.getElementById('bcTitle').value = title;
+  document.getElementById('bn-bc').textContent = title || 'Untitled';
+  switchView('blanknote', null);
+  document.querySelectorAll('.nav-btn')[0].classList.add('active');
+}
+
+/* ════════════════════════════════
+   BLANK NOTE — INSERT BLOCKS
+════════════════════════════════ */
+function insertBlock(type) {
+  const container = document.getElementById('bcBlocks');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'ins-block';
+  let html = '';
+  if (type === 'hyp') {
+    html = `<div class="callout hyp" contenteditable="false">
+      <div class="callout-icon">💡</div>
+      <div style="flex:1;">
+        <div class="callout-lbl">Hypothesis</div>
+        <textarea class="callout-input" placeholder="State your hypothesis…" rows="2"></textarea>
+      </div>
+    </div>`;
+  } else if (type === 'con') {
+    html = `<div class="callout con" contenteditable="false">
+      <div class="callout-icon">🎯</div>
+      <div style="flex:1;">
+        <div class="callout-lbl">Conclusion</div>
+        <textarea class="callout-input" placeholder="State your conclusion…" rows="2"></textarea>
+      </div>
+    </div>`;
+  } else if (type === 'findings') {
+    html = `<div class="findings-insert" contenteditable="false">
+      <div class="fi-lbl">Key Findings</div>
+      <div class="fi-row"><span class="fi-num">1</span><input class="fi-inp" placeholder="Finding 1…"/></div>
+      <div class="fi-row"><span class="fi-num">2</span><input class="fi-inp" placeholder="Finding 2…"/></div>
+      <div class="fi-row"><span class="fi-num">3</span><input class="fi-inp" placeholder="Finding 3…"/></div>
+    </div>`;
+  } else if (type === 'ref') {
+    html = `<div class="rbox" contenteditable="false" style="padding:12px 14px;">
+      <div class="fbox-lbl" style="color:var(--p600);margin-bottom:8px;">Reference</div>
+      <input style="width:100%;border:none;background:transparent;outline:none;font-size:13px;color:var(--p700);font-family:'DM Sans',sans-serif;border-bottom:1px solid var(--p200);padding-bottom:5px;" placeholder="Title of reference…"/>
+      <input style="width:100%;border:none;background:transparent;outline:none;font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:6px;" placeholder="https://…"/>
+    </div>`;
+  } else if (type === 'divider') {
+    html = `<hr style="border:none;border-top:1px solid var(--border);margin:8px 0;" contenteditable="false"/>`;
+  } else if (type === 'ai-claude' || type === 'ai-chatgpt') {
+    const model = type === 'ai-claude' ? 'Claude' : 'ChatGPT';
+    const bg = type === 'ai-claude' ? 'var(--p600)' : '#10A37F';
+    const letter = type === 'ai-claude' ? 'C' : 'G';
+    html = `<div class="ai-block" contenteditable="false">
+      <div class="ai-block-hdr">
+        <div class="ai-logo" style="background:${bg};">${letter}</div>
+        <span class="ai-name-lbl">${model}</span>
+        <span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">awaiting prompt</span>
+      </div>
+      <input style="width:100%;border:none;background:white;border-radius:6px;padding:8px 10px;font-size:13px;color:var(--t2);outline:none;border:1px solid var(--p200);" placeholder="Type your question for ${model}…"/>
+      <div class="ai-block-footer"><button class="ai-resp-btn" style="background:${bg};color:white;border-color:${bg};">Ask ${model}</button></div>
+    </div>`;
+  }
+
+  const del = `<button class="del-block" onclick="this.closest('.ins-block').remove()" title="Remove block">
+    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l10 10M11 1L1 11"/></svg>
+  </button>`;
+  wrapper.innerHTML = html + del;
+  container.appendChild(wrapper);
+  // scroll into view
+  wrapper.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+/* ════════════════════════════════
+   TYPE CHIPS ON BLANK NOTE
+════════════════════════════════ */
+document.querySelectorAll('.bc-chip').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.bc-chip').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+}));
+
+/* ════════════════════════════════
+   @MENTION DROPDOWN
+════════════════════════════════ */
+const editorArea = document.getElementById('editorArea');
+const mentionDD = document.getElementById('mentionDD');
+let mentionStart = null;
+editorArea.addEventListener('keyup', e => {
+  const sel = window.getSelection();
+  const txt = sel.anchorNode && sel.anchorNode.textContent || '';
+  const pos = sel.anchorOffset;
+  if (txt[pos - 1] === '@') {
+    mentionStart = { node: sel.anchorNode, offset: pos };
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    const eRect = editorArea.getBoundingClientRect();
+    mentionDD.style.top = (rect.bottom - eRect.top + 6) + 'px';
+    mentionDD.style.left = (rect.left - eRect.left) + 'px';
+    mentionDD.classList.add('open');
+  } else if (e.key === 'Escape') mentionDD.classList.remove('open');
+});
+document.addEventListener('click', e => {
+  if (!mentionDD.contains(e.target) && e.target !== editorArea) mentionDD.classList.remove('open');
+});
+function insertMention(model) {
+  mentionDD.classList.remove('open');
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const logos  = { Claude:'C', ChatGPT:'G', Gemini:'G', Groq:'Q' };
+  const chip = document.createElement('span');
+  chip.className = 'ai-mention';
+  chip.contentEditable = 'false';
+  chip.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:${colors[model]};color:white;font-size:8px;font-weight:700;margin-right:3px;">${logos[model]}</span>@${model}`;
+  if (mentionStart) {
+    const range = document.createRange();
+    try {
+      range.setStart(mentionStart.node, mentionStart.offset - 1);
+      range.setEnd(mentionStart.node, mentionStart.offset);
+      range.deleteContents(); range.insertNode(chip); range.collapse(false);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+    } catch(err) {}
+    mentionStart = null;
+  }
+  setTimeout(() => showAIBlock(model), 400);
+}
+function showAIBlock(model) {
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const div = document.createElement('div');
+  div.className = 'ai-block';
+  div.innerHTML = `<div class="ai-block-hdr"><div class="ai-logo" style="background:${colors[model]};">${model[0]}</div><span class="ai-name-lbl">${model} · responding…</span></div><div class="ai-block-text" style="color:var(--t4);font-style:italic;">Analysing your note context…</div><div class="ai-block-footer"><button class="ai-resp-btn">📋 Copy</button><button class="ai-resp-btn">📝 Save as note</button><button class="ai-resp-btn">🔗 Link to graph</button></div>`;
+  editorArea.parentNode.insertBefore(div, editorArea.nextSibling);
+}
+
+/* ════════════════════════════════
+   MISC INTERACTIVE
+════════════════════════════════ */
+document.querySelectorAll('.model-card').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.model-card').forEach(x => x.classList.remove('sel'));
+  c.classList.add('sel');
+}));
+document.querySelectorAll('.pl-f').forEach(f => f.addEventListener('click', () => {
+  document.querySelectorAll('.pl-f').forEach(x => x.classList.remove('active'));
+  f.classList.add('active');
+}));
+document.querySelectorAll('.snav-item').forEach(i => i.addEventListener('click', () => {
+  document.querySelectorAll('.snav-item').forEach(x => x.classList.remove('active'));
+  i.classList.add('active');
+}));
+</script>
+</body>
+</html>

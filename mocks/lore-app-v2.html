@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lore — Your AI-Powered Knowledge Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --p50:#F5F3FF; --p100:#EDE9FE; --p200:#DDD6FE; --p300:#C4B5FD;
+  --p400:#A78BFA; --p500:#8B5CF6; --p600:#7C3AED; --p700:#6D28D9; --p900:#2E1065;
+  --bg:#F8F7FC; --surface:#FFFFFF; --surface2:#FAFAF9;
+  --border:rgba(109,40,217,0.1); --border2:rgba(109,40,217,0.18);
+  --t1:#1A1529; --t2:#4B4568; --t3:#8C84A8; --t4:#BCB6D4;
+  --amber:#D97706; --amber-bg:#FFFBEB;
+  --teal:#0F766E;  --teal-bg:#F0FDFA;
+  --rose:#BE185D;  --rose-bg:#FFF1F2;
+  --blue:#1D4ED8;  --blue-bg:#EFF6FF;
+  --green:#15803D; --green-bg:#F0FDF4;
+  --nav-w:56px; --sidebar-w:268px; --toolbar-h:48px;
+  --radius-sm:5px; --radius-md:9px; --radius-lg:14px; --radius-xl:20px;
+  --shadow-card:0 1px 3px rgba(109,40,217,0.06),0 4px 16px rgba(109,40,217,0.05);
+  --shadow-float:0 8px 32px rgba(109,40,217,0.18),0 2px 8px rgba(0,0,0,0.08);
+}
+body { font-family:'DM Sans',sans-serif; background:var(--bg); display:flex; height:100vh; overflow:hidden; color:var(--t1); -webkit-font-smoothing:antialiased; font-size:14px; }
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--p200); border-radius:3px; }
+
+/* ══ NAV RAIL ══ */
+.nav-rail { width:var(--nav-w); background:var(--p900); display:flex; flex-direction:column; align-items:center; padding:12px 0 16px; gap:4px; flex-shrink:0; z-index:20; }
+.nav-logo { width:34px; height:34px; background:var(--p600); border-radius:9px; display:flex; align-items:center; justify-content:center; font-family:'Lora',serif; font-size:16px; font-weight:600; color:white; margin-bottom:16px; box-shadow:0 0 0 3px rgba(139,92,246,0.3); cursor:pointer; }
+.nav-spacer { flex:1; }
+.nav-btn { width:40px; height:40px; border-radius:10px; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(255,255,255,0.4); transition:all 0.15s; position:relative; }
+.nav-btn:hover { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.8); }
+.nav-btn.active { background:var(--p600); color:white; }
+.nav-btn svg { width:18px; height:18px; }
+.nav-tip { position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); background:var(--t1); color:white; font-size:11px; white-space:nowrap; padding:4px 8px; border-radius:5px; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; }
+.nav-btn:hover .nav-tip { opacity:1; }
+.nav-divider { width:28px; height:1px; background:rgba(255,255,255,0.08); margin:6px 0; }
+.nav-avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,var(--p400),var(--p700)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:white; cursor:pointer; margin-top:8px; box-shadow:0 0 0 2px rgba(255,255,255,0.1); }
+
+/* ══ SIDEBAR ══ */
+.sidebar { width:var(--sidebar-w); background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; overflow:hidden; }
+
+/* — Top bar — */
+.sb-topbar { display:flex; align-items:center; gap:6px; padding:11px 12px 8px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.sb-search { flex:1; display:flex; align-items:center; gap:6px; background:var(--p50); border:1px solid var(--border); border-radius:var(--radius-md); padding:5px 9px; }
+.sb-search input { border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:12.5px; color:var(--t1); width:100%; outline:none; }
+.sb-search input::placeholder { color:var(--t4); }
+.sb-search svg { color:var(--t4); flex-shrink:0; width:12px; height:12px; }
+
+/* — View toggle compact/expanded — */
+.sb-view-toggle { display:flex; align-items:center; gap:2px; background:var(--p50); border:1px solid var(--border); border-radius:6px; padding:2px; flex-shrink:0; }
+.sb-vt-btn { width:26px; height:22px; border-radius:4px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t4); transition:0.15s; }
+.sb-vt-btn.active { background:white; color:var(--p600); box-shadow:0 1px 3px rgba(109,40,217,0.12); }
+.sb-vt-btn svg { width:13px; height:13px; }
+
+/* — New note btn — */
+.sb-new-btn { display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; border:none; background:var(--p600); color:white; cursor:pointer; flex-shrink:0; transition:0.15s; }
+.sb-new-btn:hover { background:var(--p700); }
+.sb-new-btn svg { width:14px; height:14px; }
+
+/* — Tree scroll — */
+.sb-tree { flex:1; overflow-y:auto; padding:6px 0 12px; }
+
+/* ─ SHELF ─ */
+.shelf { }
+.shelf-header {
+  display:flex; align-items:center; gap:0; padding:6px 10px 5px 8px;
+  cursor:pointer; user-select:none; border-radius:6px; margin:0 4px;
+  transition:background 0.12s; position:relative;
+}
+.shelf-header:hover { background:var(--p50); }
+.shelf-chevron { width:16px; height:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.2s; }
+.shelf-chevron svg { width:10px; height:10px; color:var(--t4); }
+.shelf.open .shelf-chevron { transform:rotate(90deg); }
+.shelf-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin:0 7px 0 2px; }
+.shelf-name { font-size:12px; font-weight:600; color:var(--t1); flex:1; letter-spacing:0.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.shelf-count { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--t4); background:var(--p50); padding:1px 5px; border-radius:3px; margin-right:2px; flex-shrink:0; }
+.shelf-add { width:18px; height:18px; border-radius:4px; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--t4); opacity:0; transition:0.15s; flex-shrink:0; }
+.shelf-header:hover .shelf-add { opacity:1; }
+.shelf-add:hover { color:var(--p600); background:var(--p100); }
+.shelf-add svg { width:10px; height:10px; }
+
+.shelf-body { overflow:hidden; max-height:0; transition:max-height 0.25s ease; }
+.shelf.open .shelf-body { max-height:2000px; }
+
+/* ─ NOTEBOOK ─ */
+.notebook { margin-left:10px; }
+.notebook-header {
+  display:flex; align-items:center; gap:0; padding:4px 10px 4px 6px;
+  cursor:pointer; user-select:none; border-radius:6px; margin:0 4px;
+  transition:background 0.12s;
+}
+.notebook-header:hover { background:var(--p50); }
+.nb-chevron { width:14px; height:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.2s; }
+.nb-chevron svg { width:9px; height:9px; color:var(--t4); }
+.notebook.open .nb-chevron { transform:rotate(90deg); }
+.nb-icon { font-size:12px; margin:0 5px 0 1px; flex-shrink:0; line-height:1; }
+.nb-name { font-size:12.5px; color:var(--t2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nb-count { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--t4); flex-shrink:0; }
+.nb-body { overflow:hidden; max-height:0; transition:max-height 0.22s ease; }
+.notebook.open .nb-body { max-height:600px; }
+
+/* ─ NOTE ITEM — EXPANDED (default) ─ */
+.note-item {
+  margin:1px 4px 1px 20px;
+  padding:7px 10px 7px 8px;
+  border-radius:var(--radius-md);
+  cursor:pointer; transition:background 0.1s;
+  border-left:2px solid transparent;
+  position:relative;
+}
+.note-item:hover { background:var(--p50); }
+.note-item.active { background:var(--p50); border-left-color:var(--p600); }
+/* expanded layout */
+.ni-top { display:flex; align-items:center; gap:6px; margin-bottom:2px; }
+.ni-badge { font-size:9px; font-weight:600; padding:2px 6px; border-radius:20px; font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+.ni-date { font-size:10px; color:var(--t4); font-family:'JetBrains Mono',monospace; margin-left:auto; flex-shrink:0; }
+.ni-title-exp { font-size:12.5px; font-weight:500; color:var(--t1); line-height:1.3; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ni-preview { font-size:11px; color:var(--t3); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+/* compact layout */
+.ni-compact { display:none; align-items:center; gap:7px; }
+.ni-compact-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.ni-compact-title { font-size:12.5px; color:var(--t2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ni-compact-date { font-size:10px; color:var(--t4); font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+
+/* Compact mode — switch display */
+body.compact-mode .ni-top,
+body.compact-mode .ni-title-exp,
+body.compact-mode .ni-preview { display:none; }
+body.compact-mode .ni-compact { display:flex; }
+body.compact-mode .note-item { padding:5px 10px 5px 8px; margin:0px 4px 0px 20px; border-radius:5px; }
+body.compact-mode .shelf-body { }
+
+/* note type badge colours */
+.badge-research  { background:var(--teal-bg);  color:var(--teal);  }
+.badge-journal   { background:var(--amber-bg); color:var(--amber); }
+.badge-task      { background:var(--blue-bg);  color:var(--blue);  }
+.badge-idea      { background:var(--rose-bg);  color:var(--rose);  }
+.badge-reference { background:var(--p100);     color:var(--p700);  }
+
+/* dot colours (compact) */
+.dot-research  { background:var(--teal);  }
+.dot-journal   { background:var(--amber); }
+.dot-task      { background:var(--blue);  }
+.dot-idea      { background:var(--rose);  }
+.dot-reference { background:var(--p500);  }
+.dot-shelf-1   { background:#7C3AED; }
+.dot-shelf-2   { background:#D97706; }
+.dot-shelf-3   { background:#0F766E; }
+
+/* ══ MAIN ══ */
+.main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+.view { display:none; flex:1; flex-direction:column; overflow:hidden; }
+.view.active { display:flex; }
+
+/* ══ NOTE EDITOR VIEW ══ */
+.note-toolbar { height:var(--toolbar-h); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; padding:0 20px; flex-shrink:0; }
+.nt-breadcrumb { display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--t3); }
+.nt-breadcrumb .sep { color:var(--t4); font-size:11px; }
+.nt-breadcrumb .cur { color:var(--t2); font-weight:500; }
+.nt-breadcrumb .shelf-bc { color:var(--p600); font-weight:500; }
+.nt-spacer { flex:1; }
+.nt-btn { height:28px; padding:0 10px; border-radius:var(--radius-md); border:1px solid var(--border2); background:transparent; color:var(--t2); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.12s; white-space:nowrap; }
+.nt-btn:hover { background:var(--p50); }
+.nt-btn.primary { background:var(--p600); border-color:var(--p600); color:white; font-weight:500; }
+.nt-btn.primary:hover { background:var(--p700); }
+.ai-pill { height:26px; padding:0 10px; border-radius:20px; border:1px solid var(--p300); background:var(--p50); color:var(--p700); font-size:11px; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:5px; cursor:pointer; }
+.ai-pill-dot { width:6px; height:6px; border-radius:50%; background:var(--p500); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.4;} }
+.note-location-pill { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--t3); background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-family:'JetBrains Mono',monospace; }
+.note-location-pill span { color:var(--p600); }
+
+.note-editor-area { flex:1; display:flex; overflow:hidden; }
+.note-editor-main { flex:1; overflow-y:auto; padding:36px 48px 48px; }
+.note-type-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.note-type-select, .status-select { appearance:none; border:1px solid var(--border2); border-radius:var(--radius-md); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:12px; color:var(--t2); padding:4px 10px; cursor:pointer; outline:none; }
+.status-select { border-radius:20px; background:var(--p50); color:var(--p700); font-family:'JetBrains Mono',monospace; font-size:11px; }
+.note-title-input { width:100%; border:none; background:transparent; outline:none; font-family:'Lora',serif; font-size:28px; font-weight:600; color:var(--t1); line-height:1.3; margin-bottom:14px; letter-spacing:-0.02em; }
+.note-title-input::placeholder { color:var(--t4); }
+.note-meta-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.meta-chip { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; background:var(--p50); border:1px solid var(--border); font-size:11px; color:var(--p700); font-family:'JetBrains Mono',monospace; cursor:pointer; }
+.meta-chip:hover { background:var(--p100); }
+.editor-divider { border:none; border-top:1px solid var(--border); margin-bottom:20px; }
+.callout { border-left:3px solid; border-radius:0 var(--radius-md) var(--radius-md) 0; padding:12px 14px; margin-bottom:16px; display:flex; gap:10px; }
+.callout.hyp { background:#FFFBF0; border-color:var(--amber); }
+.callout.con { background:#F0FDF9; border-color:var(--teal); }
+.callout.ai  { background:var(--p50); border-color:var(--p400); }
+.callout-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+.callout-lbl { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; font-family:'JetBrains Mono',monospace; margin-bottom:4px; }
+.callout.hyp .callout-lbl { color:var(--amber); }
+.callout.con .callout-lbl { color:var(--teal); }
+.callout.ai  .callout-lbl { color:var(--p600); }
+.callout-text { font-size:13.5px; line-height:1.65; color:var(--t2); font-family:'Lora',serif; font-style:italic; }
+.note-content-area { font-size:14.5px; line-height:1.75; color:var(--t2); outline:none; min-height:180px; position:relative; }
+.note-content-area p { margin-bottom:10px; }
+.ai-mention { display:inline-flex; align-items:center; gap:4px; background:var(--p100); color:var(--p700); border-radius:4px; padding:1px 6px; font-size:12.5px; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.ai-response-block { background:var(--p50); border:1px solid var(--p200); border-radius:var(--radius-md); padding:14px 16px; margin:12px 0; }
+.ai-response-header { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+.ai-response-logo { width:18px; height:18px; border-radius:4px; background:var(--p600); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:white; font-family:'Lora',serif; }
+.ai-response-name { font-size:11px; font-weight:600; color:var(--p700); font-family:'JetBrains Mono',monospace; }
+.ai-response-text { font-size:13.5px; color:var(--t2); line-height:1.65; }
+.ai-response-footer { margin-top:8px; display:flex; gap:6px; }
+.ai-resp-btn { font-size:11px; color:var(--t3); border:1px solid var(--border2); background:white; border-radius:5px; padding:3px 8px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.ai-resp-btn:hover { color:var(--p600); border-color:var(--p300); }
+.mention-dropdown { position:absolute; z-index:200; background:white; border:1px solid var(--border2); border-radius:var(--radius-md); box-shadow:var(--shadow-float); width:220px; overflow:hidden; display:none; }
+.mention-dropdown.open { display:block; }
+.mention-dd-header { padding:8px 12px 6px; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--t3); font-family:'JetBrains Mono',monospace; border-bottom:1px solid var(--border); }
+.mention-item { display:flex; align-items:center; gap:9px; padding:8px 12px; cursor:pointer; transition:background 0.1s; }
+.mention-item:hover { background:var(--p50); }
+.mention-item-logo { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:white; flex-shrink:0; }
+.mention-item-name { font-size:13px; font-weight:500; color:var(--t1); }
+.mention-item-desc { font-size:11px; color:var(--t3); }
+.mention-item-connected { margin-left:auto; font-size:9px; font-family:'JetBrains Mono',monospace; padding:2px 5px; border-radius:3px; background:var(--green-bg); color:var(--green); }
+.note-context-panel { width:240px; border-left:1px solid var(--border); background:var(--surface2); padding:20px 16px; overflow-y:auto; flex-shrink:0; }
+.cp-section { margin-bottom:20px; }
+.cp-label { font-size:9.5px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--t4); font-family:'JetBrains Mono',monospace; margin-bottom:8px; }
+.cp-tags { display:flex; flex-wrap:wrap; gap:4px; }
+.cp-tag { font-size:10.5px; padding:2px 8px; border-radius:20px; background:var(--p100); color:var(--p700); cursor:pointer; font-family:'JetBrains Mono',monospace; border:1px solid var(--p200); }
+.cp-linked-note { display:flex; align-items:center; gap:7px; padding:6px 8px; border-radius:var(--radius-md); border:1px solid var(--border); background:white; cursor:pointer; margin-bottom:5px; transition:0.12s; }
+.cp-linked-note:hover { border-color:var(--p300); }
+.cp-linked-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.cp-linked-text { font-size:11.5px; color:var(--t2); flex:1; }
+.cp-ai-used { display:flex; align-items:center; gap:6px; padding:5px 8px; border-radius:6px; background:var(--p50); border:1px solid var(--p200); margin-bottom:4px; }
+.cp-ai-icon { width:16px; height:16px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:white; }
+.cp-ai-name { font-size:11px; color:var(--p700); font-family:'JetBrains Mono',monospace; }
+.cp-ai-count { margin-left:auto; font-size:10px; color:var(--t4); }
+.note-tags-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:20px; padding-top:14px; border-top:1px solid var(--border); }
+.note-tag { font-size:11px; padding:3px 9px; border-radius:20px; background:var(--p100); color:var(--p700); font-family:'JetBrains Mono',monospace; cursor:pointer; }
+.note-tag:hover { background:var(--p200); }
+.section-mini-lbl { font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--t4); font-family:'JetBrains Mono',monospace; margin-bottom:8px; margin-top:16px; }
+.prose-p { font-size:14px; line-height:1.75; color:var(--t2); margin-bottom:14px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.findings-box { background:var(--p50); border-radius:var(--radius-md); border:1px solid var(--p200); padding:14px; }
+.findings-label { font-size:9.5px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--t3); font-family:'JetBrains Mono',monospace; margin-bottom:9px; }
+.finding-row { display:flex; gap:8px; align-items:flex-start; font-size:13px; color:var(--t2); padding:5px 0; border-bottom:1px solid var(--border); line-height:1.5; }
+.finding-row:last-child { border-bottom:none; }
+.finding-num { width:17px; height:17px; border-radius:50%; background:white; border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:9.5px; font-family:'JetBrains Mono',monospace; color:var(--t3); flex-shrink:0; margin-top:1px; }
+.refs-box { background:#F8F6FF; border-radius:var(--radius-md); border:1px solid #DDD6FE; padding:14px; }
+.ref-link { display:flex; align-items:flex-start; gap:7px; font-size:12.5px; color:var(--p700); text-decoration:none; padding:5px 0; border-bottom:1px solid #E9E4FD; line-height:1.4; }
+.ref-link:last-child { border-bottom:none; }
+.ref-link:hover { color:var(--p900); }
+
+/* ══ NEW NOTE CREATION VIEW ══ */
+#view-newnote { background:var(--bg); }
+.nn-wrap { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.nn-topbar { height:var(--toolbar-h); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+.nn-topbar-title { font-size:15px; font-weight:600; color:var(--t1); font-family:'Lora',serif; }
+.nn-close-btn { margin-left:auto; width:28px; height:28px; border-radius:6px; border:1px solid var(--border2); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t3); transition:0.12s; }
+.nn-close-btn:hover { background:var(--p50); color:var(--t1); }
+
+.nn-body { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+
+/* Step 1 — type picker */
+.nn-step { padding:32px 48px 24px; }
+.nn-step-label { font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--t4); font-family:'JetBrains Mono',monospace; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+.nn-step-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* type cards grid */
+.nn-type-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.nn-type-card {
+  border:2px solid var(--border); border-radius:var(--radius-lg);
+  padding:18px 12px 14px; cursor:pointer; text-align:center;
+  background:var(--surface); transition:all 0.15s; position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.nn-type-card:hover { border-color:var(--p300); transform:translateY(-2px); box-shadow:0 4px 16px rgba(109,40,217,0.1); }
+.nn-type-card.selected { border-color:var(--p600); background:var(--p50); }
+.nn-type-card.selected::after { content:'✓'; position:absolute; top:8px; right:8px; width:16px; height:16px; border-radius:50%; background:var(--p600); color:white; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.nn-type-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.nn-type-name { font-size:13px; font-weight:600; color:var(--t1); }
+.nn-type-desc { font-size:11px; color:var(--t3); line-height:1.4; text-align:center; }
+
+/* Step 2 — title + location */
+.nn-step2 { padding:0 48px 24px; border-top:1px solid var(--border); margin-top:0; }
+.nn-title-input {
+  width:100%; border:none; background:transparent; outline:none;
+  font-family:'Lora',serif; font-size:32px; font-weight:600; color:var(--t1);
+  line-height:1.3; padding:28px 0 16px; letter-spacing:-0.02em;
+  border-bottom:2px solid var(--p200); margin-bottom:24px;
+  transition:border-color 0.2s;
+}
+.nn-title-input:focus { border-bottom-color:var(--p600); }
+.nn-title-input::placeholder { color:var(--t4); }
+
+/* Location picker row */
+.nn-location-row { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.nn-location-label { font-size:12px; color:var(--t3); font-family:'JetBrains Mono',monospace; width:70px; flex-shrink:0; }
+.nn-location-select {
+  flex:1; appearance:none; border:1px solid var(--border2);
+  border-radius:var(--radius-md); background:var(--surface);
+  font-family:'DM Sans',sans-serif; font-size:13px; color:var(--t1);
+  padding:8px 12px; cursor:pointer; outline:none;
+}
+.nn-location-select:focus { border-color:var(--p400); }
+.nn-arrow { color:var(--t4); font-size:12px; }
+
+/* Template picker */
+.nn-template-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:4px; }
+.nn-tpl-card {
+  border:1px solid var(--border); border-radius:var(--radius-md);
+  padding:10px 12px; cursor:pointer; background:var(--surface);
+  transition:all 0.12s; display:flex; align-items:center; gap:8px;
+}
+.nn-tpl-card:hover { border-color:var(--p300); background:var(--p50); }
+.nn-tpl-card.selected { border-color:var(--p600); background:var(--p50); }
+.nn-tpl-icon { font-size:16px; flex-shrink:0; }
+.nn-tpl-name { font-size:12px; font-weight:500; color:var(--t1); }
+.nn-tpl-desc { font-size:10.5px; color:var(--t3); margin-top:1px; }
+.nn-blank-badge { font-size:9px; background:var(--p100); color:var(--p700); padding:1px 5px; border-radius:3px; font-family:'JetBrains Mono',monospace; margin-left:auto; }
+
+/* CTA bar */
+.nn-cta-bar {
+  padding:20px 48px 32px; display:flex; align-items:center; gap:12px;
+  border-top:1px solid var(--border); background:var(--surface);
+  margin-top:auto; flex-shrink:0;
+}
+.nn-create-btn {
+  display:flex; align-items:center; gap:8px;
+  padding:11px 28px; border-radius:var(--radius-md);
+  background:var(--p600); border:none; color:white;
+  font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif;
+  cursor:pointer; transition:0.15s;
+  box-shadow:0 4px 14px rgba(124,58,237,0.35);
+}
+.nn-create-btn:hover { background:var(--p700); box-shadow:0 4px 18px rgba(124,58,237,0.45); }
+.nn-create-btn svg { width:16px; height:16px; }
+.nn-preview-text { font-size:12px; color:var(--t3); line-height:1.5; }
+.nn-preview-text strong { color:var(--t2); }
+
+/* ══ NOTE BLANK STATE (when note just created) ══ */
+.note-blank-canvas {
+  flex:1; overflow-y:auto; padding:48px 64px;
+  display:flex; flex-direction:column;
+}
+.nbc-type-chips { display:flex; align-items:center; gap:8px; margin-bottom:20px; }
+.nbc-type-chip {
+  display:flex; align-items:center; gap:6px; padding:5px 12px;
+  border:1px solid var(--border2); border-radius:20px; cursor:pointer;
+  font-size:12px; color:var(--t2); background:var(--surface); transition:0.12s;
+}
+.nbc-type-chip.active { background:var(--p600); border-color:var(--p600); color:white; }
+.nbc-type-chip svg { width:12px; height:12px; }
+.nbc-title { width:100%; border:none; background:transparent; outline:none; font-family:'Lora',serif; font-size:34px; font-weight:600; color:var(--t1); line-height:1.25; margin-bottom:8px; letter-spacing:-0.02em; }
+.nbc-title::placeholder { color:var(--t4); }
+.nbc-subtitle { font-size:14px; color:var(--t4); border:none; background:transparent; outline:none; width:100%; margin-bottom:24px; font-family:'Lora',serif; font-style:italic; }
+.nbc-subtitle::placeholder { color:var(--t4); }
+.nbc-divider { border:none; border-top:1px solid var(--border); margin:0 0 24px; }
+.nbc-body { flex:1; width:100%; border:none; background:transparent; outline:none; font-size:15px; line-height:1.8; color:var(--t2); font-family:'Lora',serif; resize:none; min-height:300px; }
+.nbc-body::placeholder { color:var(--t4); }
+.nbc-insert-bar { display:flex; align-items:center; gap:6px; padding:12px 0 0; border-top:1px solid var(--border); margin-top:16px; flex-wrap:wrap; }
+.nbc-insert-btn { display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:6px; border:1px solid var(--border2); background:white; font-size:11.5px; color:var(--t2); cursor:pointer; font-family:'DM Sans',sans-serif; transition:0.12s; }
+.nbc-insert-btn:hover { border-color:var(--p300); color:var(--p600); background:var(--p50); }
+.nbc-insert-btn.ai { border-color:var(--p300); background:var(--p50); color:var(--p700); font-family:'JetBrains Mono',monospace; }
+
+/* ══ SETTINGS (compact) ══ */
+.settings-layout { flex:1; display:flex; overflow:hidden; }
+.settings-sidebar { width:190px; border-right:1px solid var(--border); background:var(--surface); padding:16px 0; flex-shrink:0; }
+.settings-nav-item { display:flex; align-items:center; gap:9px; padding:8px 18px; cursor:pointer; font-size:13px; color:var(--t2); border-left:2px solid transparent; transition:0.12s; }
+.settings-nav-item:hover { background:var(--p50); color:var(--t1); }
+.settings-nav-item.active { background:var(--p50); color:var(--p700); border-left-color:var(--p600); font-weight:500; }
+.settings-nav-item svg { width:14px; height:14px; opacity:0.7; }
+.settings-content { flex:1; overflow-y:auto; padding:28px 36px; }
+.settings-section { margin-bottom:32px; }
+.settings-section-title { font-size:16px; font-weight:600; color:var(--t1); margin-bottom:3px; font-family:'Lora',serif; }
+.settings-section-desc { font-size:12.5px; color:var(--t3); margin-bottom:16px; }
+.settings-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; margin-bottom:12px; box-shadow:var(--shadow-card); }
+.api-key-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.api-key-row:last-child { margin-bottom:0; }
+.api-provider-logo { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; flex-shrink:0; }
+.api-key-info { flex:1; min-width:0; }
+.api-key-name { font-size:12.5px; font-weight:500; color:var(--t1); }
+.api-key-status { font-size:10.5px; color:var(--t3); font-family:'JetBrains Mono',monospace; }
+.api-key-input { flex:2; border:1px solid var(--border2); border-radius:var(--radius-md); padding:6px 10px; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--t2); background:var(--p50); outline:none; }
+.api-key-input:focus { border-color:var(--p400); background:white; }
+.api-key-input::placeholder { color:var(--t4); }
+.api-connect-btn { padding:5px 12px; border-radius:var(--radius-md); border:1px solid var(--p300); background:var(--p50); color:var(--p700); font-size:11.5px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:0.12s; white-space:nowrap; }
+.api-connect-btn:hover { background:var(--p100); }
+.api-connect-btn.connected { background:var(--green-bg); border-color:#86EFAC; color:var(--green); }
+.toggle-row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--border); }
+.toggle-row:last-child { border-bottom:none; }
+.toggle-info { flex:1; }
+.toggle-name { font-size:12.5px; font-weight:500; color:var(--t1); }
+.toggle-desc { font-size:11px; color:var(--t3); margin-top:2px; }
+.toggle-sw { width:34px; height:19px; background:var(--t4); border-radius:20px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+.toggle-sw.on { background:var(--p600); }
+.toggle-sw::after { content:''; position:absolute; width:15px; height:15px; border-radius:50%; background:white; top:2px; left:2px; transition:left 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.toggle-sw.on::after { left:17px; }
+.view-header-bar { height:var(--toolbar-h); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:10px; flex-shrink:0; }
+.view-header-title { font-size:15px; font-weight:600; color:var(--t1); font-family:'Lora',serif; }
+.model-select-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.model-card { border:1px solid var(--border); border-radius:var(--radius-md); padding:10px 12px; cursor:pointer; transition:0.15s; display:flex; align-items:flex-start; gap:8px; }
+.model-card:hover { border-color:var(--p300); background:var(--p50); }
+.model-card.selected { border-color:var(--p500); background:var(--p50); }
+.model-card-dot { width:13px; height:13px; border-radius:50%; border:2px solid var(--border2); flex-shrink:0; margin-top:3px; transition:0.15s; }
+.model-card.selected .model-card-dot { background:var(--p600); border-color:var(--p600); }
+.model-name { font-size:12px; font-weight:500; color:var(--t1); }
+.model-desc { font-size:10.5px; color:var(--t3); margin-top:1px; }
+
+/* ══ PROMPT LIBRARY ══ */
+.prompt-library { flex:1; overflow-y:auto; padding:24px 28px; }
+.pl-filters { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.pl-filter { padding:5px 13px; border-radius:20px; border:1px solid var(--border2); background:white; font-size:12px; color:var(--t2); cursor:pointer; transition:0.12s; }
+.pl-filter:hover,.pl-filter.active { background:var(--p600); border-color:var(--p600); color:white; }
+.pl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+.prompt-card { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; cursor:pointer; transition:0.15s; box-shadow:var(--shadow-card); }
+.prompt-card:hover { border-color:var(--p300); transform:translateY(-1px); }
+.pc-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+.pc-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.pc-name { font-size:13px; font-weight:600; color:var(--t1); line-height:1.3; }
+.pc-category { font-size:10px; color:var(--t3); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+.pc-desc { font-size:12px; color:var(--t2); line-height:1.5; margin-bottom:10px; }
+.pc-preview { background:var(--p50); border:1px solid var(--p200); border-radius:5px; padding:7px 9px; font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--p700); line-height:1.5; margin-bottom:10px; }
+.pc-footer { display:flex; align-items:center; gap:8px; }
+.pc-uses { font-size:11px; color:var(--t3); }
+.pc-ai-badges { display:flex; gap:4px; margin-left:auto; }
+.pc-ai-badge { width:17px; height:17px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:white; }
+.pc-use-btn { padding:4px 10px; border-radius:5px; background:var(--p600); border:none; color:white; font-size:11px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.pc-use-btn:hover { background:var(--p700); }
+
+/* ══ KNOWLEDGE GRAPH ══ */
+.graph-view { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.graph-main { flex:1; display:flex; overflow:hidden; }
+.graph-canvas { flex:1; position:relative; background:var(--bg); overflow:hidden; }
+#knowledgeGraph { width:100%; height:100%; }
+.graph-legend { position:absolute; bottom:20px; left:20px; background:white; border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 14px; box-shadow:var(--shadow-card); }
+.legend-title { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--t3); font-family:'JetBrains Mono',monospace; margin-bottom:8px; }
+.legend-item { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--t2); margin-bottom:5px; }
+.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.graph-info-panel { width:250px; border-left:1px solid var(--border); background:var(--surface); padding:18px; overflow-y:auto; flex-shrink:0; }
+.gip-title { font-size:15px; font-weight:600; color:var(--t1); font-family:'Lora',serif; margin-bottom:4px; }
+.gip-stat { display:flex; gap:12px; margin-bottom:14px; }
+.gip-stat-item { text-align:center; }
+.gip-stat-num { font-size:18px; font-weight:600; color:var(--p600); font-family:'Lora',serif; }
+.gip-stat-lbl { font-size:9.5px; color:var(--t3); font-family:'JetBrains Mono',monospace; }
+.gip-conn-item { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.gip-conn-item:last-child { border-bottom:none; }
+.gip-conn-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.gip-conn-name { font-size:12px; color:var(--t2); flex:1; }
+.gip-conn-strength { font-size:10px; color:var(--t4); font-family:'JetBrains Mono',monospace; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV RAIL ══ -->
+<nav class="nav-rail">
+  <div class="nav-logo">L</div>
+  <button class="nav-btn active" onclick="switchView('notes',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+    <span class="nav-tip">Notes</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('prompts',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg>
+    <span class="nav-tip">Prompt Library</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('graph',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg>
+    <span class="nav-tip">Knowledge Graph</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="switchView('settings',this)">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+    <span class="nav-tip">Settings</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar">H</div>
+</nav>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar" id="sidebar">
+  <!-- Top controls -->
+  <div class="sb-topbar">
+    <div class="sb-search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M9.5 9.5l3 3"/></svg>
+      <input type="text" placeholder="Search notes…" />
+    </div>
+    <!-- Compact / Expanded toggle -->
+    <div class="sb-view-toggle">
+      <button class="sb-vt-btn" id="btnCompact" onclick="setViewMode('compact')" title="Compact">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+      </button>
+      <button class="sb-vt-btn active" id="btnExpanded" onclick="setViewMode('expanded')" title="Expanded">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="4" rx="1"/><rect x="2" y="9" width="12" height="4" rx="1"/></svg>
+      </button>
+    </div>
+    <!-- New note -->
+    <button class="sb-new-btn" onclick="switchView('newnote', null)" title="New Note">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+    </button>
+  </div>
+
+  <!-- ══ SHELF TREE ══ -->
+  <div class="sb-tree">
+
+    <!-- ── SHELF 1: AI & Machine Learning ── -->
+    <div class="shelf open" id="shelf1">
+      <div class="shelf-header" onclick="toggleShelf('shelf1')">
+        <div class="shelf-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="shelf-dot dot-shelf-1"></div>
+        <span class="shelf-name">AI &amp; Machine Learning</span>
+        <span class="shelf-count">8</span>
+        <button class="shelf-add" onclick="event.stopPropagation(); switchView('newnote',null)">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg>
+        </button>
+      </div>
+      <div class="shelf-body">
+
+        <!-- Notebook: Transformers -->
+        <div class="notebook open" id="nb-transformers">
+          <div class="notebook-header" onclick="toggleNotebook('nb-transformers')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📔</span>
+            <span class="nb-name">Transformers</span>
+            <span class="nb-count">3</span>
+          </div>
+          <div class="nb-body">
+            <!-- Note 1 — active -->
+            <div class="note-item active" onclick="selectNote(this,'Transformer Architecture Deep Dive','Research','AI &amp; Machine Learning','Transformers')">
+              <!-- expanded -->
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title-exp">Transformer Architecture Deep Dive</div>
+              <div class="ni-preview">Attention mechanisms, positional encodings, multi-head attention tradeoffs.</div>
+              <!-- compact -->
+              <div class="ni-compact"><div class="ni-compact-dot dot-research"></div><span class="ni-compact-title">Transformer Architecture Deep Dive</span><span class="ni-compact-date">Mar 16</span></div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'Attention Mechanisms Survey','Research','AI &amp; Machine Learning','Transformers')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 18</span></div>
+              <div class="ni-title-exp">Attention Mechanisms Survey</div>
+              <div class="ni-preview">Scaled dot-product, sparse, local, and flash attention variants compared.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-research"></div><span class="ni-compact-title">Attention Mechanisms Survey</span><span class="ni-compact-date">Mar 18</span></div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'BERT vs GPT Analysis','Idea','AI &amp; Machine Learning','Transformers')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Mar 22</span></div>
+              <div class="ni-title-exp">BERT vs GPT Analysis</div>
+              <div class="ni-preview">Bidirectional vs autoregressive — when to use which for enterprise tasks.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-idea"></div><span class="ni-compact-title">BERT vs GPT Analysis</span><span class="ni-compact-date">Mar 22</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notebook: RAG Patterns -->
+        <div class="notebook open" id="nb-rag">
+          <div class="notebook-header" onclick="toggleNotebook('nb-rag')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📗</span>
+            <span class="nb-name">RAG Patterns</span>
+            <span class="nb-count">2</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Hybrid Retrieval Strategies','Research','AI &amp; Machine Learning','RAG Patterns')">
+              <div class="ni-top"><span class="ni-badge badge-research">Research</span><span class="ni-date">Mar 20</span></div>
+              <div class="ni-title-exp">Hybrid Retrieval Strategies</div>
+              <div class="ni-preview">Chunking, BM25 + dense vectors, cross-encoder re-ranking.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-research"></div><span class="ni-compact-title">Hybrid Retrieval Strategies</span><span class="ni-compact-date">Mar 20</span></div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'Context Window Management','Task','AI &amp; Machine Learning','RAG Patterns')">
+              <div class="ni-top"><span class="ni-badge badge-task">Task</span><span class="ni-date">Mar 25</span></div>
+              <div class="ni-title-exp">Context Window Management</div>
+              <div class="ni-preview">Token budgeting strategies for long-context LLM calls.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-task"></div><span class="ni-compact-title">Context Window Management</span><span class="ni-compact-date">Mar 25</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notebook: AI Roadmap -->
+        <div class="notebook" id="nb-roadmap">
+          <div class="notebook-header" onclick="toggleNotebook('nb-roadmap')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">🗺️</span>
+            <span class="nb-name">AI Roadmap</span>
+            <span class="nb-count">3</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'36-Week Learning Plan','Task','AI &amp; Machine Learning','AI Roadmap')">
+              <div class="ni-top"><span class="ni-badge badge-task">Task</span><span class="ni-date">Apr 1</span></div>
+              <div class="ni-title-exp">36-Week Learning Plan</div>
+              <div class="ni-preview">Math → ML → LLM → Enterprise. Structured lanes.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-task"></div><span class="ni-compact-title">36-Week Learning Plan</span><span class="ni-compact-date">Apr 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHELF 2: Personal ── -->
+    <div class="shelf open" id="shelf2">
+      <div class="shelf-header" onclick="toggleShelf('shelf2')">
+        <div class="shelf-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="shelf-dot dot-shelf-2"></div>
+        <span class="shelf-name">Personal</span>
+        <span class="shelf-count">5</span>
+        <button class="shelf-add" onclick="event.stopPropagation();">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg>
+        </button>
+      </div>
+      <div class="shelf-body">
+        <!-- Notebook: Daily Journal -->
+        <div class="notebook open" id="nb-journal">
+          <div class="notebook-header" onclick="toggleNotebook('nb-journal')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📒</span>
+            <span class="nb-name">Daily Journal</span>
+            <span class="nb-count">12</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Monday — Deep Work Session','Journal','Personal','Daily Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 16</span></div>
+              <div class="ni-title-exp">Monday — Deep Work Session</div>
+              <div class="ni-preview">Shipped Lore demo data. Azure deployed. Energy 4/5.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-journal"></div><span class="ni-compact-title">Monday — Deep Work Session</span><span class="ni-compact-date">Mar 16</span></div>
+            </div>
+            <div class="note-item" onclick="selectNote(this,'Weekly Review · Week 12','Journal','Personal','Daily Journal')">
+              <div class="ni-top"><span class="ni-badge badge-journal">Journal</span><span class="ni-date">Mar 22</span></div>
+              <div class="ni-title-exp">Weekly Review · Week 12</div>
+              <div class="ni-preview">Roadmap milestones, gym streak 6/6, two blog posts drafted.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-journal"></div><span class="ni-compact-title">Weekly Review · Week 12</span><span class="ni-compact-date">Mar 22</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Notebook: Linear Algebra Book -->
+        <div class="notebook" id="nb-linalg">
+          <div class="notebook-header" onclick="toggleNotebook('nb-linalg')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📐</span>
+            <span class="nb-name">Linear Algebra Book</span>
+            <span class="nb-count">3</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Chapter Structure & Outline','Idea','Personal','Linear Algebra Book')">
+              <div class="ni-top"><span class="ni-badge badge-idea">Idea</span><span class="ni-date">Apr 5</span></div>
+              <div class="ni-title-exp">Chapter Structure &amp; Outline</div>
+              <div class="ni-preview">Story → Math → Python → Manim animation. 3B1B style.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-idea"></div><span class="ni-compact-title">Chapter Structure &amp; Outline</span><span class="ni-compact-date">Apr 5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHELF 3: Work / Finance ── -->
+    <div class="shelf" id="shelf3">
+      <div class="shelf-header" onclick="toggleShelf('shelf3')">
+        <div class="shelf-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+        <div class="shelf-dot dot-shelf-3"></div>
+        <span class="shelf-name">Work &amp; Finance</span>
+        <span class="shelf-count">4</span>
+        <button class="shelf-add" onclick="event.stopPropagation();">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 2v6M2 5h6"/></svg>
+        </button>
+      </div>
+      <div class="shelf-body">
+        <div class="notebook open" id="nb-equity">
+          <div class="notebook-header" onclick="toggleNotebook('nb-equity')">
+            <div class="nb-chevron"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2l4 3-4 3"/></svg></div>
+            <span class="nb-icon">📊</span>
+            <span class="nb-name">Equity Research</span>
+            <span class="nb-count">4</span>
+          </div>
+          <div class="nb-body">
+            <div class="note-item" onclick="selectNote(this,'Indian Equity Framework','Reference','Work &amp; Finance','Equity Research')">
+              <div class="ni-top"><span class="ni-badge badge-reference">Reference</span><span class="ni-date">Feb 10</span></div>
+              <div class="ni-title-exp">Indian Equity Framework</div>
+              <div class="ni-preview">BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.</div>
+              <div class="ni-compact"><div class="ni-compact-dot dot-reference"></div><span class="ni-compact-title">Indian Equity Framework</span><span class="ni-compact-date">Feb 10</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.sb-tree -->
+</div><!-- /.sidebar -->
+
+<!-- ══════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════ -->
+<div class="main">
+
+  <!-- ══ VIEW: NOTES (editor) ══ -->
+  <div class="view active" id="view-notes">
+    <div class="note-toolbar">
+      <div class="nt-breadcrumb">
+        <span class="shelf-bc">AI &amp; Machine Learning</span>
+        <span class="sep">›</span><span>Transformers</span>
+        <span class="sep">›</span><span class="cur" id="breadcrumb-note">Transformer Architecture Deep Dive</span>
+      </div>
+      <div class="nt-spacer"></div>
+      <div class="note-location-pill">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 5h4M6 8h4"/></svg>
+        <span>Transformers</span> notebook
+      </div>
+      <div class="ai-pill"><div class="ai-pill-dot"></div>Ask AI</div>
+      <button class="nt-btn">Structured</button>
+      <button class="nt-btn primary">Edit</button>
+    </div>
+
+    <div class="note-editor-area">
+      <div class="note-editor-main">
+        <div class="note-type-row">
+          <select class="note-type-select"><option>Research</option><option>Journal</option><option>Task</option><option>Idea</option><option>Reference</option></select>
+          <select class="status-select"><option>In Progress</option><option>Done</option><option>Draft</option></select>
+        </div>
+        <input class="note-title-input" type="text" value="Transformer Architecture Deep Dive" />
+        <div class="note-meta-chips">
+          <div class="meta-chip"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3V2M11 3V2"/></svg>Machine Learning</div>
+          <div class="meta-chip"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>Mar 16, 2026</div>
+          <div class="meta-chip" style="background:var(--green-bg);border-color:#86EFAC;color:var(--green);">+ Add field</div>
+        </div>
+        <hr class="editor-divider"/>
+        <div class="callout hyp">
+          <div class="callout-icon">💡</div>
+          <div><div class="callout-lbl">Hypothesis</div><div class="callout-text">Attention mechanisms can replace recurrence entirely for sequence modelling tasks.</div></div>
+        </div>
+        <div class="section-mini-lbl">Methodology</div>
+        <p class="prose-p">Literature review of "Attention Is All You Need" (Vaswani et al., 2017) and follow-up papers. Implemented a mini transformer on a toy dataset to validate the core claims.</p>
+        <div class="two-col">
+          <div class="findings-box">
+            <div class="findings-label">Key Findings</div>
+            <div class="finding-row"><span class="finding-num">1</span><span>Self-attention scales quadratically with sequence length — a key bottleneck.</span></div>
+            <div class="finding-row"><span class="finding-num">2</span><span>Positional encodings are critical; learned vs sinusoidal perform similarly.</span></div>
+            <div class="finding-row"><span class="finding-num">3</span><span>Multi-head attention allows attending to different representation subspaces.</span></div>
+          </div>
+          <div class="refs-box">
+            <div class="findings-label" style="color:var(--p600);">References</div>
+            <a class="ref-link" href="#"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>Attention Is All You Need — Vaswani et al.</a>
+            <a class="ref-link" href="#"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;margin-top:2px;opacity:0.5;"><path d="M4 2h6l4 4v8a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v4h4"/></svg>The Illustrated Transformer — Jay Alammar</a>
+          </div>
+        </div>
+        <p class="prose-p"><span class="ai-mention"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:var(--p600);color:white;font-size:8px;font-weight:700;margin-right:3px;">C</span>@claude</span> What are the main architectural differences between encoder-only and decoder-only transformers?</p>
+        <div class="ai-response-block">
+          <div class="ai-response-header"><div class="ai-response-logo">C</div><span class="ai-response-name">Claude · Sonnet 4</span><span style="font-size:10px;color:var(--t4);margin-left:auto;font-family:'JetBrains Mono',monospace;">just now</span></div>
+          <div class="ai-response-text">Encoder-only models (BERT, RoBERTa) use bidirectional attention — ideal for classification and embeddings. Decoder-only models (GPT family) use causal/autoregressive attention, optimized for generation. Encoder-decoder (T5, BART) combines both via cross-attention between encoder states and the decoder.</div>
+          <div class="ai-response-footer"><button class="ai-resp-btn">📋 Copy</button><button class="ai-resp-btn">📝 Save as note</button><button class="ai-resp-btn">🔗 Link to graph</button></div>
+        </div>
+        <div class="callout con" style="margin-top:16px;">
+          <div class="callout-icon">🎯</div>
+          <div><div class="callout-lbl">Conclusion</div><div class="callout-text">Transformers are now the dominant architecture for NLP and increasingly vision tasks. Worth investing deep time in internals before moving to fine-tuning.</div></div>
+        </div>
+        <div class="section-mini-lbl">Your notes</div>
+        <div id="editorArea" class="note-content-area" contenteditable="true"><p style="color:var(--t4)">Continue here… type @ to mention an AI model</p></div>
+        <div class="mention-dropdown" id="mentionDropdown">
+          <div class="mention-dd-header">Ask AI — choose a model</div>
+          <div class="mention-item" onclick="insertMention('Claude')"><div class="mention-item-logo" style="background:var(--p600);">C</div><div><div class="mention-item-name">Claude</div><div class="mention-item-desc">Anthropic · Sonnet 4</div></div><span class="mention-item-connected">Connected</span></div>
+          <div class="mention-item" onclick="insertMention('ChatGPT')"><div class="mention-item-logo" style="background:#10A37F;">G</div><div><div class="mention-item-name">ChatGPT</div><div class="mention-item-desc">OpenAI · GPT-4o</div></div><span class="mention-item-connected">Connected</span></div>
+          <div class="mention-item" onclick="insertMention('Gemini')"><div class="mention-item-logo" style="background:#4285F4;">G</div><div><div class="mention-item-name">Gemini</div><div class="mention-item-desc">Google · 1.5 Pro</div></div></div>
+          <div class="mention-item" onclick="insertMention('Groq')"><div class="mention-item-logo" style="background:#F55036;">Q</div><div><div class="mention-item-name">Groq</div><div class="mention-item-desc">Llama 3 70B</div></div></div>
+        </div>
+        <div class="note-tags-row">
+          <span class="note-tag">transformers</span><span class="note-tag">attention</span><span class="note-tag">NLP</span><span class="note-tag">deep-learning</span>
+          <span class="note-tag" style="background:white;border:1px dashed var(--p300);color:var(--p600);">+ tag</span>
+        </div>
+      </div>
+      <!-- Right context panel -->
+      <div class="note-context-panel">
+        <div class="cp-section">
+          <div class="cp-label">Location</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2);"><div style="width:8px;height:8px;border-radius:50%;background:var(--p600);flex-shrink:0;"></div>AI &amp; Machine Learning <span style="color:var(--t4);font-size:10px;">shelf</span></div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2);padding-left:14px;"><span style="font-size:11px;">📔</span> Transformers <span style="color:var(--t4);font-size:10px;">notebook</span></div>
+          </div>
+        </div>
+        <div class="cp-section"><div class="cp-label">Tags</div><div class="cp-tags"><span class="cp-tag">transformers</span><span class="cp-tag">attention</span><span class="cp-tag">NLP</span></div></div>
+        <div class="cp-section"><div class="cp-label">AI Used</div><div class="cp-ai-used"><div class="cp-ai-icon" style="background:var(--p600);">C</div><span class="cp-ai-name">Claude</span><span class="cp-ai-count">3 calls</span></div></div>
+        <div class="cp-section"><div class="cp-label">Linked Notes</div><div class="cp-linked-note"><div class="cp-linked-dot" style="background:var(--teal);"></div><div class="cp-linked-text">Hybrid Retrieval Strategies</div></div><div class="cp-linked-note"><div class="cp-linked-dot" style="background:var(--blue);"></div><div class="cp-linked-text">36-Week Learning Plan</div></div></div>
+        <div class="cp-section">
+          <div class="cp-label">Note Stats</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;">847</div><div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;">words</div></div>
+            <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:18px;font-weight:600;color:var(--p600);font-family:'Lora',serif;">4</div><div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;">AI calls</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: NEW NOTE CREATION ══ -->
+  <div class="view" id="view-newnote">
+    <div class="nn-wrap">
+      <div class="nn-topbar">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--p600)" stroke-width="1.8"><path d="M10 3v14M3 10h14"/></svg>
+        <span class="nn-topbar-title">New Note</span>
+        <div style="flex:1;"></div>
+        <button class="nn-close-btn" onclick="switchView('notes', document.querySelector('.nav-btn.active'))">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l10 10M13 3L3 13"/></svg>
+        </button>
+      </div>
+
+      <div class="nn-body">
+        <!-- Step 1: Choose type -->
+        <div class="nn-step">
+          <div class="nn-step-label">1 — Choose note type</div>
+          <div class="nn-type-grid">
+            <div class="nn-type-card selected" onclick="selectType(this)">
+              <div class="nn-type-icon" style="background:var(--teal-bg);">🔬</div>
+              <div class="nn-type-name">Research</div>
+              <div class="nn-type-desc">Hypotheses, findings, references</div>
+            </div>
+            <div class="nn-type-card" onclick="selectType(this)">
+              <div class="nn-type-icon" style="background:var(--amber-bg);">📔</div>
+              <div class="nn-type-name">Journal</div>
+              <div class="nn-type-desc">Daily reflections &amp; intentions</div>
+            </div>
+            <div class="nn-type-card" onclick="selectType(this)">
+              <div class="nn-type-icon" style="background:var(--blue-bg);">✅</div>
+              <div class="nn-type-name">Task</div>
+              <div class="nn-type-desc">Action items &amp; milestones</div>
+            </div>
+            <div class="nn-type-card" onclick="selectType(this)">
+              <div class="nn-type-icon" style="background:var(--rose-bg);">💡</div>
+              <div class="nn-type-name">Idea</div>
+              <div class="nn-type-desc">Concepts &amp; creative sparks</div>
+            </div>
+            <div class="nn-type-card" onclick="selectType(this)">
+              <div class="nn-type-icon" style="background:var(--p100);">📎</div>
+              <div class="nn-type-name">Reference</div>
+              <div class="nn-type-desc">Links, docs &amp; resources</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Title + location -->
+        <div class="nn-step2">
+          <input class="nn-title-input" type="text" placeholder="Give your note a title…" id="newNoteTitle" />
+
+          <div class="nn-location-row">
+            <span class="nn-location-label">Shelf</span>
+            <span class="nn-arrow">→</span>
+            <select class="nn-location-select">
+              <option>AI &amp; Machine Learning</option>
+              <option>Personal</option>
+              <option>Work &amp; Finance</option>
+              <option>+ New Shelf</option>
+            </select>
+          </div>
+          <div class="nn-location-row">
+            <span class="nn-location-label">Notebook</span>
+            <span class="nn-arrow">→</span>
+            <select class="nn-location-select">
+              <option>Transformers</option>
+              <option>RAG Patterns</option>
+              <option>AI Roadmap</option>
+              <option>+ New Notebook</option>
+            </select>
+          </div>
+
+          <!-- Step 3: Template (optional) -->
+          <div class="nn-step-label" style="margin-top:24px;">3 — Start from a template <span style="font-size:10px;color:var(--t4);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></div>
+          <div class="nn-template-grid">
+            <div class="nn-tpl-card selected" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">📄</span>
+              <div><div class="nn-tpl-name">Blank</div><div class="nn-tpl-desc">Start fresh</div></div>
+              <span class="nn-blank-badge">default</span>
+            </div>
+            <div class="nn-tpl-card" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">🔬</span>
+              <div><div class="nn-tpl-name">Research Notes</div><div class="nn-tpl-desc">Hypothesis → Findings → Conclusion</div></div>
+            </div>
+            <div class="nn-tpl-card" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">📊</span>
+              <div><div class="nn-tpl-name">Literature Review</div><div class="nn-tpl-desc">Summary, critique, gaps</div></div>
+            </div>
+            <div class="nn-tpl-card" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">🗓️</span>
+              <div><div class="nn-tpl-name">Daily Journal</div><div class="nn-tpl-desc">Intention, wins, blockers</div></div>
+            </div>
+            <div class="nn-tpl-card" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">✅</span>
+              <div><div class="nn-tpl-name">Sprint Plan</div><div class="nn-tpl-desc">Goals, tasks, milestones</div></div>
+            </div>
+            <div class="nn-tpl-card" onclick="selectTpl(this)">
+              <span class="nn-tpl-icon">💬</span>
+              <div><div class="nn-tpl-name">AI Conversation</div><div class="nn-tpl-desc">Pre-loaded with @claude prompt</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="nn-cta-bar">
+        <button class="nn-create-btn" onclick="createNote()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Start Writing
+        </button>
+        <div class="nn-preview-text">
+          Creating a <strong>Research</strong> note in <strong>Transformers</strong> notebook<br/>
+          inside the <strong>AI &amp; Machine Learning</strong> shelf.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: BLANK NOTE (after creation) ══ -->
+  <div class="view" id="view-blanknote">
+    <div class="note-toolbar">
+      <div class="nt-breadcrumb">
+        <span class="shelf-bc">AI &amp; Machine Learning</span>
+        <span class="sep">›</span><span>Transformers</span>
+        <span class="sep">›</span><span class="cur">Untitled</span>
+      </div>
+      <div class="nt-spacer"></div>
+      <div class="note-location-pill"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 5h4M6 8h4"/></svg><span>Transformers</span> notebook</div>
+      <button class="nt-btn" style="border-color:rgba(30,20,10,0.08);color:var(--t3);">Draft</button>
+      <button class="nt-btn primary">Save</button>
+    </div>
+    <div class="note-blank-canvas">
+      <!-- Type chips at top -->
+      <div class="nbc-type-chips">
+        <div class="nbc-type-chip active">🔬 Research</div>
+        <div class="nbc-type-chip">📔 Journal</div>
+        <div class="nbc-type-chip">✅ Task</div>
+        <div class="nbc-type-chip">💡 Idea</div>
+        <div class="nbc-type-chip">📎 Reference</div>
+      </div>
+
+      <!-- Title -->
+      <input class="nbc-title" type="text" placeholder="Note title…" id="blankNoteTitle" />
+      <input class="nbc-subtitle" type="text" placeholder="Add a subtitle or brief context (optional)…" />
+      <hr class="nbc-divider" />
+
+      <!-- Body -->
+      <textarea class="nbc-body" placeholder="Start writing your note…&#10;&#10;Type @ to ask an AI model inline&#10;Type / to insert a block (callout, findings, image…)&#10;Type [[ to link another note"></textarea>
+
+      <!-- Insert bar -->
+      <div class="nbc-insert-bar">
+        <span style="font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-right:4px;">Insert</span>
+        <button class="nbc-insert-btn">💡 Hypothesis</button>
+        <button class="nbc-insert-btn">🎯 Conclusion</button>
+        <button class="nbc-insert-btn">🔑 Key Findings</button>
+        <button class="nbc-insert-btn">📎 Reference</button>
+        <button class="nbc-insert-btn">📊 Table</button>
+        <button class="nbc-insert-btn ai">✦ @claude</button>
+        <button class="nbc-insert-btn ai">✦ @chatgpt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: SETTINGS ══ -->
+  <div class="view" id="view-settings">
+    <div class="view-header-bar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg><span class="view-header-title">Settings</span><div style="flex:1;"></div><button class="nt-btn primary">Save Changes</button></div>
+    <div class="settings-layout">
+      <div class="settings-sidebar">
+        <div class="settings-nav-item active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h3"/></svg>AI Providers</div>
+        <div class="settings-nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Profile</div>
+        <div class="settings-nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6"/></svg>Appearance</div>
+        <div class="settings-nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v3M8 11v3M2 8h3M11 8h3"/></svg>AI Behaviour</div>
+        <div class="settings-nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/></svg>Sync &amp; Export</div>
+      </div>
+      <div class="settings-content">
+        <div class="settings-section">
+          <div class="settings-section-title">AI Provider Keys</div>
+          <div class="settings-section-desc">Stored locally only. Each key enables @mention for that model in your notes.</div>
+          <div class="settings-card">
+            <div class="api-key-row"><div class="api-provider-logo" style="background:var(--p600);">C</div><div class="api-key-info"><div class="api-key-name">Anthropic · Claude</div><div class="api-key-status">claude-sonnet-4 · Connected ✓</div></div><input class="api-key-input" type="password" value="sk-ant-••••••••••••••••" /><button class="api-connect-btn connected">Connected</button></div>
+            <div class="api-key-row"><div class="api-provider-logo" style="background:#10A37F;">G</div><div class="api-key-info"><div class="api-key-name">OpenAI · ChatGPT</div><div class="api-key-status">gpt-4o · Connected ✓</div></div><input class="api-key-input" type="password" value="sk-••••••••••••••••••" /><button class="api-connect-btn connected">Connected</button></div>
+            <div class="api-key-row"><div class="api-provider-logo" style="background:#4285F4;">G</div><div class="api-key-info"><div class="api-key-name">Google · Gemini</div><div class="api-key-status">Not configured</div></div><input class="api-key-input" type="text" placeholder="AIza••••••••••••••••" /><button class="api-connect-btn">Connect</button></div>
+            <div class="api-key-row"><div class="api-provider-logo" style="background:#F55036;">Q</div><div class="api-key-info"><div class="api-key-name">Groq · Llama 3</div><div class="api-key-status">Not configured</div></div><input class="api-key-input" type="text" placeholder="gsk_••••••••••••••••" /><button class="api-connect-btn">Connect</button></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Default Model</div>
+          <div class="settings-section-desc">Used when @ai is invoked without specifying a provider.</div>
+          <div class="model-select-grid">
+            <div class="model-card selected"><div class="model-card-dot"></div><div><div class="model-name">Claude Sonnet 4</div><div class="model-desc">Best for research</div></div></div>
+            <div class="model-card"><div class="model-card-dot"></div><div><div class="model-name">GPT-4o</div><div class="model-desc">Writing &amp; code</div></div></div>
+            <div class="model-card"><div class="model-card-dot"></div><div><div class="model-name">Gemini 1.5 Pro</div><div class="model-desc">1M token context</div></div></div>
+            <div class="model-card"><div class="model-card-dot"></div><div><div class="model-name">Groq Llama 3</div><div class="model-desc">Fastest inference</div></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">AI Behaviour</div>
+          <div class="settings-card">
+            <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Auto-link AI responses to Knowledge Graph</div><div class="toggle-desc">Replies parsed and linked as graph nodes</div></div><div class="toggle-sw on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Save AI exchanges as sub-notes</div><div class="toggle-desc">Conversations saved as child notes</div></div><div class="toggle-sw on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Include note context in AI prompts</div><div class="toggle-desc">Current note sent as context</div></div><div class="toggle-sw on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><div class="toggle-info"><div class="toggle-name">Scheduled AI prompts</div><div class="toggle-desc">Auto-run prompts from Prompt Library</div></div><div class="toggle-sw" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: PROMPT LIBRARY ══ -->
+  <div class="view" id="view-prompts">
+    <div class="view-header-bar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7 8.5c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-1.5 2.5-3 3v1"/><circle cx="10" cy="15.5" r=".5" fill="currentColor"/></svg><span class="view-header-title">Prompt Library</span><div style="flex:1;"></div><button class="nt-btn primary">+ New Prompt</button></div>
+    <div class="prompt-library">
+      <div class="pl-filters"><div class="pl-filter active">All</div><div class="pl-filter">Research</div><div class="pl-filter">Journal</div><div class="pl-filter">Finance</div><div class="pl-filter">Coding</div><div class="pl-filter">My Prompts</div></div>
+      <div class="pl-grid">
+        <div class="prompt-card"><div class="pc-top"><div class="pc-icon" style="background:var(--teal-bg);">🔬</div><div><div class="pc-name">Research Deep Dive</div><div class="pc-category">Research · Analysis</div></div></div><div class="pc-desc">Summarise key findings, tradeoffs, and open research questions from your note.</div><div class="pc-preview">Analyse this research note: (1) core thesis, (2) key findings, (3) open questions, (4) gaps.</div><div class="pc-footer"><span class="pc-uses">Used 47×</span><div class="pc-ai-badges"><div class="pc-ai-badge" style="background:var(--p600);">C</div><div class="pc-ai-badge" style="background:#10A37F;">G</div></div><button class="pc-use-btn">Use</button></div></div>
+        <div class="prompt-card"><div class="pc-top"><div class="pc-icon" style="background:var(--amber-bg);">📔</div><div><div class="pc-name">Daily Reflection</div><div class="pc-category">Journal · Reflection</div></div></div><div class="pc-desc">Structured daily journal — intention, wins, blockers, and tomorrow's focus.</div><div class="pc-preview">Today is {{date}}. Wins? Blockers? What changes tomorrow?</div><div class="pc-footer"><span class="pc-uses">Used 124×</span><div class="pc-ai-badges"><div class="pc-ai-badge" style="background:var(--p600);">C</div></div><button class="pc-use-btn">Use</button></div></div>
+        <div class="prompt-card"><div class="pc-top"><div class="pc-icon" style="background:var(--rose-bg);">📈</div><div><div class="pc-name">Equity Research Analyst</div><div class="pc-category">Finance · Analysis</div></div></div><div class="pc-desc">Institutional-grade analysis: BRSR, Beneish M-Score, ROIC vs WACC, promoter pledges.</div><div class="pc-preview">Analyse {{company}}: M-Score signals, ROIC/WACC spread, promoter pledge %, SEBI flags.</div><div class="pc-footer"><span class="pc-uses">Used 18×</span><div class="pc-ai-badges"><div class="pc-ai-badge" style="background:var(--p600);">C</div></div><button class="pc-use-btn">Use</button></div></div>
+        <div class="prompt-card"><div class="pc-top"><div class="pc-icon" style="background:var(--p100);">🧠</div><div><div class="pc-name">Concept Explainer</div><div class="pc-category">Learning · Education</div></div></div><div class="pc-desc">Explain any concept with analogy, definition, worked example, and misconceptions.</div><div class="pc-preview">Explain {{concept}} to someone with CS background new to this topic. Intuition + example + misconceptions.</div><div class="pc-footer"><span class="pc-uses">Used 89×</span><div class="pc-ai-badges"><div class="pc-ai-badge" style="background:var(--p600);">C</div><div class="pc-ai-badge" style="background:#4285F4;">G</div></div><button class="pc-use-btn">Use</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: KNOWLEDGE GRAPH ══ -->
+  <div class="view" id="view-graph">
+    <div class="graph-view">
+      <div class="view-header-bar"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="5" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="10" cy="15" r="2.5"/><path d="M7 5h5.5M6.5 6.5l2 7M13.5 6.5l-2 7"/></svg><div class="view-header-title">Knowledge Graph</div><span style="font-size:12px;color:var(--t3);margin-left:6px;">13 notes · 18 connections</span><div style="flex:1;"></div><button class="nt-btn">Filter</button><button class="nt-btn primary">Add note →</button></div>
+      <div class="graph-main">
+        <div class="graph-canvas">
+          <svg id="knowledgeGraph" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg">
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#EDE9FE" stroke-width="0.5"/></pattern>
+            <rect width="860" height="520" fill="url(#grid)"/>
+            <g stroke="#DDD6FE" stroke-width="1.5" fill="none">
+              <line x1="430" y1="210" x2="220" y2="115"/>
+              <line x1="430" y1="210" x2="640" y2="125"/>
+              <line x1="430" y1="210" x2="165" y2="310"/>
+              <line x1="430" y1="210" x2="695" y2="310"/>
+              <line x1="430" y1="210" x2="430" y2="390"/>
+              <line x1="220" y1="115" x2="640" y2="125" stroke="#E9E4FD" stroke-dasharray="5,4"/>
+              <line x1="165" y1="310" x2="430" y2="390" stroke="#E9E4FD" stroke-dasharray="5,4"/>
+              <line x1="640" y1="125" x2="695" y2="310" stroke="#F0FDFA" stroke-dasharray="5,4" stroke="#9FE1CB"/>
+            </g>
+            <!-- Central: Transformer -->
+            <g style="cursor:pointer;">
+              <circle cx="430" cy="210" r="50" fill="#7C3AED" opacity="0.1"/>
+              <circle cx="430" cy="210" r="38" fill="#7C3AED"/>
+              <circle cx="430" cy="210" r="38" fill="none" stroke="white" stroke-width="1.5" opacity="0.25"/>
+              <text x="430" y="204" text-anchor="middle" fill="white" font-size="10.5" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text>
+              <text x="430" y="220" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="DM Sans,sans-serif">Architecture</text>
+              <text x="430" y="261" text-anchor="middle" fill="#8B5CF6" font-size="9" font-family="JetBrains Mono,monospace">Research</text>
+            </g>
+            <!-- RAG -->
+            <g style="cursor:pointer;">
+              <circle cx="220" cy="115" r="30" fill="#0F766E"/>
+              <text x="220" y="110" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">RAG</text>
+              <text x="220" y="124" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">Patterns</text>
+              <text x="220" y="158" text-anchor="middle" fill="#0F766E" font-size="9" font-family="JetBrains Mono,monospace">Research</text>
+            </g>
+            <!-- AI Roadmap -->
+            <g style="cursor:pointer;">
+              <circle cx="640" cy="125" r="32" fill="#1D4ED8"/>
+              <text x="640" y="119" text-anchor="middle" fill="white" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">AI Roadmap</text>
+              <text x="640" y="133" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">36 Weeks</text>
+              <text x="640" y="170" text-anchor="middle" fill="#1D4ED8" font-size="9" font-family="JetBrains Mono,monospace">Task</text>
+            </g>
+            <!-- Journal -->
+            <g style="cursor:pointer;">
+              <circle cx="165" cy="310" r="27" fill="#D97706"/>
+              <text x="165" y="304" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Monday</text>
+              <text x="165" y="317" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans,sans-serif">Journal</text>
+              <text x="165" y="349" text-anchor="middle" fill="#D97706" font-size="9" font-family="JetBrains Mono,monospace">Journal</text>
+            </g>
+            <!-- Equity -->
+            <g style="cursor:pointer;">
+              <circle cx="695" cy="310" r="28" fill="#BE185D"/>
+              <text x="695" y="304" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Equity</text>
+              <text x="695" y="317" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9" font-family="DM Sans,sans-serif">Research</text>
+              <text x="695" y="351" text-anchor="middle" fill="#BE185D" font-size="9" font-family="JetBrains Mono,monospace">Reference</text>
+            </g>
+            <!-- Linear Algebra -->
+            <g style="cursor:pointer;">
+              <circle cx="430" cy="390" r="28" fill="#7C3AED" opacity="0.7"/>
+              <text x="430" y="384" text-anchor="middle" fill="white" font-size="9.5" font-weight="600" font-family="DM Sans,sans-serif">Linear</text>
+              <text x="430" y="397" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" font-family="DM Sans,sans-serif">Algebra Book</text>
+              <text x="430" y="430" text-anchor="middle" fill="#7C3AED" font-size="9" font-family="JetBrains Mono,monospace">Idea</text>
+            </g>
+            <!-- Shelf labels -->
+            <rect x="100" y="60" width="190" height="20" rx="5" fill="#EDE9FE" opacity="0.6"/>
+            <text x="195" y="74" text-anchor="middle" fill="#7C3AED" font-size="9.5" font-family="JetBrains Mono,monospace">📚 AI &amp; Machine Learning shelf</text>
+            <rect x="360" y="430" width="140" height="20" rx="5" fill="#FFF1F2" opacity="0.6"/>
+            <text x="430" y="444" text-anchor="middle" fill="#BE185D" font-size="9.5" font-family="JetBrains Mono,monospace">📚 Personal shelf</text>
+            <text x="430" y="505" text-anchor="middle" fill="#BCB6D4" font-size="11" font-family="DM Sans,sans-serif">Click a node to explore connections</text>
+          </svg>
+          <div class="graph-legend">
+            <div class="legend-title">Note types</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7C3AED;"></div>Research</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div>Journal</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D4ED8;"></div>Task</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BE185D;"></div>Reference</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--rose);"></div>Idea</div>
+          </div>
+        </div>
+        <div class="graph-info-panel">
+          <div class="cp-label" style="margin-bottom:10px;">Selected Node</div>
+          <div class="gip-title">Transformer Architecture</div>
+          <div style="margin:6px 0 12px;"><span class="ni-badge badge-research" style="font-size:10px;">Research</span></div>
+          <div class="gip-stat"><div class="gip-stat-item"><div class="gip-stat-num">5</div><div class="gip-stat-lbl">links</div></div><div class="gip-stat-item"><div class="gip-stat-num">4</div><div class="gip-stat-lbl">AI calls</div></div><div class="gip-stat-item"><div class="gip-stat-num">847</div><div class="gip-stat-lbl">words</div></div></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin-bottom:12px;"/>
+          <div class="cp-label">Connected Notes</div>
+          <div class="gip-conn-item"><div class="gip-conn-dot" style="background:#0F766E;"></div><span class="gip-conn-name">RAG Hybrid Retrieval</span><span class="gip-conn-strength">strong</span></div>
+          <div class="gip-conn-item"><div class="gip-conn-dot" style="background:#1D4ED8;"></div><span class="gip-conn-name">36-Week AI Roadmap</span><span class="gip-conn-strength">strong</span></div>
+          <div class="gip-conn-item"><div class="gip-conn-dot" style="background:#7C3AED;opacity:0.7;"></div><span class="gip-conn-name">Linear Algebra Book</span><span class="gip-conn-strength">medium</span></div>
+          <div class="gip-conn-item"><div class="gip-conn-dot" style="background:#D97706;"></div><span class="gip-conn-name">Monday Deep Work</span><span class="gip-conn-strength">weak</span></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;"/>
+          <div style="background:var(--p50);border:1px solid var(--p200);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.6;">This is a <strong style="color:var(--p700);">central hub</strong> — connects to 5 notes with strong thematic overlap across RAG, Roadmap, and Math.</div>
+          <button class="api-connect-btn" style="width:100%;margin-top:10px;text-align:center;">Open Note →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<script>
+// ── View switcher ──
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const v = document.getElementById('view-' + name);
+  if (v) v.classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  // Hide sidebar for new-note and blank-note
+  const sb = document.getElementById('sidebar');
+  sb.style.display = (name === 'newnote') ? 'none' : '';
+}
+
+// ── Compact / Expanded sidebar ──
+function setViewMode(mode) {
+  document.getElementById('btnCompact').classList.toggle('active', mode === 'compact');
+  document.getElementById('btnExpanded').classList.toggle('active', mode === 'expanded');
+  document.body.classList.toggle('compact-mode', mode === 'compact');
+}
+
+// ── Shelf / Notebook toggle ──
+function toggleShelf(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+function toggleNotebook(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── Select a note from sidebar ──
+function selectNote(el, title, type, shelf, notebook) {
+  document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('breadcrumb-note').textContent = title;
+  switchView('notes', null);
+}
+
+// ── Note type card (new note screen) ──
+function selectType(card) {
+  document.querySelectorAll('.nn-type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+// ── Template card ──
+function selectTpl(card) {
+  document.querySelectorAll('.nn-tpl-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+// ── Create note → go to blank editor ──
+function createNote() {
+  const title = document.getElementById('newNoteTitle').value;
+  if (title) document.getElementById('blankNoteTitle').value = title;
+  switchView('blanknote', null);
+}
+
+// ── @mention dropdown ──
+const editorArea = document.getElementById('editorArea');
+const dropdown = document.getElementById('mentionDropdown');
+let mentionStart = null;
+
+editorArea.addEventListener('keyup', function(e) {
+  const sel = window.getSelection();
+  const text = sel.anchorNode && sel.anchorNode.textContent || '';
+  const pos = sel.anchorOffset;
+  if (text[pos - 1] === '@') {
+    mentionStart = { node: sel.anchorNode, offset: pos };
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    const edRect = editorArea.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom - edRect.top + 6) + 'px';
+    dropdown.style.left = (rect.left - edRect.left) + 'px';
+    dropdown.classList.add('open');
+  } else if (e.key === 'Escape') {
+    dropdown.classList.remove('open');
+  }
+});
+document.addEventListener('click', function(e) {
+  if (!dropdown.contains(e.target) && e.target !== editorArea) dropdown.classList.remove('open');
+});
+function insertMention(model) {
+  dropdown.classList.remove('open');
+  const colors = { Claude:'#7C3AED', ChatGPT:'#10A37F', Gemini:'#4285F4', Groq:'#F55036' };
+  const logos = { Claude:'C', ChatGPT:'G', Gemini:'G', Groq:'Q' };
+  const chip = document.createElement('span');
+  chip.className = 'ai-mention';
+  chip.contentEditable = 'false';
+  chip.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:${colors[model]};color:white;font-size:8px;font-weight:700;margin-right:3px;">${logos[model]}</span>@${model}`;
+  if (mentionStart) {
+    const range = document.createRange();
+    try {
+      range.setStart(mentionStart.node, mentionStart.offset - 1);
+      range.setEnd(mentionStart.node, mentionStart.offset);
+      range.deleteContents(); range.insertNode(chip); range.collapse(false);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+    } catch(e) {}
+    mentionStart = null;
+  }
+}
+
+// Model cards
+document.querySelectorAll('.model-card').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.model-card').forEach(x => x.classList.remove('selected'));
+  c.classList.add('selected');
+}));
+// Prompt filters
+document.querySelectorAll('.pl-filter').forEach(f => f.addEventListener('click', () => {
+  document.querySelectorAll('.pl-filter').forEach(x => x.classList.remove('active'));
+  f.classList.add('active');
+}));
+// Type chips in blank note
+document.querySelectorAll('.nbc-type-chip').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.nbc-type-chip').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+}));
+</script>
+</body>
+</html>

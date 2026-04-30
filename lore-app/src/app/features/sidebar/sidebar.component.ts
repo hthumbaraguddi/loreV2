@@ -39,6 +39,10 @@ export class SidebarComponent {
   // Inline editing state
   renamingId = signal<string | null>(null);
   renamingValue = signal('');
+  
+  // Keyboard navigation state
+  focusedItemId = signal<string | null>(null);
+  focusedItemType = signal<'shelf' | 'notebook' | 'note' | null>(null);
 
   // Computed
   filteredShelves = computed(() => {
@@ -91,6 +95,17 @@ export class SidebarComponent {
         }
       }
     }
+    
+    // Set up keyboard navigation
+    this.setupKeyboardNavigation();
+  }
+
+  /**
+   * Set up global keyboard event listeners
+   */
+  private setupKeyboardNavigation(): void {
+    // Note: In a real app, this would be in ngOnInit/ngOnDestroy
+    // For now, we'll handle it in the component
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -498,5 +513,245 @@ export class SidebarComponent {
     // Update order property and persist
     const noteIds = notes.map(n => n.id);
     this.shelfService.reorderNotes(notebookId, noteIds);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // KEYBOARD NAVIGATION
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Handle keyboard events for navigation
+   */
+  onKeyDown(event: KeyboardEvent): void {
+    // Don't handle if user is typing in an input
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+      return;
+    }
+
+    const key = event.key;
+    const focusedId = this.focusedItemId();
+    const focusedType = this.focusedItemType();
+
+    switch (key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.navigateDown();
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.navigateUp();
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        if (focusedId && focusedType) {
+          this.expandItem(focusedId, focusedType);
+        }
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        if (focusedId && focusedType) {
+          this.collapseItem(focusedId, focusedType);
+        }
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (focusedId && focusedType) {
+          this.activateItem(focusedId, focusedType);
+        }
+        break;
+      case 'F2':
+        event.preventDefault();
+        if (focusedId && focusedType && (focusedType === 'shelf' || focusedType === 'notebook')) {
+          this.startRenameById(focusedId, focusedType);
+        }
+        break;
+      case 'Delete':
+        event.preventDefault();
+        if (focusedId && focusedType) {
+          this.deleteItemById(focusedId, focusedType);
+        }
+        break;
+    }
+  }
+
+  /**
+   * Get all visible items in order (for navigation)
+   */
+  private getVisibleItems(): Array<{ id: string; type: 'shelf' | 'notebook' | 'note' }> {
+    const items: Array<{ id: string; type: 'shelf' | 'notebook' | 'note' }> = [];
+    
+    for (const shelf of this.filteredShelves()) {
+      items.push({ id: shelf.id, type: 'shelf' });
+      
+      if (this.isShelfExpanded(shelf.id)) {
+        for (const notebook of shelf.notebooks) {
+          items.push({ id: notebook.id, type: 'notebook' });
+          
+          if (this.isNotebookExpanded(notebook.id)) {
+            for (const note of notebook.notes) {
+              items.push({ id: note.id, type: 'note' });
+            }
+          }
+        }
+      }
+    }
+    
+    return items;
+  }
+
+  /**
+   * Navigate to next item
+   */
+  private navigateDown(): void {
+    const items = this.getVisibleItems();
+    if (items.length === 0) return;
+
+    const currentId = this.focusedItemId();
+    
+    if (!currentId) {
+      // Focus first item
+      this.focusedItemId.set(items[0].id);
+      this.focusedItemType.set(items[0].type);
+      return;
+    }
+
+    const currentIndex = items.findIndex(item => item.id === currentId);
+    if (currentIndex === -1 || currentIndex === items.length - 1) return;
+
+    const nextItem = items[currentIndex + 1];
+    this.focusedItemId.set(nextItem.id);
+    this.focusedItemType.set(nextItem.type);
+  }
+
+  /**
+   * Navigate to previous item
+   */
+  private navigateUp(): void {
+    const items = this.getVisibleItems();
+    if (items.length === 0) return;
+
+    const currentId = this.focusedItemId();
+    
+    if (!currentId) {
+      // Focus last item
+      const lastItem = items[items.length - 1];
+      this.focusedItemId.set(lastItem.id);
+      this.focusedItemType.set(lastItem.type);
+      return;
+    }
+
+    const currentIndex = items.findIndex(item => item.id === currentId);
+    if (currentIndex <= 0) return;
+
+    const prevItem = items[currentIndex - 1];
+    this.focusedItemId.set(prevItem.id);
+    this.focusedItemType.set(prevItem.type);
+  }
+
+  /**
+   * Expand item (shelf or notebook)
+   */
+  private expandItem(id: string, type: 'shelf' | 'notebook' | 'note'): void {
+    if (type === 'shelf') {
+      const expanded = this.expandedShelves();
+      if (!expanded.has(id)) {
+        const newExpanded = new Set(expanded);
+        newExpanded.add(id);
+        this.expandedShelves.set(newExpanded);
+      }
+    } else if (type === 'notebook') {
+      const expanded = this.expandedNotebooks();
+      if (!expanded.has(id)) {
+        const newExpanded = new Set(expanded);
+        newExpanded.add(id);
+        this.expandedNotebooks.set(newExpanded);
+      }
+    }
+  }
+
+  /**
+   * Collapse item (shelf or notebook)
+   */
+  private collapseItem(id: string, type: 'shelf' | 'notebook' | 'note'): void {
+    if (type === 'shelf') {
+      const expanded = this.expandedShelves();
+      if (expanded.has(id)) {
+        const newExpanded = new Set(expanded);
+        newExpanded.delete(id);
+        this.expandedShelves.set(newExpanded);
+      }
+    } else if (type === 'notebook') {
+      const expanded = this.expandedNotebooks();
+      if (expanded.has(id)) {
+        const newExpanded = new Set(expanded);
+        newExpanded.delete(id);
+        this.expandedNotebooks.set(newExpanded);
+      }
+    }
+  }
+
+  /**
+   * Activate item (open note, open notebook, or toggle shelf)
+   */
+  private activateItem(id: string, type: 'shelf' | 'notebook' | 'note'): void {
+    if (type === 'shelf') {
+      this.toggleShelf(id);
+    } else if (type === 'notebook') {
+      this.onNotebookClick(id);
+    } else if (type === 'note') {
+      this.onNoteClick(id);
+    }
+  }
+
+  /**
+   * Start rename by ID
+   */
+  private startRenameById(id: string, type: 'shelf' | 'notebook'): void {
+    let name = '';
+    
+    if (type === 'shelf') {
+      const shelf = this.shelfService.getShelf(id);
+      name = shelf?.name || '';
+    } else if (type === 'notebook') {
+      const notebook = this.shelfService.getNotebook(id);
+      name = notebook?.name || '';
+    }
+    
+    this.startRename({ type, id, name });
+  }
+
+  /**
+   * Delete item by ID
+   */
+  private deleteItemById(id: string, type: 'shelf' | 'notebook' | 'note'): void {
+    let name = '';
+    
+    if (type === 'shelf') {
+      const shelf = this.shelfService.getShelf(id);
+      name = shelf?.name || '';
+    } else if (type === 'notebook') {
+      const notebook = this.shelfService.getNotebook(id);
+      name = notebook?.name || '';
+    } else if (type === 'note') {
+      const note = this.shelfService.getNote(id);
+      name = note?.title || '';
+    }
+    
+    this.handleDelete({ type, id, name });
+  }
+
+  /**
+   * Check if item is focused
+   */
+  isFocused(id: string): boolean {
+    return this.focusedItemId() === id;
+  }
+
+  /**
+   * Set focus on item (for click events)
+   */
+  setFocus(id: string, type: 'shelf' | 'notebook' | 'note'): void {
+    this.focusedItemId.set(id);
+    this.focusedItemType.set(type);
   }
 }

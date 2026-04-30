@@ -1,4 +1,4 @@
-<div class="sidebar" [class.compact]="!isExpanded()">
+<div class="sidebar" [class.compact]="!isExpanded()" (keydown)="onKeyDown($event)" tabindex="0">
   <!-- Topbar -->
   <div class="sb-topbar">
     <!-- Search Box -->
@@ -115,7 +115,8 @@
           <!-- Shelf Header -->
           <div 
             class="shelf-hdr"
-            (click)="toggleShelf(shelf.id)"
+            [class.focused]="isFocused(shelf.id)"
+            (click)="toggleShelf(shelf.id); setFocus(shelf.id, 'shelf')"
             (contextmenu)="onShelfContextMenu($event, shelf)"
           >
           <!-- Chevron: 16px × 16px container, 9px × 9px icon -->
@@ -188,6 +189,8 @@
                 <!-- Notebook Header -->
                 <div 
                   class="nb-hdr"
+                  [class.focused]="isFocused(notebook.id)"
+                  (click)="setFocus(notebook.id, 'notebook')"
                   (contextmenu)="onNotebookContextMenu($event, notebook)"
                 >
                 <!-- Chevron: 14px × 14px container, 9px × 9px icon -->
@@ -245,7 +248,8 @@
                     <div 
                       class="note-item"
                       [class.active]="isNoteActive(note.id)"
-                      (click)="onNoteClick(note.id)"
+                      [class.focused]="isFocused(note.id)"
+                      (click)="onNoteClick(note.id); setFocus(note.id, 'note')"
                       (contextmenu)="onNoteContextMenu($event, note)"
                       cdkDrag
                       [cdkDragData]="note"

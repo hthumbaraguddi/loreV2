@@ -1,0 +1,63 @@
+@if (open()) {
+  <div class="ctx-menu-overlay" (click)="close()">
+    <div class="ctx-menu" (click)="onMenuClick($event)">
+      <!-- Open -->
+      <div class="ctx-item" (click)="onAction('open')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="12" height="10" rx="1.5"/>
+          <path d="M5 7h6M5 10h4"/>
+        </svg>
+        <span>{{ getOpenLabel() }}</span>
+      </div>
+
+      <!-- Rename -->
+      <div class="ctx-item" (click)="onAction('rename')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M11 2l3 3-9 9H2v-3L11 2z"/>
+        </svg>
+        <span>Rename</span>
+      </div>
+
+      <!-- New Notebook (only for shelves) -->
+      @if (showNewNotebook()) {
+        <div class="ctx-item" (click)="onAction('new-notebook')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 3v10M3 8h10"/>
+          </svg>
+          <span>New Notebook</span>
+        </div>
+      }
+
+      <!-- New Note -->
+      <div class="ctx-item" (click)="onAction('new-note')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+          <path d="M8 5v6M5 8h6"/>
+        </svg>
+        <span>New Note</span>
+      </div>
+
+      <hr class="ctx-divider"/>
+
+      <!-- Change Color (only for shelves) -->
+      @if (target()?.type === 'shelf') {
+        <div class="ctx-item" (click)="onAction('change-color')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="5"/>
+            <path d="M8 3v2M8 11v2M3 8h2M11 8h2"/>
+          </svg>
+          <span>Change colour</span>
+        </div>
+        <hr class="ctx-divider"/>
+      }
+
+      <!-- Delete -->
+      <div class="ctx-item danger" (click)="onAction('delete')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 4h10M6 4V2h4v2M5 4v9a1 1 0 001 1h4a1 1 0 001-1V4"/>
+        </svg>
+        <span>Delete</span>
+      </div>
+    </div>
+  </div>
+}

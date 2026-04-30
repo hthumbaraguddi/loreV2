@@ -1,0 +1,273 @@
+// Lore Design System - CSS Custom Properties
+// Based on lore-docs/02-design-system.md
+
+:root {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PRIMITIVE PALETTE
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  // Purple (Brand)
+  --lore-primitive-purple-50: #F5F3FF;
+  --lore-primitive-purple-100: #EDE9FE;
+  --lore-primitive-purple-150: #EAE7F7;
+  --lore-primitive-purple-200: #DDD6FE;
+  --lore-primitive-purple-300: #C4B5FD;
+  --lore-primitive-purple-400: #A78BFA;
+  --lore-primitive-purple-500: #8B5CF6;
+  --lore-primitive-purple-600: #7C3AED;
+  --lore-primitive-purple-700: #6D28D9;
+  --lore-primitive-purple-800: #5B21B6;
+  --lore-primitive-purple-900: #4C1D95;
+  --lore-primitive-purple-950: #2E1065;
+
+  // Grey (Neutral)
+  --lore-primitive-grey-0: #FFFFFF;
+  --lore-primitive-grey-50: #F9F9FB;
+  --lore-primitive-grey-100: #F0EEF9;
+  --lore-primitive-grey-150: #E8E6F2;
+  --lore-primitive-grey-200: #E2E0EC;
+  --lore-primitive-grey-300: #C8C5D8;
+  --lore-primitive-grey-400: #A09CB8;
+  --lore-primitive-grey-500: #7A758F;
+  --lore-primitive-grey-600: #5C5870;
+  --lore-primitive-grey-700: #3D3A50;
+  --lore-primitive-grey-800: #2A2640;
+  --lore-primitive-grey-900: #1A1625;
+  --lore-primitive-grey-950: #0F0C1A;
+
+  // Red (Error)
+  --lore-primitive-red-50: #FFF5F5;
+  --lore-primitive-red-100: #FFE3E3;
+  --lore-primitive-red-200: #FFC9C9;
+  --lore-primitive-red-300: #FFA8A8;
+  --lore-primitive-red-400: #FF8787;
+  --lore-primitive-red-500: #FF6B6B;
+  --lore-primitive-red-600: #FA5252;
+  --lore-primitive-red-700: #E03131;
+  --lore-primitive-red-800: #C92A2A;
+  --lore-primitive-red-900: #A61E1E;
+  --lore-primitive-red-950: #6E0E0E;
+
+  // Green (Success)
+  --lore-primitive-green-50: #F0FDF4;
+  --lore-primitive-green-100: #DCFCE7;
+  --lore-primitive-green-200: #BBF7D0;
+  --lore-primitive-green-300: #86EFAC;
+  --lore-primitive-green-400: #4ADE80;
+  --lore-primitive-green-500: #22C55E;
+  --lore-primitive-green-600: #16A34A;
+  --lore-primitive-green-700: #15803D;
+  --lore-primitive-green-800: #166534;
+  --lore-primitive-green-900: #14532D;
+  --lore-primitive-green-950: #052E16;
+
+  // Yellow (Warning)
+  --lore-primitive-yellow-50: #FFFBEB;
+  --lore-primitive-yellow-100: #FEF3C7;
+  --lore-primitive-yellow-200: #FDE68A;
+  --lore-primitive-yellow-300: #FCD34D;
+  --lore-primitive-yellow-400: #FBBF24;
+  --lore-primitive-yellow-500: #F59E0B;
+  --lore-primitive-yellow-600: #D97706;
+  --lore-primitive-yellow-700: #B45309;
+  --lore-primitive-yellow-800: #92400E;
+  --lore-primitive-yellow-900: #78350F;
+  --lore-primitive-yellow-950: #451A03;
+
+  // Blue (Info)
+  --lore-primitive-blue-50: #EFF6FF;
+  --lore-primitive-blue-100: #DBEAFE;
+  --lore-primitive-blue-200: #BFDBFE;
+  --lore-primitive-blue-300: #93C5FD;
+  --lore-primitive-blue-400: #60A5FA;
+  --lore-primitive-blue-500: #3B82F6;
+  --lore-primitive-blue-600: #2563EB;
+  --lore-primitive-blue-700: #1D4ED8;
+  --lore-primitive-blue-800: #1E40AF;
+  --lore-primitive-blue-900: #1E3A8A;
+  --lore-primitive-blue-950: #172554;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SEMANTIC TOKENS - LIGHT MODE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Backgrounds
+  --lore-color-bg-canvas: var(--lore-primitive-grey-0);
+  --lore-color-bg-sidebar: var(--lore-primitive-grey-100);
+  --lore-color-bg-nav: var(--lore-primitive-purple-150);
+  --lore-color-bg-overlay: rgba(26, 22, 37, 0.48);
+  --lore-color-bg-tooltip: var(--lore-primitive-grey-800);
+
+  // Surfaces
+  --lore-color-surface-default: var(--lore-primitive-grey-0);
+  --lore-color-surface-subtle: var(--lore-primitive-grey-50);
+  --lore-color-surface-recessed: var(--lore-primitive-grey-100);
+  --lore-color-surface-inverse: var(--lore-primitive-grey-900);
+
+  // Borders
+  --lore-color-border-default: rgba(109, 40, 217, 0.09);
+  --lore-color-border-subtle: rgba(109, 40, 217, 0.05);
+  --lore-color-border-strong: rgba(109, 40, 217, 0.20);
+  --lore-color-border-accent: var(--lore-primitive-purple-600);
+
+  // Text
+  --lore-color-text-default: var(--lore-primitive-grey-900);
+  --lore-color-text-muted: var(--lore-primitive-grey-600);
+  --lore-color-text-faint: var(--lore-primitive-grey-500);
+  --lore-color-text-inverse: var(--lore-primitive-grey-0);
+  --lore-color-text-accent: var(--lore-primitive-purple-700);
+  --lore-color-text-on-accent: #FFFFFF;
+
+  // Icons
+  --lore-color-icon-default: var(--lore-primitive-grey-600);
+  --lore-color-icon-muted: var(--lore-primitive-grey-400);
+  --lore-color-icon-accent: var(--lore-primitive-purple-600);
+  --lore-color-icon-on-dark: #FFFFFF;
+
+  // Accent
+  --lore-color-accent-default: var(--lore-primitive-purple-600);
+  --lore-color-accent-hover: var(--lore-primitive-purple-700);
+  --lore-color-accent-active: var(--lore-primitive-purple-800);
+  --lore-color-accent-subtle: var(--lore-primitive-purple-100);
+  --lore-color-accent-muted: var(--lore-primitive-purple-300);
+
+  // State Overlays
+  --lore-color-state-hover: rgba(109, 40, 217, 0.06);
+  --lore-color-state-active: rgba(109, 40, 217, 0.12);
+  --lore-color-state-selected: rgba(109, 40, 217, 0.10);
+  --lore-color-state-focus-ring: rgba(124, 58, 237, 0.35);
+  --lore-color-state-disabled-fill: var(--lore-primitive-grey-150);
+  --lore-color-state-disabled-text: var(--lore-primitive-grey-400);
+
+  // Feedback - Error
+  --lore-color-feedback-error-bg: var(--lore-primitive-red-50);
+  --lore-color-feedback-error-border: var(--lore-primitive-red-300);
+  --lore-color-feedback-error-text: var(--lore-primitive-red-800);
+  --lore-color-feedback-error-icon: var(--lore-primitive-red-700);
+
+  // Feedback - Warning
+  --lore-color-feedback-warning-bg: var(--lore-primitive-yellow-50);
+  --lore-color-feedback-warning-border: var(--lore-primitive-yellow-300);
+  --lore-color-feedback-warning-text: var(--lore-primitive-yellow-800);
+  --lore-color-feedback-warning-icon: var(--lore-primitive-yellow-700);
+
+  // Feedback - Success
+  --lore-color-feedback-success-bg: var(--lore-primitive-green-50);
+  --lore-color-feedback-success-border: var(--lore-primitive-green-300);
+  --lore-color-feedback-success-text: var(--lore-primitive-green-800);
+  --lore-color-feedback-success-icon: var(--lore-primitive-green-700);
+
+  // Feedback - Info
+  --lore-color-feedback-info-bg: var(--lore-primitive-blue-50);
+  --lore-color-feedback-info-border: var(--lore-primitive-blue-300);
+  --lore-color-feedback-info-text: var(--lore-primitive-blue-800);
+  --lore-color-feedback-info-icon: var(--lore-primitive-blue-700);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TYPOGRAPHY
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Font Families
+  --lore-font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+  --lore-font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --lore-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  // Font Sizes
+  --lore-font-size-xs: 0.6875rem;   // 11px
+  --lore-font-size-sm: 0.75rem;     // 12px
+  --lore-font-size-base: 0.8125rem; // 13px
+  --lore-font-size-md: 0.9375rem;   // 15px
+  --lore-font-size-lg: 1.0625rem;   // 17px
+  --lore-font-size-xl: 1.25rem;     // 20px
+  --lore-font-size-2xl: 1.5rem;     // 24px
+  --lore-font-size-3xl: 1.875rem;   // 30px
+  --lore-font-size-4xl: 2.25rem;    // 36px
+  --lore-font-size-5xl: 3rem;       // 48px
+
+  // Line Heights
+  --lore-line-height-tight: 1.25;
+  --lore-line-height-normal: 1.5;
+  --lore-line-height-relaxed: 1.7;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SPACING
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-space-4: 0.25rem;   // 4px
+  --lore-space-8: 0.5rem;    // 8px
+  --lore-space-12: 0.75rem;  // 12px
+  --lore-space-16: 1rem;     // 16px
+  --lore-space-20: 1.25rem;  // 20px
+  --lore-space-24: 1.5rem;   // 24px
+  --lore-space-32: 2rem;     // 32px
+  --lore-space-40: 2.5rem;   // 40px
+  --lore-space-48: 3rem;     // 48px
+  --lore-space-64: 4rem;     // 64px
+  --lore-space-80: 5rem;     // 80px
+  --lore-space-96: 6rem;     // 96px
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BORDER RADIUS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-radius-2: 2px;
+  --lore-radius-4: 4px;
+  --lore-radius-8: 8px;
+  --lore-radius-12: 12px;
+  --lore-radius-18: 18px;
+  --lore-radius-full: 9999px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHADOWS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-shadow-sm: 0 1px 2px rgba(26, 22, 37, 0.06), 0 0 1px rgba(26, 22, 37, 0.04);
+  --lore-shadow-md: 0 4px 12px rgba(26, 22, 37, 0.08), 0 1px 3px rgba(26, 22, 37, 0.06);
+  --lore-shadow-lg: 0 12px 32px rgba(26, 22, 37, 0.12), 0 4px 12px rgba(26, 22, 37, 0.08);
+  --lore-shadow-overlay: 0 24px 64px rgba(26, 22, 37, 0.20), 0 8px 24px rgba(26, 22, 37, 0.12);
+  --lore-shadow-focus-ring: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(124, 58, 237, 0.35);
+  --lore-shadow-focus-ring-error: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(201, 42, 42, 0.40);
+  --lore-shadow-inset: inset 0 1px 3px rgba(26, 22, 37, 0.08);
+  --lore-shadow-block-drag: 0 16px 40px rgba(109, 40, 217, 0.16), 0 4px 12px rgba(109, 40, 217, 0.10);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LAYOUT
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-nav-rail-width: 56px;
+  --lore-sidebar-width: 260px;
+  --lore-right-panel-width: 320px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ANIMATION
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-anim-duration-fast: 150ms;
+  --lore-anim-duration-base: 220ms;
+  --lore-anim-duration-slow: 300ms;
+  --lore-anim-duration-theme: 300ms;
+  --lore-anim-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --lore-anim-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --lore-anim-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Z-INDEX
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  --lore-z-base: 0;
+  --lore-z-dropdown: 1000;
+  --lore-z-sticky: 1020;
+  --lore-z-fixed: 1030;
+  --lore-z-modal-backdrop: 1040;
+  --lore-z-modal: 1050;
+  --lore-z-popover: 1060;
+  --lore-z-tooltip: 1070;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DARK MODE (to be implemented in Phase 12)
+// ═══════════════════════════════════════════════════════════════════════════
+
+[data-theme="dark"] {
+  // Dark mode tokens will be added in Phase 12
+}

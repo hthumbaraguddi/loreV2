@@ -1,0 +1,32 @@
+<lore-nav-rail 
+  [items]="navItems" 
+  (itemSelected)="onNavSelect($event)"
+/>
+
+<aside 
+  class="sidebar-region"
+  [class.collapsed]="!sidebarOpen()"
+  [attr.aria-label]="'Sidebar navigation'"
+  [attr.aria-hidden]="!sidebarOpen()"
+>
+  <lore-sidebar></lore-sidebar>
+</aside>
+
+<main class="editor-region">
+  <router-outlet />
+</main>
+
+<aside 
+  class="right-panel-region"
+  [class.open]="rightPanelOpen()"
+  [attr.aria-label]="'Right panel'"
+  [attr.aria-hidden]="!rightPanelOpen()"
+>
+  <div class="right-panel-placeholder">
+    <div class="right-panel-placeholder-content">
+      <span class="material-symbols-outlined">info</span>
+      <p>Right Panel</p>
+      <small>Future phases</small>
+    </div>
+  </div>
+</aside>

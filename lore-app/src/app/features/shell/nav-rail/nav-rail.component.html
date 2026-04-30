@@ -1,0 +1,9 @@
+<nav class="nav-rail" role="navigation" aria-label="Main navigation">
+  @for (item of items(); track item.id) {
+    <lore-nav-rail-item
+      [item]="item"
+      [active]="activeId() === item.id"
+      (selected)="onItemSelect(item)"
+    />
+  }
+</nav>

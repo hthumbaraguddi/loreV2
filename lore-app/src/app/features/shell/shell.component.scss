@@ -1,0 +1,86 @@
+:host {
+  display: grid;
+  grid-template-columns: var(--lore-nav-rail-width) var(--lore-sidebar-width) 1fr 0px;
+  grid-template-rows: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  transition: grid-template-columns var(--lore-anim-duration-base) var(--lore-anim-ease-standard);
+}
+
+// Collapsed sidebar state
+:host:has(.sidebar-region.collapsed) {
+  grid-template-columns: var(--lore-nav-rail-width) 0px 1fr 0px;
+}
+
+// Open right panel state
+:host:has(.right-panel-region.open) {
+  grid-template-columns: var(--lore-nav-rail-width) var(--lore-sidebar-width) 1fr var(--lore-right-panel-width);
+}
+
+// Collapsed sidebar + open right panel
+:host:has(.sidebar-region.collapsed):has(.right-panel-region.open) {
+  grid-template-columns: var(--lore-nav-rail-width) 0px 1fr var(--lore-right-panel-width);
+}
+
+.sidebar-region {
+  overflow: hidden;
+  transition: width var(--lore-anim-duration-base) var(--lore-anim-ease-standard);
+  background: var(--lore-color-bg-sidebar);
+  border-right: 1px solid var(--lore-color-border-default);
+  
+  &.collapsed {
+    width: 0;
+  }
+}
+
+.right-panel-region {
+  overflow: hidden;
+  transition: width var(--lore-anim-duration-base) var(--lore-anim-ease-standard);
+  background: var(--lore-color-surface-default);
+  border-left: 1px solid var(--lore-color-border-default);
+  width: 0;
+  
+  &.open {
+    width: var(--lore-right-panel-width);
+  }
+}
+
+.editor-region {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--lore-color-bg-canvas);
+}
+
+// Placeholder styling (temporary for Phase 1)
+.sidebar-placeholder,
+.right-panel-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--lore-space-24);
+}
+
+.sidebar-placeholder-content,
+.right-panel-placeholder-content {
+  text-align: center;
+  color: var(--lore-color-text-muted);
+}
+
+.material-symbols-outlined {
+  font-size: 48px;
+  color: var(--lore-color-icon-muted);
+  margin-bottom: var(--lore-space-12);
+}
+
+p {
+  font-size: var(--lore-font-size-md);
+  font-weight: 500;
+  margin-bottom: var(--lore-space-4);
+}
+
+small {
+  font-size: var(--lore-font-size-sm);
+  color: var(--lore-color-text-faint);
+}

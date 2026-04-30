@@ -1,0 +1,502 @@
+import { Component, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ShelfService } from '../../core/services/shelf.service';
+import { LayoutService } from '../../core/services/layout.service';
+import { Shelf, Notebook, Note, NoteType } from '../../core/models/shelf.model';
+import { ContextMenuComponent, ContextMenuTarget, ContextMenuAction } from './components/context-menu/context-menu.component';
+
+/**
+ * SidebarComponent
+ * Main sidebar with three-level hierarchy: Shelf → Notebook → Note
+ * Supports expanded/compact view modes and search
+ */
+@Component({
+  selector: 'lore-sidebar',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ContextMenuComponent, DragDropModule],
+  templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.scss'
+})
+export class SidebarComponent {
+  private shelfService = inject(ShelfService);
+  private layoutService = inject(LayoutService);
+
+  // Signals
+  shelves = this.shelfService.shelves;
+  searchQuery = signal('');
+  viewMode = signal<'expanded' | 'compact'>('expanded');
+  expandedShelves = signal<Set<string>>(new Set());
+  expandedNotebooks = signal<Set<string>>(new Set());
+  activeNoteId = signal<string | null>(null);
+  
+  // Context menu state
+  contextMenuOpen = signal(false);
+  contextMenuTarget = signal<ContextMenuTarget | null>(null);
+  contextMenuPosition = signal<{ x: number; y: number } | null>(null);
+  
+  // Inline editing state
+  renamingId = signal<string | null>(null);
+  renamingValue = signal('');
+
+  // Computed
+  filteredShelves = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.shelves();
+
+    // Filter shelves, notebooks, and notes based on search query
+    return this.shelves()
+      .map(shelf => ({
+        ...shelf,
+        notebooks: shelf.notebooks
+          .map(notebook => ({
+            ...notebook,
+            notes: notebook.notes.filter(note =>
+              note.title.toLowerCase().includes(query) ||
+              note.preview?.toLowerCase().includes(query) ||
+              note.tags.some(tag => tag.toLowerCase().includes(query))
+            )
+          }))
+          .filter(notebook =>
+            notebook.name.toLowerCase().includes(query) ||
+            notebook.notes.length > 0
+          )
+      }))
+      .filter(shelf =>
+        shelf.name.toLowerCase().includes(query) ||
+        shelf.notebooks.length > 0
+      );
+  });
+
+  searchResults = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return [];
+
+    return this.shelfService.searchNotes(query);
+  });
+
+  isSearching = computed(() => this.searchQuery().trim().length > 0);
+
+  constructor() {
+    // Initialize with first shelf and notebook expanded
+    const shelves = this.shelves();
+    if (shelves.length > 0) {
+      this.expandedShelves.set(new Set([shelves[0].id]));
+      if (shelves[0].notebooks.length > 0) {
+        this.expandedNotebooks.set(new Set([shelves[0].notebooks[0].id]));
+        // Set first note as active
+        if (shelves[0].notebooks[0].notes.length > 0) {
+          this.activeNoteId.set(shelves[0].notebooks[0].notes[0].id);
+        }
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // VIEW MODE
+  // ═══════════════════════════════════════════════════════════
+
+  setViewMode(mode: 'expanded' | 'compact'): void {
+    this.viewMode.set(mode);
+  }
+
+  isExpanded(): boolean {
+    return this.viewMode() === 'expanded';
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SEARCH
+  // ═══════════════════════════════════════════════════════════
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SHELF OPERATIONS
+  // ═══════════════════════════════════════════════════════════
+
+  toggleShelf(shelfId: string): void {
+    const expanded = this.expandedShelves();
+    const newExpanded = new Set(expanded);
+    
+    if (newExpanded.has(shelfId)) {
+      newExpanded.delete(shelfId);
+    } else {
+      newExpanded.add(shelfId);
+    }
+    
+    this.expandedShelves.set(newExpanded);
+  }
+
+  isShelfExpanded(shelfId: string): boolean {
+    return this.expandedShelves().has(shelfId);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // NOTEBOOK OPERATIONS
+  // ═══════════════════════════════════════════════════════════
+
+  toggleNotebook(notebookId: string): void {
+    const expanded = this.expandedNotebooks();
+    const newExpanded = new Set(expanded);
+    
+    if (newExpanded.has(notebookId)) {
+      newExpanded.delete(notebookId);
+    } else {
+      newExpanded.add(notebookId);
+    }
+    
+    this.expandedNotebooks.set(newExpanded);
+  }
+
+  isNotebookExpanded(notebookId: string): boolean {
+    return this.expandedNotebooks().has(notebookId);
+  }
+
+  onNotebookClick(notebookId: string): void {
+    // Open notebook view (to be implemented in Phase 3)
+    console.log('Open notebook:', notebookId);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // NOTE OPERATIONS
+  // ═══════════════════════════════════════════════════════════
+
+  onNoteClick(noteId: string): void {
+    this.activeNoteId.set(noteId);
+    // Open note in editor (to be implemented in Phase 3)
+    console.log('Open note:', noteId);
+  }
+
+  isNoteActive(noteId: string): boolean {
+    return this.activeNoteId() === noteId;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // CONTEXT MENU (Placeholder for Phase 2 completion)
+  // ═══════════════════════════════════════════════════════════
+
+  onShelfContextMenu(event: MouseEvent, shelf: Shelf): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.contextMenuTarget.set({
+      type: 'shelf',
+      id: shelf.id,
+      name: shelf.name
+    });
+    this.contextMenuPosition.set({ x: event.clientX, y: event.clientY });
+    this.contextMenuOpen.set(true);
+  }
+
+  onNotebookContextMenu(event: MouseEvent, notebook: Notebook): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.contextMenuTarget.set({
+      type: 'notebook',
+      id: notebook.id,
+      name: notebook.name
+    });
+    this.contextMenuPosition.set({ x: event.clientX, y: event.clientY });
+    this.contextMenuOpen.set(true);
+  }
+
+  onNoteContextMenu(event: MouseEvent, note: Note): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.contextMenuTarget.set({
+      type: 'note',
+      id: note.id,
+      name: note.title
+    });
+    this.contextMenuPosition.set({ x: event.clientX, y: event.clientY });
+    this.contextMenuOpen.set(true);
+  }
+
+  onContextMenuAction(action: ContextMenuAction): void {
+    console.log('Context menu action:', action);
+    
+    switch (action.type) {
+      case 'open':
+        this.handleOpenAction(action.target);
+        break;
+      case 'rename':
+        this.startRename(action.target);
+        break;
+      case 'new-notebook':
+        this.handleNewNotebook(action.target);
+        break;
+      case 'new-note':
+        this.handleNewNote(action.target);
+        break;
+      case 'change-color':
+        this.handleChangeColor(action.target);
+        break;
+      case 'delete':
+        this.handleDelete(action.target);
+        break;
+    }
+  }
+
+  onContextMenuClosed(): void {
+    this.contextMenuOpen.set(false);
+    this.contextMenuTarget.set(null);
+    this.contextMenuPosition.set(null);
+  }
+
+  private handleOpenAction(target: ContextMenuTarget): void {
+    if (target.type === 'shelf') {
+      this.toggleShelf(target.id);
+    } else if (target.type === 'notebook') {
+      this.onNotebookClick(target.id);
+    } else if (target.type === 'note') {
+      this.onNoteClick(target.id);
+    }
+  }
+
+  private handleNewNotebook(target: ContextMenuTarget): void {
+    if (target.type !== 'shelf') return;
+    
+    const notebook = this.shelfService.createNotebook(target.id, 'New Notebook', '📔');
+    if (notebook) {
+      // Expand the shelf to show the new notebook
+      const expanded = this.expandedShelves();
+      const newExpanded = new Set(expanded);
+      newExpanded.add(target.id);
+      this.expandedShelves.set(newExpanded);
+      
+      // Start renaming the new notebook
+      setTimeout(() => {
+        this.renamingId.set(notebook.id);
+        this.renamingValue.set(notebook.name);
+      }, 100);
+    }
+  }
+
+  private handleNewNote(target: ContextMenuTarget): void {
+    let notebookId: string | undefined;
+    
+    if (target.type === 'notebook') {
+      notebookId = target.id;
+    } else if (target.type === 'shelf') {
+      // Find first notebook in shelf
+      const shelf = this.shelfService.getShelf(target.id);
+      notebookId = shelf?.notebooks[0]?.id;
+    } else if (target.type === 'note') {
+      // Find notebook containing this note
+      const note = this.shelfService.getNote(target.id);
+      notebookId = note?.notebookId;
+    }
+    
+    if (notebookId) {
+      const note = this.shelfService.createNote(notebookId, 'New Note', NoteType.Idea);
+      if (note) {
+        // Expand the notebook to show the new note
+        const expanded = this.expandedNotebooks();
+        const newExpanded = new Set(expanded);
+        newExpanded.add(notebookId);
+        this.expandedNotebooks.set(newExpanded);
+        
+        // Set as active note
+        this.activeNoteId.set(note.id);
+      }
+    }
+  }
+
+  private handleChangeColor(target: ContextMenuTarget): void {
+    if (target.type !== 'shelf') return;
+    
+    // Cycle through predefined colors
+    const colors = ['#7C3AED', '#D97706', '#0F766E', '#BE185D', '#1D4ED8', '#15803D'];
+    const shelf = this.shelfService.getShelf(target.id);
+    if (!shelf) return;
+    
+    const currentIndex = colors.indexOf(shelf.color);
+    const nextIndex = (currentIndex + 1) % colors.length;
+    
+    this.shelfService.updateShelf(target.id, { color: colors[nextIndex] });
+  }
+
+  private handleDelete(target: ContextMenuTarget): void {
+    const confirmed = confirm(`Delete ${target.type} "${target.name}"?`);
+    if (!confirmed) return;
+    
+    if (target.type === 'shelf') {
+      this.shelfService.deleteShelf(target.id);
+    } else if (target.type === 'notebook') {
+      this.shelfService.deleteNotebook(target.id);
+    } else if (target.type === 'note') {
+      this.shelfService.deleteNote(target.id);
+      if (this.activeNoteId() === target.id) {
+        this.activeNoteId.set(null);
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // INLINE EDITING
+  // ═══════════════════════════════════════════════════════════
+
+  startRename(target: ContextMenuTarget): void {
+    this.renamingId.set(target.id);
+    this.renamingValue.set(target.name);
+  }
+
+  isRenaming(id: string): boolean {
+    return this.renamingId() === id;
+  }
+
+  onRenameInput(value: string): void {
+    this.renamingValue.set(value);
+  }
+
+  commitRename(): void {
+    const id = this.renamingId();
+    const value = this.renamingValue().trim();
+    
+    if (!id || !value) {
+      this.cancelRename();
+      return;
+    }
+
+    const target = this.contextMenuTarget();
+    if (!target) {
+      // Try to determine type from shelves/notebooks
+      const shelf = this.shelfService.getShelf(id);
+      if (shelf) {
+        this.shelfService.updateShelf(id, { name: value });
+      } else {
+        const notebook = this.shelfService.getNotebook(id);
+        if (notebook) {
+          this.shelfService.updateNotebook(id, { name: value });
+        } else {
+          const note = this.shelfService.getNote(id);
+          if (note) {
+            this.shelfService.updateNote(id, { title: value });
+          }
+        }
+      }
+    } else {
+      if (target.type === 'shelf') {
+        this.shelfService.updateShelf(id, { name: value });
+      } else if (target.type === 'notebook') {
+        this.shelfService.updateNotebook(id, { name: value });
+      } else if (target.type === 'note') {
+        this.shelfService.updateNote(id, { title: value });
+      }
+    }
+
+    this.cancelRename();
+  }
+
+  cancelRename(): void {
+    this.renamingId.set(null);
+    this.renamingValue.set('');
+  }
+
+  onRenameKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitRename();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelRename();
+    }
+    event.stopPropagation();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // UTILITIES
+  // ═══════════════════════════════════════════════════════════
+
+  getNoteCount(shelf: Shelf): number {
+    return shelf.notebooks.reduce((total, nb) => total + nb.notes.length, 0);
+  }
+
+  formatDate(date: Date): string {
+    const now = new Date();
+    const noteDate = new Date(date);
+    const diffTime = Math.abs(now.getTime() - noteDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    const month = noteDate.toLocaleString('default', { month: 'short' });
+    const day = noteDate.getDate();
+    return `${month} ${day}`;
+  }
+
+  trackByShelfId(index: number, shelf: Shelf): string {
+    return shelf.id;
+  }
+
+  trackByNotebookId(index: number, notebook: Notebook): string {
+    return notebook.id;
+  }
+
+  trackByNoteId(index: number, note: Note): string {
+    return note.id;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // DRAG & DROP REORDERING
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Handle shelf reordering
+   */
+  onShelfDrop(event: CdkDragDrop<Shelf[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const shelves = [...this.shelves()];
+    moveItemInArray(shelves, event.previousIndex, event.currentIndex);
+
+    // Update order property and persist
+    const shelfIds = shelves.map(s => s.id);
+    this.shelfService.reorderShelves(shelfIds);
+  }
+
+  /**
+   * Handle notebook reordering within a shelf
+   */
+  onNotebookDrop(event: CdkDragDrop<Notebook[]>, shelfId: string): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const shelf = this.shelfService.getShelf(shelfId);
+    if (!shelf) return;
+
+    const notebooks = [...shelf.notebooks];
+    moveItemInArray(notebooks, event.previousIndex, event.currentIndex);
+
+    // Update order property and persist
+    const notebookIds = notebooks.map(nb => nb.id);
+    this.shelfService.reorderNotebooks(shelfId, notebookIds);
+  }
+
+  /**
+   * Handle note reordering within a notebook
+   */
+  onNoteDrop(event: CdkDragDrop<Note[]>, notebookId: string): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const notebook = this.shelfService.getNotebook(notebookId);
+    if (!notebook) return;
+
+    const notes = [...notebook.notes];
+    moveItemInArray(notes, event.previousIndex, event.currentIndex);
+
+    // Update order property and persist
+    const noteIds = notes.map(n => n.id);
+    this.shelfService.reorderNotes(notebookId, noteIds);
+  }
+}

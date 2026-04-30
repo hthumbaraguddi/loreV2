@@ -1,0 +1,308 @@
+<div class="sidebar" [class.compact]="!isExpanded()">
+  <!-- Topbar -->
+  <div class="sb-topbar">
+    <!-- Search Box -->
+    <div class="sb-search">
+      <!-- Search Icon: 12px × 12px -->
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="6.5" cy="6.5" r="4"/>
+        <path d="M9.5 9.5l3 3"/>
+      </svg>
+      <input 
+        type="text" 
+        placeholder="Search notes…"
+        [value]="searchQuery()"
+        (input)="onSearchInput($any($event.target).value)"
+      />
+    </div>
+
+    <!-- View Toggle: 26px × 22px buttons, 13px × 13px icons -->
+    <div class="sb-vt">
+      <button 
+        class="sb-vt-btn"
+        [class.active]="!isExpanded()"
+        (click)="setViewMode('compact')"
+        title="Compact"
+      >
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h12M2 8h8M2 12h10"/>
+        </svg>
+      </button>
+      <button 
+        class="sb-vt-btn"
+        [class.active]="isExpanded()"
+        (click)="setViewMode('expanded')"
+        title="Expanded"
+      >
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="12" height="4" rx="1"/>
+          <rect x="2" y="9" width="12" height="4" rx="1"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- New Note Button: 26px × 26px, icon 14px × 14px -->
+    <button class="sb-new" title="New Note">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3v10M3 8h10"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Search Results Overlay -->
+  @if (isSearching()) {
+    <div class="sb-search-results open">
+      <div class="sbsr-header">
+        <span class="sbsr-query">Results for <strong>"{{ searchQuery() }}"</strong></span>
+        <!-- Close Button: 22px × 22px -->
+        <button class="sbsr-close" (click)="clearSearch()">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1 1l10 10M11 1L1 11"/>
+          </svg>
+        </button>
+      </div>
+      <div class="sbsr-list">
+        @for (note of searchResults(); track trackByNoteId($index, note)) {
+          <div 
+            class="sbsr-item"
+            [class.active]="isNoteActive(note.id)"
+            (click)="onNoteClick(note.id)"
+          >
+            <div class="sbsr-top">
+              <span class="sbsr-title">{{ note.title }}</span>
+              <span class="sbsr-loc">{{ formatDate(note.updatedAt) }}</span>
+            </div>
+            @if (note.preview) {
+              <div class="sbsr-preview">{{ note.preview }}</div>
+            }
+          </div>
+        }
+        @if (searchResults().length === 0) {
+          <div class="sbsr-empty">No notes found</div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Tree -->
+  <div class="sb-tree">
+    <!-- Shelf List with Drag-Drop -->
+    <div 
+      cdkDropList
+      [cdkDropListData]="filteredShelves()"
+      (cdkDropListDropped)="onShelfDrop($event)"
+      class="shelf-list"
+    >
+      @for (shelf of filteredShelves(); track trackByShelfId($index, shelf)) {
+        <div 
+          class="shelf"
+          [class.open]="isShelfExpanded(shelf.id)"
+          cdkDrag
+          [cdkDragData]="shelf"
+        >
+          <!-- Drag Handle (visible on hover) -->
+          <div class="drag-handle" cdkDragHandle>
+            <svg viewBox="0 0 10 10" fill="currentColor">
+              <circle cx="2" cy="2" r="1"/>
+              <circle cx="2" cy="5" r="1"/>
+              <circle cx="2" cy="8" r="1"/>
+              <circle cx="5" cy="2" r="1"/>
+              <circle cx="5" cy="5" r="1"/>
+              <circle cx="5" cy="8" r="1"/>
+            </svg>
+          </div>
+
+          <!-- Shelf Header -->
+          <div 
+            class="shelf-hdr"
+            (click)="toggleShelf(shelf.id)"
+            (contextmenu)="onShelfContextMenu($event, shelf)"
+          >
+          <!-- Chevron: 16px × 16px container, 9px × 9px icon -->
+          <div class="sh-chevron">
+            <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 2l4 3-4 3"/>
+            </svg>
+          </div>
+          
+          <!-- Dot: 8px × 8px -->
+          <div class="sh-dot" [style.background]="shelf.color"></div>
+          
+          <!-- Inline rename input or name -->
+          @if (isRenaming(shelf.id)) {
+            <input 
+              class="sh-name-input"
+              type="text"
+              [value]="renamingValue()"
+              (input)="onRenameInput($any($event.target).value)"
+              (keydown)="onRenameKeydown($event)"
+              (blur)="commitRename()"
+              #renameInput
+            />
+          } @else {
+            <span class="sh-name">{{ shelf.name }}</span>
+          }
+          
+          <span class="sh-count">{{ getNoteCount(shelf) }}</span>
+          
+          <!-- Add Button: 18px × 18px, icon 10px × 10px -->
+          <button 
+            class="sh-add"
+            (click)="$event.stopPropagation()"
+            title="Add Notebook"
+          >
+            <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 2v6M2 5h6"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Shelf Body -->
+        <div class="shelf-body">
+          <!-- Notebook List with Drag-Drop -->
+          <div
+            cdkDropList
+            [cdkDropListData]="shelf.notebooks"
+            (cdkDropListDropped)="onNotebookDrop($event, shelf.id)"
+            class="notebook-list"
+          >
+            @for (notebook of shelf.notebooks; track trackByNotebookId($index, notebook)) {
+              <div 
+                class="notebook"
+                [class.open]="isNotebookExpanded(notebook.id)"
+                cdkDrag
+                [cdkDragData]="notebook"
+              >
+                <!-- Drag Handle -->
+                <div class="drag-handle drag-handle-nb" cdkDragHandle>
+                  <svg viewBox="0 0 10 10" fill="currentColor">
+                    <circle cx="2" cy="2" r="1"/>
+                    <circle cx="2" cy="5" r="1"/>
+                    <circle cx="2" cy="8" r="1"/>
+                    <circle cx="5" cy="2" r="1"/>
+                    <circle cx="5" cy="5" r="1"/>
+                    <circle cx="5" cy="8" r="1"/>
+                  </svg>
+                </div>
+
+                <!-- Notebook Header -->
+                <div 
+                  class="nb-hdr"
+                  (contextmenu)="onNotebookContextMenu($event, notebook)"
+                >
+                <!-- Chevron: 14px × 14px container, 9px × 9px icon -->
+                <div class="nb-chevron" (click)="toggleNotebook(notebook.id)">
+                  <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 2l4 3-4 3"/>
+                  </svg>
+                </div>
+                
+                <!-- Icon: 12px font-size for emoji -->
+                <span class="nb-icon">{{ notebook.icon }}</span>
+                
+                <!-- Inline rename input or name -->
+                @if (isRenaming(notebook.id)) {
+                  <input 
+                    class="nb-name-input"
+                    type="text"
+                    [value]="renamingValue()"
+                    (input)="onRenameInput($any($event.target).value)"
+                    (keydown)="onRenameKeydown($event)"
+                    (blur)="commitRename()"
+                    (click)="$event.stopPropagation()"
+                    #renameInput
+                  />
+                } @else {
+                  <span class="nb-name" (click)="onNotebookClick(notebook.id)">
+                    {{ notebook.name }}
+                  </span>
+                }
+                
+                <span class="nb-count">{{ notebook.notes.length }}</span>
+                
+                <!-- Add Button: 16px × 16px, icon 9px × 9px -->
+                <button 
+                  class="nb-add"
+                  (click)="$event.stopPropagation()"
+                  title="Add Note"
+                >
+                  <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M5 2v6M2 5h6"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Notebook Body -->
+              <div class="nb-body">
+                <!-- Note List with Drag-Drop -->
+                <div
+                  cdkDropList
+                  [cdkDropListData]="notebook.notes"
+                  (cdkDropListDropped)="onNoteDrop($event, notebook.id)"
+                  class="note-list"
+                >
+                  @for (note of notebook.notes; track trackByNoteId($index, note)) {
+                    <div 
+                      class="note-item"
+                      [class.active]="isNoteActive(note.id)"
+                      (click)="onNoteClick(note.id)"
+                      (contextmenu)="onNoteContextMenu($event, note)"
+                      cdkDrag
+                      [cdkDragData]="note"
+                    >
+                      <!-- Drag Handle -->
+                      <div class="drag-handle drag-handle-note" cdkDragHandle>
+                        <svg viewBox="0 0 10 10" fill="currentColor">
+                          <circle cx="2" cy="3" r="0.8"/>
+                          <circle cx="2" cy="7" r="0.8"/>
+                          <circle cx="5" cy="3" r="0.8"/>
+                          <circle cx="5" cy="7" r="0.8"/>
+                        </svg>
+                      </div>
+
+                      <!-- Expanded View -->
+                      <div class="ni-top">
+                      <span class="ni-badge badge-{{ note.type }}">
+                        {{ note.type | uppercase }}
+                      </span>
+                      <span class="ni-date">{{ formatDate(note.updatedAt) }}</span>
+                    </div>
+                    <div class="ni-title">{{ note.title }}</div>
+                    @if (note.preview) {
+                      <div class="ni-preview">{{ note.preview }}</div>
+                    }
+
+                    <!-- Compact View -->
+                    <div class="ni-line">
+                      <div class="ni-dot dot-{{ note.type }}"></div>
+                      <span class="ni-ctitle">{{ note.title }}</span>
+                      <span class="ni-cdate">{{ formatDate(note.updatedAt) }}</span>
+                    </div>
+                  </div>
+                }
+                </div>
+              </div>
+            </div>
+          }
+          </div>
+        </div>
+      </div>
+    }
+    </div>
+
+    @if (filteredShelves().length === 0) {
+      <div class="sb-empty">
+        <p>No shelves found</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Context Menu -->
+<lore-context-menu
+  [target]="contextMenuTarget()"
+  [position]="contextMenuPosition()"
+  [open]="contextMenuOpen()"
+  (actionSelected)="onContextMenuAction($event)"
+  (closed)="onContextMenuClosed()"
+></lore-context-menu>

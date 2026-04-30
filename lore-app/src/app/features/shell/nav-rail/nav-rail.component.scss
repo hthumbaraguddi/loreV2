@@ -1,0 +1,11 @@
+.nav-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--lore-nav-rail-width);
+  height: 100vh;
+  background: var(--lore-color-bg-nav);
+  border-right: 1px solid var(--lore-color-border-default);
+  padding: var(--lore-space-8) 0;
+  gap: var(--lore-space-4);
+}

@@ -1,0 +1,141 @@
+// CSS Reset for Lore Application
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; // Base font size for rem calculations
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--lore-font-sans);
+  font-size: var(--lore-font-size-md);
+  line-height: var(--lore-line-height-normal);
+  color: var(--lore-color-text-default);
+  background: var(--lore-color-bg-canvas);
+  overflow: hidden; // Prevent body scroll, use internal scrolling
+}
+
+// Remove default button styles
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--lore-shadow-focus-ring);
+    border-radius: var(--lore-radius-4);
+  }
+}
+
+// Remove default input styles
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+// Remove default list styles
+ul,
+ol {
+  list-style: none;
+}
+
+// Remove default link styles
+a {
+  color: inherit;
+  text-decoration: none;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--lore-shadow-focus-ring);
+    border-radius: var(--lore-radius-2);
+  }
+}
+
+// Remove default heading styles
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+// Image defaults
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// Table defaults
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// Remove default fieldset styles
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+// Remove default legend styles
+legend {
+  padding: 0;
+}
+
+// Scrollbar styling (webkit browsers)
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--lore-color-border-default);
+  border-radius: var(--lore-radius-full);
+  
+  &:hover {
+    background: var(--lore-color-border-strong);
+  }
+}
+
+// Selection styling
+::selection {
+  background: var(--lore-color-accent-subtle);
+  color: var(--lore-color-text-default);
+}
+
+::-moz-selection {
+  background: var(--lore-color-accent-subtle);
+  color: var(--lore-color-text-default);
+}

@@ -508,9 +508,13 @@
   margin: 1px 4px 1px 18px;
   padding: 7px 10px 7px 8px;
   border-radius: var(--lore-radius-md);
-  cursor: pointer;
+  cursor: grab;
   transition: background 0.1s;
   border-left: 2px solid transparent;
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &:hover {
     background: var(--lore-color-accent-subtle);
@@ -519,6 +523,10 @@
   &.active {
     background: var(--lore-color-accent-subtle);
     border-left-color: var(--lore-color-accent-default);
+  }
+
+  &.dragging {
+    opacity: 0.5;
   }
 }
 

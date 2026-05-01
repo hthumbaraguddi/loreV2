@@ -56,8 +56,6 @@ export class PaneComponent {
       event.preventDefault();
       event.stopPropagation();
       this.dragOver.set(true);
-      
-      // Set drop effect
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect = 'copy';
       }
@@ -65,15 +63,16 @@ export class PaneComponent {
   }
 
   /**
-   * Handle drag leave
+   * Handle drag leave — only clear when leaving the pane entirely
    */
   @HostListener('dragleave', ['$event'])
   onDragLeave(event: DragEvent): void {
-    if (this.isNoteDrag(event)) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.dragOver.set(false);
-    }
+    if (!this.isNoteDrag(event)) return;
+    // relatedTarget is the element being entered; if it's inside this host, ignore
+    const related = event.relatedTarget as Node | null;
+    const host = (event.currentTarget as HTMLElement);
+    if (related && host.contains(related)) return;
+    this.dragOver.set(false);
   }
 
   /**
@@ -81,20 +80,19 @@ export class PaneComponent {
    */
   @HostListener('drop', ['$event'])
   onDrop(event: DragEvent): void {
-    if (this.isNoteDrag(event)) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.dragOver.set(false);
-      
-      try {
-        const noteData = event.dataTransfer?.getData('application/json');
-        if (noteData) {
-          const noteRef = JSON.parse(noteData) as NoteRef;
-          this.noteDropped.emit({ paneIndex: this.index(), noteRef });
-        }
-      } catch (error) {
-        console.error('Failed to parse dropped note:', error);
+    if (!this.isNoteDrag(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOver.set(false);
+
+    try {
+      const noteData = event.dataTransfer?.getData('application/lore-note');
+      if (noteData) {
+        const noteRef = JSON.parse(noteData) as NoteRef;
+        this.noteDropped.emit({ paneIndex: this.index(), noteRef });
       }
+    } catch (error) {
+      console.error('Failed to parse dropped note:', error);
     }
   }
 
@@ -103,10 +101,11 @@ export class PaneComponent {
   // ═══════════════════════════════════════════════════════════
 
   /**
-   * Check if drag event contains a note
+   * Check if drag event is carrying a note.
+   * We check for our custom MIME type; during dragover only 'types' is available.
    */
   private isNoteDrag(event: DragEvent): boolean {
-    return event.dataTransfer?.types.includes('application/json') || false;
+    return event.dataTransfer?.types.includes('application/lore-note') ?? false;
   }
 
   /**

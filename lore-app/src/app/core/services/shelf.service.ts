@@ -561,12 +561,39 @@ export class ShelfService {
                 notebookId: 'nb_1',
                 title: 'Transformer Architecture Deep Dive',
                 type: NoteType.Research,
-                content: 'Attention mechanisms, positional encodings, multi-head attention tradeoffs.',
-                preview: 'Attention mechanisms, positional encodings, multi-head attention tradeoffs.',
-                tags: ['transformers', 'attention'],
+                content: `## Overview
+
+The Transformer architecture (Vaswani et al., 2017) replaced recurrence with self-attention, enabling full parallelisation during training.
+
+## Core Components
+
+**Multi-Head Attention**
+Runs h parallel attention heads, each learning different relationship patterns. Output is concatenated and projected:
+  MultiHead(Q,K,V) = Concat(head_1,...,head_h) · W^O
+
+**Positional Encoding**
+Since attention is permutation-invariant, position is injected via sinusoidal encodings added to token embeddings. Learned positional embeddings (GPT-style) are now more common.
+
+**Feed-Forward Sublayer**
+Two linear layers with a ReLU/GELU in between, applied position-wise. Typically 4× the model dimension.
+
+## Key Tradeoffs
+
+| Aspect | Transformer | RNN/LSTM |
+|---|---|---|
+| Parallelism | Full | Sequential |
+| Long-range deps | O(1) path length | O(n) path length |
+| Memory | O(n²) attention | O(n) hidden state |
+| Training speed | Fast | Slow |
+
+## Open Questions
+- Flash Attention reduces memory from O(n²) to O(n) — worth adopting for all new work?
+- RoPE vs ALiBi vs learned positional embeddings for long-context models?`,
+                preview: 'The Transformer architecture replaced recurrence with self-attention, enabling full parallelisation. Core components: multi-head attention, positional encoding, feed-forward sublayer.',
+                tags: ['transformers', 'attention', 'architecture'],
                 status: NoteStatus.InProgress,
                 blocks: [],
-                linkedNoteIds: [],
+                linkedNoteIds: ['note_2'],
                 createdAt: new Date('2026-03-16'),
                 updatedAt: new Date('2026-03-16')
               },
@@ -575,12 +602,32 @@ export class ShelfService {
                 notebookId: 'nb_1',
                 title: 'Attention Mechanisms Survey',
                 type: NoteType.Research,
-                content: 'Scaled dot-product, sparse, local, and flash attention variants compared.',
-                preview: 'Scaled dot-product, sparse, local, and flash attention variants compared.',
-                tags: ['attention', 'survey'],
+                content: `## Attention Variants
+
+### Scaled Dot-Product (Vanilla)
+  Attention(Q,K,V) = softmax(QK^T / √d_k) · V
+
+Complexity: O(n²d). Works well up to ~4k tokens.
+
+### Sparse Attention (Longformer, BigBird)
+Each token attends to a local window + a few global tokens. Reduces complexity to O(n·w) where w is window size. Good for documents.
+
+### Flash Attention (Dao et al., 2022)
+Reorders computation to avoid materialising the full n×n attention matrix. Same output as vanilla but O(n) memory. Now standard in most serious implementations.
+
+### Multi-Query Attention (MQA)
+All heads share a single K and V projection. Dramatically reduces KV-cache size at inference — critical for serving large models.
+
+### Grouped-Query Attention (GQA)
+Compromise between MHA and MQA: groups of heads share K/V. Used in Llama 2/3, Mistral.
+
+## Recommendation
+For new projects: Flash Attention + GQA is the current best practice. MHA is only worth it for small research models where interpretability matters.`,
+                preview: 'Survey of attention variants: scaled dot-product, sparse (Longformer), Flash Attention, Multi-Query, and Grouped-Query. Flash Attention + GQA is current best practice.',
+                tags: ['attention', 'survey', 'flash-attention'],
                 status: NoteStatus.InProgress,
                 blocks: [],
-                linkedNoteIds: [],
+                linkedNoteIds: ['note_1'],
                 createdAt: new Date('2026-03-18'),
                 updatedAt: new Date('2026-03-18')
               },
@@ -589,9 +636,31 @@ export class ShelfService {
                 notebookId: 'nb_1',
                 title: 'BERT vs GPT Analysis',
                 type: NoteType.Idea,
-                content: 'Bidirectional vs autoregressive — enterprise use case comparison.',
-                preview: 'Bidirectional vs autoregressive — enterprise use case comparison.',
-                tags: ['bert', 'gpt'],
+                content: `## The Core Difference
+
+BERT is bidirectional (encoder-only, masked LM). GPT is autoregressive (decoder-only, causal LM). This single architectural choice drives almost every downstream difference.
+
+## Enterprise Use Case Mapping
+
+| Use Case | Winner | Why |
+|---|---|---|
+| Classification / NER | BERT | Bidirectional context = better representations |
+| Semantic search / embeddings | BERT variants | Sentence-BERT, E5, BGE all encoder-based |
+| Text generation | GPT | Autoregressive is the only option |
+| RAG retrieval | BERT | Embedding quality matters more than generation |
+| RAG generation | GPT | Obvious |
+| Code completion | GPT | Needs to predict next token |
+| Document Q&A | Either | Depends on pipeline design |
+
+## Practical Takeaway
+
+Most enterprise pipelines need both:
+- A BERT-family model for retrieval/embedding (e5-large, BGE-M3)
+- A GPT-family model for generation (GPT-4o, Claude 3.5, Llama 3)
+
+The "BERT vs GPT" framing is mostly academic now — production systems use both.`,
+                preview: 'BERT (bidirectional encoder) vs GPT (autoregressive decoder). Most enterprise pipelines need both: BERT for retrieval/embeddings, GPT for generation.',
+                tags: ['bert', 'gpt', 'enterprise'],
                 status: NoteStatus.Draft,
                 blocks: [],
                 linkedNoteIds: [],
@@ -614,9 +683,29 @@ export class ShelfService {
                 notebookId: 'nb_2',
                 title: 'Hybrid Retrieval Strategies',
                 type: NoteType.Research,
-                content: 'BM25 + dense vectors, cross-encoder re-ranking.',
-                preview: 'BM25 + dense vectors, cross-encoder re-ranking.',
-                tags: ['rag', 'retrieval'],
+                content: `## Why Hybrid?
+
+Pure dense retrieval misses exact keyword matches. Pure BM25 misses semantic similarity. Hybrid combines both.
+
+## Architecture
+
+1. **BM25 (sparse)** — Elasticsearch / OpenSearch. Fast, exact, handles rare terms well.
+2. **Dense (vector)** — FAISS / Pinecone / Weaviate. Semantic similarity via embeddings.
+3. **Reciprocal Rank Fusion (RRF)** — Merge ranked lists without needing score normalisation:
+   RRF(d) = Σ 1/(k + rank_i(d))   where k=60 is standard
+
+## Cross-Encoder Re-ranking
+
+After retrieving top-k candidates (e.g. 50), run a cross-encoder to re-score:
+- Cross-encoders see both query and document together → much higher accuracy
+- Too slow for full corpus, perfect for re-ranking a small candidate set
+- Good models: ms-marco-MiniLM-L-6-v2, bge-reranker-large
+
+## Recommended Pipeline
+
+Query → [BM25 top-50 + Dense top-50] → RRF merge → Cross-encoder re-rank top-10 → LLM`,
+                preview: 'Hybrid retrieval combines BM25 (sparse) and dense vectors, merged via Reciprocal Rank Fusion. Cross-encoder re-ranking on top-50 candidates before passing to LLM.',
+                tags: ['rag', 'retrieval', 'hybrid', 'reranking'],
                 status: NoteStatus.InProgress,
                 blocks: [],
                 linkedNoteIds: [],
@@ -628,12 +717,42 @@ export class ShelfService {
                 notebookId: 'nb_2',
                 title: 'Context Window Management',
                 type: NoteType.Task,
-                content: 'Token budgeting strategies for long-context LLM calls.',
-                preview: 'Token budgeting strategies for long-context LLM calls.',
-                tags: ['context', 'llm'],
+                content: `## Problem
+
+LLM context windows are large but not infinite. Stuffing everything in degrades quality and increases cost. Need a principled approach.
+
+## Token Budget Framework
+
+For a 128k context model, rough allocation:
+- System prompt: ~2k tokens
+- Retrieved chunks: ~60k tokens (top-10 × ~6k each)
+- Conversation history: ~20k tokens
+- Output buffer: ~8k tokens
+- Safety margin: ~38k tokens
+
+## Strategies
+
+### 1. Sliding Window
+Keep the last N tokens of conversation. Simple but loses early context.
+
+### 2. Summarisation
+Periodically summarise older turns into a compressed memory. Loses detail but preserves gist.
+
+### 3. Selective Retrieval
+Store all history in a vector DB, retrieve relevant turns per query. Best quality, most complex.
+
+### 4. Hierarchical Chunking
+Index documents at multiple granularities (sentence, paragraph, section). Retrieve at the right level.
+
+## Action Items
+- [ ] Benchmark sliding window vs retrieval on our Q&A eval set
+- [ ] Implement token counting middleware in the API layer
+- [ ] Set up cost alerts when context > 50k tokens per request`,
+                preview: 'Token budgeting framework for 128k context models. Strategies: sliding window, summarisation, selective retrieval, hierarchical chunking.',
+                tags: ['context', 'llm', 'tokens', 'cost'],
                 status: NoteStatus.Draft,
                 blocks: [],
-                linkedNoteIds: [],
+                linkedNoteIds: ['note_4'],
                 createdAt: new Date('2026-03-25'),
                 updatedAt: new Date('2026-03-25')
               }
@@ -663,28 +782,78 @@ export class ShelfService {
                 notebookId: 'nb_3',
                 title: 'Monday — Deep Work Session',
                 type: NoteType.Journal,
-                content: 'Shipped Lore demo. Azure deployed. Energy 4/5.',
-                preview: 'Shipped Lore demo. Azure deployed. Energy 4/5.',
-                tags: ['work', 'productivity'],
+                content: `## April 28, 2026 — Monday
+
+**Energy:** 4/5  
+**Focus blocks:** 3 × 90 min  
+**Mood:** Focused, slightly anxious about the demo
+
+---
+
+### What I did
+
+- Shipped the Lore sidebar drag-and-drop feature. Took longer than expected because Angular CDK and native HTML5 drag events conflict — had to strip CDK from note items and use native dragstart/drop.
+- Deployed to Azure Static Web Apps. Build pipeline green on first try (rare).
+- Reviewed the Phase 3 component spec. Editor foundation is cleaner than I thought.
+
+### What went well
+
+The CDK conflict fix was actually a good architectural decision — native drag is simpler and more composable. Should have done it from the start.
+
+### What didn't go well
+
+Lost 45 minutes debugging a TypeScript strict-mode error that turned out to be a missing NoteRef import. Need to be more systematic about checking imports first.
+
+### Tomorrow
+
+- Start Phase 4 block system
+- Write the Hypothesis and Conclusion block components
+- Set up the slash command palette skeleton`,
+                preview: 'Shipped Lore sidebar drag-and-drop. Deployed to Azure. Reviewed Phase 3 component spec. Lost 45 min on a missing import.',
+                tags: ['work', 'productivity', 'lore'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],
-                createdAt: new Date('2026-03-16'),
-                updatedAt: new Date('2026-03-16')
+                createdAt: new Date('2026-04-28'),
+                updatedAt: new Date('2026-04-28')
               },
               {
                 id: 'note_7',
                 notebookId: 'nb_3',
-                title: 'Weekly Review · Week 12',
+                title: 'Weekly Review · Week 17',
                 type: NoteType.Journal,
-                content: 'Roadmap milestones hit, gym 6/6, two blog posts drafted.',
-                preview: 'Roadmap milestones hit, gym 6/6, two blog posts drafted.',
-                tags: ['review', 'weekly'],
+                content: `## Week of April 21–27, 2026
+
+### Wins 🏆
+- Completed Phase 2 (Sidebar) and Phase 3 (Editor Foundation) of Lore
+- Gym: 6/6 sessions. Deadlift PR: 140kg
+- Finished draft of "Why RAG beats fine-tuning for enterprise" blog post
+- Read 180 pages of Gödel, Escher, Bach
+
+### Misses ❌
+- Didn't finish the equity research note I planned
+- Skipped Sunday planning session — felt it in Monday's scattered start
+
+### Numbers
+| Metric | Target | Actual |
+|---|---|---|
+| Deep work hours | 20h | 22h |
+| Gym sessions | 5 | 6 |
+| Pages read | 100 | 180 |
+| Blog posts drafted | 1 | 1 |
+
+### Theme for next week
+**Depth over breadth.** Resist the urge to start new things. Finish Phase 4 blocks before touching anything else.
+
+### One thing I'd tell past-me
+The CDK drag conflict would have been obvious if you'd read the Angular docs first. RTFM.`,
+                preview: 'Week 17 review. Completed Phase 2 & 3 of Lore. Gym 6/6. Deadlift PR 140kg. Blog post drafted. Theme: depth over breadth.',
+                tags: ['review', 'weekly', 'reflection'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],
-                createdAt: new Date('2026-03-22'),
-                updatedAt: new Date('2026-03-22')
+                createdAt: new Date('2026-04-27'),
+                updatedAt: new Date('2026-04-27')
               }
             ],
             order: 0,
@@ -702,9 +871,43 @@ export class ShelfService {
                 notebookId: 'nb_4',
                 title: 'Chapter Structure & Outline',
                 type: NoteType.Idea,
-                content: 'Story → Math → Python → Manim. 3B1B-style.',
-                preview: 'Story → Math → Python → Manim. 3B1B-style.',
-                tags: ['book', 'outline'],
+                content: `## Concept
+
+A linear algebra book that teaches through story, then formalises with math, then implements in Python, then visualises with Manim. Inspired by 3Blue1Brown's "Essence of Linear Algebra" series.
+
+## Chapter Outline
+
+### Part 1: Foundations
+1. **What is a vector?** — Arrow in space → column of numbers → abstract element of a vector space
+2. **Linear combinations** — The geometry of span
+3. **Linear transformations** — Functions that preserve structure
+4. **Matrix multiplication** — Composition of transformations
+
+### Part 2: The Core Theorems
+5. **Determinants** — How much does a transformation scale area/volume?
+6. **Eigenvalues & Eigenvectors** — The "skeleton" of a transformation
+7. **Diagonalisation** — Simplifying repeated transformations
+8. **SVD** — The most important decomposition in applied math
+
+### Part 3: Applications
+9. **PCA** — Dimensionality reduction via eigenvectors
+10. **Least squares** — Solving overdetermined systems
+11. **PageRank** — Eigenvectors in the wild
+12. **Neural networks** — Linear algebra is all you need (almost)
+
+## Format per Chapter
+- Opening story / intuition (500 words)
+- Formal definition + proof
+- Python implementation (NumPy)
+- Manim animation script
+- Exercises (3 computational, 1 proof, 1 open-ended)
+
+## Next Steps
+- [ ] Write Chapter 1 draft
+- [ ] Set up Manim environment
+- [ ] Find a technical reviewer`,
+                preview: 'Linear algebra book: story → math → Python → Manim. 3B1B-style. 12 chapters covering vectors through SVD and applications in PCA, least squares, PageRank, neural nets.',
+                tags: ['book', 'linear-algebra', 'manim', 'education'],
                 status: NoteStatus.Draft,
                 blocks: [],
                 linkedNoteIds: [],
@@ -737,9 +940,50 @@ export class ShelfService {
                 notebookId: 'nb_5',
                 title: 'Indian Equity Framework',
                 type: NoteType.Reference,
-                content: 'BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.',
-                preview: 'BRSR, SEBI LODR, Beneish M-Score, ROIC vs WACC.',
-                tags: ['equity', 'framework'],
+                content: `## Regulatory Framework
+
+**SEBI LODR** (Listing Obligations and Disclosure Requirements)
+- Quarterly results within 45 days of quarter end
+- Annual report within 60 days of AGM
+- Material events disclosed within 24 hours
+
+**BRSR** (Business Responsibility and Sustainability Report)
+- Mandatory for top 1000 listed companies by market cap
+- Covers ESG metrics: energy, water, GHG emissions, employee welfare
+- Key for institutional investors doing ESG screening
+
+## Valuation Metrics
+
+### Quality Filters (must pass all)
+- ROIC > WACC (value creation test)
+- Debt/Equity < 1.0 (financial stability)
+- Promoter pledge < 10% (governance)
+- Operating cash flow positive for 3 of last 5 years
+
+### Fraud Detection: Beneish M-Score
+8-variable model. Score > -1.78 suggests possible manipulation.
+
+Key variables:
+- DSRI: Days Sales Receivable Index (rising = red flag)
+- GMI: Gross Margin Index (declining = pressure to manipulate)
+- AQI: Asset Quality Index (rising = capitalising expenses)
+- SGI: Sales Growth Index (high growth = incentive to manipulate)
+- DEPI: Depreciation Index (declining = extending asset lives)
+
+### Valuation
+- P/E relative to sector median and 5-year own history
+- EV/EBITDA for capital-intensive businesses
+- P/B for banks and NBFCs (target < 2× for value)
+- DCF with 3 scenarios (bear/base/bull) — use WACC = Rf + β(Rm-Rf) + size premium
+
+## Watchlist Criteria
+1. ROIC > 15% consistently
+2. Revenue CAGR > 15% over 5 years
+3. Promoter holding > 50% (skin in the game)
+4. Free cash flow yield > 3%
+5. No related-party transaction red flags`,
+                preview: 'Indian equity framework: SEBI LODR, BRSR compliance, quality filters (ROIC > WACC), Beneish M-Score fraud detection, valuation via P/E, EV/EBITDA, DCF.',
+                tags: ['equity', 'framework', 'sebi', 'valuation', 'india'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],

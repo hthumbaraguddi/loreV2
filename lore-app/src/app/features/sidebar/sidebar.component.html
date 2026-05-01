@@ -237,33 +237,19 @@
 
               <!-- Notebook Body -->
               <div class="nb-body">
-                <!-- Note List with Drag-Drop -->
-                <div
-                  cdkDropList
-                  [cdkDropListData]="notebook.notes"
-                  (cdkDropListDropped)="onNoteDrop($event, notebook.id)"
-                  class="note-list"
-                >
+                <div class="note-list">
                   @for (note of notebook.notes; track trackByNoteId($index, note)) {
                     <div 
                       class="note-item"
                       [class.active]="isNoteActive(note.id)"
                       [class.focused]="isFocused(note.id)"
+                      [class.dragging]="isNoteDragging(note.id)"
                       (click)="onNoteClick(note.id); setFocus(note.id, 'note')"
                       (contextmenu)="onNoteContextMenu($event, note)"
-                      cdkDrag
-                      [cdkDragData]="note"
+                      draggable="true"
+                      (dragstart)="onNoteDragStart($event, note)"
+                      (dragend)="onNoteDragEnd()"
                     >
-                      <!-- Drag Handle -->
-                      <div class="drag-handle drag-handle-note" cdkDragHandle>
-                        <svg viewBox="0 0 10 10" fill="currentColor">
-                          <circle cx="2" cy="3" r="0.8"/>
-                          <circle cx="2" cy="7" r="0.8"/>
-                          <circle cx="5" cy="3" r="0.8"/>
-                          <circle cx="5" cy="7" r="0.8"/>
-                        </svg>
-                      </div>
-
                       <!-- Expanded View -->
                       <div class="ni-top">
                       <span class="ni-badge badge-{{ note.type }}">

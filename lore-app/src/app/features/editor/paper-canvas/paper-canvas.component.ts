@@ -1,76 +1,52 @@
-import { Component, signal, input, output, computed, inject } from '@angular/core';
+import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShelfService } from '../../../core/services/shelf.service';
-import { Note, NoteType, NoteRef } from '../../../core/models/shelf.model';
+import { BlockService } from '../../../core/services/block.service';
+import { Note, NoteType, NoteRef, Block, BlockType } from '../../../core/models/shelf.model';
 import { CanvasBackgroundComponent } from '../canvas-background/canvas-background.component';
+import { BlockListComponent } from '../../blocks/block-list/block-list.component';
 
-/**
- * PaperCanvasComponent
- * Hosts note content with canvas background
- */
 @Component({
   selector: 'lore-paper-canvas',
   standalone: true,
-  imports: [CommonModule, CanvasBackgroundComponent],
+  imports: [CommonModule, CanvasBackgroundComponent, BlockListComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './paper-canvas.component.html',
   styleUrl: './paper-canvas.component.scss'
 })
 export class PaperCanvasComponent {
   private shelfService = inject(ShelfService);
+  private blockService = inject(BlockService);
 
-  // Inputs
   note = input.required<NoteRef>();
   backgroundStyle = input<'plain' | 'dot' | 'square' | 'lined'>('plain');
   readOnly = input<boolean>(false);
 
-  // Outputs
-  blockAdded = output<{ type: string; afterIndex: number }>();
-  blockRemoved = output<{ blockId: string }>();
-  blockReordered = output<{ blockId: string; newIndex: number }>();
-  noteChanged = output<Partial<Note>>();
-
-  // Internal state signals
-  blocks = signal<any[]>([]); // Will be replaced with Block[] type
-  focusedBlockId = signal<string | null>(null);
-  addMenuIndex = signal<number | null>(null);
-  isDirty = signal<boolean>(false);
-
-  // Computed signals
+  // Resolved full note
   fullNote = computed(() => {
-    const noteRef = this.note();
-    // Get the full note from the service
-    const fullNote = this.shelfService.getNote(noteRef.id);
-    // If we can't find the full note, create a minimal Note from the NoteRef
-    if (!fullNote) {
+    const ref = this.note();
+    const full = this.shelfService.getNote(ref.id);
+    if (!full) {
       return {
-        ...noteRef,
-        content: '',
-        tags: [],
-        status: 'draft' as any,
-        blocks: [],
-        linkedNoteIds: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        ...ref, content: '', tags: [], status: 'draft' as any,
+        blocks: [], linkedNoteIds: [], createdAt: new Date(), updatedAt: new Date()
       } as Note;
     }
-    return fullNote;
+    return full;
   });
 
+  blocks = computed(() => this.fullNote().blocks ?? []);
+
   noteTypeIcon = computed(() => {
-    const type = this.fullNote().type as NoteType;
     const icons: Record<NoteType, string> = {
-      [NoteType.Research]: 'science',
-      [NoteType.Journal]: 'book',
-      [NoteType.Task]: 'check_circle',
-      [NoteType.Idea]: 'lightbulb',
-      [NoteType.Reference]: 'description',
-      [NoteType.HTML]: 'code'
+      [NoteType.Research]: 'science', [NoteType.Journal]: 'book',
+      [NoteType.Task]: 'check_circle', [NoteType.Idea]: 'lightbulb',
+      [NoteType.Reference]: 'description', [NoteType.HTML]: 'code'
     };
-    return icons[type] || 'description';
+    return icons[this.fullNote().type as NoteType] ?? 'description';
   });
 
   noteTypeColor = computed(() => {
-    const type = this.fullNote().type as NoteType;
     const colors: Record<NoteType, string> = {
       [NoteType.Research]: 'var(--lore-color-note-research)',
       [NoteType.Journal]: 'var(--lore-color-note-journal)',
@@ -79,120 +55,38 @@ export class PaperCanvasComponent {
       [NoteType.Reference]: 'var(--lore-color-note-reference)',
       [NoteType.HTML]: 'var(--lore-color-note-html)'
     };
-    return colors[type] || 'var(--lore-color-text-muted)';
+    return colors[this.fullNote().type as NoteType] ?? 'var(--lore-color-text-muted)';
   });
 
-  constructor() {
-    // Initialize blocks from note
-    this.blocks.set(this.fullNote().blocks || []);
+  // ─── Block handlers ────────────────────────────────────────
+
+  onBlockAdded(event: { type: BlockType; afterIndex: number }): void {
+    this.blockService.createBlock(this.fullNote().id, event.type, event.afterIndex);
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // BLOCK MANAGEMENT
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Add a new block
-   */
-  addBlock(type: string, afterIndex: number): void {
-    this.blockAdded.emit({ type, afterIndex });
-    this.isDirty.set(true);
+  onBlockChanged(block: Block): void {
+    this.blockService.updateBlock(this.fullNote().id, block.id, block);
   }
 
-  /**
-   * Remove a block
-   */
-  removeBlock(blockId: string): void {
-    this.blockRemoved.emit({ blockId });
-    this.isDirty.set(true);
+  onBlockDeleted(blockId: string): void {
+    this.blockService.deleteBlock(this.fullNote().id, blockId);
   }
 
-  /**
-   * Reorder blocks
-   */
-  reorderBlock(blockId: string, newIndex: number): void {
-    this.blockReordered.emit({ blockId, newIndex });
-    this.isDirty.set(true);
+  onBlockReordered(event: { fromIndex: number; toIndex: number }): void {
+    this.blockService.reorderBlocks(this.fullNote().id, event.fromIndex, event.toIndex);
   }
 
-  /**
-   * Update note content
-   */
-  updateNoteContent(content: string): void {
-    const note = this.fullNote();
-    this.shelfService.updateNote(note.id, { content });
-    this.isDirty.set(true);
+  onDuplicateBlock(blockId: string): void {
+    this.blockService.duplicateBlock(this.fullNote().id, blockId);
   }
 
-  /**
-   * Save note
-   */
-  saveNote(): void {
-    this.isDirty.set(false);
-    // Note is already saved via shelf service update
-  }
+  // ─── Utilities ─────────────────────────────────────────────
 
-  // ═══════════════════════════════════════════════════════════
-  // UI INTERACTIONS
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Show add block menu
-   */
-  showAddMenu(index: number): void {
-    this.addMenuIndex.set(index);
-  }
-
-  /**
-   * Hide add block menu
-   */
-  hideAddMenu(): void {
-    this.addMenuIndex.set(null);
-  }
-
-  /**
-   * Set focused block
-   */
-  setFocusedBlock(blockId: string | null): void {
-    this.focusedBlockId.set(blockId);
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // UTILITIES
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Format date for display
-   */
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }
-
-  /**
-   * Get relative time
-   */
   getRelativeTime(date: Date): string {
-    const now = new Date();
-    const noteDate = new Date(date);
-    const diffTime = Math.abs(now.getTime() - noteDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    
-    return this.formatDate(date);
-  }
-
-  /**
-   * Track by block ID
-   */
-  trackByBlockId(index: number, block: any): string {
-    return block.id || index.toString();
+    const diff = Math.ceil(Math.abs(Date.now() - new Date(date).getTime()) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    if (diff < 7) return `${diff} days ago`;
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 }

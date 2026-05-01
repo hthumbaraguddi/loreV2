@@ -45,6 +45,7 @@ export class SidebarComponent {
   // Keyboard navigation state
   focusedItemId = signal<string | null>(null);
   focusedItemType = signal<'shelf' | 'notebook' | 'note' | null>(null);
+  draggingNoteId = signal<string | null>(null);
 
   // Computed
   filteredShelves = computed(() => {
@@ -194,6 +195,35 @@ export class SidebarComponent {
 
   isNoteActive(noteId: string): boolean {
     return this.activeNoteId() === noteId;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // DRAG TO EDITOR (native HTML5 drag — separate from CDK reorder)
+  // ═══════════════════════════════════════════════════════════
+
+  onNoteDragStart(event: DragEvent, note: Note): void {
+    if (!event.dataTransfer) return;
+
+    const noteRef: NoteRef = {
+      id: note.id,
+      notebookId: note.notebookId,
+      title: note.title,
+      type: note.type,
+      preview: note.preview,
+      updatedAt: note.updatedAt
+    };
+
+    event.dataTransfer.setData('application/lore-note', JSON.stringify(noteRef));
+    event.dataTransfer.effectAllowed = 'copy';
+    this.draggingNoteId.set(note.id);
+  }
+
+  onNoteDragEnd(): void {
+    this.draggingNoteId.set(null);
+  }
+
+  isNoteDragging(noteId: string): boolean {
+    return this.draggingNoteId() === noteId;
   }
 
   // ═══════════════════════════════════════════════════════════

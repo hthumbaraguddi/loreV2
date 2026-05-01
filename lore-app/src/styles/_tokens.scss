@@ -262,6 +262,55 @@
   --lore-z-modal: 1050;
   --lore-z-popover: 1060;
   --lore-z-tooltip: 1070;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHORTHAND ALIASES
+  // Used by block components and editor. Maps short names → semantic tokens.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Color aliases
+  --lore-color-border:          var(--lore-color-border-default);
+  --lore-color-border-strong:   var(--lore-color-border-strong);
+  --lore-color-accent:          var(--lore-color-accent-default);
+  --lore-color-on-accent:       var(--lore-color-text-on-accent);
+  --lore-color-accent-hover:    var(--lore-color-accent-hover);
+  --lore-color-accent-subtle:   var(--lore-color-accent-subtle);
+  --lore-color-text-muted-2:    var(--lore-color-text-faint);
+  --lore-color-icon-muted:      var(--lore-color-icon-muted);
+
+  // Surface aliases
+  --lore-color-bg-surface:      var(--lore-color-surface-default);
+  --lore-color-bg-surface-2:    var(--lore-color-surface-subtle);
+  --lore-color-bg-surface-3:    var(--lore-color-surface-recessed);
+
+  // Note type colors
+  --lore-color-note-research:   var(--lore-primitive-purple-600);
+  --lore-color-note-journal:    var(--lore-primitive-yellow-600);
+  --lore-color-note-task:       var(--lore-primitive-blue-600);
+  --lore-color-note-idea:       #F59E0B;
+  --lore-color-note-reference:  var(--lore-primitive-green-700);
+  --lore-color-note-html:       #E03131;
+
+  // Grid color (canvas backgrounds)
+  --lore-color-grid:            var(--lore-color-border-default);
+
+  // Radius aliases
+  --lore-radius-sm:   var(--lore-radius-4);
+  --lore-radius-md:   var(--lore-radius-8);
+  --lore-radius-lg:   var(--lore-radius-12);
+
+  // Spacing aliases (fills gaps like 2, 6, 10)
+  --lore-space-2:   0.125rem;  // 2px
+  --lore-space-6:   0.375rem;  // 6px
+  --lore-space-10:  0.625rem;  // 10px
+
+  // Easing alias
+  --lore-easing-standard: var(--lore-anim-ease-standard);
+
+  // Z-index aliases
+  --lore-z-above:   var(--lore-z-dropdown);
+  --lore-z-below:   -1;
+  --lore-z-default: var(--lore-z-base);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

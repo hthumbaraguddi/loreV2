@@ -320,4 +320,20 @@ export class SplitEditorComponent {
     // TODO: Implement navigation to shelf
     console.log('Navigate to shelf');
   }
+
+  /**
+   * Open Ask AI panel
+   */
+  openAskAI(): void {
+    // TODO: Implement Ask AI functionality
+    console.log('Opening Ask AI...');
+  }
+
+  /**
+   * Open templates modal
+   */
+  openTemplates(): void {
+    // TODO: Implement templates modal
+    console.log('Opening templates modal...');
+  }
 }

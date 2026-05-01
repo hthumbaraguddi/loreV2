@@ -9,43 +9,78 @@
   [attr.aria-label]="noteRef() ? noteRef()!.title + ' editor pane' : 'Empty editor pane'"
   [attr.aria-selected]="active()"
 >
-  <!-- Pane header -->
-  <div class="pane-header">
-    @if (noteRef()) {
-      <div class="note-info">
-        <span
-          class="material-symbols-outlined note-type-icon"
-          [style.color]="getNoteTypeColor(noteRef()!.type)"
-        >
-          {{ getNoteTypeIcon(noteRef()!.type) }}
-        </span>
-        <div class="note-title">
-          <h3 class="title">{{ noteRef()!.title }}</h3>
-          <span class="breadcrumb">{{ getBreadcrumbTrail() }}</span>
+  <!-- Pane header - only show when multiple panes -->
+  @if (totalPanes() > 1) {
+    <div class="pane-header">
+      @if (noteRef()) {
+        <div class="note-info">
+          <span
+            class="material-symbols-outlined note-type-icon"
+            [style.color]="getNoteTypeColor(noteRef()!.type)"
+          >
+            {{ getNoteTypeIcon(noteRef()!.type) }}
+          </span>
+          <div class="note-title">
+            <h3 class="title">{{ noteRef()!.title }}</h3>
+            <span class="breadcrumb">{{ getBreadcrumbTrail() }}</span>
+          </div>
         </div>
-      </div>
-    } @else {
-      <div class="empty-header">
-        <span class="material-symbols-outlined">note_add</span>
-        <span class="empty-text">Drop a note here</span>
-      </div>
-    }
-    
-    @if (showCloseButton()) {
-      <button
-        class="close-btn"
-        (click)="onCloseClick($event)"
-        aria-label="Close pane"
-        title="Close pane (Escape)"
-      >
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    }
-  </div>
+      } @else {
+        <div class="empty-header">
+          <span class="material-symbols-outlined">note_add</span>
+          <span class="empty-text">Drop a note here</span>
+        </div>
+      }
+      
+      @if (showCloseButton()) {
+        <button
+          class="close-btn"
+          (click)="onCloseClick($event)"
+          aria-label="Close pane"
+          title="Close pane (Escape)"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      }
+    </div>
+  }
 
   <!-- Pane content -->
   <div class="pane-content">
     @if (noteRef()) {
+      <!-- Floating action buttons - top right corner -->
+      <div class="pane-actions">
+        <!-- Panel button -->
+        <button
+          class="pane-action-btn"
+          (click)="onPanelClick($event)"
+          aria-label="Panel options"
+          title="Panel options"
+        >
+          <span class="material-symbols-outlined">view_sidebar</span>
+        </button>
+        
+        <!-- History button -->
+        <button
+          class="pane-action-btn"
+          (click)="onHistoryClick($event)"
+          aria-label="History"
+          title="History"
+        >
+          <span class="material-symbols-outlined">history</span>
+        </button>
+        
+        <!-- Canvas button -->
+        <button
+          class="pane-action-btn"
+          (click)="onCanvasClick($event)"
+          aria-label="Canvas background"
+          title="Canvas background"
+        >
+          <span class="material-symbols-outlined">grid_on</span>
+        </button>
+      </div>
+      
       <lore-paper-canvas [note]="noteRef()!" />
     } @else {
       <div class="drop-zone">

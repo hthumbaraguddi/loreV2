@@ -69,13 +69,24 @@
         <span>Focus</span>
       </button>
 
-      <!-- Canvas Background Selector -->
-      <button class="tool-pill" (click)="openCanvasPicker()" title="Canvas background">
-        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="1" y="1" width="12" height="12" rx="1.5"/>
-          <path d="M1 5h12M5 1v12" opacity=".4"/>
+      <!-- Ask AI Button -->
+      <button class="action-btn" (click)="openAskAI()" title="Ask AI">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
         </svg>
-        <span>Canvas</span>
+        <span>Ask AI</span>
+      </button>
+
+      <!-- Templates Button -->
+      <button class="action-btn" (click)="openTemplates()" title="Choose template">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18"/>
+          <path d="M9 21V9"/>
+        </svg>
+        <span>Templates</span>
       </button>
 
       <!-- Save Button -->

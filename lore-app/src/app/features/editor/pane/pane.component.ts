@@ -61,6 +61,33 @@ export class PaneComponent {
   }
 
   /**
+   * Handle canvas button click
+   */
+  onCanvasClick(event: MouseEvent): void {
+    event.stopPropagation();
+    // TODO: Open canvas picker for this pane
+    console.log('Canvas picker for pane', this.index());
+  }
+
+  /**
+   * Handle panel button click
+   */
+  onPanelClick(event: MouseEvent): void {
+    event.stopPropagation();
+    // TODO: Open panel options for this pane
+    console.log('Panel options for pane', this.index());
+  }
+
+  /**
+   * Handle history button click
+   */
+  onHistoryClick(event: MouseEvent): void {
+    event.stopPropagation();
+    // TODO: Open history for this pane
+    console.log('History for pane', this.index());
+  }
+
+  /**
    * Handle drag over for drop zone
    */
   @HostListener('dragover', ['$event'])

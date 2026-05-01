@@ -187,8 +187,58 @@
 }
 
 // ═══════════════════════════════════════════════════════════
-// SAVE BUTTON
+// SAVE BUTTON & ICON BUTTON
 // ═══════════════════════════════════════════════════════════
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--lore-radius-md);
+  border: 1px solid var(--lore-color-border-strong);
+  background: var(--lore-color-bg-surface);
+  color: var(--lore-color-text-default);
+  font-size: 12px;
+  font-family: var(--lore-font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms var(--lore-easing-standard);
+  white-space: nowrap;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--lore-color-bg-surface-3);
+    border-color: var(--lore-color-accent-border);
+    color: var(--lore-color-accent);
+  }
+
+  &.primary {
+    background: var(--lore-color-accent);
+    border-color: var(--lore-color-accent);
+    color: var(--lore-color-on-accent);
+
+    &:hover {
+      background: var(--lore-color-accent-hover);
+      border-color: var(--lore-color-accent-hover);
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lore-color-accent);
+    outline-offset: 2px;
+  }
+}
 
 .save-btn {
   height: 28px;
@@ -211,6 +261,41 @@
 
   &:active {
     transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lore-color-accent);
+    outline-offset: 2px;
+  }
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--lore-radius-md);
+  color: var(--lore-color-text-muted);
+  cursor: pointer;
+  transition: all 120ms var(--lore-easing-standard);
+  flex-shrink: 0;
+  margin-left: 4px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: var(--lore-color-bg-surface-3);
+    color: var(--lore-color-accent);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   &:focus-visible {

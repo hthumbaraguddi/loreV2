@@ -1,67 +1,75 @@
 <div class="split-editor" tabindex="0">
-  <!-- Toolbar -->
-  <div class="editor-toolbar">
-    <div class="pane-count-selector">
-      <button
-        class="pane-count-btn"
-        [class.active]="paneCount() === 1"
-        (click)="setPaneCount(1)"
-        aria-label="Single pane"
-        title="Single pane (⌘1)"
-      >
-        1
-      </button>
-      <button
-        class="pane-count-btn"
-        [class.active]="paneCount() === 2"
-        (click)="setPaneCount(2)"
-        aria-label="Two panes"
-        title="Two panes (⌘2)"
-      >
-        2
-      </button>
-      <button
-        class="pane-count-btn"
-        [class.active]="paneCount() === 3"
-        (click)="setPaneCount(3)"
-        aria-label="Three panes"
-        title="Three panes (⌘3)"
-      >
-        3
-      </button>
-    </div>
-  </div>
-
-  <!-- Editor container -->
-  <div class="editor-container" #container>
-    @for (pane of panes(); track trackByPaneIndex($index)) {
-      <lore-pane
-        [noteRef]="pane.noteRef"
-        [active]="isPaneActive(pane.index)"
-        [index]="pane.index"
-        (focused)="onPaneFocused($event)"
-        (closeRequested)="onPaneCloseRequested($event)"
-        (noteDropped)="onNoteDropped($event)"
-        [style.width]="getPaneWidthStyle(pane.index).width"
-      />
-    }
-    
-    <!-- Resize dividers -->
-    @if (paneCount() > 1) {
-      @for (divider of [].constructor(paneCount() - 1); track $index) {
-        <div
-          class="resize-divider"
-          [style.left]="getDividerStyle($index).left"
-          (mousedown)="startDividerDrag($event, $index)"
-          [class.dragging]="draggingDivider() === $index"
-          role="separator"
-          aria-orientation="vertical"
-          [attr.aria-valuenow]="paneWidths()[$index]"
-          aria-label="Pane resize handle"
+  <!-- Toolbar - only show when we have panes -->
+  @if (!showNotesGrid()) {
+    <div class="editor-toolbar">
+      <div class="pane-count-selector">
+        <button
+          class="pane-count-btn"
+          [class.active]="paneCount() === 1"
+          (click)="setPaneCount(1)"
+          aria-label="Single pane"
+          title="Single pane (⌘1)"
         >
-          <div class="divider-handle"></div>
-        </div>
+          1
+        </button>
+        <button
+          class="pane-count-btn"
+          [class.active]="paneCount() === 2"
+          (click)="setPaneCount(2)"
+          aria-label="Two panes"
+          title="Two panes (⌘2)"
+        >
+          2
+        </button>
+        <button
+          class="pane-count-btn"
+          [class.active]="paneCount() === 3"
+          (click)="setPaneCount(3)"
+          aria-label="Three panes"
+          title="Three panes (⌘3)"
+        >
+          3
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Notes Grid View -->
+  @if (showNotesGrid()) {
+    <lore-notebook-grid />
+  }
+  @else {
+    <!-- Editor container -->
+    <div class="editor-container" #container>
+      @for (pane of panes(); track trackByPaneIndex($index)) {
+        <lore-pane
+          [noteRef]="pane.noteRef"
+          [active]="isPaneActive(pane.index)"
+          [index]="pane.index"
+          (focused)="onPaneFocused($event)"
+          (closeRequested)="onPaneCloseRequested($event)"
+          (noteDropped)="onNoteDropped($event)"
+          [style.width]="getPaneWidthStyle(pane.index).width"
+        />
       }
-    }
-  </div>
+      
+      <!-- Resize dividers -->
+      @if (paneCount() > 1) {
+        @for (divider of [].constructor(paneCount() - 1); track $index) {
+          <div
+            class="resize-divider"
+            [style.left]="getDividerStyle($index).left"
+            (mousedown)="startDividerDrag($event, $index)"
+            [class.dragging]="draggingDivider() === $index"
+            role="separator"
+            aria-orientation="vertical"
+            [attr.aria-valuenow]="paneWidths()[$index]"
+            aria-label="Pane resize handle"
+          >
+            <div class="divider-handle"></div>
+          </div>
+        }
+      }
+    </div>
+  }
 </div>

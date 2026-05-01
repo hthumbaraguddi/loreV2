@@ -1,0 +1,219 @@
+<div class="settings-panel">
+  <!-- Header -->
+  <div class="settings-header">
+    <h1 class="settings-title">Settings</h1>
+    <div class="settings-tabs">
+      <button
+        class="settings-tab"
+        [class.active]="activeTab() === 'general'"
+        (click)="setTab('general')"
+      >
+        General
+      </button>
+      <button
+        class="settings-tab"
+        [class.active]="activeTab() === 'templates'"
+        (click)="setTab('templates')"
+      >
+        Templates
+      </button>
+      <button
+        class="settings-tab"
+        [class.active]="activeTab() === 'appearance'"
+        (click)="setTab('appearance')"
+      >
+        Appearance
+      </button>
+      <button
+        class="settings-tab"
+        [class.active]="activeTab() === 'shortcuts'"
+        (click)="setTab('shortcuts')"
+      >
+        Shortcuts
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="settings-content">
+    <!-- General Tab -->
+    @if (activeTab() === 'general') {
+      <div class="settings-section">
+        <h2 class="section-title">General Settings</h2>
+        <p class="section-description">Application preferences and defaults</p>
+        
+        <div class="settings-card">
+          <h3 class="card-title">Note Creation</h3>
+          <div class="setting-row">
+            <label class="setting-label">Default Note Type</label>
+            <select class="setting-control">
+              <option value="idea">Idea</option>
+              <option value="research">Research</option>
+              <option value="journal">Journal</option>
+              <option value="task">Task</option>
+              <option value="reference">Reference</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label class="setting-label">Auto-save Interval</label>
+            <select class="setting-control">
+              <option value="5">5 seconds</option>
+              <option value="10">10 seconds</option>
+              <option value="30">30 seconds</option>
+              <option value="60">1 minute</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Templates Tab -->
+    @if (activeTab() === 'templates') {
+      <div class="settings-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Template Gallery</h2>
+            <p class="section-description">Manage and apply note templates</p>
+          </div>
+          <a routerLink="/template-builder" class="btn-primary">
+            <span class="btn-icon">+</span>
+            Create Template
+          </a>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-filter">
+          @for (category of categories(); track category) {
+            <button
+              class="category-btn"
+              [class.active]="selectedCategory() === category"
+              (click)="setCategory(category)"
+            >
+              {{ category }}
+            </button>
+          }
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="templates-grid">
+          @for (template of getFilteredTemplates(); track template.id) {
+            <div class="template-card">
+              <div class="template-header">
+                <div class="template-badge" [class]="'badge-' + template.category.toLowerCase()">
+                  {{ template.category }}
+                </div>
+                <div class="template-actions">
+                  <button class="action-btn" (click)="duplicateTemplate(template.id)" title="Duplicate">
+                    <span class="action-icon">⎘</span>
+                  </button>
+                  <button class="action-btn delete" (click)="deleteTemplate(template.id)" title="Delete">
+                    <span class="action-icon">×</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="template-body">
+                <h3 class="template-title">{{ template.name }}</h3>
+                <p class="template-description">{{ template.description }}</p>
+                
+                <div class="template-meta">
+                  <span class="meta-item">
+                    <span class="meta-icon">📝</span>
+                    {{ getBlockCountText(template) }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="meta-icon">📌</span>
+                    {{ template.noteType }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    {{ formatDate(template.updatedAt) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="template-blocks">
+                @for (block of template.blocks.slice(0, 3); track block.id) {
+                  <div class="block-preview">
+                    <span class="block-icon">{{ block.icon }}</span>
+                    <span class="block-name">{{ block.name }}</span>
+                    @if (block.required) {
+                      <span class="block-required">*</span>
+                    }
+                  </div>
+                }
+                @if (template.blocks.length > 3) {
+                  <div class="block-more">+{{ template.blocks.length - 3 }} more</div>
+                }
+              </div>
+            </div>
+          }
+          @empty {
+            <div class="empty-state">
+              <span class="empty-icon">📋</span>
+              <h3 class="empty-title">No templates yet</h3>
+              <p class="empty-description">Create your first template to speed up note creation</p>
+              <a routerLink="/template-builder" class="btn-primary">
+                <span class="btn-icon">+</span>
+                Create Template
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Appearance Tab -->
+    @if (activeTab() === 'appearance') {
+      <div class="settings-section">
+        <h2 class="section-title">Appearance</h2>
+        <p class="section-description">Customize the look and feel</p>
+        
+        <div class="settings-card">
+          <h3 class="card-title">Theme</h3>
+          <div class="theme-options">
+            <button class="theme-option">
+              <div class="theme-preview light"></div>
+              <span class="theme-label">Light</span>
+            </button>
+            <button class="theme-option">
+              <div class="theme-preview dark"></div>
+              <span class="theme-label">Dark</span>
+            </button>
+            <button class="theme-option">
+              <div class="theme-preview auto"></div>
+              <span class="theme-label">Auto</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Shortcuts Tab -->
+    @if (activeTab() === 'shortcuts') {
+      <div class="settings-section">
+        <h2 class="section-title">Keyboard Shortcuts</h2>
+        <p class="section-description">Customize keyboard shortcuts</p>
+        
+        <div class="shortcuts-grid">
+          <div class="shortcut-item">
+            <span class="shortcut-action">New Note</span>
+            <span class="shortcut-key">⌘N</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-action">Search</span>
+            <span class="shortcut-key">⌘K</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-action">Toggle Sidebar</span>
+            <span class="shortcut-key">⌘B</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-action">Save Note</span>
+            <span class="shortcut-key">⌘S</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

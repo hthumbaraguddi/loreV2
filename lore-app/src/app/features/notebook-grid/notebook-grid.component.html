@@ -1,0 +1,176 @@
+<div class="notebook-grid">
+  <!-- Header -->
+  <div class="nbgv-header">
+    <div class="nbgv-breadcrumb">
+      <a (click)="openNote('')">Shelf</a>
+      <span class="sep">›</span>
+      <span class="cur">All Notes</span>
+    </div>
+    <h1 class="nbgv-title">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="3" y="3" width="14" height="14" rx="2.5"/>
+        <path d="M7 7h6M7 10h6M7 13h4"/>
+      </svg>
+      Notes
+    </h1>
+    <div class="nbgv-sub">{{ stats().total }} notes across {{ notebooks().length }} notebooks</div>
+    
+    <!-- Tabs -->
+    <div class="nbgv-tabs">
+      <button
+        class="nbgv-tab"
+        [class.active]="activeTab() === 'all'"
+        (click)="setTab('all')"
+      >
+        All
+      </button>
+      <button
+        class="nbgv-tab"
+        [class.active]="activeTab() === 'recent'"
+        (click)="setTab('recent')"
+      >
+        Recent
+      </button>
+      <button
+        class="nbgv-tab"
+        [class.active]="activeTab() === 'favorites'"
+        (click)="setTab('favorites')"
+      >
+        Favorites
+      </button>
+      <button
+        class="nbgv-tab"
+        [class.active]="activeTab() === 'ai'"
+        (click)="setTab('ai')"
+      >
+        AI
+      </button>
+    </div>
+    
+    <!-- Stats -->
+    <div class="nbgv-stats">
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().total }}</div>
+        <div class="nbgv-stat-l">Total</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().recent }}</div>
+        <div class="nbgv-stat-l">7d</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().ai }}</div>
+        <div class="nbgv-stat-l">AI</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().favorites }}</div>
+        <div class="nbgv-stat-l">Fav</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="nbgv-body">
+    <!-- Toolbar -->
+    <div class="nbgv-toolbar">
+      <!-- Tags filter -->
+      @for (tag of allTags().slice(0, 5); track tag.tag) {
+        <button
+          class="nbgv-filter"
+          [class.active]="selectedTags().includes(tag.tag)"
+          (click)="toggleTag(tag.tag)"
+        >
+          {{ tag.tag }} ({{ tag.count }})
+        </button>
+      }
+      @if (allTags().length > 5) {
+        <button class="nbgv-filter">More...</button>
+      }
+      
+      <!-- Sort -->
+      <select class="nbgv-sort" (change)="setSort($any($event.target).value)">
+        <option value="updated" [selected]="sortBy() === 'updated'">Updated</option>
+        <option value="created" [selected]="sortBy() === 'created'">Created</option>
+        <option value="title" [selected]="sortBy() === 'title'">Title</option>
+      </select>
+      
+      <!-- Layout toggle -->
+      <div class="nbgv-layout-btns">
+        <button
+          class="nbgv-layout-btn"
+          [class.active]="layoutMode() === 'grid'"
+          (click)="layoutMode.set('grid')"
+          title="Grid view"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="0.5" y="0.5" width="4" height="4" rx="1"/>
+            <rect x="7.5" y="0.5" width="4" height="4" rx="1"/>
+            <rect x="0.5" y="7.5" width="4" height="4" rx="1"/>
+            <rect x="7.5" y="7.5" width="4" height="4" rx="1"/>
+          </svg>
+        </button>
+        <button
+          class="nbgv-layout-btn"
+          [class.active]="layoutMode() === 'list'"
+          (click)="layoutMode.set('list')"
+          title="List view"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="0.5" y="0.5" width="11" height="1" rx="0.5"/>
+            <rect x="0.5" y="3.5" width="11" height="1" rx="0.5"/>
+            <rect x="0.5" y="6.5" width="11" height="1" rx="0.5"/>
+            <rect x="0.5" y="9.5" width="11" height="1" rx="0.5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="note-cards-grid" [class.list]="layoutMode() === 'list'">
+      <!-- Add Card -->
+      <div class="nc nc-add" (click)="createNewNote()">
+        <div class="nc-add-ico">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M8 3v10M3 8h10"/>
+          </svg>
+        </div>
+        <div class="nc-add-lbl">New Note</div>
+        <div class="nc-add-sub">Click to create</div>
+      </div>
+      
+      <!-- Note Cards -->
+      @for (note of notes(); track trackByNoteId($index, note)) {
+        <div class="nc" [class.list]="layoutMode() === 'list'" (click)="openNote(note.id)">
+          <div class="nc-top">
+            <div class="nc-badge" [class]="getBadgeColor(note.type)">
+              {{ getBadgeLabel(note.type) }}
+            </div>
+            <div class="nc-date">{{ formatDate(note.updatedAt) }}</div>
+          </div>
+          
+          <div class="nc-body">
+            <h3 class="nc-title">{{ note.title }}</h3>
+            <div class="nc-preview">{{ note.preview || 'No content yet...' }}</div>
+            
+            <div class="nc-footer">
+              @for (tag of note.tags.slice(0, 3); track tag) {
+                <span class="nc-tag">{{ tag }}</span>
+              }
+              @if (getAICount(note) > 0) {
+                <div class="nc-ai-dot"></div>
+                <div class="nc-ai-count">{{ getAICount(note) }} AI</div>
+              }
+            </div>
+          </div>
+          
+          <button class="nc-more" (click)="$event.stopPropagation()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="6" cy="2" r="1"/>
+              <circle cx="6" cy="6" r="1"/>
+              <circle cx="6" cy="10" r="1"/>
+            </svg>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

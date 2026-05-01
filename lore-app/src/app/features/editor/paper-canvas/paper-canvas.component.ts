@@ -80,6 +80,43 @@ export class PaperCanvasComponent {
     this.blockService.duplicateBlock(this.fullNote().id, blockId);
   }
 
+  // ─── Note body handler ─────────────────────────────────────
+
+  onNoteBodyInput(event: Event): void {
+    const content = (event.target as HTMLTextAreaElement).value;
+    this.shelfService.updateNote(this.fullNote().id, { content });
+  }
+
+  // ─── Insert block shortcuts ────────────────────────────────
+
+  insertBlock(type: string): void {
+    const blockType = this.stringToBlockType(type);
+    if (blockType) {
+      // Add block at the end (after all existing blocks)
+      const afterIndex = this.blocks().length - 1;
+      this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
+    }
+  }
+
+  private stringToBlockType(type: string): BlockType | null {
+    const typeMap: Record<string, BlockType> = {
+      'hypothesis': BlockType.Hypothesis,
+      'conclusion': BlockType.Conclusion,
+      'key-differences': BlockType.KeyDifferences,
+      'key-findings': BlockType.KeyFindings,
+      'code': BlockType.Code,
+      'ask-claude': BlockType.AskClaude,
+      'ask-gpt': BlockType.AskGPT,
+      'note': BlockType.Note,
+      'warning': BlockType.Warning,
+      'quote': BlockType.Quote,
+      'checklist': BlockType.Checklist,
+      'image': BlockType.Image,
+      'divider': BlockType.Divider
+    };
+    return typeMap[type] || null;
+  }
+
   // ─── Utilities ─────────────────────────────────────────────
 
   getRelativeTime(date: Date): string {

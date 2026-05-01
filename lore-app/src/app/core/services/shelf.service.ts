@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Shelf, Notebook, Note, NoteType, NoteStatus } from '../models/shelf.model';
+import { Shelf, Notebook, Note, NoteType, NoteStatus, BlockType } from '../models/shelf.model';
 import { LocalStorageService } from './local-storage.service';
 
 /**
@@ -18,6 +18,13 @@ export class ShelfService {
   
   // Public computed signals
   shelves = this.shelvesSignal.asReadonly();
+  notebooks = computed(() => {
+    const allNotebooks: Notebook[] = [];
+    for (const shelf of this.shelvesSignal()) {
+      allNotebooks.push(...shelf.notebooks);
+    }
+    return allNotebooks;
+  });
   totalNotes = computed(() => {
     return this.shelvesSignal().reduce((total, shelf) => {
       return total + shelf.notebooks.reduce((nbTotal, nb) => nbTotal + nb.notes.length, 0);
@@ -263,7 +270,8 @@ export class ShelfService {
     notebookId: string,
     title: string,
     type: NoteType = NoteType.Idea,
-    content: string = ''
+    content: string = '',
+    blocks: any[] = []
   ): Note | null {
     const shelves = this.shelvesSignal();
     let created: Note | null = null;
@@ -282,7 +290,7 @@ export class ShelfService {
         preview: this.generatePreview(content),
         tags: [],
         status: NoteStatus.Draft,
-        blocks: [],
+        blocks: blocks.length > 0 ? blocks : [],
         linkedNoteIds: [],
         createdAt: new Date(),
         updatedAt: new Date()
@@ -442,6 +450,21 @@ export class ShelfService {
   }
 
   /**
+   * Get all notes across all shelves and notebooks
+   */
+  getAllNotes(): Note[] {
+    const results: Note[] = [];
+    
+    for (const shelf of this.shelvesSignal()) {
+      for (const notebook of shelf.notebooks) {
+        results.push(...notebook.notes);
+      }
+    }
+    
+    return results;
+  }
+
+  /**
    * Reorder notes within a notebook
    */
   reorderNotes(notebookId: string, noteIds: string[]): boolean {
@@ -592,7 +615,46 @@ Two linear layers with a ReLU/GELU in between, applied position-wise. Typically 
                 preview: 'The Transformer architecture replaced recurrence with self-attention, enabling full parallelisation. Core components: multi-head attention, positional encoding, feed-forward sublayer.',
                 tags: ['transformers', 'attention', 'architecture'],
                 status: NoteStatus.InProgress,
-                blocks: [],
+                blocks: [
+                  {
+                    id: 'blk_1',
+                    type: BlockType.Hypothesis,
+                    content: 'We hypothesise that Flash Attention + GQA will become the standard for all production LLMs by 2027.',
+                    order: 0,
+                    createdAt: new Date('2026-03-16')
+                  },
+                  {
+                    id: 'blk_2',
+                    type: BlockType.KeyDifferences,
+                    content: 'Transformer vs RNN/LSTM',
+                    metadata: {
+                      columns: ['Transformer', 'RNN/LSTM'],
+                      rows: [
+                        ['Full parallelism', 'Sequential'],
+                        ['O(1) path length', 'O(n) path length'],
+                        ['O(n²) memory', 'O(n) hidden state']
+                      ]
+                    },
+                    order: 1,
+                    createdAt: new Date('2026-03-16')
+                  },
+                  {
+                    id: 'blk_3',
+                    type: BlockType.Code,
+                    content: 'def scaled_dot_product_attention(Q, K, V, mask=None):\n    d_k = K.shape[-1]\n    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)\n    if mask is not None:\n        scores = scores.masked_fill(mask == 0, -1e9)\n    attention = torch.softmax(scores, dim=-1)\n    return torch.matmul(attention, V)',
+                    metadata: { language: 'python' },
+                    order: 2,
+                    createdAt: new Date('2026-03-16')
+                  },
+                  {
+                    id: 'blk_4',
+                    type: BlockType.AskClaude,
+                    content: 'Explain the tradeoffs between different attention mechanisms for long-context models.',
+                    metadata: { response: 'Flash Attention reduces memory from O(n²) to O(n) by reordering computation. Sparse attention (Longformer) uses local windows + global tokens. Multi-Query Attention shares K/V projections across heads to reduce KV cache size.' },
+                    order: 3,
+                    createdAt: new Date('2026-03-16')
+                  }
+                ],
                 linkedNoteIds: ['note_2'],
                 createdAt: new Date('2026-03-16'),
                 updatedAt: new Date('2026-03-16')

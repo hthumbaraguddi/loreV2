@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings-panel.component').then(m => m.SettingsPanelComponent)
   },
   {
+    path: 'template-builder',
+    loadComponent: () => import('./features/template-builder/template-builder.component').then(m => m.TemplateBuilderComponent)
+  },
+  {
     path: '**',
     redirectTo: 'notes'
   }

@@ -1,0 +1,183 @@
+<div class="template-builder">
+  <!-- Header -->
+  <div class="tpl-header">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="2" y="2" width="12" height="12" rx="1.5"/>
+      <path d="M2 7h12M7 2v12"/>
+    </svg>
+    <span class="tpl-title">Template Builder</span>
+    <div class="tpl-spacer"></div>
+    <button class="tpl-btn" (click)="clearCanvas()">Clear canvas</button>
+    <button class="tpl-btn primary" (click)="saveTemplate()">💾 Save Template</button>
+  </div>
+
+  <!-- Main layout -->
+  <div class="tpl-layout">
+    <!-- Block palette -->
+    <div class="tpl-palette">
+      <div class="tpl-palette-header">
+        Drag blocks onto the canvas to design your template
+      </div>
+      
+      <div class="tpl-palette-section">
+        <div class="tpl-section-label">Callouts</div>
+        @for (block of paletteBlocks().slice(0, 4); track block.id) {
+          <div class="tpl-palette-item" 
+               draggable="true" 
+               (dragstart)="onPaletteDragStart($event, block)">
+            <div class="tpl-item-icon">{{ block.icon }}</div>
+            <div class="tpl-item-content">
+              <div class="tpl-item-name">{{ block.name }}</div>
+              <div class="tpl-item-desc">{{ block.description }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="tpl-palette-section">
+        <div class="tpl-section-label">Structure</div>
+        @for (block of paletteBlocks().slice(4, 8); track block.id) {
+          <div class="tpl-palette-item" 
+               draggable="true" 
+               (dragstart)="onPaletteDragStart($event, block)">
+            <div class="tpl-item-icon">{{ block.icon }}</div>
+            <div class="tpl-item-content">
+              <div class="tpl-item-name">{{ block.name }}</div>
+              <div class="tpl-item-desc">{{ block.description }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="tpl-palette-section">
+        <div class="tpl-section-label">AI & Media</div>
+        @for (block of paletteBlocks().slice(8); track block.id) {
+          <div class="tpl-palette-item" 
+               draggable="true" 
+               (dragstart)="onPaletteDragStart($event, block)">
+            <div class="tpl-item-icon">{{ block.icon }}</div>
+            <div class="tpl-item-content">
+              <div class="tpl-item-name">{{ block.name }}</div>
+              <div class="tpl-item-desc">{{ block.description }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="tpl-canvas-wrap">
+      <div class="tpl-canvas-header">
+        <div class="tpl-canvas-title">Template Canvas</div>
+        <div class="tpl-canvas-subtitle">
+          Drop blocks here · Check "required" for blocks that must always appear · Drag to reorder
+        </div>
+      </div>
+
+      <div class="tpl-drop-zone"
+           (dragover)="onCanvasDragOver($event)"
+           (dragleave)="onCanvasDragLeave($event)"
+           (drop)="onCanvasDrop($event)"
+           cdkDropList
+           [cdkDropListData]="canvasBlocks()"
+           (cdkDropListDropped)="onCanvasDropReorder($event)">
+        
+        @if (canvasBlocks().length === 0) {
+          <div class="tpl-empty-state">
+            <div class="tpl-empty-icon">🧩</div>
+            <div class="tpl-empty-text">Drop blocks here to build your template</div>
+            <div class="tpl-empty-hint">Or click any block in the left panel</div>
+          </div>
+        }
+
+        @for (block of canvasBlocks(); track block.id; let i = $index) {
+          <div class="tpl-canvas-block" cdkDrag [cdkDragData]="block">
+            <div class="tpl-block-handle" cdkDragHandle>
+              <svg viewBox="0 0 10 16" fill="currentColor" width="10" height="16">
+                <circle cx="2" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/>
+                <circle cx="2" cy="10" r="1.2"/><circle cx="2" cy="14" r="1.2"/>
+                <circle cx="7" cy="2" r="1.2"/><circle cx="7" cy="6" r="1.2"/>
+                <circle cx="7" cy="10" r="1.2"/><circle cx="7" cy="14" r="1.2"/>
+              </svg>
+            </div>
+            
+            <div class="tpl-block-content">
+              <div class="tpl-block-header">
+                <div class="tpl-block-icon">{{ block.icon }}</div>
+                <div class="tpl-block-name">{{ block.name }}</div>
+                <div class="tpl-block-actions">
+                  <label class="tpl-required-toggle">
+                    <input type="checkbox" 
+                           [checked]="block.required"
+                           (change)="toggleBlockRequired(block.id)">
+                    Required
+                  </label>
+                  <button class="tpl-block-remove" (click)="removeBlockFromCanvas(block.id)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div class="tpl-block-desc">{{ block.description }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Metadata sidebar -->
+    <div class="tpl-meta-sidebar">
+      <div class="tpl-meta-header">Template details</div>
+      
+      <input class="tpl-meta-input" 
+             placeholder="Template name…" 
+             [value]="templateName()"
+             (input)="templateName.set($any($event.target).value)">
+      
+      <textarea class="tpl-meta-input tpl-meta-textarea" 
+                placeholder="Short description…"
+                [value]="templateDescription()"
+                (input)="templateDescription.set($any($event.target).value)"></textarea>
+      
+      <div class="tpl-meta-label">Category</div>
+      <div class="tpl-tags">
+        @for (cat of categories(); track cat) {
+          <div class="tpl-tag" 
+               [class.selected]="templateCategory() === cat"
+               (click)="templateCategory.set(cat)">
+            {{ cat }}
+          </div>
+        }
+      </div>
+      
+      <div class="tpl-meta-label">Note type</div>
+      <div class="tpl-tags">
+        @for (type of noteTypes(); track type) {
+          <div class="tpl-tag" 
+               [class.selected]="templateNoteType() === type"
+               (click)="templateNoteType.set(type)">
+            {{ type }}
+          </div>
+        }
+      </div>
+      
+      <div class="tpl-meta-divider"></div>
+      
+      <div class="tpl-stats">
+        <div class="tpl-stats-label">Blocks in template</div>
+        <div class="tpl-stats-count">{{ getBlockCount() }}</div>
+        <div class="tpl-stats-sub">blocks added</div>
+        <div class="tpl-stats-required">{{ getRequiredBlockCount() }} required</div>
+      </div>
+      
+      <div class="tpl-meta-divider"></div>
+      
+      <div class="tpl-meta-hint">
+        After saving, this template will appear in the <strong>New Note</strong> flow and Settings → Templates.
+      </div>
+      
+      <button class="tpl-btn primary tpl-save-btn" (click)="saveTemplate()">
+        💾 Save Template
+      </button>
+    </div>
+  </div>
+</div>

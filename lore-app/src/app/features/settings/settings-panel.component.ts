@@ -1,51 +1,88 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { TemplateService, Template } from '../../core/services/template.service';
 
 @Component({
   selector: 'lore-settings-panel',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="placeholder">
-      <div class="placeholder-content">
-        <span class="material-symbols-outlined">settings</span>
-        <h2>Settings</h2>
-        <p>Settings panel will be implemented across multiple phases</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: var(--lore-color-bg-canvas);
-    }
-
-    .placeholder-content {
-      text-align: center;
-      color: var(--lore-color-text-muted);
-    }
-
-    .material-symbols-outlined {
-      font-size: 64px;
-      color: var(--lore-color-icon-muted);
-      margin-bottom: var(--lore-space-16);
-    }
-
-    h2 {
-      font-family: var(--lore-font-serif);
-      font-size: var(--lore-font-size-2xl);
-      font-weight: 600;
-      color: var(--lore-color-text-default);
-      margin-bottom: var(--lore-space-8);
-    }
-
-    p {
-      font-size: var(--lore-font-size-md);
-    }
-  `],
+  imports: [CommonModule, RouterLink],
+  templateUrl: './settings-panel.component.html',
+  styleUrl: './settings-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SettingsPanelComponent {}
+export class SettingsPanelComponent {
+  private templateService = inject(TemplateService);
+  
+  // Active tab
+  activeTab = signal<'general' | 'templates' | 'appearance' | 'shortcuts'>('general');
+  
+  // Template management
+  templates = this.templateService.templates;
+  selectedCategory = signal('All');
+  
+  // Categories
+  categories = signal(['All', ...this.templateService.categories()]);
+
+  // ─── Template Actions ──────────────────────────────────────────
+
+  /**
+   * Delete template
+   */
+  deleteTemplate(templateId: string): void {
+    if (confirm('Are you sure you want to delete this template?')) {
+      this.templateService.deleteTemplate(templateId);
+    }
+  }
+
+  /**
+   * Duplicate template
+   */
+  duplicateTemplate(templateId: string): void {
+    this.templateService.duplicateTemplate(templateId);
+  }
+
+  /**
+   * Get templates by selected category
+   */
+  getFilteredTemplates(): Template[] {
+    const category = this.selectedCategory();
+    if (category === 'All') {
+      return this.templates();
+    }
+    return this.templates().filter(t => t.category === category);
+  }
+
+  /**
+   * Get block count text
+   */
+  getBlockCountText(template: Template): string {
+    const count = template.blocks.length;
+    return `${count} block${count !== 1 ? 's' : ''}`;
+  }
+
+  /**
+   * Format date
+   */
+  formatDate(date: Date): string {
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  }
+
+  /**
+   * Set active tab
+   */
+  setTab(tab: 'general' | 'templates' | 'appearance' | 'shortcuts'): void {
+    this.activeTab.set(tab);
+  }
+
+  /**
+   * Set category filter
+   */
+  setCategory(category: string): void {
+    this.selectedCategory.set(category);
+  }
+}

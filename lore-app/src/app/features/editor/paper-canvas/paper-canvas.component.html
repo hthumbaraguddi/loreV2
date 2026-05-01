@@ -14,7 +14,7 @@
         <div class="note-details">
           <span class="note-date">{{ getRelativeTime(fullNote().updatedAt) }}</span>
           <span class="note-status" [class]="fullNote().status">{{ fullNote().status }}</span>
-          @if (fullNote().tags?.length) {
+          @if (fullNote().tags.length) {
             @for (tag of fullNote().tags; track tag) {
               <span class="tag">#{{ tag }}</span>
             }
@@ -22,6 +22,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Note body (simple text area) -->
+    <textarea
+      class="note-body"
+      [value]="fullNote().content"
+      (input)="onNoteBodyInput($event)"
+      [readOnly]="readOnly()"
+      placeholder="Continue writing… / for blocks, @ for AI, [[ to link"
+      rows="6"
+    ></textarea>
 
     <!-- Block list -->
     <lore-block-list
@@ -33,5 +43,18 @@
       (blockReordered)="onBlockReordered($event)"
       (duplicateRequested)="onDuplicateBlock($event)"
     />
+
+    <!-- Insert section (block shortcuts) -->
+    @if (!readOnly()) {
+      <div class="slash-hint">
+        <span class="shl">Insert:</span>
+        <span class="shk" (click)="insertBlock('hypothesis')"><kbd>H</kbd> Hypothesis</span>
+        <span class="shk" (click)="insertBlock('conclusion')"><kbd>C</kbd> Conclusion</span>
+        <span class="shk" (click)="insertBlock('key-differences')"><kbd>K</kbd> Key Diff</span>
+        <span class="shk" (click)="insertBlock('key-findings')"><kbd>F</kbd> Findings</span>
+        <span class="shk" (click)="insertBlock('code')"><kbd>`</kbd> Code</span>
+        <span class="shk" (click)="insertBlock('ask-claude')">✦ AI block</span>
+      </div>
+    }
   </div>
 </div>

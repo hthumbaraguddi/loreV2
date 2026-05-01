@@ -4,6 +4,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import { EditorService } from '../../../core/services/editor.service';
 import { NoteRef } from '../../../core/models/shelf.model';
 import { PaneComponent } from '../pane/pane.component';
+import { NotebookGridComponent } from '../../notebook-grid/notebook-grid.component';
 
 /**
  * SplitEditorComponent
@@ -12,7 +13,7 @@ import { PaneComponent } from '../pane/pane.component';
 @Component({
   selector: 'lore-split-editor',
   standalone: true,
-  imports: [CommonModule, DragDropModule, PaneComponent],
+  imports: [CommonModule, DragDropModule, PaneComponent, NotebookGridComponent],
   templateUrl: './split-editor.component.html',
   styleUrl: './split-editor.component.scss'
 })
@@ -39,6 +40,11 @@ export class SplitEditorComponent {
       noteRef: notes[i] || null,
       width: this.paneWidths()[i] || 100 / count
     }));
+  });
+
+  // Check if we should show notes grid (no active notes)
+  showNotesGrid = computed(() => {
+    return !this.editorService.hasActiveNotes();
   });
 
   constructor() {

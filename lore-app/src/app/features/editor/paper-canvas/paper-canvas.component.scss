@@ -50,3 +50,48 @@
   background: var(--lore-color-accent-subtle);
   padding: 2px 8px; border-radius: var(--lore-radius-full);
 }
+
+/* ── Note body (simple text area) ── */
+.note-body {
+  flex: 1; width: 100%; border: none; background: transparent;
+  outline: none; font-family: var(--lore-font-serif);
+  font-size: 15.5px; line-height: 1.85;
+  color: var(--lore-color-text-muted); resize: none;
+  min-height: 180px; caret-color: var(--lore-color-accent);
+  margin-bottom: 20px; display: block;
+}
+.note-body::placeholder {
+  color: var(--lore-color-text-faint); font-style: italic;
+}
+
+/* ── Slash hint (Insert section) ── */
+.slash-hint {
+  display: flex; align-items: center; gap: 5px;
+  padding: 9px 0 0; flex-wrap: wrap; margin-top: 8px;
+  border-top: 1px solid var(--lore-color-border);
+}
+
+.shl {
+  font-size: 10.5px; color: var(--lore-color-text-faint);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.shk {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; color: var(--lore-color-text-muted);
+  background: var(--lore-color-bg-surface);
+  border: 1px solid var(--lore-color-border-strong);
+  border-radius: 5px; padding: 2px 7px; cursor: pointer;
+  transition: 0.12s; font-family: 'JetBrains Mono', monospace;
+}
+.shk:hover {
+  border-color: var(--lore-color-accent);
+  color: var(--lore-color-accent);
+  background: var(--lore-color-accent-subtle);
+}
+.shk kbd {
+  font-size: 9px; color: var(--lore-color-accent);
+  font-weight: 600; background: var(--lore-color-accent-subtle);
+  border: 1px solid var(--lore-color-border-strong);
+  border-radius: 3px; padding: 0 4px; font-family: inherit;
+}

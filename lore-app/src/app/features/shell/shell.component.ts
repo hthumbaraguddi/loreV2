@@ -28,6 +28,7 @@ export class ShellComponent {
     { id: 'notes', icon: 'description', label: 'Notes', route: '/notes' },
     { id: 'graph', icon: 'hub', label: 'Graph', route: '/graph' },
     { id: 'html-notes', icon: 'web', label: 'HTML Notes', route: '/html-notes' },
+    { id: 'template-builder', icon: 'dashboard_customize', label: 'Template Builder', route: '/template-builder' },
     { id: 'ai-chat', icon: 'smart_toy', label: 'AI Chat', route: '' },
     { id: 'prompts', icon: 'library_books', label: 'Prompt Library', route: '' },
     { id: 'notifications', icon: 'notifications', label: 'Notifications', route: '' },

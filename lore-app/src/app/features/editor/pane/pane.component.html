@@ -31,14 +31,16 @@
       </div>
     }
     
-    <button
-      class="close-btn"
-      (click)="onCloseClick($event)"
-      aria-label="Close pane"
-      title="Close pane (Escape)"
-    >
-      <span class="material-symbols-outlined">close</span>
-    </button>
+    @if (showCloseButton()) {
+      <button
+        class="close-btn"
+        (click)="onCloseClick($event)"
+        aria-label="Close pane"
+        title="Close pane (Escape)"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    }
   </div>
 
   <!-- Pane content -->

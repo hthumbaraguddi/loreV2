@@ -114,6 +114,7 @@
   --lore-color-text-default: var(--lore-primitive-grey-900);
   --lore-color-text-muted: var(--lore-primitive-grey-600);
   --lore-color-text-faint: var(--lore-primitive-grey-500);
+  --lore-color-text-subtle: var(--lore-primitive-grey-400);
   --lore-color-text-inverse: var(--lore-primitive-grey-0);
   --lore-color-text-accent: var(--lore-primitive-purple-700);
   --lore-color-text-on-accent: #FFFFFF;
@@ -130,6 +131,13 @@
   --lore-color-accent-active: var(--lore-primitive-purple-800);
   --lore-color-accent-subtle: var(--lore-primitive-purple-100);
   --lore-color-accent-muted: var(--lore-primitive-purple-300);
+  --lore-color-accent-bg: var(--lore-primitive-purple-50);
+  --lore-color-accent-border: var(--lore-primitive-purple-300);
+
+  // Success
+  --lore-color-success: var(--lore-primitive-green-700);
+  --lore-color-success-bg: var(--lore-primitive-green-50);
+  --lore-color-success-border: var(--lore-primitive-green-300);
 
   // State Overlays
   --lore-color-state-hover: rgba(109, 40, 217, 0.06);

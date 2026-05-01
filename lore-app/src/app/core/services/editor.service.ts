@@ -65,11 +65,24 @@ export class EditorService {
     const notes = [...this.activeNotes()];
     if (paneIndex < 0 || paneIndex >= notes.length) return;
     
-    notes[paneIndex] = null;
+    // Remove the note at this index and compact the array
+    notes.splice(paneIndex, 1);
+    
+    // Add null at the end to maintain array length of 3
+    notes.push(null);
+    
     this.activeNotesSignal.set(notes);
     
-    // If closing the last pane with a note, reduce pane count
-    this.optimizePaneCount();
+    // Reduce pane count
+    const currentCount = this.paneCount();
+    if (currentCount > 1) {
+      this.paneCount.set((currentCount - 1) as 1 | 2 | 3);
+    }
+    
+    // Adjust active pane if needed
+    if (this.activePane() >= paneIndex && this.activePane() > 0) {
+      this.activePane.set(this.activePane() - 1);
+    }
   }
 
   /**

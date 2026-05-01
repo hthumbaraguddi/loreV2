@@ -19,6 +19,7 @@ export class PaneComponent {
   noteRef = input<NoteRef | null>(null);
   active = input<boolean>(false);
   index = input<number>(0);
+  totalPanes = input<number>(1);
 
   // Outputs
   focused = output<number>();
@@ -27,6 +28,18 @@ export class PaneComponent {
 
   // Internal state signals
   dragOver = signal<boolean>(false);
+
+  // ═══════════════════════════════════════════════════════════
+  // COMPUTED PROPERTIES
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Check if close button should be visible
+   * Only show close button when there are 2 or more panes
+   */
+  showCloseButton(): boolean {
+    return this.totalPanes() > 1;
+  }
 
   // ═══════════════════════════════════════════════════════════
   // EVENT HANDLERS

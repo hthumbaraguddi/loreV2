@@ -13,37 +13,124 @@
 }
 
 .editor-toolbar {
-  height: 48px;
+  height: 46px;
   border-bottom: 1px solid var(--lore-color-border);
   display: flex;
   align-items: center;
   padding: 0 var(--lore-space-16);
+  gap: var(--lore-space-8);
   background: var(--lore-color-bg-surface);
   flex-shrink: 0;
 }
 
-.pane-count-selector {
+// ═══════════════════════════════════════════════════════════
+// BREADCRUMB NAVIGATION
+// ═══════════════════════════════════════════════════════════
+
+.breadcrumb-nav {
   display: flex;
+  align-items: center;
   gap: var(--lore-space-4);
-  background: var(--lore-color-bg-surface-2);
-  border-radius: var(--lore-radius-md);
-  padding: var(--lore-space-2);
+  font-size: 12px;
+  color: var(--lore-color-text-muted);
 }
 
-.pane-count-btn {
-  width: 32px;
+.breadcrumb-link {
+  color: var(--lore-color-accent);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 120ms var(--lore-easing-standard);
+
+  &:hover {
+    color: var(--lore-color-accent-hover);
+    text-decoration: underline;
+  }
+}
+
+.breadcrumb-text {
+  color: var(--lore-color-text-muted);
+}
+
+.breadcrumb-sep {
+  color: var(--lore-color-text-subtle);
+  font-size: 10px;
+}
+
+.breadcrumb-current {
+  color: var(--lore-color-text-default);
+  font-weight: 500;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIVE AI INDICATOR
+// ═══════════════════════════════════════════════════════════
+
+.ai-live-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   height: 24px;
+  padding: 0 8px;
+  border-radius: 20px;
+  border: 1px solid var(--lore-color-success-bg);
+  background: var(--lore-color-success-bg);
+  color: var(--lore-color-success);
+  font-size: 10.5px;
+  font-family: var(--lore-font-mono);
+  font-weight: 500;
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lore-color-success);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PANEL CONFIGURATION TOGGLE
+// ═══════════════════════════════════════════════════════════
+
+.panel-config-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--lore-color-accent-bg);
+  border: 1px solid var(--lore-color-border-strong);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.config-btn {
+  width: 28px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background: transparent;
-  border-radius: var(--lore-radius-sm);
-  font-size: var(--lore-font-size-sm);
-  font-weight: 500;
   color: var(--lore-color-text-muted);
-  cursor: pointer;
-  transition: all 120ms var(--lore-easing-standard);
+  transition: all 150ms var(--lore-easing-standard);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 
   &:hover {
     background: var(--lore-color-bg-surface-3);
@@ -51,9 +138,9 @@
   }
 
   &.active {
-    background: var(--lore-color-accent);
-    color: var(--lore-color-on-accent);
-    box-shadow: var(--lore-shadow-xs);
+    background: var(--lore-color-bg-surface);
+    color: var(--lore-color-accent);
+    box-shadow: 0 1px 3px rgba(109, 40, 217, 0.1);
   }
 
   &:focus-visible {
@@ -62,11 +149,92 @@
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// TOOL PILLS (Focus, Canvas)
+// ═══════════════════════════════════════════════════════════
+
+.tool-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 20px;
+  border: 1px solid var(--lore-color-border-strong);
+  background: transparent;
+  color: var(--lore-color-text-muted);
+  font-size: 10.5px;
+  font-family: var(--lore-font-mono);
+  cursor: pointer;
+  transition: all 150ms var(--lore-easing-standard);
+
+  svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  &:hover,
+  &.active {
+    border-color: var(--lore-color-accent-border);
+    color: var(--lore-color-accent);
+    background: var(--lore-color-accent-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lore-color-accent);
+    outline-offset: 2px;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE BUTTON
+// ═══════════════════════════════════════════════════════════
+
+.save-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--lore-radius-md);
+  border: 1px solid var(--lore-color-accent);
+  background: var(--lore-color-accent);
+  color: var(--lore-color-on-accent);
+  font-size: 11.5px;
+  font-family: var(--lore-font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms var(--lore-easing-standard);
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--lore-color-accent-hover);
+    border-color: var(--lore-color-accent-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lore-color-accent);
+    outline-offset: 2px;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDITOR CONTAINER
+// ═══════════════════════════════════════════════════════════
+
 .editor-container {
   flex: 1;
   display: flex;
   position: relative;
   overflow: hidden;
+  
+  // Ensure panes respect their width and don't flex
+  lore-pane {
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: 100%;
+  }
 }
 
 .resize-divider {

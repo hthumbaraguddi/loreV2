@@ -2,35 +2,86 @@
   <!-- Toolbar - only show when we have panes -->
   @if (!showNotesGrid()) {
     <div class="editor-toolbar">
-      <div class="pane-count-selector">
+      <!-- Breadcrumb Navigation -->
+      <div class="breadcrumb-nav">
+        @if (currentBreadcrumb(); as breadcrumb) {
+          <a class="breadcrumb-link" (click)="navigateToShelf()">{{ breadcrumb.shelf }}</a>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-text">{{ breadcrumb.notebook }}</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">{{ breadcrumb.note }}</span>
+        }
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Live AI Indicator -->
+      <div class="ai-live-pill">
+        <span class="live-dot"></span>
+        <span>Live AI</span>
+      </div>
+
+      <!-- Panel Configuration Toggle -->
+      <div class="panel-config-toggle">
         <button
-          class="pane-count-btn"
+          class="config-btn"
           [class.active]="paneCount() === 1"
           (click)="setPaneCount(1)"
           aria-label="Single pane"
-          title="Single pane (⌘1)"
+          title="1 pane"
         >
-          1
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="2" width="12" height="12" rx="1.5"/>
+          </svg>
         </button>
         <button
-          class="pane-count-btn"
+          class="config-btn"
           [class.active]="paneCount() === 2"
           (click)="setPaneCount(2)"
           aria-label="Two panes"
-          title="Two panes (⌘2)"
+          title="2 panes"
         >
-          2
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="2" width="5" height="12" rx="1"/>
+            <rect x="9" y="2" width="5" height="12" rx="1"/>
+          </svg>
         </button>
         <button
-          class="pane-count-btn"
+          class="config-btn"
           [class.active]="paneCount() === 3"
           (click)="setPaneCount(3)"
           aria-label="Three panes"
-          title="Three panes (⌘3)"
+          title="3 panes"
         >
-          3
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="2" width="4" height="12" rx="1"/>
+            <rect x="6" y="2" width="4" height="12" rx="1"/>
+            <rect x="11" y="2" width="4" height="12" rx="1"/>
+          </svg>
         </button>
       </div>
+
+      <!-- Focus Mode Toggle -->
+      <button class="tool-pill" (click)="toggleFocusMode()" [class.active]="focusMode()" title="Focus mode">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M1 1l4 4M9 9l4 4M13 1l-4 4M5 9l-4 4"/>
+        </svg>
+        <span>Focus</span>
+      </button>
+
+      <!-- Canvas Background Selector -->
+      <button class="tool-pill" (click)="openCanvasPicker()" title="Canvas background">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="12" height="12" rx="1.5"/>
+          <path d="M1 5h12M5 1v12" opacity=".4"/>
+        </svg>
+        <span>Canvas</span>
+      </button>
+
+      <!-- Save Button -->
+      <button class="save-btn" (click)="saveNotes()" title="Save (⌘S)">
+        Save
+      </button>
     </div>
   }
 
@@ -46,10 +97,11 @@
           [noteRef]="pane.noteRef"
           [active]="isPaneActive(pane.index)"
           [index]="pane.index"
+          [totalPanes]="paneCount()"
           (focused)="onPaneFocused($event)"
           (closeRequested)="onPaneCloseRequested($event)"
           (noteDropped)="onNoteDropped($event)"
-          [style.width]="getPaneWidthStyle(pane.index).width"
+          [style.width.%]="pane.width"
         />
       }
       

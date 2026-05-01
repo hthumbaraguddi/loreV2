@@ -1,10 +1,17 @@
-import { Component, signal, computed, inject, input, output } from '@angular/core';
+import { Component, signal, computed, inject, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { EditorService } from '../../../core/services/editor.service';
+import { LayoutService } from '../../../core/services/layout.service';
 import { NoteRef } from '../../../core/models/shelf.model';
 import { PaneComponent } from '../pane/pane.component';
 import { NotebookGridComponent } from '../../notebook-grid/notebook-grid.component';
+
+interface Breadcrumb {
+  shelf: string;
+  notebook: string;
+  note: string;
+}
 
 /**
  * SplitEditorComponent
@@ -19,11 +26,15 @@ import { NotebookGridComponent } from '../../notebook-grid/notebook-grid.compone
 })
 export class SplitEditorComponent {
   private editorService = inject(EditorService);
+  private layoutService = inject(LayoutService);
 
   // Computed signals from editor service
   paneCount = this.editorService.paneCount;
   activePane = this.editorService.activePane;
   activeNotes = this.editorService.activeNotes;
+
+  // Layout state
+  focusMode = this.layoutService.zenMode;
 
   // Internal state signals
   paneWidths = signal<number[]>([100]);
@@ -35,10 +46,27 @@ export class SplitEditorComponent {
   panes = computed(() => {
     const count = this.paneCount();
     const notes = this.activeNotes();
+    const widths = this.paneWidths();
+    
+    // Ensure we have the right number of widths
+    let actualWidths: number[];
+    if (widths.length !== count) {
+      // Recalculate widths if count doesn't match
+      if (count === 1) {
+        actualWidths = [100];
+      } else if (count === 2) {
+        actualWidths = [50, 50];
+      } else {
+        actualWidths = [33.33, 33.33, 33.34];
+      }
+    } else {
+      actualWidths = widths;
+    }
+    
     return Array.from({ length: count }, (_, i) => ({
       index: i,
       noteRef: notes[i] || null,
-      width: this.paneWidths()[i] || 100 / count
+      width: actualWidths[i]
     }));
   });
 
@@ -47,9 +75,35 @@ export class SplitEditorComponent {
     return !this.editorService.hasActiveNotes();
   });
 
+  // Breadcrumb navigation
+  currentBreadcrumb = computed<Breadcrumb | null>(() => {
+    const notes = this.activeNotes();
+    const activePaneIndex = this.activePane();
+    const activeNote = notes[activePaneIndex];
+
+    if (!activeNote) {
+      return null;
+    }
+
+    // TODO: Get actual shelf and notebook names from the note
+    // For now, return placeholder data
+    return {
+      shelf: 'AI & Machine Learning',
+      notebook: 'Transformers',
+      note: activeNote.title || 'Untitled Note'
+    };
+  });
+
   constructor() {
     // Initialize pane widths based on count
     this.updatePaneWidths();
+    
+    // Watch for pane count changes and update widths
+    // This ensures widths update when panes are closed
+    effect(() => {
+      const count = this.paneCount();
+      this.updatePaneWidths();
+    });
   }
 
   /**
@@ -97,6 +151,11 @@ export class SplitEditorComponent {
    */
   onPaneCloseRequested(index: number): void {
     // Close note in this pane
+    // The editor service will automatically:
+    // 1. Remove the note from the pane
+    // 2. Compact the remaining panes
+    // 3. Reduce the pane count
+    // 4. Update widths via the paneCount signal
     this.editorService.closeNoteInPane(index);
   }
 
@@ -225,5 +284,40 @@ export class SplitEditorComponent {
    */
   trackByPaneIndex(index: number): number {
     return index;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // TOOLBAR ACTIONS
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Toggle focus mode (zen mode)
+   */
+  toggleFocusMode(): void {
+    this.layoutService.toggleZen();
+  }
+
+  /**
+   * Open canvas background picker
+   */
+  openCanvasPicker(): void {
+    // TODO: Implement canvas picker modal
+    console.log('Canvas picker coming soon');
+  }
+
+  /**
+   * Save all notes
+   */
+  saveNotes(): void {
+    // TODO: Implement save functionality
+    console.log('Saving notes...');
+  }
+
+  /**
+   * Navigate to shelf view
+   */
+  navigateToShelf(): void {
+    // TODO: Implement navigation to shelf
+    console.log('Navigate to shelf');
   }
 }

@@ -1,219 +1,648 @@
 <div class="settings-panel">
   <!-- Header -->
-  <div class="settings-header">
-    <h1 class="settings-title">Settings</h1>
-    <div class="settings-tabs">
-      <button
-        class="settings-tab"
-        [class.active]="activeTab() === 'general'"
-        (click)="setTab('general')"
-      >
-        General
-      </button>
-      <button
-        class="settings-tab"
-        [class.active]="activeTab() === 'templates'"
-        (click)="setTab('templates')"
-      >
-        Templates
-      </button>
-      <button
-        class="settings-tab"
-        [class.active]="activeTab() === 'appearance'"
-        (click)="setTab('appearance')"
-      >
-        Appearance
-      </button>
-      <button
-        class="settings-tab"
-        [class.active]="activeTab() === 'shortcuts'"
-        (click)="setTab('shortcuts')"
-      >
-        Shortcuts
-      </button>
-    </div>
+  <div class="vhbar">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="10" cy="10" r="2.5"/>
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>
+    </svg>
+    <span class="vhbar-title">Settings</span>
+    <div class="tb-sp"></div>
+    <button class="tb-btn primary" (click)="saveChanges()">Save Changes</button>
   </div>
 
-  <!-- Content -->
-  <div class="settings-content">
-    <!-- General Tab -->
-    @if (activeTab() === 'general') {
-      <div class="settings-section">
-        <h2 class="section-title">General Settings</h2>
-        <p class="section-description">Application preferences and defaults</p>
-        
-        <div class="settings-card">
-          <h3 class="card-title">Note Creation</h3>
-          <div class="setting-row">
-            <label class="setting-label">Default Note Type</label>
-            <select class="setting-control">
-              <option value="idea">Idea</option>
-              <option value="research">Research</option>
-              <option value="journal">Journal</option>
-              <option value="task">Task</option>
-              <option value="reference">Reference</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <label class="setting-label">Auto-save Interval</label>
-            <select class="setting-control">
-              <option value="5">5 seconds</option>
-              <option value="10">10 seconds</option>
-              <option value="30">30 seconds</option>
-              <option value="60">1 minute</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    }
+  <div class="settings-wrap">
+    <!-- Vertical Navigation -->
+    <div class="settings-nav">
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'ai-providers'"
+        (click)="setPanel('ai-providers')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="5"/>
+          <path d="M8 5v3l2 2"/>
+        </svg>
+        AI Providers
+      </button>
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'profile'"
+        (click)="setPanel('profile')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="6" r="3"/>
+          <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+        </svg>
+        Profile
+      </button>
+      
+      <div class="snav-divider"></div>
+      
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'ai-behaviour'"
+        (click)="setPanel('ai-behaviour')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 2v3M8 11v3M2 8h3M11 8h3"/>
+        </svg>
+        AI Behaviour
+      </button>
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'sync'"
+        (click)="setPanel('sync')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 8a6 6 0 1112 0M14 8l-2-2-2 2"/>
+        </svg>
+        Sync & Export
+      </button>
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'templates'"
+        (click)="setPanel('templates')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="12" height="12" rx="1.5"/>
+          <path d="M5 5h6M5 8h4M5 11h5"/>
+        </svg>
+        Templates
+      </button>
+      
+      <div class="snav-divider"></div>
+      
+      <button
+        class="snav-item"
+        [class.active]="activePanel() === 'appearance'"
+        (click)="setPanel('appearance')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="3"/>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2"/>
+        </svg>
+        Appearance
+      </button>
+    </div>
 
-    <!-- Templates Tab -->
-    @if (activeTab() === 'templates') {
-      <div class="settings-section">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Template Gallery</h2>
-            <p class="section-description">Manage and apply note templates</p>
-          </div>
-          <a routerLink="/template-builder" class="btn-primary">
-            <span class="btn-icon">+</span>
-            Create Template
-          </a>
-        </div>
-
-        <!-- Category Filter -->
-        <div class="category-filter">
-          @for (category of categories(); track category) {
-            <button
-              class="category-btn"
-              [class.active]="selectedCategory() === category"
-              (click)="setCategory(category)"
-            >
-              {{ category }}
-            </button>
-          }
-        </div>
-
-        <!-- Templates Grid -->
-        <div class="templates-grid">
-          @for (template of getFilteredTemplates(); track template.id) {
-            <div class="template-card">
-              <div class="template-header">
-                <div class="template-badge" [class]="'badge-' + template.category.toLowerCase()">
-                  {{ template.category }}
+    <!-- Content Area -->
+    <div class="settings-content">
+      <!-- AI Providers Panel -->
+      @if (activePanel() === 'ai-providers') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">AI Provider API Keys</div>
+            <div class="s-desc">Keys stored locally in your browser. Each key enables &#64;mention for that model inline in notes.</div>
+            <div class="s-card">
+              @for (provider of aiProviders(); track provider.id) {
+                <div class="api-row">
+                  <div class="api-logo" [style.background]="provider.logoBg">{{ provider.logoText }}</div>
+                  <div class="api-info">
+                    <div class="api-name">{{ provider.name }}</div>
+                    <div class="api-status">{{ provider.model }} · {{ provider.status }}</div>
+                  </div>
+                  <input 
+                    class="api-input" 
+                    [type]="provider.connected ? 'password' : 'text'" 
+                    [value]="provider.key" 
+                    [placeholder]="provider.id === 'openrouter' ? 'sk-or-••••••••••••' : 'API key'"
+                  />
+                  <button 
+                    class="api-btn" 
+                    [class.on]="provider.connected"
+                    (click)="toggleProviderConnection(provider.id)"
+                  >
+                    {{ provider.connected ? 'Connected' : 'Connect' }}
+                  </button>
                 </div>
-                <div class="template-actions">
-                  <button class="action-btn" (click)="duplicateTemplate(template.id)" title="Duplicate">
-                    <span class="action-icon">⎘</span>
-                  </button>
-                  <button class="action-btn delete" (click)="deleteTemplate(template.id)" title="Delete">
-                    <span class="action-icon">×</span>
-                  </button>
+              }
+            </div>
+          </div>
+          
+          <div class="s-sec">
+            <div class="s-title">Default Model</div>
+            <div class="s-desc">Used when &#64;ai is invoked without specifying a provider.</div>
+            <div class="model-grid">
+              @for (model of models(); track model.id) {
+                <div 
+                  class="model-card" 
+                  [class.sel]="model.selected"
+                  (click)="selectModel(model.id)"
+                >
+                  <div class="model-dot"></div>
+                  <div>
+                    <div class="model-name">{{ model.name }}</div>
+                    <div class="model-desc">{{ model.description }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Profile Panel -->
+      @if (activePanel() === 'profile') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">Your Profile</div>
+            <div class="s-desc">Personalise your Lore experience. Your name appears in AI prompt context.</div>
+            <div class="s-card">
+              <div class="profile-avatar-row">
+                <div class="profile-avatar">H</div>
+                <div class="profile-avatar-actions">
+                  <button class="tb-btn">📷 Change photo</button>
+                  <button class="tb-btn ghost" style="font-size:11px;color:var(--rose);">Remove</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full name</label>
+                  <input class="form-input" [value]="profile().name" (input)="updateProfileField('name', $any($event.target).value)"/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Display name</label>
+                  <input class="form-input" [value]="profile().displayName" (input)="updateProfileField('displayName', $any($event.target).value)"/>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input class="form-input" type="email" [value]="profile().email" (input)="updateProfileField('email', $any($event.target).value)"/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Timezone</label>
+                  <select class="form-input form-select" [value]="profile().timezone" (change)="updateProfileField('timezone', $any($event.target).value)">
+                    <option>Asia/Kolkata (IST +5:30)</option>
+                    <option>UTC</option>
+                    <option>America/New_York</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bio <span style="color:var(--t4);font-size:10.5px;font-weight:400;">(used as AI context)</span></label>
+                <textarea class="form-input form-textarea" (input)="updateProfileField('bio', $any($event.target).value)">
+                  {{ profile().bio }}
+                </textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="s-sec">
+            <div class="s-title">AI Persona Context</div>
+            <div class="s-desc">This context is injected into every AI prompt so models respond with awareness of your background.</div>
+            <div class="s-card">
+              <div class="form-group">
+                <label class="form-label">Professional context</label>
+                <textarea class="form-input form-textarea" style="min-height:80px;" (input)="updateProfileField('professionalContext', $any($event.target).value)">
+                  {{ profile().professionalContext }}
+                </textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred response style</label>
+                <div class="select-chips">
+                  <div 
+                    class="sel-chip" 
+                    [class.active]="isResponseStyleActive('Concise')"
+                    (click)="toggleResponseStyle('Concise')"
+                  >
+                    Concise
+                  </div>
+                  <div 
+                    class="sel-chip" 
+                    [class.active]="isResponseStyleActive('Technical depth')"
+                    (click)="toggleResponseStyle('Technical depth')"
+                  >
+                    Technical depth
+                  </div>
+                  <div 
+                    class="sel-chip" 
+                    [class.active]="isResponseStyleActive('With examples')"
+                    (click)="toggleResponseStyle('With examples')"
+                  >
+                    With examples
+                  </div>
+                  <div 
+                    class="sel-chip" 
+                    [class.active]="isResponseStyleActive('ELI5 when needed')"
+                    (click)="toggleResponseStyle('ELI5 when needed')"
+                  >
+                    ELI5 when needed
+                  </div>
+                  <div 
+                    class="sel-chip" 
+                    [class.active]="isResponseStyleActive('Use bullet points')"
+                    (click)="toggleResponseStyle('Use bullet points')"
+                  >
+                    Use bullet points
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- AI Behaviour Panel -->
+      @if (activePanel() === 'ai-behaviour') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">AI Behaviour</div>
+            <div class="s-desc">Control how AI integrates with your notes, blocks, and knowledge graph.</div>
+            <div class="s-card">
+              @for (toggle of aiBehaviourToggles(); track toggle.id) {
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-name">{{ toggle.name }}</div>
+                    <div class="toggle-desc">{{ toggle.description }}</div>
+                  </div>
+                  <div 
+                    class="sw" 
+                    [class.on]="toggle.enabled"
+                    (click)="toggleAIBehaviour(toggle.id)"
+                  ></div>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">HTML Note Generation</div>
+            <div class="s-desc">Control how AI-generated HTML files are handled and stored.</div>
+            <div class="s-card">
+              @for (toggle of htmlNoteToggles(); track toggle.id) {
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-name">{{ toggle.name }}</div>
+                    <div class="toggle-desc">{{ toggle.description }}</div>
+                  </div>
+                  <div 
+                    class="sw" 
+                    [class.on]="toggle.enabled"
+                    (click)="toggleHTMLNoteSetting(toggle.id)"
+                  ></div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Sync & Export Panel -->
+      @if (activePanel() === 'sync') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">GitHub Gist Sync</div>
+            <div class="s-desc">Sync your notes to a private GitHub Gist — your data, your account. Notes are stored as JSON and HTML.</div>
+            <div class="s-card" style="display:flex;align-items:center;gap:14px;">
+              <div style="width:36px;height:36px;border-radius:9px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/>
+                </svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:500;color:var(--t1);">Connected to GitHub</div>
+                <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">
+                  {{ syncSettings().githubUsername }} · Gist: {{ syncSettings().gistName }} · Last sync: {{ syncSettings().lastSync }}
+                </div>
+              </div>
+              <button class="api-btn" [class.on]="syncSettings().githubConnected" (click)="toggleGitHubSync()">
+                {{ syncSettings().githubConnected ? 'Syncing' : 'Connect' }}
+              </button>
+            </div>
+            <div class="s-card" style="margin-top:8px;">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-name">Auto-sync on note save</div>
+                  <div class="toggle-desc">Pushes changes to Gist immediately after saving</div>
+                </div>
+                <div class="sw" [class.on]="syncSettings().autoSync" (click)="toggleSyncSetting('autoSync')"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-name">Include HTML notes in sync</div>
+                  <div class="toggle-desc">Saves AI-generated HTML files to the Gist as separate files</div>
+                </div>
+                <div class="sw" [class.on]="syncSettings().includeHtmlNotes" (click)="toggleSyncSetting('includeHtmlNotes')"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-name">Encrypt sensitive notes before sync</div>
+                  <div class="toggle-desc">AES-256 encryption applied to notes tagged as private</div>
+                </div>
+                <div class="sw" [class.on]="syncSettings().encryptPrivateNotes" (click)="toggleSyncSetting('encryptPrivateNotes')"></div>
+              </div>
+            </div>
+          </div>
+          <div class="s-sec">
+            <div class="s-title">Export Options</div>
+            <div class="s-desc">Download your notes in various formats.</div>
+            <div class="s-card" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="flex:1;">
+                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export all notes as JSON</div>
+                  <div style="font-size:11px;color:var(--t3);">Complete data export with metadata, blocks, and AI history</div>
+                </div>
+                <button class="tb-btn" (click)="exportNotes('json')">📦 Export JSON</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="flex:1;">
+                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export as Markdown</div>
+                  <div style="font-size:11px;color:var(--t3);">One .md file per note, preserving structure</div>
+                </div>
+                <button class="tb-btn" (click)="exportNotes('markdown')">📝 Export MD</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="flex:1;">
+                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export HTML notes as ZIP</div>
+                  <div style="font-size:11px;color:var(--t3);">All AI-generated HTML files in a single archive</div>
+                </div>
+                <button class="tb-btn" (click)="exportNotes('zip')">🗜️ Export ZIP</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="flex:1;">
+                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Import notes from JSON / Markdown</div>
+                  <div style="font-size:11px;color:var(--t3);">Restore a previous backup or migrate from another app</div>
+                </div>
+                <button class="tb-btn primary" (click)="importNotes()">📥 Import</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Templates Panel -->
+      @if (activePanel() === 'templates') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">Note Templates</div>
+            <div class="s-desc">Choose a template when creating a new note for a pre-structured starting point. Click any template to preview and customise it.</div>
+            <div class="select-chips" style="margin-bottom:16px;">
+              <div class="sel-chip active">All</div>
+              <div class="sel-chip">Research</div>
+              <div class="sel-chip">Journal</div>
+              <div class="sel-chip">Finance</div>
+              <div class="sel-chip">Engineering</div>
+              <div class="sel-chip">My Templates</div>
+            </div>
+            <div class="tpl-gallery">
+              <!-- Research Deep Dive -->
+              <div class="tpl-card">
+                <div class="tpl-preview">
+                  <div class="tpl-preview-line h"></div>
+                  <div class="tpl-preview-callout"></div>
+                  <div class="tpl-preview-line w80"></div>
+                  <div class="tpl-preview-line w50"></div>
+                  <div class="tpl-preview-keydiff">
+                    <div class="tpl-preview-keydiff-col">
+                      <div class="tpl-preview-keydiff-line"></div>
+                      <div class="tpl-preview-keydiff-line w30" style="width:60%;"></div>
+                    </div>
+                    <div class="tpl-preview-keydiff-col">
+                      <div class="tpl-preview-keydiff-line"></div>
+                      <div class="tpl-preview-keydiff-line" style="width:70%;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Research Deep Dive</div>
+                  <div class="tpl-desc">Hypothesis → Method → Findings → Conclusion</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag">Research</span>
+                    <span class="tpl-tag">Analysis</span>
+                  </div>
                 </div>
               </div>
               
-              <div class="template-body">
-                <h3 class="template-title">{{ template.name }}</h3>
-                <p class="template-description">{{ template.description }}</p>
-                
-                <div class="template-meta">
-                  <span class="meta-item">
-                    <span class="meta-icon">📝</span>
-                    {{ getBlockCountText(template) }}
-                  </span>
-                  <span class="meta-item">
-                    <span class="meta-icon">📌</span>
-                    {{ template.noteType }}
-                  </span>
-                  <span class="meta-item">
-                    <span class="meta-icon">📅</span>
-                    {{ formatDate(template.updatedAt) }}
-                  </span>
+              <!-- Daily Journal -->
+              <div class="tpl-card active-tpl">
+                <div class="tpl-preview" style="background:var(--amber-bg);">
+                  <div class="tpl-preview-line h" style="background:#FDE68A;"></div>
+                  <div style="height:14px;border-radius:4px;background:#FEF3C7;margin:4px 0;display:flex;gap:4px;">
+                    <div style="width:28px;border-radius:3px;background:#FDE68A;"></div>
+                    <div style="width:28px;border-radius:3px;background:#FDE68A;"></div>
+                    <div style="width:28px;border-radius:3px;background:#FDE68A;"></div>
+                  </div>
+                  <div class="tpl-preview-line w80" style="background:#FDE68A;"></div>
+                  <div class="tpl-preview-line w50" style="background:#FDE68A;"></div>
+                  <div class="tpl-preview-line w80" style="background:#FDE68A;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Daily Journal</div>
+                  <div class="tpl-desc">Intention · Mood · Wins · Blockers · Tomorrow</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag" style="background:var(--amber-bg);color:var(--amber);">Journal</span>
+                  </div>
                 </div>
               </div>
-
-              <div class="template-blocks">
-                @for (block of template.blocks.slice(0, 3); track block.id) {
-                  <div class="block-preview">
-                    <span class="block-icon">{{ block.icon }}</span>
-                    <span class="block-name">{{ block.name }}</span>
-                    @if (block.required) {
-                      <span class="block-required">*</span>
-                    }
+              
+              <!-- Equity Research -->
+              <div class="tpl-card">
+                <div class="tpl-preview" style="background:var(--rose-bg);">
+                  <div class="tpl-preview-line h" style="background:#FCE7F3;"></div>
+                  <div class="tpl-preview-keydiff" style="margin:4px 0;height:28px;">
+                    <div class="tpl-preview-keydiff-col">
+                      <div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div>
+                    </div>
+                    <div class="tpl-preview-keydiff-col">
+                      <div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div>
+                    </div>
+                    <div class="tpl-preview-keydiff-col">
+                      <div class="tpl-preview-keydiff-line" style="background:#FCE7F3;"></div>
+                    </div>
                   </div>
-                }
-                @if (template.blocks.length > 3) {
-                  <div class="block-more">+{{ template.blocks.length - 3 }} more</div>
-                }
+                  <div class="tpl-preview-line w80" style="background:#FCE7F3;"></div>
+                  <div style="height:12px;border-radius:3px;background:#FCE7F3;width:90%;margin-top:4px;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Equity Research</div>
+                  <div class="tpl-desc">BRSR · M-Score · ROIC · Valuation · Signal</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag" style="background:var(--rose-bg);color:var(--rose);">Finance</span>
+                    <span class="tpl-tag">AI</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Sprint Plan -->
+              <div class="tpl-card">
+                <div class="tpl-preview" style="background:var(--blue-bg);">
+                  <div class="tpl-preview-line h" style="background:#DBEAFE;"></div>
+                  <div class="tpl-preview-check">
+                    <div style="width:8px;height:8px;border-radius:2px;background:#DBEAFE;"></div>
+                    <div class="tpl-preview-line w80" style="background:#DBEAFE;flex:1;height:5px;"></div>
+                  </div>
+                  <div class="tpl-preview-check">
+                    <div style="width:8px;height:8px;border-radius:2px;background:#93C5FD;"></div>
+                    <div class="tpl-preview-line" style="background:#DBEAFE;flex:1;height:5px;width:60%;"></div>
+                  </div>
+                  <div class="tpl-preview-check">
+                    <div style="width:8px;height:8px;border-radius:2px;background:#DBEAFE;"></div>
+                    <div class="tpl-preview-line" style="background:#DBEAFE;flex:1;height:5px;width:70%;"></div>
+                  </div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Sprint Plan</div>
+                  <div class="tpl-desc">Goals · Stories · Tasks · Definition of Done</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag" style="background:var(--blue-bg);color:var(--blue);">Engineering</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Code Review -->
+              <div class="tpl-card">
+                <div class="tpl-preview" style="background:#1C1829;">
+                  <div class="tpl-preview-line h" style="background:#2D2650;"></div>
+                  <div class="tpl-preview-line w80" style="background:#3D3560;"></div>
+                  <div class="tpl-preview-line w50" style="background:#2D2650;"></div>
+                  <div style="height:22px;border-radius:4px;background:#3D3560;margin-top:6px;"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Code Review</div>
+                  <div class="tpl-desc">Severity buckets · Patterns · Actions</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag" style="background:var(--p100);color:var(--p700);">Engineering</span>
+                    <span class="tpl-tag">AI</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Meeting Notes -->
+              <div class="tpl-card">
+                <div class="tpl-preview">
+                  <div class="tpl-preview-line h"></div>
+                  <div style="display:flex;gap:4px;margin:4px 0;">
+                    <div style="width:40px;height:8px;border-radius:20px;background:var(--p100);"></div>
+                    <div style="width:40px;height:8px;border-radius:20px;background:var(--teal-bg);"></div>
+                  </div>
+                  <div class="tpl-preview-line w80"></div>
+                  <div class="tpl-preview-line w50"></div>
+                  <div class="tpl-preview-line w80"></div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Meeting Notes</div>
+                  <div class="tpl-desc">Attendees · Agenda · Decisions · Actions</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag">Work</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Custom Template Add Card -->
+              <div class="tpl-card" style="border-style:dashed;border-color:var(--p300);background:var(--p50);cursor:pointer;">
+                <div class="tpl-preview" style="background:var(--p50);display:flex;align-items:center;justify-content:center;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#7C3AED" stroke-width="1.8">
+                      <path d="M9 4v10M4 9h10"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="tpl-info">
+                  <div class="tpl-name">Create Custom Template</div>
+                  <div class="tpl-desc">Design your own note structure</div>
+                  <div class="tpl-tags">
+                    <span class="tpl-tag">Custom</span>
+                  </div>
+                </div>
               </div>
             </div>
-          }
-          @empty {
-            <div class="empty-state">
-              <span class="empty-icon">📋</span>
-              <h3 class="empty-title">No templates yet</h3>
-              <p class="empty-description">Create your first template to speed up note creation</p>
-              <a routerLink="/template-builder" class="btn-primary">
-                <span class="btn-icon">+</span>
-                Create Template
-              </a>
+          </div>
+        </div>
+      }
+
+      <!-- Appearance Panel -->
+      @if (activePanel() === 'appearance') {
+        <div class="s-panel active">
+          <div class="s-sec">
+            <div class="s-title">Appearance</div>
+            <div class="s-desc">Customize the look and feel of Lore</div>
+            
+            <div class="s-card">
+              <div class="card-title">Theme</div>
+              <div class="theme-options">
+                <button 
+                  class="theme-option" 
+                  [class.active]="theme() === 'light'"
+                  (click)="setTheme('light')"
+                >
+                  <div class="theme-preview light"></div>
+                  <span class="theme-label">Light</span>
+                </button>
+                <button 
+                  class="theme-option" 
+                  [class.active]="theme() === 'dark'"
+                  (click)="setTheme('dark')"
+                >
+                  <div class="theme-preview dark"></div>
+                  <span class="theme-label">Dark</span>
+                </button>
+                <button 
+                  class="theme-option" 
+                  [class.active]="theme() === 'auto'"
+                  (click)="setTheme('auto')"
+                >
+                  <div class="theme-preview auto"></div>
+                  <span class="theme-label">Auto</span>
+                </button>
+              </div>
             </div>
-          }
-        </div>
-      </div>
-    }
 
-    <!-- Appearance Tab -->
-    @if (activeTab() === 'appearance') {
-      <div class="settings-section">
-        <h2 class="section-title">Appearance</h2>
-        <p class="section-description">Customize the look and feel</p>
-        
-        <div class="settings-card">
-          <h3 class="card-title">Theme</h3>
-          <div class="theme-options">
-            <button class="theme-option">
-              <div class="theme-preview light"></div>
-              <span class="theme-label">Light</span>
-            </button>
-            <button class="theme-option">
-              <div class="theme-preview dark"></div>
-              <span class="theme-label">Dark</span>
-            </button>
-            <button class="theme-option">
-              <div class="theme-preview auto"></div>
-              <span class="theme-label">Auto</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    }
+            <div class="s-card">
+              <div class="card-title">Font Size</div>
+              <div class="select-chips">
+                <div 
+                  class="sel-chip" 
+                  [class.active]="fontSize() === 'small'"
+                  (click)="setFontSize('small')"
+                >
+                  Small
+                </div>
+                <div 
+                  class="sel-chip" 
+                  [class.active]="fontSize() === 'medium'"
+                  (click)="setFontSize('medium')"
+                >
+                  Medium
+                </div>
+                <div 
+                  class="sel-chip" 
+                  [class.active]="fontSize() === 'large'"
+                  (click)="setFontSize('large')"
+                >
+                  Large
+                </div>
+              </div>
+            </div>
 
-    <!-- Shortcuts Tab -->
-    @if (activeTab() === 'shortcuts') {
-      <div class="settings-section">
-        <h2 class="section-title">Keyboard Shortcuts</h2>
-        <p class="section-description">Customize keyboard shortcuts</p>
-        
-        <div class="shortcuts-grid">
-          <div class="shortcut-item">
-            <span class="shortcut-action">New Note</span>
-            <span class="shortcut-key">⌘N</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="shortcut-action">Search</span>
-            <span class="shortcut-key">⌘K</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="shortcut-action">Toggle Sidebar</span>
-            <span class="shortcut-key">⌘B</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="shortcut-action">Save Note</span>
-            <span class="shortcut-key">⌘S</span>
+            <div class="s-card">
+              <div class="card-title">Density</div>
+              <div class="select-chips">
+                <div 
+                  class="sel-chip" 
+                  [class.active]="density() === 'compact'"
+                  (click)="setDensity('compact')"
+                >
+                  Compact
+                </div>
+                <div 
+                  class="sel-chip" 
+                  [class.active]="density() === 'comfortable'"
+                  (click)="setDensity('comfortable')"
+                >
+                  Comfortable
+                </div>
+                <div 
+                  class="sel-chip" 
+                  [class.active]="density() === 'spacious'"
+                  (click)="setDensity('spacious')"
+                >
+                  Spacious
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    }
+      }
+    </div>
   </div>
 </div>

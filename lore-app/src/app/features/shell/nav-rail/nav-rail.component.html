@@ -1,9 +1,33 @@
 <nav class="nav-rail" role="navigation" aria-label="Main navigation">
-  @for (item of items(); track item.id) {
+  <!-- Logo -->
+  <div class="nav-logo" title="Lore">L</div>
+  
+  <!-- Main navigation items -->
+  @for (item of mainItems(); track item.id) {
     <lore-nav-rail-item
       [item]="item"
       [active]="activeId() === item.id"
       (selected)="onItemSelect(item)"
     />
   }
+  
+  <!-- Divider -->
+  @if (bottomItems().length > 0) {
+    <div class="nav-divider"></div>
+  }
+  
+  <!-- Bottom navigation items -->
+  @for (item of bottomItems(); track item.id) {
+    <lore-nav-rail-item
+      [item]="item"
+      [active]="activeId() === item.id"
+      (selected)="onItemSelect(item)"
+    />
+  }
+  
+  <!-- Spacer -->
+  <div class="nav-spacer"></div>
+  
+  <!-- User avatar -->
+  <div class="nav-avatar" title="Profile">H</div>
 </nav>

@@ -311,6 +311,65 @@
   --lore-z-above:   var(--lore-z-dropdown);
   --lore-z-below:   -1;
   --lore-z-default: var(--lore-z-base);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MOCK-STYLE ALIASES (for v8 mock compatibility)
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  // Background colors
+  --bg: var(--lore-color-bg-canvas);
+  --canvas: var(--lore-color-bg-canvas);
+  --surface: var(--lore-color-surface-default);
+  --surface2: var(--lore-color-surface-subtle);
+  --sb-bg: var(--lore-color-bg-sidebar);
+  --nav-bg: var(--lore-color-bg-nav);
+  
+  // Border colors
+  --border: var(--lore-color-border-default);
+  --border2: var(--lore-color-border-strong);
+  --sb-border: var(--lore-color-border-default);
+  
+  // Text colors
+  --t1: var(--lore-color-text-default);
+  --t2: var(--lore-color-text-muted);
+  --t3: var(--lore-color-text-faint);
+  --t4: var(--lore-color-icon-muted);
+  --sb-text: var(--lore-color-text-muted);
+  --sb-text-active: var(--lore-color-text-default);
+  
+  // Purple/Accent colors
+  --p50: var(--lore-primitive-purple-50);
+  --p100: var(--lore-primitive-purple-100);
+  --p200: var(--lore-primitive-purple-200);
+  --p300: var(--lore-primitive-purple-300);
+  --p400: var(--lore-primitive-purple-400);
+  --p500: var(--lore-primitive-purple-500);
+  --p600: var(--lore-primitive-purple-600);
+  --p700: var(--lore-primitive-purple-700);
+  --p800: var(--lore-primitive-purple-800);
+  
+  // Note type badge colors
+  --teal: var(--lore-primitive-green-700);
+  --teal-bg: var(--lore-primitive-green-50);
+  --amber: var(--lore-primitive-yellow-600);
+  --amber-bg: var(--lore-primitive-yellow-50);
+  --blue: var(--lore-primitive-blue-700);
+  --blue-bg: var(--lore-primitive-blue-50);
+  --rose: #BE185D;
+  --rose-bg: #FFF1F2;
+  --orange: #C2410C;
+  --orange-bg: #FFF7ED;
+  
+  // Border radius
+  --r-sm: var(--lore-radius-4);
+  --r-md: var(--lore-radius-8);
+  --r-lg: var(--lore-radius-12);
+  --r-xl: var(--lore-radius-18);
+  
+  // Shadows
+  --shadow: var(--lore-shadow-md);
+  --shadow-lg: var(--lore-shadow-lg);
+  --shadow-float: var(--lore-shadow-overlay);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

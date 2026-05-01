@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -25,6 +25,23 @@ export class NavRailComponent implements OnInit, OnDestroy {
 
   // State
   readonly activeId = signal<string>('notes');
+
+  // Computed: Split items into main and bottom groups
+  readonly mainItems = computed(() => {
+    const allItems = this.items();
+    // Main items: notes, graph, html-notes, ai-chat, prompt-library
+    return allItems.filter(item => 
+      ['notes', 'graph', 'html-notes', 'ai-chat', 'prompt-library'].includes(item.id)
+    );
+  });
+
+  readonly bottomItems = computed(() => {
+    const allItems = this.items();
+    // Bottom items: notifications, settings
+    return allItems.filter(item => 
+      ['notifications', 'settings'].includes(item.id)
+    );
+  });
 
   ngOnInit(): void {
     // Subscribe to router events to update active item

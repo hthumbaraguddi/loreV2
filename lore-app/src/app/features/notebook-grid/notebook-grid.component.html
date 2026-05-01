@@ -15,6 +15,26 @@
     </h1>
     <div class="nbgv-sub">{{ stats().total }} notes across {{ notebooks().length }} notebooks</div>
     
+    <!-- Stats (positioned absolutely in top-right) -->
+    <div class="nbgv-stats">
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().total }}</div>
+        <div class="nbgv-stat-l">Total</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().recent }}</div>
+        <div class="nbgv-stat-l">7d</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().ai }}</div>
+        <div class="nbgv-stat-l">AI</div>
+      </div>
+      <div class="nbgv-stat">
+        <div class="nbgv-stat-n">{{ stats().favorites }}</div>
+        <div class="nbgv-stat-l">Fav</div>
+      </div>
+    </div>
+    
     <!-- Tabs -->
     <div class="nbgv-tabs">
       <button
@@ -45,26 +65,6 @@
       >
         AI
       </button>
-    </div>
-    
-    <!-- Stats -->
-    <div class="nbgv-stats">
-      <div class="nbgv-stat">
-        <div class="nbgv-stat-n">{{ stats().total }}</div>
-        <div class="nbgv-stat-l">Total</div>
-      </div>
-      <div class="nbgv-stat">
-        <div class="nbgv-stat-n">{{ stats().recent }}</div>
-        <div class="nbgv-stat-l">7d</div>
-      </div>
-      <div class="nbgv-stat">
-        <div class="nbgv-stat-n">{{ stats().ai }}</div>
-        <div class="nbgv-stat-l">AI</div>
-      </div>
-      <div class="nbgv-stat">
-        <div class="nbgv-stat-n">{{ stats().favorites }}</div>
-        <div class="nbgv-stat-l">Fav</div>
-      </div>
     </div>
   </div>
 

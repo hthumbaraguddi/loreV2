@@ -43,3 +43,28 @@
   text-rendering: optimizeLegibility;
   font-feature-settings: 'liga';
 }
+
+// Custom scrollbar styling (webkit browsers)
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--p200);
+  border-radius: 3px;
+  
+  &:hover {
+    background: var(--p300);
+  }
+}
+
+// Firefox scrollbar styling
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--p200) transparent;
+}

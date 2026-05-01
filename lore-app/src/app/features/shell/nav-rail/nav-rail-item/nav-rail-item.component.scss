@@ -3,50 +3,70 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--lore-radius-12);
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: none;
   background: transparent;
-  color: var(--lore-color-icon-default);
-  transition: all var(--lore-anim-duration-fast) var(--lore-anim-ease-standard);
+  color: rgba(80, 60, 160, 0.45); /* --nav-icon from mock */
+  transition: all 0.15s;
   cursor: pointer;
 
   &:hover {
-    background: var(--lore-color-state-hover);
+    background: rgba(124, 58, 237, 0.12);
+    color: var(--lore-primitive-purple-600);
   }
 
   &:active {
-    background: var(--lore-color-state-active);
+    background: rgba(124, 58, 237, 0.16);
   }
 
   &.active {
-    background: var(--lore-color-accent-default);
-    color: var(--lore-color-icon-on-dark);
+    background: rgba(124, 58, 237, 0.12);
+    color: var(--lore-primitive-purple-600);
   }
 
   &:focus-visible {
-    box-shadow: var(--lore-shadow-focus-ring);
+    outline: 2px solid var(--lore-primitive-purple-400);
+    outline-offset: 2px;
   }
 
   .material-symbols-outlined {
-    font-size: 24px;
+    font-size: 17px; /* Match mock SVG size */
+    width: 17px;
+    height: 17px;
   }
 
   .badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     background: var(--lore-color-feedback-error-icon);
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    border-radius: var(--lore-radius-full);
     border: 2px solid var(--lore-color-bg-nav);
+  }
+  
+  // Tooltip
+  .nav-tip {
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--lore-color-text-default);
+    color: var(--lore-color-bg-canvas);
+    font-size: 11px;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 300;
+  }
+  
+  &:hover .nav-tip {
+    opacity: 1;
   }
 }

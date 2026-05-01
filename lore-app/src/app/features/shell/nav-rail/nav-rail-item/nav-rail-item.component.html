@@ -1,7 +1,6 @@
 <button
   class="nav-rail-item"
   [class.active]="active()"
-  [attr.title]="item().label"
   [attr.aria-label]="item().label"
   [attr.aria-current]="active() ? 'page' : null"
   [attr.role]="item().route ? 'link' : 'button'"
@@ -12,8 +11,8 @@
   <span class="material-symbols-outlined">{{ item().icon }}</span>
   
   @if (showBadge()) {
-    <span class="badge" [attr.aria-label]="item().badgeCount + ' notifications'">
-      {{ badgeText() }}
-    </span>
+    <span class="badge" [attr.aria-label]="item().badgeCount + ' notifications'"></span>
   }
+  
+  <span class="nav-tip">{{ item().label }}</span>
 </button>

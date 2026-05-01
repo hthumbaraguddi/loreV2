@@ -152,7 +152,7 @@
                 <div class="profile-avatar">H</div>
                 <div class="profile-avatar-actions">
                   <button class="tb-btn">📷 Change photo</button>
-                  <button class="tb-btn ghost" style="font-size:11px;color:var(--rose);">Remove</button>
+                  <button class="tb-btn ghost-danger">Remove</button>
                 </div>
               </div>
               <div class="form-row">
@@ -287,89 +287,406 @@
         </div>
       }
 
-      <!-- Sync & Export Panel -->
-      @if (activePanel() === 'sync') {
-        <div class="s-panel active">
-          <div class="s-sec">
-            <div class="s-title">GitHub Gist Sync</div>
-            <div class="s-desc">Sync your notes to a private GitHub Gist — your data, your account. Notes are stored as JSON and HTML.</div>
-            <div class="s-card" style="display:flex;align-items:center;gap:14px;">
+<!-- Sync & Export Panel -->
+@if (activePanel() === 'sync') {
+  <div class="s-panel active">
+    <!-- Storage Tier Selection -->
+    <div class="s-sec">
+      <div class="s-title">Storage Tier</div>
+      <div class="s-desc">Choose how you want to store and sync your notes</div>
+      <div class="s-card">
+        <div class="storage-tier-options">
+          <div 
+            class="tier-option" 
+            [class.active]="storageSyncService.syncSettings().tier === 'local'"
+            (click)="setStorageTier('local')"
+          >
+            <div class="tier-radio"></div>
+            <div class="tier-info">
+              <div class="tier-name">Local Only</div>
+              <div class="tier-desc">Free, Unlimited</div>
+            </div>
+          </div>
+          <div 
+            class="tier-option" 
+            [class.active]="storageSyncService.syncSettings().tier === 'github'"
+            (click)="setStorageTier('github')"
+          >
+            <div class="tier-radio"></div>
+            <div class="tier-info">
+              <div class="tier-name">GitHub Sync</div>
+              <div class="tier-desc">Free for GitHub users</div>
+            </div>
+          </div>
+          <div 
+            class="tier-option disabled" 
+            [class.active]="storageSyncService.syncSettings().tier === 'cloud'"
+          >
+            <div class="tier-radio"></div>
+            <div class="tier-info">
+              <div class="tier-name">Cloud Storage</div>
+              <div class="tier-desc">$3/mo, 1GB (Coming Soon)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Local Folder Sync -->
+    @if (storageSyncService.syncSettings().tier === 'local') {
+      <div class="s-sec">
+        <div class="s-title">Local Folder Sync</div>
+        <div class="s-desc">Your notes are stored in your browser and optionally synced to a local folder on your computer.</div>
+        
+        @if (!isFileSystemAccessSupported()) {
+          <div class="s-card" style="background:var(--lore-primitive-purple-50);border-color:var(--lore-primitive-purple-200);">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:20px;">ℹ️</div>
+              <div style="flex:1;">
+                <div style="font-size:12.5px;font-weight:500;color:var(--lore-color-text-default);">Browser not supported</div>
+                <div style="font-size:11px;color:var(--lore-color-text-faint);margin-top:2px;">
+                  Your browser doesn't support automatic folder sync. Try Chrome or Edge, or use GitHub sync instead.
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="s-card">
+            <!-- Folder Selection -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <button class="tb-btn" (click)="selectLocalFolder()">
+                @if (storageSyncService.syncSettings().localSync.folderPath) {
+                  📁 Change Folder
+                } @else {
+                  📁 Select Folder
+                }
+              </button>
+              @if (storageSyncService.syncSettings().localSync.folderPath) {
+                <div style="flex:1;font-size:12px;color:var(--lore-color-text-muted);font-family:'JetBrains Mono',monospace;">
+                  {{ storageSyncService.syncSettings().localSync.folderPath }}
+                </div>
+              } @else {
+                <div style="flex:1;font-size:12px;color:var(--lore-color-text-faint);">
+                  Not configured
+                </div>
+              }
+            </div>
+
+            <!-- Auto-sync Toggle -->
+            @if (storageSyncService.syncSettings().localSync.folderPath) {
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-name">Enable auto-sync to local folder</div>
+                  <div class="toggle-desc">Automatically sync changes to the selected folder</div>
+                </div>
+                <div 
+                  class="sw" 
+                  [class.on]="storageSyncService.syncSettings().localSync.autoSyncEnabled"
+                  (click)="toggleLocalAutoSync()"
+                ></div>
+              </div>
+
+              <!-- Sync Interval -->
+              @if (storageSyncService.syncSettings().localSync.autoSyncEnabled) {
+                <div style="margin-top:16px;">
+                  <div style="font-size:12px;font-weight:500;color:var(--lore-color-text-muted);margin-bottom:8px;">
+                    Sync Interval
+                  </div>
+                  <div class="sync-interval-options">
+                    <div 
+                      class="interval-option" 
+                      [class.active]="storageSyncService.syncSettings().localSync.syncInterval === 1"
+                      (click)="setLocalSyncInterval(1)"
+                    >
+                      <div class="interval-radio"></div>
+                      <span>1 minute</span>
+                    </div>
+                    <div 
+                      class="interval-option" 
+                      [class.active]="storageSyncService.syncSettings().localSync.syncInterval === 5"
+                      (click)="setLocalSyncInterval(5)"
+                    >
+                      <div class="interval-radio"></div>
+                      <span>5 minutes</span>
+                      <span class="recommended-badge">Recommended</span>
+                    </div>
+                    <div 
+                      class="interval-option" 
+                      [class.active]="storageSyncService.syncSettings().localSync.syncInterval === 10"
+                      (click)="setLocalSyncInterval(10)"
+                    >
+                      <div class="interval-radio"></div>
+                      <span>10 minutes</span>
+                    </div>
+                    <div 
+                      class="interval-option" 
+                      [class.active]="storageSyncService.syncSettings().localSync.syncInterval === 0"
+                      (click)="setLocalSyncInterval(0)"
+                    >
+                      <div class="interval-radio"></div>
+                      <span>Manual only</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sync Status -->
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--lore-color-border);">
+                  @if (storageSyncService.syncSettings().localSync.isSyncing) {
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                      <div style="font-size:12px;color:var(--lore-color-text-muted);">
+                        Syncing... {{ storageSyncService.syncSettings().localSync.syncProgress }}%
+                      </div>
+                    </div>
+                    <div style="height:4px;background:var(--lore-color-border);border-radius:2px;overflow:hidden;">
+                      <div 
+                        style="height:100%;background:var(--lore-color-accent);transition:width 0.3s;"
+                        [style.width.%]="storageSyncService.syncSettings().localSync.syncProgress"
+                      ></div>
+                    </div>
+                  } @else if (storageSyncService.syncSettings().localSync.syncError) {
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#FFF1F2;border:1px solid #FCE7F3;border-radius:var(--lore-radius-md);">
+                      <div style="font-size:16px;">⚠️</div>
+                      <div style="flex:1;">
+                        <div style="font-size:12px;font-weight:500;color:#BE185D;">Sync failed</div>
+                        <div style="font-size:11px;color:#BE185D;margin-top:2px;">
+                          {{ storageSyncService.syncSettings().localSync.syncError }}
+                        </div>
+                      </div>
+                      <button class="tb-btn" (click)="syncToLocalFolderNow()">Retry</button>
+                    </div>
+                  } @else {
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                      <div style="font-size:11px;color:var(--lore-color-text-faint);">
+                        Last synced: {{ storageSyncService.formatRelativeTime(storageSyncService.syncSettings().localSync.lastSyncedAt) }}
+                      </div>
+                      @if (storageSyncService.syncSettings().localSync.syncInterval > 0) {
+                        <div style="font-size:11px;color:var(--lore-color-text-faint);">
+                          Next sync: {{ storageSyncService.formatNextSyncTime(storageSyncService.syncSettings().localSync.nextSyncAt) }}
+                        </div>
+                      }
+                    </div>
+                    <button class="tb-btn primary" (click)="syncToLocalFolderNow()">Sync Now</button>
+                  }
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- GitHub Sync -->
+    @if (storageSyncService.syncSettings().tier === 'github') {
+      <div class="s-sec">
+        <div class="s-title">GitHub Sync</div>
+        <div class="s-desc">Your notes are synced to a private GitHub repository with full version history.</div>
+        
+        @if (!storageSyncService.syncSettings().githubSync.connected) {
+          <!-- Not Connected State -->
+          <div class="s-card">
+            <div style="text-align:center;padding:20px 0;">
+              <div style="font-size:48px;margin-bottom:12px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:#1A1A2E;">
+                  <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/>
+                </svg>
+              </div>
+              <div style="font-size:14px;font-weight:600;color:var(--lore-color-text-default);margin-bottom:6px;">
+                Not connected to GitHub
+              </div>
+              <div style="font-size:12px;color:var(--lore-color-text-faint);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto;">
+                Connect your GitHub account to sync your notes to a private repository
+              </div>
+              <button class="tb-btn primary" (click)="signInWithGitHub()">
+                Sign in with GitHub
+              </button>
+              <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--lore-color-border);">
+                <div style="font-size:11px;font-weight:600;color:var(--lore-color-text-muted);margin-bottom:10px;">
+                  Benefits:
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;text-align:left;max-width:400px;margin:0 auto;">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lore-color-text-muted);">
+                    <span style="color:#10B981;">✓</span>
+                    <span>Free unlimited storage</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lore-color-text-muted);">
+                    <span style="color:#10B981;">✓</span>
+                    <span>Full version history</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lore-color-text-muted);">
+                    <span style="color:#10B981;">✓</span>
+                    <span>Access from any device</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lore-color-text-muted);">
+                    <span style="color:#10B981;">✓</span>
+                    <span>Edit in VS Code or any editor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <!-- Connected State -->
+          <div class="s-card">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
               <div style="width:36px;height:36px;border-radius:9px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                   <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/>
                 </svg>
               </div>
               <div style="flex:1;">
-                <div style="font-size:13px;font-weight:500;color:var(--t1);">Connected to GitHub</div>
-                <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">
-                  {{ syncSettings().githubUsername }} · Gist: {{ syncSettings().gistName }} · Last sync: {{ syncSettings().lastSync }}
+                <div style="font-size:13px;font-weight:500;color:var(--lore-color-text-default);">
+                  Connected as &#64;{{ storageSyncService.syncSettings().githubSync.username }}
+                </div>
+                <div style="font-size:11px;color:var(--lore-color-text-faint);font-family:'JetBrains Mono',monospace;margin-top:2px;">
+                  Repository: {{ storageSyncService.syncSettings().githubSync.repository }}
                 </div>
               </div>
-              <button class="api-btn" [class.on]="syncSettings().githubConnected" (click)="toggleGitHubSync()">
-                {{ syncSettings().githubConnected ? 'Syncing' : 'Connect' }}
-              </button>
+              <button class="tb-btn" (click)="disconnectGitHub()">Disconnect</button>
             </div>
-            <div class="s-card" style="margin-top:8px;">
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-name">Auto-sync on note save</div>
-                  <div class="toggle-desc">Pushes changes to Gist immediately after saving</div>
-                </div>
-                <div class="sw" [class.on]="syncSettings().autoSync" (click)="toggleSyncSetting('autoSync')"></div>
-              </div>
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-name">Include HTML notes in sync</div>
-                  <div class="toggle-desc">Saves AI-generated HTML files to the Gist as separate files</div>
-                </div>
-                <div class="sw" [class.on]="syncSettings().includeHtmlNotes" (click)="toggleSyncSetting('includeHtmlNotes')"></div>
-              </div>
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-name">Encrypt sensitive notes before sync</div>
-                  <div class="toggle-desc">AES-256 encryption applied to notes tagged as private</div>
-                </div>
-                <div class="sw" [class.on]="syncSettings().encryptPrivateNotes" (click)="toggleSyncSetting('encryptPrivateNotes')"></div>
-              </div>
-            </div>
-          </div>
-          <div class="s-sec">
-            <div class="s-title">Export Options</div>
-            <div class="s-desc">Download your notes in various formats.</div>
-            <div class="s-card" style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="flex:1;">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export all notes as JSON</div>
-                  <div style="font-size:11px;color:var(--t3);">Complete data export with metadata, blocks, and AI history</div>
-                </div>
-                <button class="tb-btn" (click)="exportNotes('json')">📦 Export JSON</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="flex:1;">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export as Markdown</div>
-                  <div style="font-size:11px;color:var(--t3);">One .md file per note, preserving structure</div>
-                </div>
-                <button class="tb-btn" (click)="exportNotes('markdown')">📝 Export MD</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="flex:1;">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export HTML notes as ZIP</div>
-                  <div style="font-size:11px;color:var(--t3);">All AI-generated HTML files in a single archive</div>
-                </div>
-                <button class="tb-btn" (click)="exportNotes('zip')">🗜️ Export ZIP</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="flex:1;">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Import notes from JSON / Markdown</div>
-                  <div style="font-size:11px;color:var(--t3);">Restore a previous backup or migrate from another app</div>
-                </div>
-                <button class="tb-btn primary" (click)="importNotes()">📥 Import</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
 
+            <!-- Auto-sync Toggle -->
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Enable auto-sync</div>
+                <div class="toggle-desc">Automatically sync changes to GitHub</div>
+              </div>
+              <div 
+                class="sw" 
+                [class.on]="storageSyncService.syncSettings().githubSync.autoSyncEnabled"
+                (click)="toggleGitHubAutoSync()"
+              ></div>
+            </div>
+
+            <!-- Sync Interval -->
+            @if (storageSyncService.syncSettings().githubSync.autoSyncEnabled) {
+              <div style="margin-top:16px;">
+                <div style="font-size:12px;font-weight:500;color:var(--lore-color-text-muted);margin-bottom:8px;">
+                  Sync Interval
+                </div>
+                <div class="sync-interval-options">
+                  <div 
+                    class="interval-option" 
+                    [class.active]="storageSyncService.syncSettings().githubSync.syncInterval === 1"
+                    (click)="setGitHubSyncInterval(1)"
+                  >
+                    <div class="interval-radio"></div>
+                    <span>1 minute</span>
+                  </div>
+                  <div 
+                    class="interval-option" 
+                    [class.active]="storageSyncService.syncSettings().githubSync.syncInterval === 5"
+                    (click)="setGitHubSyncInterval(5)"
+                  >
+                    <div class="interval-radio"></div>
+                    <span>5 minutes</span>
+                    <span class="recommended-badge">Recommended</span>
+                  </div>
+                  <div 
+                    class="interval-option" 
+                    [class.active]="storageSyncService.syncSettings().githubSync.syncInterval === 10"
+                    (click)="setGitHubSyncInterval(10)"
+                  >
+                    <div class="interval-radio"></div>
+                    <span>10 minutes</span>
+                  </div>
+                  <div 
+                    class="interval-option" 
+                    [class.active]="storageSyncService.syncSettings().githubSync.syncInterval === 0"
+                    (click)="setGitHubSyncInterval(0)"
+                  >
+                    <div class="interval-radio"></div>
+                    <span>Manual only</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sync Status -->
+              <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--lore-color-border);">
+                @if (storageSyncService.syncSettings().githubSync.isSyncing) {
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                    <div style="font-size:12px;color:var(--lore-color-text-muted);">
+                      Syncing... {{ storageSyncService.syncSettings().githubSync.syncProgress }}%
+                    </div>
+                  </div>
+                  <div style="height:4px;background:var(--lore-color-border);border-radius:2px;overflow:hidden;">
+                    <div 
+                      style="height:100%;background:var(--lore-color-accent);transition:width 0.3s;"
+                      [style.width.%]="storageSyncService.syncSettings().githubSync.syncProgress"
+                    ></div>
+                  </div>
+                } @else if (storageSyncService.syncSettings().githubSync.syncError) {
+                  <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#FFF1F2;border:1px solid #FCE7F3;border-radius:var(--lore-radius-md);">
+                    <div style="font-size:16px;">⚠️</div>
+                    <div style="flex:1;">
+                      <div style="font-size:12px;font-weight:500;color:#BE185D;">Sync failed</div>
+                      <div style="font-size:11px;color:#BE185D;margin-top:2px;">
+                        {{ storageSyncService.syncSettings().githubSync.syncError }}
+                      </div>
+                    </div>
+                    <button class="tb-btn" (click)="syncToGitHubNow()">Retry</button>
+                  </div>
+                } @else {
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:11px;color:var(--lore-color-text-faint);">
+                      Last synced: {{ storageSyncService.formatRelativeTime(storageSyncService.syncSettings().githubSync.lastSyncedAt) }}
+                    </div>
+                    @if (storageSyncService.syncSettings().githubSync.syncInterval > 0) {
+                      <div style="font-size:11px;color:var(--lore-color-text-faint);">
+                        Next sync: {{ storageSyncService.formatNextSyncTime(storageSyncService.syncSettings().githubSync.nextSyncAt) }}
+                      </div>
+                    }
+                  </div>
+                  @if (storageSyncService.syncSettings().githubSync.pendingChanges > 0) {
+                    <div style="font-size:11px;color:var(--lore-color-text-muted);margin-bottom:8px;">
+                      {{ storageSyncService.syncSettings().githubSync.pendingChanges }} change{{ storageSyncService.syncSettings().githubSync.pendingChanges !== 1 ? 's' : '' }} pending
+                    </div>
+                  }
+                  <button class="tb-btn primary" (click)="syncToGitHubNow()">Sync Now</button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Export Options -->
+    <div class="s-sec">
+      <div class="s-title">Export Options</div>
+      <div class="s-desc">Download your notes in various formats.</div>
+      <div class="s-card" style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export all notes as JSON</div>
+            <div style="font-size:11px;color:var(--t3);">Complete data export with metadata, blocks, and AI history</div>
+          </div>
+          <button class="tb-btn" (click)="exportNotes('json')">📦 Export JSON</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export as Markdown</div>
+            <div style="font-size:11px;color:var(--t3);">One .md file per note, preserving structure</div>
+          </div>
+          <button class="tb-btn" (click)="exportNotes('markdown')">📝 Export MD</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Export HTML notes as ZIP</div>
+            <div style="font-size:11px;color:var(--t3);">All AI-generated HTML files in a single archive</div>
+          </div>
+          <button class="tb-btn" (click)="exportNotes('zip')">🗜️ Export ZIP</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:12.5px;font-weight:500;color:var(--t1);">Import notes from JSON / Markdown</div>
+            <div style="font-size:11px;color:var(--t3);">Restore a previous backup or migrate from another app</div>
+          </div>
+          <button class="tb-btn primary" (click)="importNotes()">📥 Import</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
       <!-- Templates Panel -->
       @if (activePanel() === 'templates') {
         <div class="s-panel active">

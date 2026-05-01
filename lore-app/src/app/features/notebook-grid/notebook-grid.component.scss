@@ -282,30 +282,36 @@
   padding: 2px 6px;
   border-radius: 20px;
   font-family: 'JetBrains Mono', monospace;
+  border: 1px solid transparent;
   
   &.badge-research {
     background: var(--teal-bg);
     color: var(--teal);
+    border-color: #99F6E4;
   }
   
   &.badge-journal {
     background: var(--amber-bg);
     color: var(--amber);
+    border-color: #FDE68A;
   }
   
   &.badge-task {
     background: var(--blue-bg);
     color: var(--blue);
+    border-color: #BFDBFE;
   }
   
   &.badge-idea {
     background: var(--rose-bg);
     color: var(--rose);
+    border-color: #FECDD3;
   }
   
   &.badge-reference {
     background: var(--p100);
     color: var(--p600);
+    border-color: var(--p200);
   }
   
   &.badge-html {

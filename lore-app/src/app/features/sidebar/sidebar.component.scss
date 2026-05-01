@@ -608,6 +608,7 @@
   border-radius: 20px;
   font-family: var(--lore-font-mono);
   flex-shrink: 0;
+  border: 1px solid transparent;
 }
 
 .ni-date {
@@ -694,31 +695,37 @@
 .badge-research {
   background: #F0FDFA;
   color: #0F766E;
+  border-color: #99F6E4;
 }
 
 .badge-journal {
   background: #FFFBEB;
   color: #D97706;
+  border-color: #FDE68A;
 }
 
 .badge-task {
   background: #EFF6FF;
   color: #1D4ED8;
+  border-color: #BFDBFE;
 }
 
 .badge-idea {
   background: #FFF1F2;
   color: #BE185D;
+  border-color: #FECDD3;
 }
 
 .badge-reference {
   background: #EDE9FE;
   color: #8B5CF6;
+  border-color: #DDD6FE;
 }
 
 .badge-html {
   background: #F0FDF4;
   color: #15803D;
+  border-color: #BBF7D0;
 }
 
 /* ══ NOTE TYPE DOT COLORS ══ */

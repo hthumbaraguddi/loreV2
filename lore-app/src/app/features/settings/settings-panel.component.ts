@@ -2,6 +2,7 @@ import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TemplateService, Template } from '../../core/services/template.service';
+import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
 
 export type SettingsPanel = 
   | 'ai-providers' 
@@ -41,6 +42,7 @@ export interface Profile {
 })
 export class SettingsPanelComponent {
   private templateService = inject(TemplateService);
+  storageSyncService = inject(StorageSyncService);
   
   // Active panel
   activePanel = signal<SettingsPanel>('ai-providers');
@@ -248,6 +250,112 @@ export class SettingsPanelComponent {
   }
 
   // ─── Sync & Export ──────────────────────────────────────────
+
+  /**
+   * Set storage tier
+   */
+  setStorageTier(tier: StorageTier): void {
+    this.storageSyncService.setStorageTier(tier);
+  }
+
+  /**
+   * Select folder for local sync
+   */
+  async selectLocalFolder(): Promise<void> {
+    try {
+      await this.storageSyncService.selectFolder();
+    } catch (error: any) {
+      alert(`Failed to select folder: ${error.message}`);
+    }
+  }
+
+  /**
+   * Toggle local auto-sync
+   */
+  toggleLocalAutoSync(): void {
+    const settings = this.storageSyncService.syncSettings();
+    if (settings.localSync.autoSyncEnabled) {
+      this.storageSyncService.disableLocalAutoSync();
+    } else {
+      this.storageSyncService.enableLocalAutoSync(settings.localSync.syncInterval);
+    }
+  }
+
+  /**
+   * Set local sync interval
+   */
+  setLocalSyncInterval(interval: SyncInterval): void {
+    const settings = this.storageSyncService.syncSettings();
+    this.storageSyncService.enableLocalAutoSync(interval);
+  }
+
+  /**
+   * Sync to local folder now
+   */
+  async syncToLocalFolderNow(): Promise<void> {
+    try {
+      await this.storageSyncService.syncToLocalFolder();
+    } catch (error: any) {
+      alert(`Sync failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Sign in with GitHub
+   */
+  async signInWithGitHub(): Promise<void> {
+    try {
+      await this.storageSyncService.signInWithGitHub();
+    } catch (error: any) {
+      alert(`GitHub sign-in failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Disconnect from GitHub
+   */
+  disconnectGitHub(): void {
+    if (confirm('Are you sure you want to disconnect from GitHub?')) {
+      this.storageSyncService.disconnectGitHub();
+    }
+  }
+
+  /**
+   * Toggle GitHub auto-sync
+   */
+  toggleGitHubAutoSync(): void {
+    const settings = this.storageSyncService.syncSettings();
+    if (settings.githubSync.autoSyncEnabled) {
+      this.storageSyncService.disableGitHubAutoSync();
+    } else {
+      this.storageSyncService.enableGitHubAutoSync(settings.githubSync.syncInterval);
+    }
+  }
+
+  /**
+   * Set GitHub sync interval
+   */
+  setGitHubSyncInterval(interval: SyncInterval): void {
+    this.storageSyncService.enableGitHubAutoSync(interval);
+  }
+
+  /**
+   * Sync to GitHub now
+   */
+  async syncToGitHubNow(): Promise<void> {
+    try {
+      await this.storageSyncService.syncToGitHub();
+    } catch (error: any) {
+      alert(`Sync failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Check if File System Access API is supported
+   */
+  isFileSystemAccessSupported(): boolean {
+    return this.storageSyncService.isFileSystemAccessSupported();
+  }
 
   /**
    * Toggle GitHub sync connection

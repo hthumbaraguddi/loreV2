@@ -2,11 +2,11 @@ import { Routes } from '@angular/router';
 
 /**
  * Editor feature routes
- * Will be fully implemented in Phase 3
+ * Phase 3: Editor Foundation
  */
 export const editorRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./editor-placeholder/editor-placeholder.component').then(m => m.EditorPlaceholderComponent)
+    loadComponent: () => import('./split-editor/split-editor.component').then(m => m.SplitEditorComponent)
   }
 ];

@@ -1,0 +1,58 @@
+<div
+  class="pane"
+  [class.active]="active()"
+  [class.drag-over]="dragOver()"
+  [class.empty]="!noteRef()"
+  (click)="onPaneClick()"
+  tabindex="-1"
+  role="region"
+  [attr.aria-label]="noteRef() ? noteRef()!.title + ' editor pane' : 'Empty editor pane'"
+  [attr.aria-selected]="active()"
+>
+  <!-- Pane header -->
+  <div class="pane-header">
+    @if (noteRef()) {
+      <div class="note-info">
+        <span
+          class="material-symbols-outlined note-type-icon"
+          [style.color]="getNoteTypeColor(noteRef()!.type)"
+        >
+          {{ getNoteTypeIcon(noteRef()!.type) }}
+        </span>
+        <div class="note-title">
+          <h3 class="title">{{ noteRef()!.title }}</h3>
+          <span class="breadcrumb">{{ getBreadcrumbTrail() }}</span>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-header">
+        <span class="material-symbols-outlined">note_add</span>
+        <span class="empty-text">Drop a note here</span>
+      </div>
+    }
+    
+    <button
+      class="close-btn"
+      (click)="onCloseClick($event)"
+      aria-label="Close pane"
+      title="Close pane (Escape)"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <!-- Pane content -->
+  <div class="pane-content">
+    @if (noteRef()) {
+      <lore-paper-canvas [note]="noteRef()!" />
+    } @else {
+      <div class="drop-zone">
+        <div class="drop-zone-content">
+          <span class="material-symbols-outlined">upload</span>
+          <p>Drop a note here or open from sidebar</p>
+          <p class="hint">Drag any note from the sidebar into this pane</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

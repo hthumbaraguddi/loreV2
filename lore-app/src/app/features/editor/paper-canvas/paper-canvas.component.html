@@ -1,0 +1,103 @@
+<div class="paper-canvas" role="document" aria-label="Note editor">
+  <!-- Canvas background -->
+  <lore-canvas-background [style]="backgroundStyle()" />
+
+  <!-- Canvas content -->
+  <div class="canvas-content">
+    <!-- Note header -->
+    <div class="note-header">
+      <div class="note-meta">
+        <span
+          class="material-symbols-outlined note-type-icon"
+          [style.color]="noteTypeColor()"
+        >
+          {{ noteTypeIcon() }}
+        </span>
+        <div class="note-info">
+          <h1 class="note-title">{{ fullNote().title }}</h1>
+          <div class="note-details">
+            <span class="note-date">
+              {{ getRelativeTime(fullNote().updatedAt) }}
+            </span>
+            <span class="note-status" [class]="fullNote().status">
+              {{ fullNote().status }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="note-actions">
+        <button
+          class="save-btn"
+          [class.dirty]="isDirty()"
+          (click)="saveNote()"
+          [disabled]="!isDirty()"
+          aria-label="Save note"
+          title="Save note (⌘S)"
+        >
+          <span class="material-symbols-outlined">
+            {{ isDirty() ? 'save' : 'check' }}
+          </span>
+          <span class="save-text">
+            {{ isDirty() ? 'Save' : 'Saved' }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Blocks container -->
+    <div class="blocks-container">
+      @if ((fullNote().blocks || []).length === 0) {
+        <div class="empty-state">
+          <div class="empty-content">
+            <span class="material-symbols-outlined">edit_note</span>
+            <h3>Start writing</h3>
+            <p>Add your first block to begin</p>
+            <button
+              class="add-first-block-btn"
+              (click)="addBlock('note-insight', -1)"
+              [disabled]="readOnly()"
+            >
+              <span class="material-symbols-outlined">add</span>
+              Add first block
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- Blocks will be rendered here in Phase 4 -->
+        <div class="blocks-placeholder">
+          <div class="placeholder-content">
+            <span class="material-symbols-outlined">view_week</span>
+            <h3>Block system coming soon</h3>
+            <p>The 14 block types will be implemented in Phase 4</p>
+            <p class="placeholder-hint">
+              For now, you can view and edit basic note content
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Note content (temporary until blocks are implemented) -->
+    <div class="note-content-container">
+      <div class="content-editor">
+        <textarea
+          class="content-textarea"
+          [value]="fullNote().content"
+          (input)="updateNoteContent($any($event.target).value)"
+          [readonly]="readOnly()"
+          placeholder="Start typing your note content here..."
+          aria-label="Note content"
+        ></textarea>
+      </div>
+      
+      @if (fullNote().tags && fullNote().tags.length > 0) {
+        <div class="note-tags">
+          @for (tag of fullNote().tags; track tag) {
+            <span class="tag">{{ tag }}</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

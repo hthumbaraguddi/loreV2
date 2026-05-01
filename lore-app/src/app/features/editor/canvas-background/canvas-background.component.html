@@ -1,0 +1,11 @@
+<div class="canvas-background" aria-hidden="true">
+  @if (style() !== 'plain') {
+    <svg
+      class="background-svg"
+      width="100%"
+      height="100%"
+      preserveAspectRatio="none"
+      [innerHTML]="sanitizedSvgContent()"
+    ></svg>
+  }
+</div>

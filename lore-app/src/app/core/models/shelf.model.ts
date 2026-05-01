@@ -48,6 +48,19 @@ export interface Note {
 }
 
 /**
+ * Note Reference
+ * Lightweight reference to a note for sidebar and editor
+ */
+export interface NoteRef {
+  id: string;
+  notebookId: string;
+  title: string;
+  type: NoteType;
+  preview?: string;
+  updatedAt: Date;
+}
+
+/**
  * Note Type Enum
  * Defines the six note types with their visual styling
  */

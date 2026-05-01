@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ShelfService } from '../../core/services/shelf.service';
 import { LayoutService } from '../../core/services/layout.service';
-import { Shelf, Notebook, Note, NoteType } from '../../core/models/shelf.model';
+import { EditorService } from '../../core/services/editor.service';
+import { Shelf, Notebook, Note, NoteType, NoteRef } from '../../core/models/shelf.model';
 import { ContextMenuComponent, ContextMenuTarget, ContextMenuAction } from './components/context-menu/context-menu.component';
 
 /**
@@ -22,6 +23,7 @@ import { ContextMenuComponent, ContextMenuTarget, ContextMenuAction } from './co
 export class SidebarComponent {
   private shelfService = inject(ShelfService);
   private layoutService = inject(LayoutService);
+  private editorService = inject(EditorService);
 
   // Signals
   shelves = this.shelfService.shelves;
@@ -185,8 +187,9 @@ export class SidebarComponent {
 
   onNoteClick(noteId: string): void {
     this.activeNoteId.set(noteId);
-    // Open note in editor (to be implemented in Phase 3)
-    console.log('Open note:', noteId);
+    
+    // Open note in editor
+    this.editorService.openNoteInPane(noteId);
   }
 
   isNoteActive(noteId: string): boolean {

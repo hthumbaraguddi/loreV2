@@ -6,6 +6,7 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--lore-color-bg-canvas);
+  height: 100vh; /* Fixed height to enable scrolling in child containers */
 }
 
 /* Header - using vhbar from mock */
@@ -85,22 +86,24 @@
   font-size: 12.5px;
   color: var(--lore-color-text-muted);
   border-left: 2px solid transparent;
-  transition: var(--lore-anim-duration-fast);
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  transition: 0.12s;
   background: transparent;
-  border: none;
   width: 100%;
   text-align: left;
   font-family: var(--lore-font-sans);
   
   &:hover {
-    background: var(--lore-color-accent-subtle);
+    background: var(--lore-primitive-purple-50);
     color: var(--lore-color-text-default);
   }
   
   &.active {
-    background: var(--lore-color-accent-subtle);
-    color: var(--lore-color-text-accent);
-    border-left-color: var(--lore-color-accent);
+    background: var(--lore-primitive-purple-50);
+    color: var(--lore-primitive-purple-700);
+    border-left-color: var(--lore-primitive-purple-600);
     font-weight: 500;
   }
   
@@ -310,7 +313,7 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--lore-color-text-muted);
-  background: var(--lore-color-accent-subtle);
+  background: var(--lore-primitive-purple-50); /* Light purple background for API inputs */
   outline: none;
   
   &:focus {
@@ -506,7 +509,7 @@
 .sw {
   width: 32px;
   height: 18px;
-  background: var(--lore-color-icon-muted);
+  background: var(--lore-color-text-faint); /* More visible OFF state - matches mock --t4 */
   border-radius: 20px;
   position: relative;
   cursor: pointer;
@@ -1397,8 +1400,6 @@
   margin-bottom: 12px;
 }
 
-.cron-field {}
-
 .cron-label {
   font-size: 11px;
   font-weight: 500;
@@ -1823,7 +1824,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  background: var(--lore-color-accent-subtle);
+  background: var(--lore-primitive-purple-50); /* Light purple background for search */
   border: 1px solid var(--lore-color-border-strong);
   border-radius: var(--lore-radius-md);
   padding: 6px 10px;

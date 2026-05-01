@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lore — Your knowledge, supercharged by AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0F0D1A;
+  --bg2:#13101F;
+  --bg3:#1A1728;
+  --surface:#1E1A2E;
+  --surface2:#252138;
+  --border:rgba(139,92,246,0.14);
+  --border2:rgba(139,92,246,0.24);
+  --p300:#C4B5FD;--p400:#A78BFA;--p500:#8B5CF6;--p600:#7C3AED;
+  --t1:#F0EEFF;--t2:#C4B5FD;--t3:#7B6F9A;--t4:#4A4068;
+  --green:#4ADE80;--green-bg:rgba(74,222,128,0.1);
+  --amber:#FCD34D;--amber-bg:rgba(253,211,77,0.1);
+  --teal:#34D399;--teal-bg:rgba(52,211,153,0.08);
+  --rose:#F472B6;--rose-bg:rgba(244,114,182,0.08);
+  --blue:#60A5FA;--blue-bg:rgba(96,165,250,0.08);
+  --orange:#FB923C;--orange-bg:rgba(251,146,60,0.08);
+  --r-sm:5px;--r-md:10px;--r-lg:14px;--r-xl:20px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --shadow-card:0 2px 12px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.04);
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--t1);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px;}
+
+/* ══ NOISE TEXTURE OVERLAY ══ */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.5;
+}
+
+/* ══ PAGE WRAPPER ══ */
+.page{position:relative;z-index:1;}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 40px;border-bottom:1px solid var(--border);
+  background:rgba(15,13,26,0.8);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:100;
+}
+.topbar-logo{display:flex;align-items:center;gap:9px;}
+.logo-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--p600);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Lora',serif;font-size:14px;font-weight:700;color:white;
+  box-shadow:0 2px 12px rgba(124,58,237,0.5);
+}
+.logo-name{font-size:16px;font-weight:600;color:var(--t1);letter-spacing:-0.01em;}
+.topbar-badges{display:flex;gap:6px;align-items:center;}
+.badge{
+  font-size:10.5px;font-family:'JetBrains Mono',monospace;font-weight:500;
+  padding:3px 8px;border-radius:20px;border:1px solid var(--border2);
+  color:var(--t3);background:rgba(139,92,246,0.07);
+}
+.badge.ai{color:var(--p400);border-color:rgba(167,139,250,0.3);background:rgba(139,92,246,0.12);}
+.topbar-links{display:flex;align-items:center;gap:6px;}
+.nav-link{
+  padding:5px 13px;border-radius:var(--r-sm);font-size:13px;color:var(--t3);
+  cursor:pointer;transition:0.15s;border:none;background:transparent;
+}
+.nav-link:hover{color:var(--t1);background:rgba(255,255,255,0.05);}
+.nav-link.cta{
+  background:var(--p600);color:white;font-weight:500;
+  border:1px solid rgba(167,139,250,0.2);
+}
+.nav-link.cta:hover{background:var(--p500);}
+
+/* ══ HERO ══ */
+.hero{
+  display:grid;grid-template-columns:1fr 380px;gap:40px;
+  padding:52px 40px 60px;max-width:1200px;margin:0 auto;align-items:start;
+}
+.hero-left{}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:8px;margin-bottom:24px;
+  flex-wrap:wrap;
+}
+.hero-eyebrow .badge{font-size:11px;}
+.hero-h1{
+  font-family:'Lora',serif;
+  font-size:46px;font-weight:700;line-height:1.12;
+  letter-spacing:-0.03em;
+  color:var(--t1);
+  margin-bottom:8px;
+}
+.hero-h1 .accent{
+  background:linear-gradient(135deg,#A78BFA 0%,#7C3AED 50%,#C4B5FD 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:15px;color:var(--t3);line-height:1.65;margin-bottom:28px;max-width:520px;
+}
+.hero-sub strong{color:var(--t2);}
+.section-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--t4);font-family:'JetBrains Mono',monospace;
+  margin-bottom:12px;
+}
+.section-dot{width:5px;height:5px;border-radius:50%;background:var(--p500);}
+
+/* AI FEATURES grid (3 col) */
+.features-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.features-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:0;}
+
+.feat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px;cursor:pointer;
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.feat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(139,92,246,0.05) 0%,transparent 60%);
+  opacity:0;transition:0.2s;
+}
+.feat-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.feat-card:hover::before{opacity:1;}
+.feat-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;margin-bottom:8px;
+  background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.18);
+}
+.feat-icon.teal{background:var(--teal-bg);border-color:rgba(52,211,153,0.2);}
+.feat-icon.amber{background:var(--amber-bg);border-color:rgba(253,211,77,0.2);}
+.feat-icon.rose{background:var(--rose-bg);border-color:rgba(244,114,182,0.2);}
+.feat-icon.blue{background:var(--blue-bg);border-color:rgba(96,165,250,0.2);}
+.feat-icon.orange{background:var(--orange-bg);border-color:rgba(251,146,60,0.2);}
+.feat-icon.green{background:var(--green-bg);border-color:rgba(74,222,128,0.2);}
+.feat-title{font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:4px;}
+.feat-desc{font-size:11px;color:var(--t3);line-height:1.5;}
+
+/* WIDER feature cards (2-col) */
+.feat-card.wide .feat-icon{margin-bottom:0;float:left;margin-right:10px;flex-shrink:0;}
+.feat-card.wide .feat-title{font-size:13px;}
+.feat-card.wide .feat-desc{font-size:11.5px;}
+.feat-wide-inner{display:flex;align-items:flex-start;gap:10px;}
+.feat-wide-inner .feat-icon{margin-bottom:0;flex-shrink:0;}
+
+/* ══ AUTH CARD ══ */
+.auth-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:28px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);
+  position:sticky;top:80px;
+}
+.auth-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.auth-logo{
+  width:36px;height:36px;border-radius:10px;background:var(--p600);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Lora',serif;font-size:16px;font-weight:700;color:white;
+  box-shadow:0 3px 12px rgba(124,58,237,0.4);
+}
+.auth-name{font-size:15px;font-weight:600;color:var(--t1);}
+.auth-tagline{font-size:11.5px;color:var(--t3);}
+.auth-prompt{font-size:13px;color:var(--t3);text-align:center;margin-bottom:14px;}
+.auth-btn{
+  width:100%;padding:11px;border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  font-size:13.5px;font-weight:600;cursor:pointer;
+  transition:all 0.15s;border:1px solid;font-family:'DM Sans',sans-serif;
+  margin-bottom:8px;
+}
+.auth-btn.github{
+  background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);
+  color:var(--t1);
+}
+.auth-btn.github:hover{background:rgba(255,255,255,0.12);}
+.auth-btn svg{width:16px;height:16px;flex-shrink:0;}
+.auth-or{
+  display:flex;align-items:center;gap:10px;margin:12px 0;
+  font-size:11px;color:var(--t4);
+}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-btn.local{
+  background:var(--surface2);border-color:var(--border2);color:var(--t2);
+}
+.auth-btn.local:hover{border-color:rgba(167,139,250,0.4);color:var(--t1);}
+.auth-note{font-size:10.5px;color:var(--t4);text-align:center;margin-bottom:14px;}
+.auth-divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.auth-providers-label{
+  font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--t4);font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:10px;
+}
+.auth-providers{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
+.provider-pill{
+  font-size:11.5px;padding:4px 11px;border-radius:20px;
+  border:1px solid var(--border2);background:rgba(139,92,246,0.07);
+  color:var(--t2);cursor:pointer;transition:0.15s;
+}
+.provider-pill:hover{border-color:var(--border2);color:var(--p300);background:rgba(139,92,246,0.12);}
+
+/* new feature: live status */
+.auth-live{
+  display:flex;align-items:center;gap:6px;
+  font-size:10.5px;color:var(--green);font-family:'JetBrains Mono',monospace;
+  margin-bottom:14px;justify-content:center;
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ══ BELOW THE FOLD ══ */
+.below{max-width:1200px;margin:0 auto;padding:0 40px 80px;}
+
+/* Section header */
+.section-header{margin-bottom:24px;}
+.section-header h2{
+  font-family:'Lora',serif;font-size:28px;font-weight:700;
+  color:var(--t1);margin-bottom:6px;letter-spacing:-0.02em;
+}
+.section-header p{font-size:14px;color:var(--t3);line-height:1.6;max-width:580px;}
+
+.divider{border:none;border-top:1px solid var(--border);margin:48px 0;}
+
+/* NEW FEATURES — expanded grids */
+.features-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.features-3b{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.features-2b{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+
+/* SHOWCASE CARD */
+.showcase{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:0;overflow:hidden;
+  box-shadow:var(--shadow-card);margin-bottom:10px;
+}
+.showcase-top{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;
+}
+.showcase-info{padding:32px 36px;}
+.showcase-label{
+  font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--p400);font-family:'JetBrains Mono',monospace;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.showcase-h{
+  font-family:'Lora',serif;font-size:22px;font-weight:600;
+  color:var(--t1);margin-bottom:10px;letter-spacing:-0.01em;
+}
+.showcase-desc{font-size:13px;color:var(--t3);line-height:1.65;margin-bottom:16px;}
+.showcase-bullets{display:flex;flex-direction:column;gap:7px;}
+.sb{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--t2);}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--p400);flex-shrink:0;margin-top:6px;}
+.showcase-visual{
+  background:var(--bg3);border-left:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;min-height:220px;position:relative;overflow:hidden;
+}
+
+/* ── SPLIT PANE VISUAL ── */
+.sv-panes{display:flex;gap:3px;width:100%;height:160px;}
+.sv-pane{
+  flex:1;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px;overflow:hidden;
+}
+.sv-pane-hdr{height:5px;background:var(--border2);border-radius:3px;width:70%;margin-bottom:3px;}
+.sv-block{height:14px;background:rgba(139,92,246,0.12);border-radius:3px;border-left:2px solid var(--p500);}
+.sv-block.amber{background:var(--amber-bg);border-color:var(--amber);}
+.sv-block.teal{background:var(--teal-bg);border-color:var(--teal);}
+.sv-block.sm{height:8px;}
+.sv-block.xs{height:5px;background:rgba(255,255,255,0.04);border:none;}
+
+/* ── BLOCK VISUAL ── */
+.bv-list{display:flex;flex-direction:column;gap:6px;width:100%;}
+.bv-block{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:7px;padding:8px 10px;
+}
+.bv-ico{font-size:13px;flex-shrink:0;}
+.bv-label{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+.bv-line{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;}
+.bv-block.hyp .bv-label{color:var(--amber);}
+.bv-block.con .bv-label{color:var(--teal);}
+.bv-block.ai .bv-label{color:var(--p400);}
+.bv-block.diff .bv-label{color:var(--blue);}
+.bv-handle{width:8px;height:12px;display:flex;flex-direction:column;gap:2px;opacity:0.3;flex-shrink:0;}
+.bv-handle span{width:100%;height:1.5px;background:var(--t3);border-radius:1px;}
+
+/* ── AI VISUAL ── */
+.av-box{
+  background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);
+  border-radius:10px;padding:12px;width:100%;
+}
+.av-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.av-logo{width:18px;height:18px;border-radius:4px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:white;}
+.av-name{font-size:10px;font-weight:600;color:var(--p300);font-family:'JetBrains Mono',monospace;}
+.av-live{font-size:9px;color:var(--green);margin-left:auto;display:flex;align-items:center;gap:3px;}
+.av-line{height:5px;border-radius:3px;margin-bottom:5px;}
+.av-line.w100{width:100%;background:rgba(255,255,255,0.07);}
+.av-line.w80{width:80%;background:rgba(255,255,255,0.07);}
+.av-line.w60{width:60%;background:rgba(255,255,255,0.07);}
+.av-line.accent{width:90%;background:rgba(139,92,246,0.25);}
+
+/* ── GRAPH VISUAL ── */
+.gv{position:relative;width:100%;height:160px;}
+
+/* ── HTML NOTE VISUAL ── */
+.hnv{
+  width:100%;background:linear-gradient(135deg,#1A1728,#252138);
+  border-radius:8px;border:1px solid var(--border);padding:12px;
+}
+.hnv-hdr{display:flex;align-items:center;gap:7px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.hnv-ico{width:22px;height:22px;border-radius:5px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:10px;}
+.hnv-title{font-size:11px;font-weight:600;color:var(--t1);}
+.hnv-tag{font-size:8.5px;padding:1px 6px;border-radius:3px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.hnv-row{display:flex;gap:7px;margin-bottom:6px;}
+.hnv-stat{flex:1;background:var(--surface);border-radius:5px;padding:6px 8px;text-align:center;}
+.hnv-stat-n{font-size:14px;font-weight:700;color:var(--p400);font-family:'Lora',serif;}
+.hnv-stat-l{font-size:8px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.hnv-table-row{display:flex;gap:5px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.hnv-td{font-size:9px;color:var(--t3);flex:1;}
+.hnv-pill{font-size:8px;padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;}
+.hnv-pill.ok{background:var(--green-bg);color:var(--green);}
+.hnv-pill.warn{background:var(--amber-bg);color:var(--amber);}
+
+/* ── PROMPT LIBRARY VISUAL ── */
+.plv{display:flex;flex-direction:column;gap:6px;width:100%;}
+.plv-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 11px;
+  display:flex;align-items:center;gap:9px;
+}
+.plv-ico{font-size:14px;flex-shrink:0;}
+.plv-name{font-size:11px;font-weight:600;color:var(--t1);flex:1;}
+.plv-cron{font-size:9px;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.plv-ai{width:14px;height:14px;border-radius:3px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:white;flex-shrink:0;}
+.plv-run{
+  padding:2px 9px;border-radius:5px;background:var(--p600);
+  border:none;color:white;font-size:10px;font-weight:600;cursor:pointer;flex-shrink:0;
+}
+
+/* ── RUNS VISUAL ── */
+.rv{display:flex;flex-direction:column;gap:5px;width:100%;}
+.rv-row{
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  padding:7px 10px;display:flex;align-items:center;gap:9px;
+}
+.rv-ico{font-size:12px;flex-shrink:0;}
+.rv-name{font-size:10.5px;font-weight:500;color:var(--t2);flex:1;}
+.rv-status{font-size:8.5px;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.rs-ok{background:var(--green-bg);color:var(--green);}
+.rs-run{background:rgba(139,92,246,0.15);color:var(--p400);}
+.rs-fail{background:rgba(248,113,113,0.1);color:#F87171;}
+.rv-time{font-size:9px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+
+/* ══ FEATURE STAT ROW ══ */
+.stats-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:1px;
+  background:var(--border);border-radius:var(--r-lg);overflow:hidden;
+  border:1px solid var(--border);margin-bottom:48px;
+}
+.stat-cell{
+  background:var(--surface);padding:22px 20px;text-align:center;
+}
+.stat-n{
+  font-family:'Lora',serif;font-size:32px;font-weight:700;
+  background:linear-gradient(135deg,var(--p300),var(--p500));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px;
+}
+.stat-l{font-size:11.5px;color:var(--t3);}
+
+/* ══ UX FEATURES GRID ══ */
+.ux-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.ux-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:13px;transition:all 0.2s;
+}
+.ux-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.ux-icon{font-size:18px;margin-bottom:7px;}
+.ux-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px;}
+.ux-desc{font-size:11px;color:var(--t3);line-height:1.5;}
+.ux-shortcut{
+  display:inline-flex;align-items:center;gap:3px;margin-top:5px;
+  font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--t4);
+}
+.key{
+  background:var(--bg3);border:1px solid rgba(255,255,255,0.08);
+  border-radius:3px;padding:1px 5px;font-size:9px;color:var(--t3);
+}
+
+/* ══ DESIGN SYSTEM STRIP ══ */
+.ds-strip{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:28px 32px;
+  display:flex;gap:40px;align-items:flex-start;margin-bottom:48px;
+}
+.ds-col{flex:1;}
+.ds-title{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-bottom:12px;}
+.ds-fonts{display:flex;flex-direction:column;gap:6px;}
+.ds-font{font-size:12px;color:var(--t3);}
+.ds-font strong{color:var(--t1);}
+.color-swatches{display:flex;gap:5px;flex-wrap:wrap;}
+.swatch{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:transform 0.15s;}
+.swatch:hover{transform:scale(1.15);}
+.block-icons{display:flex;flex-wrap:wrap;gap:5px;}
+.bi{
+  display:flex;align-items:center;gap:4px;
+  font-size:10.5px;color:var(--t3);background:var(--bg3);
+  border:1px solid var(--border);border-radius:5px;padding:3px 8px;
+}
+
+/* ══ KEYBOARD SHORTCUTS ══ */
+.shortcuts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.shortcut-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+}
+.shortcut-keys{display:flex;gap:3px;flex-shrink:0;}
+.shortcut-desc{font-size:12px;color:var(--t2);}
+
+/* ══ BOTTOM CTA ══ */
+.bottom-cta{
+  background:linear-gradient(135deg,rgba(124,58,237,0.15) 0%,rgba(139,92,246,0.08) 50%,rgba(196,181,253,0.05) 100%);
+  border:1px solid rgba(139,92,246,0.2);
+  border-radius:var(--r-xl);padding:56px 48px;text-align:center;
+  position:relative;overflow:hidden;margin-bottom:48px;
+}
+.bottom-cta::before{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(124,58,237,0.15) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cta-h{
+  font-family:'Lora',serif;font-size:36px;font-weight:700;
+  color:var(--t1);margin-bottom:10px;letter-spacing:-0.02em;position:relative;
+}
+.cta-h span{
+  background:linear-gradient(135deg,#A78BFA,#7C3AED);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cta-sub{font-size:15px;color:var(--t3);margin-bottom:28px;position:relative;}
+.cta-btns{display:flex;gap:10px;justify-content:center;position:relative;}
+.cta-btn{
+  padding:11px 28px;border-radius:var(--r-md);font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;gap:7px;
+}
+.cta-btn.primary{background:var(--p600);border:1px solid rgba(167,139,250,0.2);color:white;}
+.cta-btn.primary:hover{background:var(--p500);}
+.cta-btn.secondary{background:rgba(255,255,255,0.05);border:1px solid var(--border2);color:var(--t2);}
+.cta-btn.secondary:hover{background:rgba(255,255,255,0.09);}
+
+/* ══ FOOTER ══ */
+.footer{
+  border-top:1px solid var(--border);padding:24px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  max-width:1200px;margin:0 auto;
+}
+.footer-left{display:flex;align-items:center;gap:10px;}
+.footer-logo{width:22px;height:22px;border-radius:5px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:10px;font-weight:700;color:white;}
+.footer-name{font-size:13px;color:var(--t3);}
+.footer-links{display:flex;gap:18px;}
+.footer-link{font-size:12px;color:var(--t4);cursor:pointer;transition:0.15s;}
+.footer-link:hover{color:var(--t2);}
+.footer-version{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.hero-left{animation:fadeUp 0.6s ease both;}
+.auth-card{animation:fadeUp 0.6s 0.1s ease both;}
+.stats-row{animation:fadeIn 0.8s 0.3s ease both;opacity:0;animation-fill-mode:forwards;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">L</div>
+    <span class="logo-name">Lore</span>
+    <div class="topbar-badges">
+      <span class="badge">v3.0.0</span>
+      <span class="badge ai">AI-POWERED</span>
+    </div>
+  </div>
+  <div class="topbar-links">
+    <button class="nav-link">Features</button>
+    <button class="nav-link">Docs</button>
+    <button class="nav-link">Changelog</button>
+    <button class="nav-link cta">Get Started →</button>
+  </div>
+</header>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="badge ai">✦ LIVE CLAUDE API</span>
+      <span class="badge">14 BLOCK TYPES</span>
+      <span class="badge">SPLIT PANES</span>
+    </div>
+    <h1 class="hero-h1">Your knowledge,<br/><span class="accent">supercharged by AI</span></h1>
+    <p class="hero-sub">
+      Capture ideas, chat with <strong>Claude, GPT-4o, Gemini, Groq</strong> inline, run scheduled prompts on a cron, and surface insights through a live knowledge graph — all in one place, on your own API key.
+    </p>
+
+    <!-- AI FEATURES -->
+    <div class="section-label"><span class="section-dot"></span>AI FEATURES</div>
+    <div class="features-3" style="margin-bottom:16px;">
+      <div class="feat-card">
+        <div class="feat-icon">✦</div>
+        <div class="feat-title">In-App AI Chat</div>
+        <div class="feat-desc">Chat with Claude, Gemini, Groq &amp; more. Save any response as a note block.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon amber">📚</div>
+        <div class="feat-title">Prompt Library</div>
+        <div class="feat-desc">Save reusable prompts with <code style="font-size:10px;color:var(--p300);">{{variables}}</code>. Run, schedule, and track results.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon teal">⏱</div>
+        <div class="feat-title">Scheduled Prompts</div>
+        <div class="feat-desc">Auto-run prompts daily, weekly, or monthly — saves output as a note or HTML report.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon rose">@</div>
+        <div class="feat-title">@Mention AI Inline</div>
+        <div class="feat-desc">Type @ in any note to ask a model inline. Response appears as a draggable block.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon blue">📄</div>
+        <div class="feat-title">HTML Note Generation</div>
+        <div class="feat-desc">Claude generates rich, self-contained HTML reports. Saved in gallery, linked to notes.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🕸️</div>
+        <div class="feat-title">Knowledge Graph</div>
+        <div class="feat-desc">Live SVG graph of note connections, shelf clusters, and cron output arrows.</div>
+      </div>
+    </div>
+
+    <!-- CORE FEATURES -->
+    <div class="section-label"><span class="section-dot"></span>CORE FEATURES</div>
+    <div class="features-2">
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon">📚</div>
+          <div><div class="feat-title">Shelves &amp; Notebooks</div><div class="feat-desc">Organise into shelves, notebooks, and notes. Three-level hierarchy with colour-coded shelves.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon amber">⚡</div>
+          <div><div class="feat-title">Split Pane Editor</div><div class="feat-desc">1, 2, or 3 simultaneous panes. Each with an independent note, canvas, and AI call.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon teal">🔍</div>
+          <div><div class="feat-title">Advanced Search</div><div class="feat-desc">Find any note with type, shelf, and date range filters. Highlighted results with ⌘K.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon rose">🔗</div>
+          <div><div class="feat-title">[[Note Linking</div><div class="feat-desc">Type [[ to search and link notes. Backlink chips auto-appear. Mini graph in right panel.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon blue">📤</div>
+          <div><div class="feat-title">Export &amp; Gist Sync</div><div class="feat-desc">MD, PDF, HTML export. Auto-sync to your private GitHub Gist. Embed code for any note.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon orange">🔒</div>
+          <div><div class="feat-title">Your Key, Your Data</div><div class="feat-desc">AI runs on your own API key. Nothing stored on our servers. localStorage or Gist only.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon">🎨</div>
+          <div><div class="feat-title">14 Block Types</div><div class="feat-desc">Hypothesis, Conclusion, Key Diff, Findings, Checklist, Code, Table, Image, AI blocks &amp; more. All draggable.</div></div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-wide-inner">
+          <div class="feat-icon green">📋</div>
+          <div><div class="feat-title">8 Built-in Templates</div><div class="feat-desc">Research, Journal, Finance, Scrum &amp; more. Build custom templates with the visual Template Builder.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AUTH CARD ══ -->
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo">L</div>
+      <div>
+        <div class="auth-name">Lore</div>
+        <div class="auth-tagline">Your knowledge, organised</div>
+      </div>
+    </div>
+    <div class="auth-live"><span class="live-dot"></span>Claude Sonnet 4 · Connected</div>
+    <div class="auth-prompt">Sign in to continue</div>
+    <button class="auth-btn github">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+      Continue with GitHub
+    </button>
+    <p style="font-size:10.5px;color:var(--t4);text-align:center;margin-bottom:10px;">Syncs your notes to a private GitHub Gist — your data, your account</p>
+    <div class="auth-or">or</div>
+    <button class="auth-btn local">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="16" height="12" rx="2"/><path d="M6 17h8M10 15v2"/></svg>
+      Use Locally
+    </button>
+    <div class="auth-note">No account needed · Saved in this browser</div>
+    <hr class="auth-divider"/>
+    <div class="auth-providers-label">Works with any AI provider</div>
+    <div class="auth-providers">
+      <span class="provider-pill">Claude</span>
+      <span class="provider-pill">Gemini</span>
+      <span class="provider-pill">Groq</span>
+      <span class="provider-pill">OpenRouter</span>
+      <span class="provider-pill">Together AI</span>
+      <span class="provider-pill">+ custom</span>
+    </div>
+    <hr class="auth-divider"/>
+    <!-- Quick features list -->
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t3);">
+        <span style="color:var(--green);font-size:12px;">✓</span> Live Claude API with streaming
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t3);">
+        <span style="color:var(--green);font-size:12px;">✓</span> Cron-scheduled AI prompts
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t3);">
+        <span style="color:var(--green);font-size:12px;">✓</span> HTML report generation
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t3);">
+        <span style="color:var(--green);font-size:12px;">✓</span> Split pane · Knowledge graph
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t3);">
+        <span style="color:var(--green);font-size:12px;">✓</span> Dark mode · Zen focus mode
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BELOW THE FOLD ══ -->
+<div class="below">
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-cell"><div class="stat-n">14</div><div class="stat-l">Block types</div></div>
+    <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">AI providers</div></div>
+    <div class="stat-cell"><div class="stat-n">3</div><div class="stat-l">Split pane columns</div></div>
+    <div class="stat-cell"><div class="stat-n">8</div><div class="stat-l">Built-in templates</div></div>
+    <div class="stat-cell"><div class="stat-n">∞</div><div class="stat-l">Scheduled prompts</div></div>
+  </div>
+
+  <!-- SPLIT PANE EDITOR -->
+  <div class="showcase">
+    <div class="showcase-top">
+      <div class="showcase-info">
+        <div class="showcase-label">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--p400);display:inline-block;"></span>
+          SMART EDITOR
+        </div>
+        <div class="showcase-h">Split pane research environment</div>
+        <div class="showcase-desc">Work across 1, 2, or 3 notes simultaneously. Each pane is fully independent — its own canvas background, block stack, AI response area, and [[note links.</div>
+        <div class="showcase-bullets">
+          <div class="sb"><span class="sb-dot"></span>Plain white, dot grid, square grid, or lined canvas</div>
+          <div class="sb"><span class="sb-dot"></span>Drag-and-drop block reordering in every pane</div>
+          <div class="sb"><span class="sb-dot"></span>[[Note linker with keyboard nav, backlink chips</div>
+          <div class="sb"><span class="sb-dot"></span>Zen / Focus mode with floating toolbar</div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="sv-panes">
+          <div class="sv-pane">
+            <div class="sv-pane-hdr"></div>
+            <div class="sv-block amber"></div>
+            <div class="sv-block" style="height:28px;"></div>
+            <div class="sv-block teal"></div>
+            <div class="sv-block xs"></div>
+            <div class="sv-block xs"></div>
+          </div>
+          <div class="sv-pane" style="border-color:rgba(139,92,246,0.3);">
+            <div class="sv-pane-hdr" style="background:var(--p500);opacity:0.4;"></div>
+            <div class="sv-block" style="height:20px;"></div>
+            <div class="sv-block sm"></div>
+            <div class="sv-block sm"></div>
+            <div class="sv-block xs"></div>
+            <div class="sv-block xs"></div>
+            <div class="sv-block xs"></div>
+          </div>
+          <div class="sv-pane">
+            <div class="sv-pane-hdr" style="width:50%;"></div>
+            <div class="sv-block" style="height:24px;background:var(--rose-bg);border-color:var(--rose);"></div>
+            <div class="sv-block xs"></div>
+            <div class="sv-block xs"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 BLOCK TYPES -->
+  <div class="showcase" style="margin-top:10px;">
+    <div class="showcase-top">
+      <div class="showcase-visual" style="border-right:1px solid var(--border);border-left:none;">
+        <div class="bv-list">
+          <div class="bv-block hyp"><div class="bv-handle"><span></span><span></span><span></span></div><div class="bv-ico">💡</div><div class="bv-label">Hypothesis</div><div class="bv-line"></div></div>
+          <div class="bv-block diff"><div class="bv-handle"><span></span><span></span><span></span></div><div class="bv-ico">⚡</div><div class="bv-label">Key Differences</div><div class="bv-line"></div></div>
+          <div class="bv-block con"><div class="bv-handle"><span></span><span></span><span></span></div><div class="bv-ico">🎯</div><div class="bv-label">Conclusion</div><div class="bv-line"></div></div>
+          <div class="bv-block ai"><div class="bv-handle"><span></span><span></span><span></span></div><div class="bv-ico">✦</div><div class="bv-label">Ask Claude</div><div class="bv-line"></div></div>
+        </div>
+      </div>
+      <div class="showcase-info">
+        <div class="showcase-label"><span style="width:5px;height:5px;border-radius:50%;background:var(--amber);display:inline-block;"></span>BLOCK SYSTEM</div>
+        <div class="showcase-h">14 structured note blocks</div>
+        <div class="showcase-desc">Every block is draggable, commentable, and linkable. Type / to open the searchable block palette. All blocks compile into a structured knowledge graph.</div>
+        <div class="showcase-bullets">
+          <div class="sb"><span class="sb-dot"></span>Hypothesis · Conclusion · Note · Warning · Quote</div>
+          <div class="sb"><span class="sb-dot"></span>Key Differences · Key Findings · Checklist · Table</div>
+          <div class="sb"><span class="sb-dot"></span>Code · Image · Divider · Ask Claude · Ask GPT</div>
+          <div class="sb"><span class="sb-dot"></span>Inline threaded comments — add, reply, resolve</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- PROMPT LIBRARY + SCHEDULED RUNS side by side -->
+  <div class="features-2b" style="margin-bottom:10px;">
+    <div class="showcase" style="margin-bottom:0;">
+      <div class="showcase-info" style="padding:24px 26px;">
+        <div class="showcase-label"><span style="width:5px;height:5px;border-radius:50%;background:var(--amber);display:inline-block;"></span>PROMPT LIBRARY</div>
+        <div class="showcase-h" style="font-size:18px;">Reusable AI prompts</div>
+        <div class="showcase-desc" style="font-size:12.5px;">Save prompts with <code style="font-size:11px;color:var(--p300);">{{variable}}</code> syntax. Schedule them as cron jobs. Pick your AI provider per prompt.</div>
+        <div class="plv">
+          <div class="plv-card">
+            <div class="plv-ico">📈</div>
+            <div class="plv-name">Equity Monitor</div>
+            <div class="plv-cron">⏱ Mon 08:00</div>
+            <div class="plv-ai">C</div>
+            <button class="plv-run">▶</button>
+          </div>
+          <div class="plv-card">
+            <div class="plv-ico">📔</div>
+            <div class="plv-name">Daily Journal Starter</div>
+            <div class="plv-cron">⏱ 07:00 IST</div>
+            <div class="plv-ai">C</div>
+            <button class="plv-run">▶</button>
+          </div>
+          <div class="plv-card">
+            <div class="plv-ico">🔬</div>
+            <div class="plv-name">Research Deep Dive</div>
+            <div style="font-size:9px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex:1;">89 uses</div>
+            <div class="plv-ai">C</div>
+            <button class="plv-run">Use</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="showcase" style="margin-bottom:0;">
+      <div class="showcase-info" style="padding:24px 26px;">
+        <div class="showcase-label"><span style="width:5px;height:5px;border-radius:50%;background:var(--teal);display:inline-block;"></span>SCHEDULED RUNS</div>
+        <div class="showcase-h" style="font-size:18px;">Cron job dashboard</div>
+        <div class="showcase-desc" style="font-size:12.5px;">Full run log with stats, enable/disable toggles, countdown to next run, and one-click retry on failures.</div>
+        <div class="rv">
+          <div class="rv-row">
+            <div class="rv-ico">📈</div>
+            <div class="rv-name">Equity Monitor</div>
+            <div class="rv-status rs-ok">✓ Success</div>
+            <div class="rv-time">08:00</div>
+          </div>
+          <div class="rv-row">
+            <div class="rv-ico">📔</div>
+            <div class="rv-name">Journal Starter</div>
+            <div class="rv-status rs-run">⟳ Running</div>
+            <div class="rv-time">now</div>
+          </div>
+          <div class="rv-row">
+            <div class="rv-ico">🔬</div>
+            <div class="rv-name">Research Summary</div>
+            <div class="rv-status rs-fail">✗ Failed</div>
+            <div class="rv-time">07:02</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HTML NOTES SHOWCASE -->
+  <div class="showcase" style="margin-top:10px;">
+    <div class="showcase-top">
+      <div class="showcase-info">
+        <div class="showcase-label"><span style="width:5px;height:5px;border-radius:50%;background:var(--orange);display:inline-block;"></span>HTML NOTES</div>
+        <div class="showcase-h">AI-generated reports, saved in Lore</div>
+        <div class="showcase-desc">Ask Claude to generate a polished HTML report — financial dashboards, research briefs, interactive tools. Saved as a special HTML Note type, linked to your notebooks, exportable at any time.</div>
+        <div class="showcase-bullets">
+          <div class="sb"><span class="sb-dot"></span>Import existing HTML files by drop, paste, or URL</div>
+          <div class="sb"><span class="sb-dot"></span>Generate via AI with your Prompt Library templates</div>
+          <div class="sb"><span class="sb-dot"></span>Gallery view with live iframe preview</div>
+          <div class="sb"><span class="sb-dot"></span>Link HTML notes to any notebook note</div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="hnv">
+          <div class="hnv-hdr">
+            <div class="hnv-ico">📊</div>
+            <div class="hnv-title">Tata Motors Q4 FY2026</div>
+            <div class="hnv-tag">Auto-generated</div>
+          </div>
+          <div class="hnv-row">
+            <div class="hnv-stat"><div class="hnv-stat-n">₹932</div><div class="hnv-stat-l">Price</div></div>
+            <div class="hnv-stat"><div class="hnv-stat-n">1.24×</div><div class="hnv-stat-l">ROIC/WACC</div></div>
+            <div class="hnv-stat"><div class="hnv-stat-n">−0.82</div><div class="hnv-stat-l">M-Score</div></div>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="hnv-table-row"><div class="hnv-td">Infosys</div><div class="hnv-td">1.68×</div><div class="hnv-td">−2.14</div><div><span class="hnv-pill ok">✓ BUY</span></div></div>
+            <div class="hnv-table-row"><div class="hnv-td">HDFC Bank</div><div class="hnv-td">0.98×</div><div class="hnv-td">−1.24</div><div><span class="hnv-pill warn">⚠ HOLD</span></div></div>
+            <div class="hnv-table-row"><div class="hnv-td">Reliance</div><div class="hnv-td">1.41×</div><div class="hnv-td">−1.89</div><div><span class="hnv-pill ok">✓ BUY</span></div></div>
+          </div>
+          <div style="margin-top:10px;background:rgba(139,92,246,0.08);border-radius:5px;padding:7px 8px;border-left:2px solid var(--p500);">
+            <div style="font-size:8.5px;font-weight:600;color:var(--p400);font-family:'JetBrains Mono',monospace;margin-bottom:3px;">✦ Claude Insight</div>
+            <div style="font-size:10px;color:var(--t3);line-height:1.5;">Infosys leads ROIC/WACC spread. Tata Motors improving fundamentals.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KNOWLEDGE GRAPH -->
+  <div class="showcase" style="margin-top:10px;">
+    <div class="showcase-top">
+      <div class="showcase-visual" style="border-right:1px solid var(--border);border-left:none;">
+        <svg class="gv" viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg">
+          <!-- shelf cluster -->
+          <ellipse cx="140" cy="68" rx="110" ry="58" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.15)" stroke-width="1" stroke-dasharray="5,4"/>
+          <!-- edges -->
+          <g stroke="rgba(139,92,246,0.2)" stroke-width="1.2" fill="none">
+            <line x1="140" y1="68" x2="60" y2="36"/>
+            <line x1="140" y1="68" x2="220" y2="36"/>
+            <line x1="140" y1="68" x2="60" y2="100"/>
+            <line x1="140" y1="68" x2="220" y2="100"/>
+            <line x1="140" y1="68" x2="140" y2="138"/>
+          </g>
+          <!-- cron arrow -->
+          <path d="M190 52 Q230 42 220 100" stroke="rgba(253,211,77,0.5)" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#arr)"/>
+          <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L6,2 z" fill="rgba(253,211,77,0.6)"/></marker></defs>
+          <!-- central node -->
+          <circle cx="140" cy="68" r="28" fill="rgba(124,58,237,0.8)"/>
+          <text x="140" y="64" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="DM Sans,sans-serif">Transformer</text>
+          <text x="140" y="76" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="7" font-family="DM Sans,sans-serif">Architecture</text>
+          <!-- satellites -->
+          <circle cx="60" cy="36" r="16" fill="rgba(15,118,110,0.8)"/>
+          <text x="60" y="39" text-anchor="middle" fill="white" font-size="7.5" font-weight="600" font-family="DM Sans,sans-serif">RAG</text>
+          <circle cx="220" cy="36" r="16" fill="rgba(29,78,216,0.8)"/>
+          <text x="220" y="39" text-anchor="middle" fill="white" font-size="7" font-weight="600" font-family="DM Sans,sans-serif">Roadmap</text>
+          <circle cx="60" cy="100" r="14" fill="rgba(217,119,6,0.8)"/>
+          <text x="60" y="103" text-anchor="middle" fill="white" font-size="7" font-weight="600" font-family="DM Sans,sans-serif">Journal</text>
+          <circle cx="220" cy="100" r="16" fill="rgba(146,64,14,0.8)"/>
+          <text x="220" y="97" text-anchor="middle" fill="white" font-size="6.5" font-weight="600" font-family="DM Sans,sans-serif">Tata Q4</text>
+          <text x="220" y="106" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="5.5" font-family="DM Sans,sans-serif">HTML</text>
+          <circle cx="140" cy="138" r="14" fill="rgba(124,58,237,0.5)"/>
+          <text x="140" y="141" text-anchor="middle" fill="white" font-size="6.5" font-weight="600" font-family="DM Sans,sans-serif">LinAlg</text>
+          <!-- cron label -->
+          <text x="218" y="58" fill="rgba(253,211,77,0.7)" font-size="7.5" font-family="JetBrains Mono,monospace">⏱ cron</text>
+        </svg>
+      </div>
+      <div class="showcase-info">
+        <div class="showcase-label"><span style="width:5px;height:5px;border-radius:50%;background:var(--teal);display:inline-block;"></span>KNOWLEDGE GRAPH</div>
+        <div class="showcase-h">Your entire knowledge, visualised</div>
+        <div class="showcase-desc">An interactive SVG graph of every note connection. Shelf clusters show domain boundaries. Cron output arrows reveal AI-generated notes and their sources.</div>
+        <div class="showcase-bullets">
+          <div class="sb"><span class="sb-dot"></span>Click any node to inspect connections + AI insight</div>
+          <div class="sb"><span class="sb-dot"></span>Shelf cluster outlines — colour-coded domains</div>
+          <div class="sb"><span class="sb-dot"></span>Cron output shown as dashed amber arrows</div>
+          <div class="sb"><span class="sb-dot"></span>Mini graph in right panel per note</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- UX FEATURES GRID -->
+  <div class="section-header">
+    <h2>Every detail, considered</h2>
+    <p>Beyond the core features — the interactions and conveniences that make Lore a pleasure to work in daily.</p>
+  </div>
+  <div class="ux-grid" style="margin-bottom:48px;">
+    <div class="ux-card">
+      <div class="ux-icon">🌙</div>
+      <div class="ux-title">Dark mode</div>
+      <div class="ux-desc">Full CSS variable dark mode — deep purple canvas for late-night sessions.</div>
+      <div class="ux-shortcut"><span class="key">⌘</span><span class="key">⇧</span><span class="key">D</span></div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🧘</div>
+      <div class="ux-title">Zen / Focus mode</div>
+      <div class="ux-desc">Hides sidebar and toolbar. Wide margins. Floating zen bar with word count.</div>
+      <div class="ux-shortcut"><span class="key">⌘</span><span class="key">F</span></div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">⚡</div>
+      <div class="ux-title">Quick Capture</div>
+      <div class="ux-desc">Floating FAB to capture a thought in seconds. Saved directly to Inbox shelf.</div>
+      <div class="ux-shortcut"><span class="key">⌘</span><span class="key">J</span></div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🔍</div>
+      <div class="ux-title">Global Search</div>
+      <div class="ux-desc">Full-screen overlay. Type, shelf, date range filters. Highlighted result matches.</div>
+      <div class="ux-shortcut"><span class="key">⌘</span><span class="key">K</span></div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🔗</div>
+      <div class="ux-title">Share &amp; Embed</div>
+      <div class="ux-desc">Share via link, export MD/PDF/HTML, embed as iframe, push to GitHub Gist.</div>
+      <div class="ux-shortcut"><span class="key">⌘</span><span class="key">⇧</span><span class="key">S</span></div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🔔</div>
+      <div class="ux-title">Notification Centre</div>
+      <div class="ux-desc">Cron completions, AI events, and errors in a slide-in panel. Action buttons per event.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">💬</div>
+      <div class="ux-title">Block Comments</div>
+      <div class="ux-desc">Threaded comments on any block. Reply, resolve, and track open threads.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">📐</div>
+      <div class="ux-title">Template Builder</div>
+      <div class="ux-desc">Drag blocks onto a canvas to design custom note templates. Save and reuse.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🎨</div>
+      <div class="ux-title">Canvas Backgrounds</div>
+      <div class="ux-desc">Plain white, dot grid, square grid, or lined — applied across all panes.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">⌚</div>
+      <div class="ux-title">Version History</div>
+      <div class="ux-desc">Auto-save timeline with named snapshots. Restore any previous version.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">🚀</div>
+      <div class="ux-title">Onboarding Flow</div>
+      <div class="ux-desc">4-step guided intro covering Shelf/Notebook/Note, blocks, AI, and setup.</div>
+    </div>
+    <div class="ux-card">
+      <div class="ux-icon">⌨️</div>
+      <div class="ux-title">Keyboard Shortcuts</div>
+      <div class="ux-desc">Full shortcut system. Press ? anytime to open the cheatsheet overlay.</div>
+      <div class="ux-shortcut"><span class="key">?</span></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section-header">
+    <h2>Fully configurable</h2>
+    <p>Settings across 6 tabs — everything from AI provider keys to appearance, sync, and cron behaviour.</p>
+  </div>
+  <div class="features-3b" style="margin-bottom:48px;">
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">🤖</div>
+      <div class="feat-title" style="font-size:13px;">AI Providers</div>
+      <div class="feat-desc" style="font-size:12px;">API keys for Claude, ChatGPT, Gemini, Groq, OpenRouter. Default model selector across 4 options.</div>
+    </div>
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">👤</div>
+      <div class="feat-title" style="font-size:13px;">Profile &amp; Persona</div>
+      <div class="feat-desc" style="font-size:12px;">Name, timezone, bio, and AI persona context injected into every prompt. Response style chips.</div>
+    </div>
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">⚙️</div>
+      <div class="feat-title" style="font-size:13px;">AI Behaviour</div>
+      <div class="feat-desc" style="font-size:12px;">8 toggles — graph auto-link, note context, persona context, token tracking, HTML gen, cron.</div>
+    </div>
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">🔄</div>
+      <div class="feat-title" style="font-size:13px;">Sync &amp; Export</div>
+      <div class="feat-desc" style="font-size:12px;">GitHub Gist sync with auto-push on save. Export all notes as JSON, Markdown, or ZIP.</div>
+    </div>
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">📋</div>
+      <div class="feat-title" style="font-size:13px;">Templates</div>
+      <div class="feat-desc" style="font-size:12px;">Gallery of 8 built-in templates with visual previews. Template Builder for custom block layouts.</div>
+    </div>
+    <div class="feat-card" style="padding:16px;">
+      <div class="feat-icon">🌗</div>
+      <div class="feat-title" style="font-size:13px;">Appearance</div>
+      <div class="feat-desc" style="font-size:12px;">Light / Dark / System theme. Canvas background picker. Font size selection across all views.</div>
+    </div>
+  </div>
+
+  <!-- DESIGN SYSTEM STRIP -->
+  <div class="ds-strip">
+    <div class="ds-col">
+      <div class="ds-title">Typography</div>
+      <div class="ds-fonts">
+        <div class="ds-font"><strong style="font-family:'Lora',serif;font-size:16px;">Lora</strong> — note titles, headings</div>
+        <div class="ds-font"><strong style="font-family:'DM Sans',sans-serif;">DM Sans</strong> — UI, body, labels</div>
+        <div class="ds-font"><strong style="font-family:'JetBrains Mono',monospace;font-size:12px;">JetBrains Mono</strong> — metadata, badges, code</div>
+      </div>
+    </div>
+    <div class="ds-col">
+      <div class="ds-title">Colour Tokens</div>
+      <div class="color-swatches">
+        <div class="swatch" style="background:#7C3AED;" title="p600"></div>
+        <div class="swatch" style="background:#8B5CF6;" title="p500"></div>
+        <div class="swatch" style="background:#A78BFA;" title="p400"></div>
+        <div class="swatch" style="background:#C4B5FD;" title="p300"></div>
+        <div class="swatch" style="background:#1E1A2E;" title="surface"></div>
+        <div class="swatch" style="background:#0F0D1A;" title="bg"></div>
+        <div class="swatch" style="background:#34D399;" title="teal"></div>
+        <div class="swatch" style="background:#FCD34D;" title="amber"></div>
+        <div class="swatch" style="background:#F472B6;" title="rose"></div>
+        <div class="swatch" style="background:#60A5FA;" title="blue"></div>
+      </div>
+    </div>
+    <div class="ds-col">
+      <div class="ds-title">Block type palette</div>
+      <div class="block-icons">
+        <div class="bi">💡 Hyp</div><div class="bi">🎯 Con</div><div class="bi">📝 Note</div>
+        <div class="bi">⚠️ Warn</div><div class="bi">❝ Quote</div><div class="bi">⚡ KeyDiff</div>
+        <div class="bi">🔑 Findings</div><div class="bi">✅ Check</div><div class="bi">📊 Table</div>
+        <div class="bi">💻 Code</div><div class="bi">🖼️ Image</div><div class="bi">— Divider</div>
+        <div class="bi">✦ Claude</div><div class="bi">✦ GPT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CTA -->
+  <div class="bottom-cta">
+    <div class="cta-h">Ready to build your<br/><span>knowledge base?</span></div>
+    <div class="cta-sub">Start free. Use your own API key. Your data stays yours.</div>
+    <div class="cta-btns">
+      <button class="cta-btn primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z"/></svg>
+        Continue with GitHub
+      </button>
+      <button class="cta-btn secondary">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="16" height="12" rx="2"/><path d="M6 17h8M10 15v2"/></svg>
+        Use Locally — No signup
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:22px;height:22px;border-radius:5px;background:var(--p600);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:10px;font-weight:700;color:white;">L</div>
+    <span style="font-size:13px;color:var(--t3);">Lore · Your knowledge, supercharged by AI</span>
+  </div>
+  <div style="display:flex;gap:18px;">
+    <span style="font-size:12px;color:var(--t4);cursor:pointer;">Docs</span>
+    <span style="font-size:12px;color:var(--t4);cursor:pointer;">Changelog</span>
+    <span style="font-size:12px;color:var(--t4);cursor:pointer;">GitHub</span>
+    <span style="font-size:12px;color:var(--t4);cursor:pointer;">Privacy</span>
+  </div>
+  <span style="font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;">v3.0.0</span>
+</footer>
+
+</div>
+</body>
+</html>

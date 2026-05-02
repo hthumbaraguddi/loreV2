@@ -15,9 +15,15 @@ export class EditorService {
   paneCount = signal<1 | 2 | 3>(1);
   activePane = signal<number>(0);
   
+  // Filter signals
+  private shelfFilterSignal = signal<string | null>(null);
+  private notebookFilterSignal = signal<string | null>(null);
+  
   // Computed signals
   activeNotes = this.activeNotesSignal.asReadonly();
   hasActiveNotes = computed(() => this.activeNotes().some(note => note !== null));
+  shelfFilter = this.shelfFilterSignal.asReadonly();
+  notebookFilter = this.notebookFilterSignal.asReadonly();
 
   constructor(private shelfService: ShelfService) {}
 
@@ -205,5 +211,35 @@ export class EditorService {
     if (targetPaneIndex >= this.paneCount()) {
       this.paneCount.set(Math.min(3, targetPaneIndex + 1) as 1 | 2 | 3);
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // FILTER MANAGEMENT
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Set shelf filter (shows all notes in a shelf)
+   */
+  setShelfFilter(shelfId: string | null): void {
+    this.shelfFilterSignal.set(shelfId);
+    this.notebookFilterSignal.set(null); // Clear notebook filter
+    this.closeAllNotes(); // Close all open notes to show grid
+  }
+
+  /**
+   * Set notebook filter (shows all notes in a notebook)
+   */
+  setNotebookFilter(notebookId: string | null): void {
+    this.notebookFilterSignal.set(notebookId);
+    this.shelfFilterSignal.set(null); // Clear shelf filter
+    this.closeAllNotes(); // Close all open notes to show grid
+  }
+
+  /**
+   * Clear all filters
+   */
+  clearFilters(): void {
+    this.shelfFilterSignal.set(null);
+    this.notebookFilterSignal.set(null);
   }
 }

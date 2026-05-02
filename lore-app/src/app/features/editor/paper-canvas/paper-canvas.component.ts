@@ -1,4 +1,4 @@
-import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShelfService } from '../../../core/services/shelf.service';
 import { BlockService } from '../../../core/services/block.service';
@@ -14,13 +14,28 @@ import { BlockListComponent } from '../../blocks/block-list/block-list.component
   templateUrl: './paper-canvas.component.html',
   styleUrl: './paper-canvas.component.scss'
 })
-export class PaperCanvasComponent {
+export class PaperCanvasComponent implements AfterViewInit {
   private shelfService = inject(ShelfService);
   private blockService = inject(BlockService);
+
+  @ViewChild('noteBodyTextarea') noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('titleElement') titleElement?: ElementRef<HTMLHeadingElement>;
 
   note = input.required<NoteRef>();
   backgroundStyle = input<'plain' | 'dot' | 'square' | 'lined'>('plain');
   readOnly = input<boolean>(false);
+
+  constructor() {
+    // Sync title element with note title when it changes
+    effect(() => {
+      const title = this.fullNote().title;
+      if (this.titleElement?.nativeElement && 
+          this.titleElement.nativeElement.textContent !== title &&
+          document.activeElement !== this.titleElement.nativeElement) {
+        this.titleElement.nativeElement.textContent = title;
+      }
+    });
+  }
 
   // Resolved full note
   fullNote = computed(() => {
@@ -58,6 +73,17 @@ export class PaperCanvasComponent {
     return colors[this.fullNote().type as NoteType] ?? 'var(--lore-color-text-muted)';
   });
 
+  // ─── Lifecycle ─────────────────────────────────────────────
+
+  ngAfterViewInit(): void {
+    // Initialize textarea height on load
+    if (this.noteBodyTextarea?.nativeElement) {
+      setTimeout(() => {
+        this.autoResizeTextarea(this.noteBodyTextarea!.nativeElement);
+      });
+    }
+  }
+
   // ─── Block handlers ────────────────────────────────────────
 
   onBlockAdded(event: { type: BlockType; afterIndex: number }): void {
@@ -82,19 +108,109 @@ export class PaperCanvasComponent {
 
   // ─── Note body handler ─────────────────────────────────────
 
+  onTitleBlur(event: Event): void {
+    const title = (event.target as HTMLElement).textContent?.trim() || 'Untitled';
+    if (title !== this.fullNote().title) {
+      this.shelfService.updateNote(this.fullNote().id, { title });
+    }
+  }
+
+  onTitleEnter(event: KeyboardEvent): void {
+    event.preventDefault();
+    (event.target as HTMLElement).blur();
+  }
+
   onNoteBodyInput(event: Event): void {
-    const content = (event.target as HTMLTextAreaElement).value;
+    const textarea = event.target as HTMLTextAreaElement;
+    const content = textarea.value;
     this.shelfService.updateNote(this.fullNote().id, { content });
+    this.autoResizeTextarea(textarea);
+  }
+
+  private autoResizeTextarea(textarea: HTMLTextAreaElement): void {
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto';
+    // Set height to scrollHeight to fit content
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
 
   // ─── Insert block shortcuts ────────────────────────────────
 
   insertBlock(type: string): void {
     const blockType = this.stringToBlockType(type);
-    if (blockType) {
-      // Add block at the end (after all existing blocks)
+    if (!blockType) return;
+
+    const textarea = this.noteBodyTextarea?.nativeElement;
+    if (!textarea) {
+      // Fallback: add at the end
       const afterIndex = this.blocks().length - 1;
       this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
+      return;
+    }
+
+    const content = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    // Find the current line
+    const beforeCursor = content.substring(0, cursorPos);
+    const afterCursor = content.substring(cursorPos);
+    
+    const lastNewlineBeforeCursor = beforeCursor.lastIndexOf('\n');
+    const nextNewlineAfterCursor = afterCursor.indexOf('\n');
+    
+    const lineStart = lastNewlineBeforeCursor === -1 ? 0 : lastNewlineBeforeCursor + 1;
+    const lineEnd = nextNewlineAfterCursor === -1 ? content.length : cursorPos + nextNewlineAfterCursor;
+    
+    const currentLine = content.substring(lineStart, lineEnd);
+    const isLineEmpty = currentLine.trim().length === 0;
+
+    if (isLineEmpty) {
+      // Current line is empty - insert block here and remove the empty line
+      const beforeLine = content.substring(0, lineStart);
+      const afterLine = content.substring(lineEnd);
+      
+      // Remove the empty line
+      let newContent = beforeLine;
+      if (afterLine.startsWith('\n')) {
+        newContent += afterLine.substring(1);
+      } else {
+        newContent += afterLine;
+      }
+      
+      // Update the note content
+      this.shelfService.updateNote(this.fullNote().id, { content: newContent.trimEnd() });
+      
+      // Add block at the end (blocks always go after text content)
+      const afterIndex = this.blocks().length - 1;
+      this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
+      
+      // Update textarea
+      setTimeout(() => {
+        if (this.noteBodyTextarea?.nativeElement) {
+          this.autoResizeTextarea(this.noteBodyTextarea.nativeElement);
+        }
+      });
+    } else {
+      // Current line has content - add newline and insert block on next line
+      const newContent = content.substring(0, lineEnd) + '\n' + content.substring(lineEnd);
+      
+      // Update the note content
+      this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+      
+      // Add block at the end
+      const afterIndex = this.blocks().length - 1;
+      this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
+      
+      // Update textarea and move cursor
+      setTimeout(() => {
+        if (this.noteBodyTextarea?.nativeElement) {
+          const ta = this.noteBodyTextarea.nativeElement;
+          this.autoResizeTextarea(ta);
+          // Move cursor to the new line
+          ta.selectionStart = ta.selectionEnd = lineEnd + 1;
+          ta.focus();
+        }
+      });
     }
   }
 

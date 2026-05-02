@@ -42,7 +42,7 @@
     </div>
 
     <!-- New Note Button: 26px × 26px, icon 14px × 14px -->
-    <button class="sb-new" title="New Note">
+    <button class="sb-new" title="New Shelf" (click)="createNewShelf()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M8 3v10M3 8h10"/>
       </svg>
@@ -116,18 +116,17 @@
           <div 
             class="shelf-hdr"
             [class.focused]="isFocused(shelf.id)"
-            (click)="toggleShelf(shelf.id); setFocus(shelf.id, 'shelf')"
             (contextmenu)="onShelfContextMenu($event, shelf)"
           >
           <!-- Chevron: 16px × 16px container, 9px × 9px icon -->
-          <div class="sh-chevron">
+          <div class="sh-chevron" (click)="toggleShelf(shelf.id); setFocus(shelf.id, 'shelf')">
             <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M3 2l4 3-4 3"/>
             </svg>
           </div>
           
           <!-- Dot: 8px × 8px -->
-          <div class="sh-dot" [style.background]="shelf.color"></div>
+          <div class="sh-dot" [style.background]="shelf.color" (click)="onShelfClick(shelf.id)"></div>
           
           <!-- Inline rename input or name -->
           @if (isRenaming(shelf.id)) {
@@ -141,7 +140,7 @@
               #renameInput
             />
           } @else {
-            <span class="sh-name">{{ shelf.name }}</span>
+            <span class="sh-name" (click)="onShelfClick(shelf.id)">{{ shelf.name }}</span>
           }
           
           <span class="sh-count">{{ getNoteCount(shelf) }}</span>
@@ -149,7 +148,7 @@
           <!-- Add Button: 18px × 18px, icon 10px × 10px -->
           <button 
             class="sh-add"
-            (click)="$event.stopPropagation()"
+            (click)="createNewNotebookInShelf(shelf.id, $event)"
             title="Add Notebook"
           >
             <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -190,18 +189,17 @@
                 <div 
                   class="nb-hdr"
                   [class.focused]="isFocused(notebook.id)"
-                  (click)="setFocus(notebook.id, 'notebook')"
                   (contextmenu)="onNotebookContextMenu($event, notebook)"
                 >
                 <!-- Chevron: 14px × 14px container, 9px × 9px icon -->
-                <div class="nb-chevron" (click)="toggleNotebook(notebook.id)">
+                <div class="nb-chevron" (click)="toggleNotebook(notebook.id); setFocus(notebook.id, 'notebook')">
                   <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M3 2l4 3-4 3"/>
                   </svg>
                 </div>
                 
                 <!-- Icon: 12px font-size for emoji -->
-                <span class="nb-icon">{{ notebook.icon }}</span>
+                <span class="nb-icon" (click)="onNotebookClick(notebook.id)">{{ notebook.icon }}</span>
                 
                 <!-- Inline rename input or name -->
                 @if (isRenaming(notebook.id)) {
@@ -226,7 +224,7 @@
                 <!-- Add Button: 16px × 16px, icon 9px × 9px -->
                 <button 
                   class="nb-add"
-                  (click)="$event.stopPropagation()"
+                  (click)="createNewNoteInNotebook(notebook.id, $event)"
                   title="Add Note"
                 >
                   <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">

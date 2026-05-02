@@ -28,11 +28,61 @@ export class NotebookGridComponent {
 
   // Computed signals
   notebooks = this.shelfService.notebooks;
+  
+  // Get current filters
+  shelfFilter = this.editorService.shelfFilter;
+  notebookFilter = this.editorService.notebookFilter;
+  
+  // Get filtered shelf or notebook name for display
+  filterContext = computed(() => {
+    const shelfId = this.shelfFilter();
+    const notebookId = this.notebookFilter();
+    
+    if (notebookId) {
+      const notebook = this.shelfService.getNotebook(notebookId);
+      return {
+        type: 'notebook' as const,
+        name: notebook?.name || 'Unknown Notebook',
+        icon: notebook?.icon || '📔'
+      };
+    }
+    
+    if (shelfId) {
+      const shelf = this.shelfService.getShelf(shelfId);
+      return {
+        type: 'shelf' as const,
+        name: shelf?.name || 'Unknown Shelf',
+        color: shelf?.color || '#7C3AED'
+      };
+    }
+    
+    return null;
+  });
+  
   notes = computed(() => {
-    const allNotes = this.shelfService.getAllNotes();
+    const shelfId = this.shelfFilter();
+    const notebookId = this.notebookFilter();
     const tab = this.activeTab();
     const tags = this.selectedTags();
     const sort = this.sortBy();
+
+    // Get notes based on filter
+    let allNotes: Note[];
+    
+    if (notebookId) {
+      // Filter by notebook
+      const notebook = this.shelfService.getNotebook(notebookId);
+      allNotes = notebook ? [...notebook.notes] : [];
+    } else if (shelfId) {
+      // Filter by shelf
+      const shelf = this.shelfService.getShelf(shelfId);
+      allNotes = shelf 
+        ? shelf.notebooks.flatMap(nb => nb.notes)
+        : [];
+    } else {
+      // All notes
+      allNotes = this.shelfService.getAllNotes();
+    }
 
     // Filter by tab
     let filtered = [...allNotes];
@@ -110,15 +160,20 @@ export class NotebookGridComponent {
    * Create new note
    */
   createNewNote(): void {
-    // This would open a modal or direct editor
-    // For now, create a basic note
-    const notebookId = this.notebooks()[0]?.id;
+    const notebookId = this.notebookFilter() || this.notebooks()[0]?.id;
     if (notebookId) {
       const note = this.shelfService.createNote(notebookId, 'New Note', NoteType.Idea);
       if (note) {
         this.openNote(note.id);
       }
     }
+  }
+
+  /**
+   * Clear filters and return to all notes view
+   */
+  clearFilters(): void {
+    this.editorService.clearFilters();
   }
 
   /**

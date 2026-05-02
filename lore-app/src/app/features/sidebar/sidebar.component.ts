@@ -152,6 +152,59 @@ export class SidebarComponent {
     this.expandedShelves.set(newExpanded);
   }
 
+  createNewShelf(): void {
+    const shelf = this.shelfService.createShelf('New Shelf', '#7C3AED', '📚');
+    if (shelf) {
+      // Expand the new shelf
+      const expanded = this.expandedShelves();
+      const newExpanded = new Set(expanded);
+      newExpanded.add(shelf.id);
+      this.expandedShelves.set(newExpanded);
+      
+      // Start renaming the new shelf
+      setTimeout(() => {
+        this.renamingId.set(shelf.id);
+        this.renamingValue.set(shelf.name);
+      }, 100);
+    }
+  }
+
+  createNewNotebookInShelf(shelfId: string, event: Event): void {
+    event.stopPropagation();
+    
+    const notebook = this.shelfService.createNotebook(shelfId, 'New Notebook', '📔');
+    if (notebook) {
+      // Expand the shelf to show the new notebook
+      const expanded = this.expandedShelves();
+      const newExpanded = new Set(expanded);
+      newExpanded.add(shelfId);
+      this.expandedShelves.set(newExpanded);
+      
+      // Start renaming the new notebook
+      setTimeout(() => {
+        this.renamingId.set(notebook.id);
+        this.renamingValue.set(notebook.name);
+      }, 100);
+    }
+  }
+
+  createNewNoteInNotebook(notebookId: string, event: Event): void {
+    event.stopPropagation();
+    
+    const note = this.shelfService.createNote(notebookId, 'New Note', NoteType.Idea);
+    if (note) {
+      // Expand the notebook to show the new note
+      const expanded = this.expandedNotebooks();
+      const newExpanded = new Set(expanded);
+      newExpanded.add(notebookId);
+      this.expandedNotebooks.set(newExpanded);
+      
+      // Set as active note and open in editor
+      this.activeNoteId.set(note.id);
+      this.editorService.openNoteInPane(note.id);
+    }
+  }
+
   isShelfExpanded(shelfId: string): boolean {
     return this.expandedShelves().has(shelfId);
   }
@@ -178,8 +231,13 @@ export class SidebarComponent {
   }
 
   onNotebookClick(notebookId: string): void {
-    // Open notebook view (to be implemented in Phase 3)
-    console.log('Open notebook:', notebookId);
+    // Navigate to notes view with notebook filter
+    this.editorService.setNotebookFilter(notebookId);
+  }
+
+  onShelfClick(shelfId: string): void {
+    // Navigate to notes view with shelf filter
+    this.editorService.setShelfFilter(shelfId);
   }
 
   // ═══════════════════════════════════════════════════════════

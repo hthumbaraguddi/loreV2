@@ -10,7 +10,15 @@
         {{ noteTypeIcon() }}
       </span>
       <div class="note-meta">
-        <h1 class="note-title">{{ fullNote().title }}</h1>
+        <h1 
+          #titleElement
+          class="note-title" 
+          contenteditable="true"
+          (blur)="onTitleBlur($event)"
+          (keydown.enter)="onTitleEnter($any($event))"
+          [attr.aria-label]="'Note title'"
+          spellcheck="false"
+        >{{ fullNote().title }}</h1>
         <div class="note-details">
           <span class="note-date">{{ getRelativeTime(fullNote().updatedAt) }}</span>
           <span class="note-status" [class]="fullNote().status">{{ fullNote().status }}</span>
@@ -25,12 +33,13 @@
 
     <!-- Note body (simple text area) -->
     <textarea
+      #noteBodyTextarea
       class="note-body"
       [value]="fullNote().content"
       (input)="onNoteBodyInput($event)"
       [readOnly]="readOnly()"
       placeholder="Continue writing… / for blocks, @ for AI, [[ to link"
-      rows="6"
+      rows="1"
     ></textarea>
 
     <!-- Block list -->
@@ -43,9 +52,11 @@
       (blockReordered)="onBlockReordered($event)"
       (duplicateRequested)="onDuplicateBlock($event)"
     />
+  </div>
 
-    <!-- Insert section (block shortcuts) -->
-    @if (!readOnly()) {
+  <!-- Insert section (block shortcuts) - Fixed bottom overlay -->
+  @if (!readOnly()) {
+    <div class="insert-overlay">
       <div class="slash-hint">
         <span class="shl">Insert:</span>
         <span class="shk" (click)="insertBlock('hypothesis')"><kbd>H</kbd> Hypothesis</span>
@@ -55,6 +66,6 @@
         <span class="shk" (click)="insertBlock('code')"><kbd>`</kbd> Code</span>
         <span class="shk" (click)="insertBlock('ask-claude')">✦ AI block</span>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>

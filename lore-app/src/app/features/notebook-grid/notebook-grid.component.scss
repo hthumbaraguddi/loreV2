@@ -59,6 +59,18 @@
   svg {
     color: var(--p600);
   }
+  
+  .shelf-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .notebook-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
 }
 
 .nbgv-sub {

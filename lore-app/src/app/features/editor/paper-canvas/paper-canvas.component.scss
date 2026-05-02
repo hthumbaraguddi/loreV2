@@ -7,8 +7,8 @@
 
 .canvas-content {
   position: relative; z-index: 1;
-  padding: 48px 64px 80px;
-  max-width: 820px; margin: 0 auto; min-height: 100%;
+  padding: 48px 80px 120px;
+  max-width: 1100px; margin: 0 auto; min-height: 100%;
 }
 
 /* ── Note header ── */
@@ -28,6 +28,21 @@
   font-size: var(--lore-font-size-3xl);
   font-weight: 700; color: var(--lore-color-text-default);
   margin: 0 0 var(--lore-space-8); line-height: 1.2;
+  outline: none;
+  cursor: text;
+  border-radius: var(--lore-radius-sm);
+  padding: 2px 4px;
+  margin-left: -4px;
+  transition: background 120ms;
+}
+
+.note-title:hover {
+  background: var(--lore-color-bg-surface-2);
+}
+
+.note-title:focus {
+  background: var(--lore-color-bg-surface-2);
+  box-shadow: 0 0 0 2px var(--lore-color-accent-subtle);
 }
 
 .note-details {
@@ -57,18 +72,43 @@
   outline: none; font-family: var(--lore-font-serif);
   font-size: 15.5px; line-height: 1.85;
   color: var(--lore-color-text-muted); resize: none;
-  min-height: 180px; caret-color: var(--lore-color-accent);
-  margin-bottom: 20px; display: block;
+  min-height: 5px; /* Reduced from 180px so empty notes don't have huge gap */
+  caret-color: var(--lore-color-accent);
+  margin-bottom: 32px; display: block;
+  overflow: hidden; /* Hide scrollbar as it auto-expands */
 }
 .note-body::placeholder {
   color: var(--lore-color-text-faint); font-style: italic;
+}
+/* When textarea has content, it will auto-expand via JS */
+.note-body:not(:placeholder-shown) {
+  min-height: 10px;
+}
+
+/* ── Insert overlay (fixed at bottom of canvas) ── */
+.insert-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: linear-gradient(to top, var(--lore-color-bg-canvas) 70%, transparent);
+  padding: 24px 0 16px;
+  pointer-events: none;
 }
 
 /* ── Slash hint (Insert section) ── */
 .slash-hint {
   display: flex; align-items: center; gap: 5px;
-  padding: 9px 0 0; flex-wrap: wrap; margin-top: 8px;
-  border-top: 1px solid var(--lore-color-border);
+  padding: 12px 20px;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--lore-color-bg-surface);
+  border: 1px solid var(--lore-color-border);
+  border-radius: var(--lore-radius-lg);
+  box-shadow: var(--lore-shadow-md);
+  pointer-events: auto;
 }
 
 .shl {

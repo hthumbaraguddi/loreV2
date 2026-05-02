@@ -4,6 +4,7 @@
 
 .sidebar {
   width: var(--lore-sidebar-width);
+  height: 100%;
   background: var(--lore-color-bg-sidebar); /* #F0EEF9 - light purple */
   border-right: 1px solid var(--lore-primitive-grey-200); /* #E2E0EC - sidebar border */
   display: flex;
@@ -290,6 +291,34 @@
   flex: 1;
   overflow-y: auto;
   padding: 6px 0 16px;
+  
+  /* Ensure scrollbar is visible - Webkit (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(109, 40, 217, 0.05);
+    border-radius: 5px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(109, 40, 217, 0.3);
+    border-radius: 5px;
+    border: 2px solid var(--lore-color-bg-sidebar);
+    
+    &:hover {
+      background: rgba(109, 40, 217, 0.5);
+    }
+    
+    &:active {
+      background: rgba(109, 40, 217, 0.6);
+    }
+  }
+  
+  /* Firefox scrollbar */
+  scrollbar-width: auto;
+  scrollbar-color: rgba(109, 40, 217, 0.3) rgba(109, 40, 217, 0.05);
 }
 
 .sb-empty {

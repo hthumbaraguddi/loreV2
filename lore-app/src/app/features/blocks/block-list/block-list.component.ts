@@ -31,14 +31,6 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
           />
         </div>
       }
-
-      <!-- Empty state -->
-      @if (blocks().length === 0 && !readOnly()) {
-        <div class="empty-state" (click)="onAddBlock({ afterIndex: -1 })">
-          <span class="material-symbols-outlined">add_circle_outline</span>
-          <p>Click to add your first block, or type <kbd>/</kbd> to open the block picker</p>
-        </div>
-      }
     </div>
 
     <!-- Slash palette -->
@@ -57,17 +49,6 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
   styles: [`
     .block-list { display: flex; flex-direction: column; gap: var(--lore-space-4); }
     .block-row { position: relative; }
-    .empty-state {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 120px; border: 2px dashed var(--lore-color-border);
-      border-radius: var(--lore-radius-lg); cursor: pointer; color: var(--lore-color-text-muted);
-      gap: var(--lore-space-8); padding: var(--lore-space-24);
-      transition: all 120ms;
-      &:hover { border-color: var(--lore-color-accent); background: var(--lore-color-accent-subtle); }
-      .material-symbols-outlined { font-size: 32px; }
-      p { margin: 0; font-size: var(--lore-font-size-md); text-align: center; }
-      kbd { background: var(--lore-color-bg-surface-2); border: 1px solid var(--lore-color-border); border-radius: 4px; padding: 1px 5px; font-size: 12px; }
-    }
     .palette-overlay {
       position: fixed; inset: 0; z-index: 100;
     }

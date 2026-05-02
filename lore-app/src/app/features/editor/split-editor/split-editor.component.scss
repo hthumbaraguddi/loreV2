@@ -10,6 +10,14 @@
   flex-direction: column;
   height: 100%;
   background: var(--lore-color-bg-canvas);
+  overflow: hidden;
+  
+  // Ensure notebook-grid can scroll properly
+  lore-notebook-grid {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
 }
 
 .editor-toolbar {

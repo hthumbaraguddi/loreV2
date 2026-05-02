@@ -1,11 +1,19 @@
 @use '../../../styles/tokens' as *;
 
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .notebook-grid {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   background: var(--bg);
+  min-height: 0; // Allows flex child to shrink below content size
+  width: 100%;
 }
 
 /* Header */
@@ -147,7 +155,32 @@
 .nbgv-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px 24px;
+  min-height: 0; // Allows flex child to shrink and enable scrolling
+  
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 5px;
+    border: 2px solid var(--bg);
+    
+    &:hover {
+      background: var(--p300);
+    }
+  }
+  
+  // Firefox scrollbar styling
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) var(--bg);
 }
 
 /* Toolbar */
@@ -162,20 +195,27 @@
 .nbgv-filter {
   padding: 4px 11px;
   border-radius: 20px;
-  border: 1px solid var(--border2);
+  border: 1.5px solid rgba(109, 40, 217, 0.25);
   background: var(--surface);
   font-size: 11.5px;
   color: var(--t2);
   cursor: pointer;
-  transition: 0.12s;
+  transition: all 0.15s ease;
   font-family: 'DM Sans', sans-serif;
   white-space: nowrap;
   
-  &:hover,
+  &:hover:not(.active) {
+    border-color: var(--p400);
+    background: var(--p50);
+    color: var(--p600);
+    transform: translateY(-1px);
+  }
+  
   &.active {
     background: var(--p600);
     border-color: var(--p600);
     color: white;
+    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.2);
   }
   
   [data-theme="dark"] &.active {

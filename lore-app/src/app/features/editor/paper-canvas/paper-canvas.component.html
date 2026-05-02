@@ -37,6 +37,7 @@
       class="note-body"
       [value]="fullNote().content"
       (input)="onNoteBodyInput($event)"
+      (keydown)="onNoteBodyKeydown($event)"
       [readOnly]="readOnly()"
       placeholder="Continue writing… / for blocks, @ for AI, [[ to link"
       rows="1"

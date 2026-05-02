@@ -127,6 +127,89 @@ export class PaperCanvasComponent implements AfterViewInit {
     this.autoResizeTextarea(textarea);
   }
 
+  onNoteBodyKeydown(event: KeyboardEvent): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const content = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    // Check for slash command trigger
+    if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      // Check if slash is at start of line or preceded by whitespace
+      const beforeCursor = content.substring(0, cursorPos);
+      const lastChar = beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
+      const isStartOfLine = cursorPos === 0 || beforeCursor.endsWith('\n') || beforeCursor.endsWith(' ');
+      
+      if (isStartOfLine || lastChar === ' ' || lastChar === '\n' || lastChar === '') {
+        event.preventDefault();
+        this.triggerSlashCommand(textarea, cursorPos);
+        return;
+      }
+    }
+
+    // Check for @ mention trigger
+    if (event.key === '@' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      // Check if @ is at start of line or preceded by whitespace
+      const beforeCursor = content.substring(0, cursorPos);
+      const lastChar = beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
+      const isStartOfLine = cursorPos === 0 || beforeCursor.endsWith('\n') || beforeCursor.endsWith(' ');
+      
+      if (isStartOfLine || lastChar === ' ' || lastChar === '\n' || lastChar === '') {
+        event.preventDefault();
+        this.triggerMention(textarea, cursorPos);
+        return;
+      }
+    }
+
+    // Check for [[ link trigger
+    if (event.key === '[' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      const beforeCursor = content.substring(0, cursorPos);
+      // Check if we have a single [ before cursor (would make [[)
+      if (beforeCursor.length > 0 && beforeCursor[beforeCursor.length - 1] === '[') {
+        event.preventDefault();
+        this.triggerLink(textarea, cursorPos);
+        return;
+      }
+    }
+
+    // Allow Escape to cancel any in-progress operation
+    if (event.key === 'Escape') {
+      // Currently no operation to cancel, but we could add state for this later
+      return;
+    }
+  }
+
+  private triggerSlashCommand(textarea: HTMLTextAreaElement, cursorPos: number): void {
+    // Use the existing insertBlock logic which handles line detection
+    // We'll insert a default 'note' block
+    this.insertBlock('note');
+  }
+
+  private triggerMention(textarea: HTMLTextAreaElement, cursorPos: number): void {
+    // Use the existing insertBlock logic for AI block
+    this.insertBlock('ask-claude');
+  }
+
+  private triggerLink(textarea: HTMLTextAreaElement, cursorPos: number): void {
+    // When user types [[, insert a link placeholder
+    const content = textarea.value;
+    const beforeCursor = content.substring(0, cursorPos - 1); // Remove the first [
+    const afterCursor = content.substring(cursorPos);
+    
+    // Insert link placeholder
+    const newContent = beforeCursor + '[[Link Title]]' + afterCursor;
+    this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+    
+    // Position cursor between [[ and ]]
+    setTimeout(() => {
+      if (this.noteBodyTextarea?.nativeElement) {
+        const ta = this.noteBodyTextarea.nativeElement;
+        // Position cursor after "[["
+        ta.selectionStart = ta.selectionEnd = cursorPos + 1;
+        ta.focus();
+      }
+    });
+  }
+
   private autoResizeTextarea(textarea: HTMLTextAreaElement): void {
     // Reset height to auto to get the correct scrollHeight
     textarea.style.height = 'auto';

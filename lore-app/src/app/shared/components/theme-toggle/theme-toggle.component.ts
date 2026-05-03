@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../core/services/theme.service';
 
@@ -10,11 +10,11 @@ import { ThemeService } from '../../../core/services/theme.service';
     <button 
       class="theme-toggle"
       (click)="toggleTheme()"
-      [attr.aria-label]="'Switch to ' + (isDark() ? 'light' : 'dark') + ' theme'"
-      [title]="'Switch to ' + (isDark() ? 'light' : 'dark') + ' theme (⌘⇧D)'"
+      [attr.aria-label]="'Switch to ' + (themeService.appliedTheme() === 'dark' ? 'light' : 'dark') + ' theme'"
+      [title]="'Switch to ' + (themeService.appliedTheme() === 'dark' ? 'light' : 'dark') + ' theme (⌘⇧D)'"
     >
       <span class="material-symbols-outlined">
-        {{ iconName() }}
+        {{ themeService.appliedTheme() === 'light' ? 'dark_mode' : 'light_mode' }}
       </span>
     </button>
   `,
@@ -49,11 +49,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   `]
 })
 export class ThemeToggleComponent {
-  private themeService = inject(ThemeService);
-
-  // Computed signal that automatically updates when appliedTheme changes
-  isDark = computed(() => this.themeService.appliedTheme() === 'dark');
-  iconName = computed(() => this.isDark() ? 'light_mode' : 'dark_mode');
+  themeService = inject(ThemeService);
 
   toggleTheme() {
     this.themeService.toggleTheme();

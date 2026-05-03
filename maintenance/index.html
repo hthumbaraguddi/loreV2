@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lore is currently undergoing a redesign. We will be back soon.">
+    <title>Lore | Under Maintenance</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-1: #3b82f6;
+            --accent-2: #8b5cf6;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 4rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .icon-wrapper {
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(to right, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin: 0 0 2.5rem 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            width: 30%;
+            border-radius: 10px;
+            animation: load 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+
+        @keyframes load {
+            0% { width: 10%; transform: translateX(0); }
+            100% { width: 40%; transform: translateX(250%); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-wrapper">
+            <div class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+            </div>
+        </div>
+        <h1>We're Brewing Something Special</h1>
+        <p>Lore is currently undergoing a complete aesthetic and functional redesign. We are building a significantly more powerful and beautiful experience. We will be back online shortly.</p>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+</body>
+</html>

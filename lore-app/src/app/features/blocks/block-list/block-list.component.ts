@@ -36,7 +36,13 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
     <!-- Slash palette -->
     @if (paletteOpen()) {
       <div class="palette-overlay" (click)="closePalette()">
-        <div class="palette-anchor" (click)="$event.stopPropagation()">
+        <div 
+          class="palette-anchor" 
+          (click)="$event.stopPropagation()"
+          [style.position]="'fixed'"
+          [style.left.px]="palettePosition().x"
+          [style.top.px]="palettePosition().y"
+        >
           <lore-slash-palette
             [afterIndex]="paletteAfterIndex()"
             (selected)="onPaletteSelect($event)"
@@ -81,17 +87,24 @@ export class BlockListComponent {
 
   paletteOpen = signal(false);
   paletteAfterIndex = signal(0);
+  palettePosition = signal({ x: 0, y: 0 });
 
   onDrop(event: CdkDragDrop<Block[]>): void {
     if (event.previousIndex === event.currentIndex) return;
     this.blockReordered.emit({ fromIndex: event.previousIndex, toIndex: event.currentIndex });
   }
 
-  onAddBlock(event: { afterIndex: number; type?: BlockType }): void {
+  onAddBlock(event: { afterIndex: number; type?: BlockType; clickPosition?: { x: number; y: number } }): void {
     if (event.type) {
       this.blockAdded.emit({ type: event.type, afterIndex: event.afterIndex });
     } else {
       this.paletteAfterIndex.set(event.afterIndex);
+      if (event.clickPosition) {
+        this.palettePosition.set(event.clickPosition);
+      } else {
+        // Default position if no click position provided
+        this.palettePosition.set({ x: 100, y: 100 });
+      }
       this.paletteOpen.set(true);
     }
   }

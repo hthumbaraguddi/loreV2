@@ -1,6 +1,6 @@
 import {
   Component, input, output, signal, computed,
-  ChangeDetectionStrategy, HostListener
+  ChangeDetectionStrategy, HostListener, ViewChild, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -56,8 +56,7 @@ import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
         [visible]="hovered() || focused()"
         (deleteRequested)="blockDeleted.emit(block().id)"
         (duplicateRequested)="duplicateRequested.emit(block().id)"
-        (addAboveRequested)="addBlockAfter.emit({ afterIndex: index() - 1 })"
-        (addBelowRequested)="addBlockAfter.emit({ afterIndex: index() })"
+        (addAboveRequested)="onAddAboveFromToolbar($event)"
         (typeChangeRequested)="onTypeChange($event)"
       />
 
@@ -111,7 +110,12 @@ import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
 
       <!-- Add block below button (shows on hover) -->
       @if (!readOnly() && (hovered() || focused())) {
-        <button class="add-below" (click)="addBlockAfter.emit({ afterIndex: index() })" title="Add block below (⌘Enter)">
+        <button 
+          #addBelowButton
+          class="add-below" 
+          (click)="onAddBelowClick($event)" 
+          title="Add block below (⌘Enter)"
+        >
           <span class="material-symbols-outlined">add</span>
         </button>
       }
@@ -152,13 +156,15 @@ export class BlockContainerComponent {
 
   blockChanged = output<Block>();
   blockDeleted = output<string>();
-  addBlockAfter = output<{ afterIndex: number; type?: BlockType }>();
+  addBlockAfter = output<{ afterIndex: number; type?: BlockType; clickPosition?: { x: number; y: number } }>();
   duplicateRequested = output<string>();
   focusedBlock = output<string>();
 
   BlockType = BlockType;
   hovered = signal(false);
   focused = signal(false);
+
+  @ViewChild('addBelowButton') addBelowButton?: ElementRef<HTMLButtonElement>;
 
   onChanged(event: { blockId: string; content?: string; metadata?: Record<string, any> }): void {
     this.blockChanged.emit({
@@ -171,4 +177,30 @@ export class BlockContainerComponent {
   onTypeChange(type: BlockType): void {
     this.blockChanged.emit({ ...this.block(), type });
   }
+
+  onAddBelowClick(event: MouseEvent): void {
+    if (this.addBelowButton?.nativeElement) {
+      const rect = this.addBelowButton.nativeElement.getBoundingClientRect();
+      const clickPosition = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+      this.addBlockAfter.emit({ 
+        afterIndex: this.index(), 
+        clickPosition 
+      });
+    } else {
+      // Fallback to just emitting the index
+      this.addBlockAfter.emit({ afterIndex: this.index() });
+    }
+  }
+
+  onAddAboveFromToolbar(event: { clickPosition: { x: number; y: number } }): void {
+    this.addBlockAfter.emit({ 
+      afterIndex: this.index() - 1,
+      clickPosition: event.clickPosition
+    });
+  }
+
+
 }

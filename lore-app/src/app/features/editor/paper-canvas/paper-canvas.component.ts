@@ -5,11 +5,12 @@ import { BlockService } from '../../../core/services/block.service';
 import { Note, NoteType, NoteRef, Block, BlockType } from '../../../core/models/shelf.model';
 import { CanvasBackgroundComponent } from '../canvas-background/canvas-background.component';
 import { BlockListComponent } from '../../blocks/block-list/block-list.component';
+import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette.component';
 
 @Component({
   selector: 'lore-paper-canvas',
   standalone: true,
-  imports: [CommonModule, CanvasBackgroundComponent, BlockListComponent],
+  imports: [CommonModule, CanvasBackgroundComponent, BlockListComponent, FileLinkPaletteComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './paper-canvas.component.html',
   styleUrl: './paper-canvas.component.scss'
@@ -24,6 +25,11 @@ export class PaperCanvasComponent implements AfterViewInit {
   note = input.required<NoteRef>();
   backgroundStyle = input<'plain' | 'dot' | 'square' | 'lined'>('plain');
   readOnly = input<boolean>(false);
+
+  // File link palette state
+  showLinkPalette = signal(false);
+  linkPaletteCursorPos = signal(0);
+  linkPalettePosition = signal({ x: 0, y: 0 });
 
   constructor() {
     // Sync title element with note title when it changes
@@ -190,20 +196,32 @@ export class PaperCanvasComponent implements AfterViewInit {
   }
 
   private triggerLink(textarea: HTMLTextAreaElement, cursorPos: number): void {
-    // When user types [[, insert a link placeholder
+    // When user types [[, show file link palette
     const content = textarea.value;
     const beforeCursor = content.substring(0, cursorPos - 1); // Remove the first [
     const afterCursor = content.substring(cursorPos);
     
-    // Insert link placeholder
-    const newContent = beforeCursor + '[[Link Title]]' + afterCursor;
+    // Insert [[ placeholder
+    const newContent = beforeCursor + '[[]]' + afterCursor;
     this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+    
+    // Store cursor position and show palette
+    this.linkPaletteCursorPos.set(cursorPos + 1); // Position between [[]]
+    this.showLinkPalette.set(true);
+    
+    // Calculate position for palette (near cursor)
+    const textareaRect = textarea.getBoundingClientRect();
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20;
+    const linesBeforeCursor = (content.substring(0, cursorPos).match(/\n/g) || []).length;
+    const paletteY = textareaRect.top + (linesBeforeCursor * lineHeight) + lineHeight;
+    const paletteX = textareaRect.left + 20;
+    
+    this.linkPalettePosition.set({ x: paletteX, y: paletteY });
     
     // Position cursor between [[ and ]]
     setTimeout(() => {
       if (this.noteBodyTextarea?.nativeElement) {
         const ta = this.noteBodyTextarea.nativeElement;
-        // Position cursor after "[["
         ta.selectionStart = ta.selectionEnd = cursorPos + 1;
         ta.focus();
       }
@@ -215,6 +233,66 @@ export class PaperCanvasComponent implements AfterViewInit {
     textarea.style.height = 'auto';
     // Set height to scrollHeight to fit content
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  // ─── File link palette handlers ─────────────────────────────
+
+  onLinkPaletteSelect(event: { noteId: string; noteTitle: string; cursorPosition: number }): void {
+    const textarea = this.noteBodyTextarea?.nativeElement;
+    if (!textarea) return;
+
+    const content = textarea.value;
+    const cursorPos = event.cursorPosition;
+    
+    // Find the [[ placeholder
+    const beforeCursor = content.substring(0, cursorPos - 2); // Before [[
+    const afterCursor = content.substring(cursorPos + 2); // After ]]
+    
+    // Replace [[ placeholder with [[Note Title]]
+    const newContent = beforeCursor + `[[${event.noteTitle}]]` + afterCursor;
+    this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+    
+    // Close palette
+    this.showLinkPalette.set(false);
+    
+    // Update cursor position after the link
+    setTimeout(() => {
+      if (this.noteBodyTextarea?.nativeElement) {
+        const ta = this.noteBodyTextarea.nativeElement;
+        const newCursorPos = cursorPos - 2 + event.noteTitle.length + 4; // Position after [[Note Title]]
+        ta.selectionStart = ta.selectionEnd = newCursorPos;
+        ta.focus();
+        this.autoResizeTextarea(ta);
+      }
+    });
+  }
+
+  onLinkPaletteDismiss(): void {
+    this.showLinkPalette.set(false);
+    
+    // If palette is dismissed, remove the [[ placeholder
+    const textarea = this.noteBodyTextarea?.nativeElement;
+    if (textarea) {
+      const content = textarea.value;
+      const cursorPos = this.linkPaletteCursorPos();
+      
+      // Find and remove [[ placeholder
+      const beforeCursor = content.substring(0, cursorPos - 2); // Before [[
+      const afterCursor = content.substring(cursorPos + 2); // After ]]
+      
+      const newContent = beforeCursor + afterCursor;
+      this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+      
+      // Restore cursor position
+      setTimeout(() => {
+        if (this.noteBodyTextarea?.nativeElement) {
+          const ta = this.noteBodyTextarea.nativeElement;
+          ta.selectionStart = ta.selectionEnd = cursorPos - 2;
+          ta.focus();
+          this.autoResizeTextarea(ta);
+        }
+      });
+    }
   }
 
   // ─── Insert block shortcuts ────────────────────────────────

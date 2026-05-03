@@ -26,7 +26,7 @@ export const BLOCK_TYPE_MENU: { type: BlockType; label: string; icon: string }[]
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="block-toolbar" role="toolbar" aria-label="Block actions" [class.visible]="visible()">
-      <button class="tb-btn" (click)="addAboveRequested.emit()" title="Add block above" aria-label="Add block above">
+      <button class="tb-btn" (click)="onAddAboveClick($event)" title="Add block above" aria-label="Add block above">
         <span class="material-symbols-outlined">add_circle</span>
       </button>
       <button class="tb-btn" (click)="duplicateRequested.emit()" title="Duplicate" aria-label="Duplicate block">
@@ -119,8 +119,7 @@ export class BlockToolbarComponent {
   duplicateRequested = output<void>();
   typeChangeRequested = output<BlockType>();
   commentRequested = output<void>();
-  addAboveRequested = output<void>();
-  addBelowRequested = output<void>();
+  addAboveRequested = output<{ clickPosition: { x: number; y: number } }>();
 
   typePickerOpen = signal(false);
   blockTypes = BLOCK_TYPE_MENU;
@@ -133,4 +132,15 @@ export class BlockToolbarComponent {
     this.typePickerOpen.set(false);
     this.typeChangeRequested.emit(type);
   }
+
+  onAddAboveClick(event: MouseEvent): void {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    const clickPosition = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+    this.addAboveRequested.emit({ clickPosition });
+  }
+
+
 }

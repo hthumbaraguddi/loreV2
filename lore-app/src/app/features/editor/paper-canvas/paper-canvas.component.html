@@ -69,4 +69,17 @@
       </div>
     </div>
   }
+
+  <!-- File link palette overlay -->
+  @if (showLinkPalette()) {
+    <div class="palette-overlay" (click)="onLinkPaletteDismiss()">
+      <div class="palette-anchor" (click)="$event.stopPropagation()" [style.position]="'fixed'" [style.top.px]="linkPalettePosition().y" [style.left.px]="linkPalettePosition().x">
+        <lore-file-link-palette
+          [cursorPosition]="linkPaletteCursorPos()"
+          (selected)="onLinkPaletteSelect($event)"
+          (dismissed)="onLinkPaletteDismiss()"
+        />
+      </div>
+    </div>
+  }
 </div>

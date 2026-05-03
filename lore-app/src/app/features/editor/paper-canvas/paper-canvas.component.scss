@@ -135,3 +135,17 @@
   border: 1px solid var(--lore-color-border-strong);
   border-radius: 3px; padding: 0 4px; font-family: inherit;
 }
+
+
+/* ── File link palette overlay ── */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.palette-anchor {
+  position: fixed;
+  z-index: 101;
+}

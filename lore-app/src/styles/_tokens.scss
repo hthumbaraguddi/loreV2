@@ -89,39 +89,40 @@
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SEMANTIC TOKENS - LIGHT MODE
+  // Based on lore-landing-light-purple.html
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // Backgrounds
-  --lore-color-bg-canvas: var(--lore-primitive-grey-0);
-  --lore-color-bg-sidebar: var(--lore-primitive-grey-100);
-  --lore-color-bg-nav: var(--lore-primitive-purple-150);
+  // Backgrounds (updated to match landing page)
+  --lore-color-bg-canvas: #F6F4FF;
+  --lore-color-bg-sidebar: #EEE9FF;
+  --lore-color-bg-nav: #E6DFFF;
   --lore-color-bg-overlay: rgba(26, 22, 37, 0.48);
   --lore-color-bg-tooltip: var(--lore-primitive-grey-800);
 
-  // Surfaces
-  --lore-color-surface-default: var(--lore-primitive-grey-0);
-  --lore-color-surface-subtle: var(--lore-primitive-grey-50);
-  --lore-color-surface-recessed: var(--lore-primitive-grey-100);
+  // Surfaces (updated to match landing page)
+  --lore-color-surface-default: #FFFFFF;
+  --lore-color-surface-subtle: #F2EEFF;
+  --lore-color-surface-recessed: #EEE9FF;
   --lore-color-surface-inverse: var(--lore-primitive-grey-900);
 
-  // Borders
-  --lore-color-border-default: rgba(109, 40, 217, 0.09);
-  --lore-color-border-subtle: rgba(109, 40, 217, 0.05);
-  --lore-color-border-strong: rgba(109, 40, 217, 0.20);
+  // Borders (updated to match landing page)
+  --lore-color-border-default: rgba(124, 58, 237, 0.12);
+  --lore-color-border-subtle: rgba(124, 58, 237, 0.06);
+  --lore-color-border-strong: rgba(124, 58, 237, 0.26);
   --lore-color-border-accent: var(--lore-primitive-purple-600);
 
-  // Text
-  --lore-color-text-default: var(--lore-primitive-grey-900);
-  --lore-color-text-muted: var(--lore-primitive-grey-600);
-  --lore-color-text-faint: var(--lore-primitive-grey-500);
-  --lore-color-text-subtle: var(--lore-primitive-grey-400);
+  // Text (updated to match landing page)
+  --lore-color-text-default: #1A1130;
+  --lore-color-text-muted: #3B2F62;
+  --lore-color-text-faint: #7B6F9A;
+  --lore-color-text-subtle: #A89EC8;
   --lore-color-text-inverse: var(--lore-primitive-grey-0);
   --lore-color-text-accent: var(--lore-primitive-purple-700);
   --lore-color-text-on-accent: #FFFFFF;
 
-  // Icons
-  --lore-color-icon-default: var(--lore-primitive-grey-600);
-  --lore-color-icon-muted: var(--lore-primitive-grey-400);
+  // Icons (updated to match landing page)
+  --lore-color-icon-default: #3B2F62;
+  --lore-color-icon-muted: #7B6F9A;
   --lore-color-icon-accent: var(--lore-primitive-purple-600);
   --lore-color-icon-on-dark: #FFFFFF;
 
@@ -135,14 +136,14 @@
   --lore-color-accent-border: var(--lore-primitive-purple-300);
 
   // Success
-  --lore-color-success: var(--lore-primitive-green-700);
-  --lore-color-success-bg: var(--lore-primitive-green-50);
+  --lore-color-success: #16A34A;
+  --lore-color-success-bg: rgba(22, 163, 74, 0.09);
   --lore-color-success-border: var(--lore-primitive-green-300);
 
-  // State Overlays
-  --lore-color-state-hover: rgba(109, 40, 217, 0.06);
-  --lore-color-state-active: rgba(109, 40, 217, 0.12);
-  --lore-color-state-selected: rgba(109, 40, 217, 0.10);
+  // State Overlays (updated to match landing page)
+  --lore-color-state-hover: rgba(124, 58, 237, 0.07);
+  --lore-color-state-active: rgba(124, 58, 237, 0.12);
+  --lore-color-state-selected: rgba(124, 58, 237, 0.10);
   --lore-color-state-focus-ring: rgba(124, 58, 237, 0.35);
   --lore-color-state-disabled-fill: var(--lore-primitive-grey-150);
   --lore-color-state-disabled-text: var(--lore-primitive-grey-400);
@@ -226,17 +227,18 @@
   --lore-radius-full: 9999px;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SHADOWS
+  // SHADOWS (updated to match landing page)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  --lore-shadow-sm: 0 1px 2px rgba(26, 22, 37, 0.06), 0 0 1px rgba(26, 22, 37, 0.04);
-  --lore-shadow-md: 0 4px 12px rgba(26, 22, 37, 0.08), 0 1px 3px rgba(26, 22, 37, 0.06);
-  --lore-shadow-lg: 0 12px 32px rgba(26, 22, 37, 0.12), 0 4px 12px rgba(26, 22, 37, 0.08);
-  --lore-shadow-overlay: 0 24px 64px rgba(26, 22, 37, 0.20), 0 8px 24px rgba(26, 22, 37, 0.12);
+  --lore-shadow-sm: 0 1px 2px rgba(80, 40, 180, 0.06), 0 0 1px rgba(80, 40, 180, 0.04);
+  --lore-shadow-md: 0 4px 24px rgba(80, 40, 180, 0.08);
+  --lore-shadow-lg: 0 12px 32px rgba(80, 40, 180, 0.12), 0 4px 12px rgba(80, 40, 180, 0.08);
+  --lore-shadow-overlay: 0 24px 64px rgba(80, 40, 180, 0.20), 0 8px 24px rgba(80, 40, 180, 0.12);
   --lore-shadow-focus-ring: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(124, 58, 237, 0.35);
   --lore-shadow-focus-ring-error: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(201, 42, 42, 0.40);
-  --lore-shadow-inset: inset 0 1px 3px rgba(26, 22, 37, 0.08);
+  --lore-shadow-inset: inset 0 1px 3px rgba(80, 40, 180, 0.08);
   --lore-shadow-block-drag: 0 16px 40px rgba(109, 40, 217, 0.16), 0 4px 12px rgba(109, 40, 217, 0.10);
+  --lore-shadow-card: 0 1px 4px rgba(80, 40, 180, 0.07), 0 4px 16px rgba(80, 40, 180, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // LAYOUT
@@ -321,29 +323,29 @@
   --lore-z-default: var(--lore-z-base);
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // MOCK-STYLE ALIASES (for v8 mock compatibility)
+  // MOCK-STYLE ALIASES (updated to match landing page)
   // ═══════════════════════════════════════════════════════════════════════════
   
   // Background colors
-  --bg: var(--lore-color-bg-canvas);
-  --canvas: var(--lore-color-bg-canvas);
-  --surface: var(--lore-color-surface-default);
-  --surface2: var(--lore-color-surface-subtle);
-  --sb-bg: var(--lore-color-bg-sidebar);
-  --nav-bg: var(--lore-color-bg-nav);
+  --bg: #F6F4FF;
+  --canvas: #F6F4FF;
+  --surface: #FFFFFF;
+  --surface2: #F2EEFF;
+  --sb-bg: #EEE9FF;
+  --nav-bg: #E6DFFF;
   
   // Border colors
-  --border: var(--lore-color-border-default);
-  --border2: var(--lore-color-border-strong);
-  --sb-border: var(--lore-color-border-default);
+  --border: rgba(124, 58, 237, 0.12);
+  --border2: rgba(124, 58, 237, 0.26);
+  --sb-border: rgba(124, 58, 237, 0.12);
   
   // Text colors
-  --t1: var(--lore-color-text-default);
-  --t2: var(--lore-color-text-muted);
-  --t3: var(--lore-color-text-faint);
-  --t4: var(--lore-color-icon-muted);
-  --sb-text: var(--lore-color-text-muted);
-  --sb-text-active: var(--lore-color-text-default);
+  --t1: #1A1130;
+  --t2: #3B2F62;
+  --t3: #7B6F9A;
+  --t4: #A89EC8;
+  --sb-text: #7B6F9A;
+  --sb-text-active: #1A1130;
   
   // Purple/Accent colors
   --p50: var(--lore-primitive-purple-50);
@@ -356,34 +358,171 @@
   --p700: var(--lore-primitive-purple-700);
   --p800: var(--lore-primitive-purple-800);
   
-  // Note type badge colors
-  --teal: var(--lore-primitive-green-700);
-  --teal-bg: var(--lore-primitive-green-50);
-  --amber: var(--lore-primitive-yellow-600);
-  --amber-bg: var(--lore-primitive-yellow-50);
-  --blue: var(--lore-primitive-blue-700);
-  --blue-bg: var(--lore-primitive-blue-50);
-  --rose: #BE185D;
-  --rose-bg: #FFF1F2;
-  --orange: #C2410C;
-  --orange-bg: #FFF7ED;
+  // Note type badge colors (updated to match landing page)
+  --teal: #0D9488;
+  --teal-bg: rgba(13, 148, 136, 0.08);
+  --amber: #D97706;
+  --amber-bg: rgba(217, 119, 6, 0.10);
+  --blue: #2563EB;
+  --blue-bg: rgba(37, 99, 235, 0.08);
+  --rose: #DB2777;
+  --rose-bg: rgba(219, 39, 119, 0.07);
+  --orange: #EA580C;
+  --orange-bg: rgba(234, 88, 12, 0.08);
+  --green: #16A34A;
+  --green-bg: rgba(22, 163, 74, 0.09);
   
-  // Border radius
-  --r-sm: var(--lore-radius-4);
-  --r-md: var(--lore-radius-8);
-  --r-lg: var(--lore-radius-12);
-  --r-xl: var(--lore-radius-18);
+  // Border radius (updated to match landing page)
+  --r-sm: 5px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
   
-  // Shadows
-  --shadow: var(--lore-shadow-md);
-  --shadow-lg: var(--lore-shadow-lg);
-  --shadow-float: var(--lore-shadow-overlay);
+  // Shadows (updated to match landing page)
+  --shadow: 0 4px 24px rgba(80, 40, 180, 0.08);
+  --shadow-lg: 0 12px 32px rgba(80, 40, 180, 0.12);
+  --shadow-float: 0 24px 64px rgba(80, 40, 180, 0.20);
+  --shadow-card: 0 1px 4px rgba(80, 40, 180, 0.07), 0 4px 16px rgba(80, 40, 180, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DARK MODE (to be implemented in Phase 12)
+// DARK MODE
+// Based on lore-landing-v3.html dark theme
 // ═══════════════════════════════════════════════════════════════════════════
 
 [data-theme="dark"] {
-  // Dark mode tokens will be added in Phase 12
+  // Backgrounds
+  --lore-color-bg-canvas: #0F0D1A;
+  --lore-color-bg-sidebar: #13101F;
+  --lore-color-bg-nav: #1A1728;
+  --lore-color-bg-overlay: rgba(0, 0, 0, 0.6);
+  --lore-color-bg-tooltip: #252138;
+
+  // Surfaces
+  --lore-color-surface-default: #1E1A2E;
+  --lore-color-surface-subtle: #252138;
+  --lore-color-surface-recessed: #13101F;
+  --lore-color-surface-inverse: #F0EEFF;
+
+  // Borders
+  --lore-color-border-default: rgba(139, 92, 246, 0.14);
+  --lore-color-border-subtle: rgba(139, 92, 246, 0.08);
+  --lore-color-border-strong: rgba(139, 92, 246, 0.24);
+  --lore-color-border-accent: var(--lore-primitive-purple-500);
+
+  // Text
+  --lore-color-text-default: #F0EEFF;
+  --lore-color-text-muted: #C4B5FD;
+  --lore-color-text-faint: #7B6F9A;
+  --lore-color-text-subtle: #4A4068;
+  --lore-color-text-inverse: #1A1625;
+  --lore-color-text-accent: var(--lore-primitive-purple-400);
+  --lore-color-text-on-accent: #FFFFFF;
+
+  // Icons
+  --lore-color-icon-default: #C4B5FD;
+  --lore-color-icon-muted: #7B6F9A;
+  --lore-color-icon-accent: var(--lore-primitive-purple-400);
+  --lore-color-icon-on-dark: #FFFFFF;
+
+  // Accent
+  --lore-color-accent-default: var(--lore-primitive-purple-500);
+  --lore-color-accent-hover: var(--lore-primitive-purple-400);
+  --lore-color-accent-active: var(--lore-primitive-purple-300);
+  --lore-color-accent-subtle: rgba(139, 92, 246, 0.15);
+  --lore-color-accent-muted: var(--lore-primitive-purple-600);
+  --lore-color-accent-bg: rgba(139, 92, 246, 0.10);
+  --lore-color-accent-border: rgba(139, 92, 246, 0.24);
+
+  // Success (adjusted for dark mode)
+  --lore-color-success: #4ADE80;
+  --lore-color-success-bg: rgba(74, 222, 128, 0.10);
+  --lore-color-success-border: rgba(74, 222, 128, 0.24);
+
+  // State Overlays
+  --lore-color-state-hover: rgba(255, 255, 255, 0.05);
+  --lore-color-state-active: rgba(255, 255, 255, 0.10);
+  --lore-color-state-selected: rgba(139, 92, 246, 0.15);
+  --lore-color-state-focus-ring: rgba(139, 92, 246, 0.40);
+  --lore-color-state-disabled-fill: #252138;
+  --lore-color-state-disabled-text: #4A4068;
+
+  // Feedback - Error (dark mode)
+  --lore-color-feedback-error-bg: rgba(239, 68, 68, 0.10);
+  --lore-color-feedback-error-border: rgba(239, 68, 68, 0.24);
+  --lore-color-feedback-error-text: #FCA5A5;
+  --lore-color-feedback-error-icon: #F87171;
+
+  // Feedback - Warning (dark mode)
+  --lore-color-feedback-warning-bg: rgba(253, 211, 77, 0.10);
+  --lore-color-feedback-warning-border: rgba(253, 211, 77, 0.24);
+  --lore-color-feedback-warning-text: #FCD34D;
+  --lore-color-feedback-warning-icon: #FBBF24;
+
+  // Feedback - Success (dark mode)
+  --lore-color-feedback-success-bg: rgba(74, 222, 128, 0.10);
+  --lore-color-feedback-success-border: rgba(74, 222, 128, 0.24);
+  --lore-color-feedback-success-text: #86EFAC;
+  --lore-color-feedback-success-icon: #4ADE80;
+
+  // Feedback - Info (dark mode)
+  --lore-color-feedback-info-bg: rgba(96, 165, 250, 0.10);
+  --lore-color-feedback-info-border: rgba(96, 165, 250, 0.24);
+  --lore-color-feedback-info-text: #93C5FD;
+  --lore-color-feedback-info-icon: #60A5FA;
+
+  // Shadows (adjusted for dark mode)
+  --lore-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.2);
+  --lore-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --lore-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --lore-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --lore-shadow-focus-ring: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(139, 92, 246, 0.40);
+  --lore-shadow-focus-ring-error: 0 0 0 2px var(--lore-color-bg-canvas), 0 0 0 4px rgba(239, 68, 68, 0.40);
+  --lore-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  --lore-shadow-block-drag: 0 16px 40px rgba(139, 92, 246, 0.24), 0 4px 12px rgba(139, 92, 246, 0.16);
+
+  // Grid color (canvas backgrounds)
+  --lore-color-grid: rgba(139, 92, 246, 0.12);
+
+  // Note type colors (adjusted for dark mode visibility)
+  --lore-color-note-research: var(--lore-primitive-purple-400);
+  --lore-color-note-journal: #FCD34D;
+  --lore-color-note-task: #60A5FA;
+  --lore-color-note-idea: #FBBF24;
+  --lore-color-note-reference: #4ADE80;
+  --lore-color-note-html: #F87171;
+
+  // Mock-style aliases for dark mode
+  --bg: #0F0D1A;
+  --canvas: #0F0D1A;
+  --surface: #1E1A2E;
+  --surface2: #252138;
+  --sb-bg: #13101F;
+  --nav-bg: #1A1728;
+  
+  --border: rgba(139, 92, 246, 0.14);
+  --border2: rgba(139, 92, 246, 0.24);
+  --sb-border: rgba(139, 92, 246, 0.14);
+  
+  --t1: #F0EEFF;
+  --t2: #C4B5FD;
+  --t3: #7B6F9A;
+  --t4: #4A4068;
+  --sb-text: #7B6F9A;
+  --sb-text-active: #F0EEFF;
+  
+  --teal: #34D399;
+  --teal-bg: rgba(52, 211, 153, 0.08);
+  --amber: #FCD34D;
+  --amber-bg: rgba(253, 211, 77, 0.10);
+  --blue: #60A5FA;
+  --blue-bg: rgba(96, 165, 250, 0.08);
+  --rose: #F472B6;
+  --rose-bg: rgba(244, 114, 182, 0.08);
+  --orange: #FB923C;
+  --orange-bg: rgba(251, 146, 60, 0.08);
+  
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-float: 0 24px 64px rgba(0, 0, 0, 0.6);
 }

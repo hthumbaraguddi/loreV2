@@ -1,10 +1,25 @@
-/* Lore Application - Global Styles */
+// Lore Application - Global Styles
 
 // Import design tokens and reset
 @use 'styles/tokens';
 @use 'styles/reset';
 
 // Google Fonts are loaded in index.html
+
+// Smooth theme transitions
+* {
+  transition: 
+    background-color var(--lore-anim-duration-theme) var(--lore-anim-ease-standard),
+    border-color var(--lore-anim-duration-theme) var(--lore-anim-ease-standard),
+    color var(--lore-anim-duration-theme) var(--lore-anim-ease-standard),
+    box-shadow var(--lore-anim-duration-theme) var(--lore-anim-ease-standard);
+}
+
+// Disable transitions for elements that shouldn't animate
+.no-theme-transition,
+.no-theme-transition * {
+  transition: none !important;
+}
 
 // Utility classes
 .sr-only {
@@ -46,25 +61,37 @@
 
 // Custom scrollbar styling (webkit browsers)
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--p200);
-  border-radius: 3px;
+  background: var(--p300);
+  border-radius: 5px;
+  border: 2px solid var(--bg-primary);
   
   &:hover {
-    background: var(--p300);
+    background: var(--p400);
   }
 }
 
 // Firefox scrollbar styling
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--p200) transparent;
+  scrollbar-width: auto;
+  scrollbar-color: var(--p300) var(--bg-primary);
+}
+
+// Ensure body can scroll
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
 }

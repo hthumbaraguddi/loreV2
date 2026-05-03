@@ -4,11 +4,12 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { NavItem } from '../../../core/models/nav-item.model';
 import { NavRailItemComponent } from './nav-rail-item/nav-rail-item.component';
+import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'lore-nav-rail',
   standalone: true,
-  imports: [CommonModule, NavRailItemComponent],
+  imports: [CommonModule, NavRailItemComponent, ThemeToggleComponent],
   templateUrl: './nav-rail.component.html',
   styleUrl: './nav-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

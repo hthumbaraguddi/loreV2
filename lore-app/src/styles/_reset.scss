@@ -20,7 +20,8 @@ body {
   line-height: var(--lore-line-height-normal);
   color: var(--lore-color-text-default);
   background: var(--lore-color-bg-canvas);
-  overflow: hidden; // Prevent body scroll, use internal scrolling
+  overflow-x: hidden; // Prevent horizontal scroll
+  overflow-y: auto; // Allow vertical scroll
 }
 
 // Remove default button styles
@@ -112,21 +113,28 @@ legend {
 
 // Scrollbar styling (webkit browsers)
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--lore-color-bg-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--lore-color-border-default);
+  background: var(--lore-color-border-strong);
   border-radius: var(--lore-radius-full);
+  border: 2px solid var(--lore-color-bg-canvas);
   
   &:hover {
-    background: var(--lore-color-border-strong);
+    background: var(--p400);
   }
+}
+
+// Firefox scrollbar
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--lore-color-border-strong) var(--lore-color-bg-canvas);
 }
 
 // Selection styling

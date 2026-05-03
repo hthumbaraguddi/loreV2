@@ -976,15 +976,15 @@
   border: 1px solid var(--lore-color-border);
   
   &.light {
-    background: white;
+    background: #F6F4FF;
   }
   
   &.dark {
-    background: #1A1729;
+    background: #0F0D1A;
   }
   
   &.auto {
-    background: linear-gradient(to right, white 50%, #1A1729 50%);
+    background: linear-gradient(to right, #F6F4FF 50%, #0F0D1A 50%);
   }
 }
 

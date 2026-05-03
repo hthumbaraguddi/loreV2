@@ -1,8 +1,9 @@
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TemplateService, Template } from '../../core/services/template.service';
 import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
+import { ThemeService, type Theme } from '../../core/services/theme.service';
 
 export type SettingsPanel = 
   | 'ai-providers' 
@@ -43,6 +44,7 @@ export interface Profile {
 export class SettingsPanelComponent {
   private templateService = inject(TemplateService);
   storageSyncService = inject(StorageSyncService);
+  private themeService = inject(ThemeService);
   
   // Active panel
   activePanel = signal<SettingsPanel>('ai-providers');
@@ -115,9 +117,17 @@ export class SettingsPanelComponent {
   });
 
   // Appearance
-  theme = signal<'light' | 'dark' | 'auto'>('light');
+  theme = signal<Theme>('light');
   fontSize = signal('medium');
   density = signal('comfortable');
+
+  constructor() {
+    // Sync theme with ThemeService
+    effect(() => {
+      const themePreference = this.themeService.getThemePreference();
+      this.theme.set(themePreference);
+    });
+  }
 
   // ─── Panel Navigation ──────────────────────────────────────────
 
@@ -400,8 +410,16 @@ export class SettingsPanelComponent {
   /**
    * Set theme
    */
-  setTheme(theme: 'light' | 'dark' | 'auto'): void {
+  setTheme(theme: Theme): void {
     this.theme.set(theme);
+    this.themeService.setTheme(theme);
+  }
+
+  /**
+   * Get current applied theme (resolves 'system' to actual theme)
+   */
+  getAppliedTheme(): 'light' | 'dark' {
+    return this.themeService.appliedTheme();
   }
 
   /**

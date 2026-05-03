@@ -4,9 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node post-build.js",
+    "build:app": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "preview:landing": "npm run build && npx http-server dist/lore-app/browser -p 8080 -o"
   },
   "private": true,
   "dependencies": {

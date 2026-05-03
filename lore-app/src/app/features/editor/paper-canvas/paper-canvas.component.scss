@@ -85,9 +85,9 @@
   min-height: 10px;
 }
 
-/* ── Insert overlay (fixed at bottom of canvas) ── */
+/* ── Insert overlay (sticky at bottom within content) ── */
 .insert-overlay {
-  position: absolute;
+  position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
@@ -95,6 +95,7 @@
   background: linear-gradient(to top, var(--lore-color-bg-canvas) 70%, transparent);
   padding: 24px 0 16px;
   pointer-events: none;
+  margin-top: auto;
 }
 
 /* ── Slash hint (Insert section) ── */

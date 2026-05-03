@@ -1,0 +1,310 @@
+{
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/update-landing-links.js": {
+    "mtime": 1777803608.5993764,
+    "hash": "90be949e8b6d3379a1a991cec69ccf68"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/post-build.js": {
+    "mtime": 1777803658.5490978,
+    "hash": "f34eedf47790db7bfed7e19fc8f2ab19"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/main.ts": {
+    "mtime": 1777572561.3005323,
+    "hash": "c986c915181c0d91d6ea1af9fc003131"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/app.routes.ts": {
+    "mtime": 1777805958.2798622,
+    "hash": "05825fbd4bac0f2098d36b1683be554e"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/app.component.spec.ts": {
+    "mtime": 1777572561.301931,
+    "hash": "d009af9d9f9ab16f13c580e23849b133"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/app.component.ts": {
+    "mtime": 1777805947.31961,
+    "hash": "ee4f6a78e042c1b6c59df9c26157fb20"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/app.config.ts": {
+    "mtime": 1777572925.4966714,
+    "hash": "544bf01790a0246066d5336cc8f32f9f"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/index.ts": {
+    "mtime": 1777796848.409021,
+    "hash": "88ca4d90825b847c54bf6cd3a94f0b93"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/models/nav-item.model.ts": {
+    "mtime": 1777572858.4593656,
+    "hash": "ee56f10d32cb3a4de7bda8587501d652"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/models/shelf.model.ts": {
+    "mtime": 1777577698.543069,
+    "hash": "37d6dd01f28d7fc4dc5bda79e215b41b"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/theme.service.ts": {
+    "mtime": 1777808439.3473444,
+    "hash": "f02ee3370dae890def1ef3c11365265e"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/editor.service.ts": {
+    "mtime": 1777722855.398298,
+    "hash": "b72c2a1000ed729a69ff42dddccb51c5"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/shelf.service.ts": {
+    "mtime": 1777618375.1958733,
+    "hash": "8f2cef0ce8447dc5dac1edb377bb3067"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/storage-sync.service.ts": {
+    "mtime": 1777659608.1134613,
+    "hash": "ac2c5c5ffb4a2fb2b77b476b9bb05ae6"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/template.service.ts": {
+    "mtime": 1777618170.8972747,
+    "hash": "98ae10c74f4ea53c1dd37a90f8c0109e"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/layout.service.ts": {
+    "mtime": 1777572851.7539625,
+    "hash": "efd1558bfae8450a84953e8edbc4de13"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/local-storage.service.ts": {
+    "mtime": 1777574175.4227357,
+    "hash": "46e90da7af50bf87e9500c3dcf407777"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/services/block.service.ts": {
+    "mtime": 1777610287.6647208,
+    "hash": "80f79d332b7a1f2d6a261366c1c10ed4"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/guards/auth.guard.ts": {
+    "mtime": 1777572864.6667295,
+    "hash": "204d35ac06c8c9f8ec12c839f29b8c17"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/core/guards/unsaved-changes.guard.ts": {
+    "mtime": 1777572870.928148,
+    "hash": "d536499af47bde15622941908e26e598"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/notebook-grid/notebook-grid.component.ts": {
+    "mtime": 1777722878.063012,
+    "hash": "af0fedadcefa7a42186788c6c005d851"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/key-findings-block/key-findings-block.component.ts": {
+    "mtime": 1777612486.3661277,
+    "hash": "522d2a5158dc463d17ef33240c7e8ab0"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/slash-palette/slash-palette.component.ts": {
+    "mtime": 1777610514.3376641,
+    "hash": "9477edcc2ba442160538c6fda36fb3bf"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/hypothesis-block/hypothesis-block.component.ts": {
+    "mtime": 1777612399.197602,
+    "hash": "11611a5b2b10fe38402a85dc167efe37"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/conclusion-block/conclusion-block.component.ts": {
+    "mtime": 1777612411.8714068,
+    "hash": "260b46d10d1da3019b5c0682c45bbedd"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/block-toolbar/block-toolbar.component.ts": {
+    "mtime": 1777745576.5794559,
+    "hash": "cf8e812dcdc67391f2b701dd7809f8fa"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/code-block/code-block.component.ts": {
+    "mtime": 1777612522.6813235,
+    "hash": "891c9aa9a56a3812f3d849cf64399d67"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/block-list/block-list.component.ts": {
+    "mtime": 1777744378.9248443,
+    "hash": "90680b4747261a5be684757d92d13ffb"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/warning-block/warning-block.component.ts": {
+    "mtime": 1777612432.9779398,
+    "hash": "102b2e3390497b3a46dd57b2cf0ae6ac"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/divider-block/divider-block.component.ts": {
+    "mtime": 1777610430.6129942,
+    "hash": "6525ce152578c85152a65ee50bfd9738"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/shared/block-base.ts": {
+    "mtime": 1777610295.2035844,
+    "hash": "485cea47a6cc05c43ca6ab2daab0e920"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/key-differences-block/key-differences-block.component.ts": {
+    "mtime": 1777612469.133517,
+    "hash": "c120ecec2162e221703ed8e896d9b050"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/block-container/block-container.component.ts": {
+    "mtime": 1777745480.1702917,
+    "hash": "6c9d4b88e1a43ff9b1bfe48d8198fa9c"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/checklist-block/checklist-block.component.ts": {
+    "mtime": 1777612505.6300209,
+    "hash": "b2e37733af63f0879fe9d94c18312cf1"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/image-block/image-block.component.ts": {
+    "mtime": 1777610443.7127068,
+    "hash": "8b37c8110ef9cacffbeabff68191e174"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/quote-block/quote-block.component.ts": {
+    "mtime": 1777612444.9003804,
+    "hash": "71c60e231e8d8a05227f1f579e12646c"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/ask-ai-block/ask-ai-block.component.ts": {
+    "mtime": 1777612555.9779956,
+    "hash": "868012ecb52bac5946fe8601a3fe45fc"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/blocks/note-insight-block/note-insight-block.component.ts": {
+    "mtime": 1777612421.5846596,
+    "hash": "3c97a9e2da6a6a15d63c2e832d136f87"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/sidebar/sidebar.component.ts": {
+    "mtime": 1777722806.1999109,
+    "hash": "da6d0290a6666a1479355712401a4646"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/sidebar/components/context-menu/context-menu.component.ts": {
+    "mtime": 1777575229.314828,
+    "hash": "93a54d84c12b21da19a85a22ce6842e5"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/settings/settings-panel.component.ts": {
+    "mtime": 1777797245.0989935,
+    "hash": "c0cec773d1f38155f91dd9497761b34a"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/landing/landing.component.ts": {
+    "mtime": 1777808222.4780316,
+    "hash": "4c553f84abbebbe2c11870d4e6293897"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/shell.component.ts": {
+    "mtime": 1777614622.6849935,
+    "hash": "a5b619cf168d527f51826908682238a6"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/nav-rail/nav-rail.component.ts": {
+    "mtime": 1777797366.6139731,
+    "hash": "812c8fced647171710a2e8a31709e221"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/nav-rail/nav-rail-item/nav-rail-item.component.ts": {
+    "mtime": 1777573383.1669312,
+    "hash": "1570339cb89b4fa193876dced2ca673d"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/graph/knowledge-graph.component.ts": {
+    "mtime": 1777572894.3211555,
+    "hash": "44f3c71513e8385622ccc6f42f7405a6"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/template-builder/template-builder.component.ts": {
+    "mtime": 1777618271.8769958,
+    "hash": "3b0edee765a1b0a1383a8f87088bb37d"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/html-notes/html-notes-gallery.component.ts": {
+    "mtime": 1777572902.5017877,
+    "hash": "f63861496dd7287820aa6e81eaceb963"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/editor.routes.ts": {
+    "mtime": 1777577590.533305,
+    "hash": "4fe2a81488a782797a521a1255a8e39a"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/pane/pane.component.ts": {
+    "mtime": 1777642051.3847384,
+    "hash": "260b2ef40a39911ae301563e15310873"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/editor-placeholder/editor-placeholder.component.ts": {
+    "mtime": 1777572886.557497,
+    "hash": "2b3715dbb07bc868aae88502f1c6adea"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/file-link-palette/file-link-palette.component.ts": {
+    "mtime": 1777740008.1150794,
+    "hash": "8288c3c8a5b27cdbcaa778c3a3cae88d"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/paper-canvas/paper-canvas.component.ts": {
+    "mtime": 1777743758.7703118,
+    "hash": "3c2c41a0dbd5102d9d2f226dc7cecc23"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/split-editor/split-editor.component.ts": {
+    "mtime": 1777641496.8719954,
+    "hash": "051b2a2a5a4c865290750b1bab2eadd3"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/canvas-background/canvas-background.component.ts": {
+    "mtime": 1777606804.2483542,
+    "hash": "7da9bf9cc158d6e844a0b06b811702c7"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/shared/components/theme-toggle/theme-toggle.component.ts": {
+    "mtime": 1777809103.5715604,
+    "hash": "4db5b67da01d27c4cfc5f30f96e6deac"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/README.md": {
+    "mtime": 1777572561.2972288,
+    "hash": "166da00f826414a673c9d959b98d4756"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/DESIGN_SPECS.md": {
+    "mtime": 1777574427.7907367,
+    "hash": "843dab37ed4497582bc3fee31607922d"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/DESIGN_SYSTEM.md": {
+    "mtime": 1777796883.6603339,
+    "hash": "ef927956656ea5358f105e7a63523330"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/THEME_USAGE_EXAMPLE.md": {
+    "mtime": 1777796960.77716,
+    "hash": "c6609a6f1e428fd8e4a0104c45fd3db8"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/public/landing-light.html": {
+    "mtime": 1777796616.636095,
+    "hash": "9ceb36e09df5a3479faf5ea4fc6afc4e"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/public/landing-dark.html": {
+    "mtime": 1777803619.918809,
+    "hash": "921fa3b3bdc3dae954dec526771f4e7c"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/public/README.md": {
+    "mtime": 1777798528.1694303,
+    "hash": "6eb4251acee6e0fff40e92438e5057e7"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/index.html": {
+    "mtime": 1777803635.5801306,
+    "hash": "a03ce18fa18be22d45ee7167893eb9aa"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/notebook-grid/notebook-grid.component.html": {
+    "mtime": 1777722891.0638556,
+    "hash": "db858122bf86168cf3dbcab450e2ead4"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/sidebar/sidebar.component.html": {
+    "mtime": 1777722835.539618,
+    "hash": "2b293fb432cc7975aa8b99d6e27caaf0"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/sidebar/components/context-menu/context-menu.component.html": {
+    "mtime": 1777575243.8436515,
+    "hash": "e73c8611040523b75e6bb5a5cbc7bc11"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/settings/settings-panel.component.html": {
+    "mtime": 1777797254.2560768,
+    "hash": "046c10143820f535db98a11727af6414"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/landing/landing.component.html": {
+    "mtime": 1777808241.429659,
+    "hash": "e9191b2a4e31dbcecd3acb4820185a17"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/shell.component.html": {
+    "mtime": 1777574577.5528169,
+    "hash": "312159d898dc8185f5c2ed4667199e5b"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/nav-rail/nav-rail.component.html": {
+    "mtime": 1777797343.3016691,
+    "hash": "307ce1a2ce5ca6c759fef53ac29483f4"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/shell/nav-rail/nav-rail-item/nav-rail-item.component.html": {
+    "mtime": 1777629723.6316411,
+    "hash": "473e52b747e2a6c49a5d2e33b586b893"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/template-builder/template-builder.component.html": {
+    "mtime": 1777614408.7643664,
+    "hash": "65d6151e84f450d9fdb3ea0b1122c4f6"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/pane/pane.component.html": {
+    "mtime": 1777642480.888389,
+    "hash": "a9b0ab2deeb0c32ee1683e73728e697e"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/paper-canvas/paper-canvas.component.html": {
+    "mtime": 1777743788.2460926,
+    "hash": "47711a87997ce78db21af283bc4d1d9f"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/split-editor/split-editor.component.html": {
+    "mtime": 1777641585.6544404,
+    "hash": "dd857d72a43a456724b2c89b785e5f80"
+  },
+  "/Users/harsha/gitProjects/loreV2/loreV2/lore-app/src/app/features/editor/canvas-background/canvas-background.component.html": {
+    "mtime": 1777606761.4428225,
+    "hash": "724089de99831dc605ca44fb80e7b6cc"
+  }
+}

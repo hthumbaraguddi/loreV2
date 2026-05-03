@@ -1,0 +1,705 @@
+{
+  "communities": {
+    "0": [
+      "sidebar_sidebar_component_sidebarcomponent",
+      "sidebar_sidebar_component_sidebarcomponent_activateitem",
+      "sidebar_sidebar_component_sidebarcomponent_cancelrename",
+      "sidebar_sidebar_component_sidebarcomponent_clearsearch",
+      "sidebar_sidebar_component_sidebarcomponent_collapseitem",
+      "sidebar_sidebar_component_sidebarcomponent_commitrename",
+      "sidebar_sidebar_component_sidebarcomponent_constructor",
+      "sidebar_sidebar_component_sidebarcomponent_createnewnotebookinshelf",
+      "sidebar_sidebar_component_sidebarcomponent_createnewnoteinnotebook",
+      "sidebar_sidebar_component_sidebarcomponent_createnewshelf",
+      "sidebar_sidebar_component_sidebarcomponent_deleteitembyid",
+      "sidebar_sidebar_component_sidebarcomponent_expanditem",
+      "sidebar_sidebar_component_sidebarcomponent_formatdate",
+      "sidebar_sidebar_component_sidebarcomponent_getnotecount",
+      "sidebar_sidebar_component_sidebarcomponent_getvisibleitems",
+      "sidebar_sidebar_component_sidebarcomponent_handlechangecolor",
+      "sidebar_sidebar_component_sidebarcomponent_handledelete",
+      "sidebar_sidebar_component_sidebarcomponent_handlenewnote",
+      "sidebar_sidebar_component_sidebarcomponent_handlenewnotebook",
+      "sidebar_sidebar_component_sidebarcomponent_handleopenaction",
+      "sidebar_sidebar_component_sidebarcomponent_isexpanded",
+      "sidebar_sidebar_component_sidebarcomponent_isfocused",
+      "sidebar_sidebar_component_sidebarcomponent_isnoteactive",
+      "sidebar_sidebar_component_sidebarcomponent_isnotebookexpanded",
+      "sidebar_sidebar_component_sidebarcomponent_isnotedragging",
+      "sidebar_sidebar_component_sidebarcomponent_isrenaming",
+      "sidebar_sidebar_component_sidebarcomponent_isshelfexpanded",
+      "sidebar_sidebar_component_sidebarcomponent_navigatedown",
+      "sidebar_sidebar_component_sidebarcomponent_navigateup",
+      "sidebar_sidebar_component_sidebarcomponent_oncontextmenuaction",
+      "sidebar_sidebar_component_sidebarcomponent_oncontextmenuclosed",
+      "sidebar_sidebar_component_sidebarcomponent_onkeydown",
+      "sidebar_sidebar_component_sidebarcomponent_onnotebookclick",
+      "sidebar_sidebar_component_sidebarcomponent_onnotebookcontextmenu",
+      "sidebar_sidebar_component_sidebarcomponent_onnotebookdrop",
+      "sidebar_sidebar_component_sidebarcomponent_onnoteclick",
+      "sidebar_sidebar_component_sidebarcomponent_onnotecontextmenu",
+      "sidebar_sidebar_component_sidebarcomponent_onnotedragend",
+      "sidebar_sidebar_component_sidebarcomponent_onnotedragstart",
+      "sidebar_sidebar_component_sidebarcomponent_onnotedrop",
+      "sidebar_sidebar_component_sidebarcomponent_onrenameinput",
+      "sidebar_sidebar_component_sidebarcomponent_onrenamekeydown",
+      "sidebar_sidebar_component_sidebarcomponent_onsearchinput",
+      "sidebar_sidebar_component_sidebarcomponent_onshelfclick",
+      "sidebar_sidebar_component_sidebarcomponent_onshelfcontextmenu",
+      "sidebar_sidebar_component_sidebarcomponent_onshelfdrop",
+      "sidebar_sidebar_component_sidebarcomponent_setfocus",
+      "sidebar_sidebar_component_sidebarcomponent_setupkeyboardnavigation",
+      "sidebar_sidebar_component_sidebarcomponent_setviewmode",
+      "sidebar_sidebar_component_sidebarcomponent_startrename",
+      "sidebar_sidebar_component_sidebarcomponent_startrenamebyid",
+      "sidebar_sidebar_component_sidebarcomponent_togglenotebook",
+      "sidebar_sidebar_component_sidebarcomponent_toggleshelf",
+      "sidebar_sidebar_component_sidebarcomponent_trackbynotebookid",
+      "sidebar_sidebar_component_sidebarcomponent_trackbynoteid",
+      "sidebar_sidebar_component_sidebarcomponent_trackbyshelfid",
+      "src_app_features_sidebar_sidebar_component_ts"
+    ],
+    "1": [
+      "settings_settings_panel_component_settingspanelcomponent",
+      "settings_settings_panel_component_settingspanelcomponent_constructor",
+      "settings_settings_panel_component_settingspanelcomponent_deletetemplate",
+      "settings_settings_panel_component_settingspanelcomponent_disconnectgithub",
+      "settings_settings_panel_component_settingspanelcomponent_duplicatetemplate",
+      "settings_settings_panel_component_settingspanelcomponent_exportnotes",
+      "settings_settings_panel_component_settingspanelcomponent_formatdate",
+      "settings_settings_panel_component_settingspanelcomponent_getappliedtheme",
+      "settings_settings_panel_component_settingspanelcomponent_getblockcounttext",
+      "settings_settings_panel_component_settingspanelcomponent_getfilteredtemplates",
+      "settings_settings_panel_component_settingspanelcomponent_importnotes",
+      "settings_settings_panel_component_settingspanelcomponent_isfilesystemaccesssupported",
+      "settings_settings_panel_component_settingspanelcomponent_isresponsestyleactive",
+      "settings_settings_panel_component_settingspanelcomponent_savechanges",
+      "settings_settings_panel_component_settingspanelcomponent_selectlocalfolder",
+      "settings_settings_panel_component_settingspanelcomponent_selectmodel",
+      "settings_settings_panel_component_settingspanelcomponent_setcategory",
+      "settings_settings_panel_component_settingspanelcomponent_setdensity",
+      "settings_settings_panel_component_settingspanelcomponent_setfontsize",
+      "settings_settings_panel_component_settingspanelcomponent_setgithubsyncinterval",
+      "settings_settings_panel_component_settingspanelcomponent_setlocalsyncinterval",
+      "settings_settings_panel_component_settingspanelcomponent_setpanel",
+      "settings_settings_panel_component_settingspanelcomponent_setstoragetier",
+      "settings_settings_panel_component_settingspanelcomponent_settheme",
+      "settings_settings_panel_component_settingspanelcomponent_signinwithgithub",
+      "settings_settings_panel_component_settingspanelcomponent_synctogithubnow",
+      "settings_settings_panel_component_settingspanelcomponent_synctolocalfoldernow",
+      "settings_settings_panel_component_settingspanelcomponent_toggleaibehaviour",
+      "settings_settings_panel_component_settingspanelcomponent_togglegithubautosync",
+      "settings_settings_panel_component_settingspanelcomponent_togglegithubsync",
+      "settings_settings_panel_component_settingspanelcomponent_togglehtmlnotesetting",
+      "settings_settings_panel_component_settingspanelcomponent_togglelocalautosync",
+      "settings_settings_panel_component_settingspanelcomponent_toggleproviderconnection",
+      "settings_settings_panel_component_settingspanelcomponent_toggleresponsestyle",
+      "settings_settings_panel_component_settingspanelcomponent_togglesyncsetting",
+      "settings_settings_panel_component_settingspanelcomponent_updateprofilefield",
+      "src_app_features_settings_settings_panel_component_ts"
+    ],
+    "2": [
+      "services_shelf_service_shelfservice",
+      "services_shelf_service_shelfservice_constructor",
+      "services_shelf_service_shelfservice_createnote",
+      "services_shelf_service_shelfservice_createnotebook",
+      "services_shelf_service_shelfservice_createshelf",
+      "services_shelf_service_shelfservice_deletenote",
+      "services_shelf_service_shelfservice_deletenotebook",
+      "services_shelf_service_shelfservice_deleteshelf",
+      "services_shelf_service_shelfservice_generateid",
+      "services_shelf_service_shelfservice_generatepreview",
+      "services_shelf_service_shelfservice_getallnotes",
+      "services_shelf_service_shelfservice_getnote",
+      "services_shelf_service_shelfservice_getnotebook",
+      "services_shelf_service_shelfservice_getshelf",
+      "services_shelf_service_shelfservice_initializeseeddata",
+      "services_shelf_service_shelfservice_loadfromstorage",
+      "services_shelf_service_shelfservice_reordernotebooks",
+      "services_shelf_service_shelfservice_reordernotes",
+      "services_shelf_service_shelfservice_reordershelves",
+      "services_shelf_service_shelfservice_resettoseeddata",
+      "services_shelf_service_shelfservice_savetostorage",
+      "services_shelf_service_shelfservice_searchnotes",
+      "services_shelf_service_shelfservice_updatenote",
+      "services_shelf_service_shelfservice_updatenotebook",
+      "services_shelf_service_shelfservice_updateshelf",
+      "src_app_core_services_shelf_service_ts"
+    ],
+    "3": [
+      "services_storage_sync_service_storagesyncservice",
+      "services_storage_sync_service_storagesyncservice_calculatenextsync",
+      "services_storage_sync_service_storagesyncservice_constructor",
+      "services_storage_sync_service_storagesyncservice_disablegithubautosync",
+      "services_storage_sync_service_storagesyncservice_disablelocalautosync",
+      "services_storage_sync_service_storagesyncservice_disconnectgithub",
+      "services_storage_sync_service_storagesyncservice_enablegithubautosync",
+      "services_storage_sync_service_storagesyncservice_enablelocalautosync",
+      "services_storage_sync_service_storagesyncservice_formatnextsynctime",
+      "services_storage_sync_service_storagesyncservice_formatrelativetime",
+      "services_storage_sync_service_storagesyncservice_isfilesystemaccesssupported",
+      "services_storage_sync_service_storagesyncservice_loadsettings",
+      "services_storage_sync_service_storagesyncservice_savesettings",
+      "services_storage_sync_service_storagesyncservice_selectfolder",
+      "services_storage_sync_service_storagesyncservice_setstoragetier",
+      "services_storage_sync_service_storagesyncservice_signinwithgithub",
+      "services_storage_sync_service_storagesyncservice_simulatesync",
+      "services_storage_sync_service_storagesyncservice_startsynctimer",
+      "services_storage_sync_service_storagesyncservice_stopsynctimer",
+      "services_storage_sync_service_storagesyncservice_storefolderhandle",
+      "services_storage_sync_service_storagesyncservice_synctogithub",
+      "services_storage_sync_service_storagesyncservice_synctolocalfolder",
+      "src_app_core_services_storage_sync_service_ts"
+    ],
+    "4": [
+      "split_editor_split_editor_component_spliteditorcomponent",
+      "split_editor_split_editor_component_spliteditorcomponent_constructor",
+      "split_editor_split_editor_component_spliteditorcomponent_getcontainerwidth",
+      "split_editor_split_editor_component_spliteditorcomponent_getdividerstyle",
+      "split_editor_split_editor_component_spliteditorcomponent_getpanewidthstyle",
+      "split_editor_split_editor_component_spliteditorcomponent_handlemousemove",
+      "split_editor_split_editor_component_spliteditorcomponent_handlemouseup",
+      "split_editor_split_editor_component_spliteditorcomponent_ispaneactive",
+      "split_editor_split_editor_component_spliteditorcomponent_navigatetoshelf",
+      "split_editor_split_editor_component_spliteditorcomponent_onnotedropped",
+      "split_editor_split_editor_component_spliteditorcomponent_onpanecloserequested",
+      "split_editor_split_editor_component_spliteditorcomponent_onpanefocused",
+      "split_editor_split_editor_component_spliteditorcomponent_openaskai",
+      "split_editor_split_editor_component_spliteditorcomponent_opencanvaspicker",
+      "split_editor_split_editor_component_spliteditorcomponent_opentemplates",
+      "split_editor_split_editor_component_spliteditorcomponent_savenotes",
+      "split_editor_split_editor_component_spliteditorcomponent_setactivepane",
+      "split_editor_split_editor_component_spliteditorcomponent_setpanecount",
+      "split_editor_split_editor_component_spliteditorcomponent_startdividerdrag",
+      "split_editor_split_editor_component_spliteditorcomponent_togglefocusmode",
+      "split_editor_split_editor_component_spliteditorcomponent_trackbypaneindex",
+      "split_editor_split_editor_component_spliteditorcomponent_updatepanewidths",
+      "src_app_features_editor_split_editor_split_editor_component_ts"
+    ],
+    "5": [
+      "paper_canvas_paper_canvas_component_papercanvascomponent",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_autoresizetextarea",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_constructor",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_getrelativetime",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_insertblock",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_ngafterviewinit",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onblockadded",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onblockchanged",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onblockdeleted",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onblockreordered",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onduplicateblock",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onlinkpalettedismiss",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onlinkpaletteselect",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onnotebodyinput",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_onnotebodykeydown",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_ontitleblur",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_ontitleenter",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_stringtoblocktype",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_triggerlink",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_triggermention",
+      "paper_canvas_paper_canvas_component_papercanvascomponent_triggerslashcommand",
+      "src_app_features_editor_paper_canvas_paper_canvas_component_ts"
+    ],
+    "6": [
+      "services_editor_service_editorservice",
+      "services_editor_service_editorservice_clearfilters",
+      "services_editor_service_editorservice_closeallnotes",
+      "services_editor_service_editorservice_closenoteinpane",
+      "services_editor_service_editorservice_constructor",
+      "services_editor_service_editorservice_getactivenote",
+      "services_editor_service_editorservice_getnotebypaneindex",
+      "services_editor_service_editorservice_getpaneindexfornote",
+      "services_editor_service_editorservice_isnoteopen",
+      "services_editor_service_editorservice_movenotetopane",
+      "services_editor_service_editorservice_opennoteinpane",
+      "services_editor_service_editorservice_optimizepanecount",
+      "services_editor_service_editorservice_setactivepane",
+      "services_editor_service_editorservice_setnotebookfilter",
+      "services_editor_service_editorservice_setpanecount",
+      "services_editor_service_editorservice_setshelffilter",
+      "src_app_core_services_editor_service_ts"
+    ],
+    "7": [
+      "services_template_service_templateservice",
+      "services_template_service_templateservice_applytemplate",
+      "services_template_service_templateservice_constructor",
+      "services_template_service_templateservice_createtemplate",
+      "services_template_service_templateservice_deletetemplate",
+      "services_template_service_templateservice_duplicatetemplate",
+      "services_template_service_templateservice_generateid",
+      "services_template_service_templateservice_gettemplate",
+      "services_template_service_templateservice_gettemplatesbycategory",
+      "services_template_service_templateservice_gettemplatesbynotetype",
+      "services_template_service_templateservice_initializedefaulttemplates",
+      "services_template_service_templateservice_loadfromstorage",
+      "services_template_service_templateservice_savetostorage",
+      "services_template_service_templateservice_searchtemplates",
+      "services_template_service_templateservice_updatetemplate",
+      "src_app_core_services_template_service_ts"
+    ],
+    "8": [
+      "pane_pane_component_panecomponent",
+      "pane_pane_component_panecomponent_getbreadcrumbtrail",
+      "pane_pane_component_panecomponent_getnotetypecolor",
+      "pane_pane_component_panecomponent_getnotetypeicon",
+      "pane_pane_component_panecomponent_isnotedrag",
+      "pane_pane_component_panecomponent_oncanvasclick",
+      "pane_pane_component_panecomponent_oncloseclick",
+      "pane_pane_component_panecomponent_ondragleave",
+      "pane_pane_component_panecomponent_ondragover",
+      "pane_pane_component_panecomponent_ondrop",
+      "pane_pane_component_panecomponent_onhistoryclick",
+      "pane_pane_component_panecomponent_onpaneclick",
+      "pane_pane_component_panecomponent_onpanelclick",
+      "pane_pane_component_panecomponent_showclosebutton",
+      "src_app_features_editor_pane_pane_component_ts"
+    ],
+    "9": [
+      "notebook_grid_notebook_grid_component_notebookgridcomponent",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_clearfilters",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_createnewnote",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_formatdate",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_getaicount",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_getbadgecolor",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_getbadgelabel",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_opennote",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_setsort",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_settab",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_togglelayout",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_toggletag",
+      "notebook_grid_notebook_grid_component_notebookgridcomponent_trackbynoteid",
+      "src_app_features_notebook_grid_notebook_grid_component_ts"
+    ],
+    "10": [
+      "src_app_features_template_builder_template_builder_component_ts",
+      "template_builder_template_builder_component_templatebuildercomponent",
+      "template_builder_template_builder_component_templatebuildercomponent_addblocktocanvas",
+      "template_builder_template_builder_component_templatebuildercomponent_clearcanvas",
+      "template_builder_template_builder_component_templatebuildercomponent_getblockcount",
+      "template_builder_template_builder_component_templatebuildercomponent_getrequiredblockcount",
+      "template_builder_template_builder_component_templatebuildercomponent_oncanvasdragleave",
+      "template_builder_template_builder_component_templatebuildercomponent_oncanvasdragover",
+      "template_builder_template_builder_component_templatebuildercomponent_oncanvasdrop",
+      "template_builder_template_builder_component_templatebuildercomponent_oncanvasdropreorder",
+      "template_builder_template_builder_component_templatebuildercomponent_onpalettedragstart",
+      "template_builder_template_builder_component_templatebuildercomponent_removeblockfromcanvas",
+      "template_builder_template_builder_component_templatebuildercomponent_savetemplate",
+      "template_builder_template_builder_component_templatebuildercomponent_toggleblockrequired"
+    ],
+    "11": [
+      "services_block_service_blockservice",
+      "services_block_service_blockservice_createblock",
+      "services_block_service_blockservice_defaultcontent",
+      "services_block_service_blockservice_defaultmetadata",
+      "services_block_service_blockservice_deleteblock",
+      "services_block_service_blockservice_duplicateblock",
+      "services_block_service_blockservice_generateid",
+      "services_block_service_blockservice_reindex",
+      "services_block_service_blockservice_reorderblocks",
+      "services_block_service_blockservice_updateblock",
+      "src_app_core_services_block_service_ts"
+    ],
+    "12": [
+      "services_theme_service_themeservice",
+      "services_theme_service_themeservice_applytheme",
+      "services_theme_service_themeservice_constructor",
+      "services_theme_service_themeservice_getthemepreference",
+      "services_theme_service_themeservice_loadthemepreference",
+      "services_theme_service_themeservice_settheme",
+      "services_theme_service_themeservice_setupsystemthemelistener",
+      "services_theme_service_themeservice_toggletheme",
+      "src_app_core_services_theme_service_ts"
+    ],
+    "13": [
+      "context_menu_context_menu_component_contextmenucomponent",
+      "context_menu_context_menu_component_contextmenucomponent_close",
+      "context_menu_context_menu_component_contextmenucomponent_constructor",
+      "context_menu_context_menu_component_contextmenucomponent_getopenlabel",
+      "context_menu_context_menu_component_contextmenucomponent_onaction",
+      "context_menu_context_menu_component_contextmenucomponent_onmenuclick",
+      "context_menu_context_menu_component_contextmenucomponent_positionmenu",
+      "context_menu_context_menu_component_contextmenucomponent_shownewnotebook",
+      "src_app_features_sidebar_components_context_menu_context_menu_component_ts"
+    ],
+    "14": [
+      "services_layout_service_layoutservice",
+      "services_layout_service_layoutservice_closerightpanel",
+      "services_layout_service_layoutservice_disablezen",
+      "services_layout_service_layoutservice_enablezen",
+      "services_layout_service_layoutservice_togglerightpanel",
+      "services_layout_service_layoutservice_togglesidebar",
+      "services_layout_service_layoutservice_togglezen",
+      "src_app_core_services_layout_service_ts"
+    ],
+    "15": [
+      "services_local_storage_service_localstorageservice",
+      "services_local_storage_service_localstorageservice_clear",
+      "services_local_storage_service_localstorageservice_getitem",
+      "services_local_storage_service_localstorageservice_getstorageinfo",
+      "services_local_storage_service_localstorageservice_isavailable",
+      "services_local_storage_service_localstorageservice_removeitem",
+      "services_local_storage_service_localstorageservice_setitem",
+      "src_app_core_services_local_storage_service_ts"
+    ],
+    "16": [
+      "checklist_block_checklist_block_component_checklistblockcomponent",
+      "checklist_block_checklist_block_component_checklistblockcomponent_additem",
+      "checklist_block_checklist_block_component_checklistblockcomponent_emit",
+      "checklist_block_checklist_block_component_checklistblockcomponent_ngoninit",
+      "checklist_block_checklist_block_component_checklistblockcomponent_onbackspace",
+      "checklist_block_checklist_block_component_checklistblockcomponent_oninput",
+      "checklist_block_checklist_block_component_checklistblockcomponent_toggle",
+      "src_app_features_blocks_checklist_block_checklist_block_component_ts"
+    ],
+    "17": [
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent",
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent_additem",
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent_emit",
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent_ngoninit",
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent_onbackspace",
+      "key_findings_block_key_findings_block_component_keyfindingsblockcomponent_oninput",
+      "src_app_features_blocks_key_findings_block_key_findings_block_component_ts"
+    ],
+    "18": [
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent",
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent_addrow",
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent_emit",
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent_ngoninit",
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent_oncellinput",
+      "key_differences_block_key_differences_block_component_keydifferencesblockcomponent_onheaderinput",
+      "src_app_features_blocks_key_differences_block_key_differences_block_component_ts"
+    ],
+    "19": [
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent",
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent_getnoteicon",
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent_getnotepath",
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent_onescape",
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent_onkeydown",
+      "file_link_palette_file_link_palette_component_filelinkpalettecomponent_select",
+      "src_app_features_editor_file_link_palette_file_link_palette_component_ts"
+    ],
+    "20": [
+      "code_block_code_block_component_codeblockcomponent",
+      "code_block_code_block_component_codeblockcomponent_copy",
+      "code_block_code_block_component_codeblockcomponent_ngoninit",
+      "code_block_code_block_component_codeblockcomponent_oninput",
+      "code_block_code_block_component_codeblockcomponent_setlanguage",
+      "src_app_features_blocks_code_block_code_block_component_ts"
+    ],
+    "21": [
+      "block_list_block_list_component_blocklistcomponent",
+      "block_list_block_list_component_blocklistcomponent_closepalette",
+      "block_list_block_list_component_blocklistcomponent_onaddblock",
+      "block_list_block_list_component_blocklistcomponent_ondrop",
+      "block_list_block_list_component_blocklistcomponent_onpaletteselect",
+      "src_app_features_blocks_block_list_block_list_component_ts"
+    ],
+    "22": [
+      "block_container_block_container_component_blockcontainercomponent",
+      "block_container_block_container_component_blockcontainercomponent_onaddabovefromtoolbar",
+      "block_container_block_container_component_blockcontainercomponent_onaddbelowclick",
+      "block_container_block_container_component_blockcontainercomponent_onchanged",
+      "block_container_block_container_component_blockcontainercomponent_ontypechange",
+      "src_app_features_blocks_block_container_block_container_component_ts"
+    ],
+    "23": [
+      "ask_ai_block_ask_ai_block_component_askaiblockcomponent",
+      "ask_ai_block_ask_ai_block_component_askaiblockcomponent_clearresponse",
+      "ask_ai_block_ask_ai_block_component_askaiblockcomponent_ngoninit",
+      "ask_ai_block_ask_ai_block_component_askaiblockcomponent_oninput",
+      "ask_ai_block_ask_ai_block_component_askaiblockcomponent_run",
+      "src_app_features_blocks_ask_ai_block_ask_ai_block_component_ts"
+    ],
+    "24": [
+      "nav_rail_nav_rail_component_navrailcomponent",
+      "nav_rail_nav_rail_component_navrailcomponent_ngondestroy",
+      "nav_rail_nav_rail_component_navrailcomponent_ngoninit",
+      "nav_rail_nav_rail_component_navrailcomponent_onitemselect",
+      "nav_rail_nav_rail_component_navrailcomponent_updateactivefromurl",
+      "src_app_features_shell_nav_rail_nav_rail_component_ts"
+    ],
+    "25": [
+      "slash_palette_slash_palette_component_slashpalettecomponent",
+      "slash_palette_slash_palette_component_slashpalettecomponent_onescape",
+      "slash_palette_slash_palette_component_slashpalettecomponent_onkeydown",
+      "slash_palette_slash_palette_component_slashpalettecomponent_select",
+      "src_app_features_blocks_slash_palette_slash_palette_component_ts"
+    ],
+    "26": [
+      "block_toolbar_block_toolbar_component_blocktoolbarcomponent",
+      "block_toolbar_block_toolbar_component_blocktoolbarcomponent_onaddaboveclick",
+      "block_toolbar_block_toolbar_component_blocktoolbarcomponent_selecttype",
+      "block_toolbar_block_toolbar_component_blocktoolbarcomponent_toggletypepicker",
+      "src_app_features_blocks_block_toolbar_block_toolbar_component_ts"
+    ],
+    "27": [
+      "landing_landing_component_landingcomponent",
+      "landing_landing_component_landingcomponent_continuewithgithub",
+      "landing_landing_component_landingcomponent_isdark",
+      "landing_landing_component_landingcomponent_uselocally",
+      "src_app_features_landing_landing_component_ts"
+    ],
+    "28": [
+      "image_block_image_block_component_imageblockcomponent",
+      "image_block_image_block_component_imageblockcomponent_onfile",
+      "image_block_image_block_component_imageblockcomponent_triggerupload",
+      "src_app_features_blocks_image_block_image_block_component_ts"
+    ],
+    "29": [
+      "nav_rail_item_nav_rail_item_component_navrailitemcomponent",
+      "nav_rail_item_nav_rail_item_component_navrailitemcomponent_onclick",
+      "nav_rail_item_nav_rail_item_component_navrailitemcomponent_onkeydown",
+      "src_app_features_shell_nav_rail_nav_rail_item_nav_rail_item_component_ts"
+    ],
+    "30": [
+      "app_app_component_appcomponent",
+      "app_app_component_appcomponent_handlekeyboardevent",
+      "src_app_app_component_ts"
+    ],
+    "31": [
+      "hypothesis_block_hypothesis_block_component_hypothesisblockcomponent",
+      "hypothesis_block_hypothesis_block_component_hypothesisblockcomponent_oninput",
+      "src_app_features_blocks_hypothesis_block_hypothesis_block_component_ts"
+    ],
+    "32": [
+      "conclusion_block_conclusion_block_component_conclusionblockcomponent",
+      "conclusion_block_conclusion_block_component_conclusionblockcomponent_oninput",
+      "src_app_features_blocks_conclusion_block_conclusion_block_component_ts"
+    ],
+    "33": [
+      "src_app_features_blocks_warning_block_warning_block_component_ts",
+      "warning_block_warning_block_component_warningblockcomponent",
+      "warning_block_warning_block_component_warningblockcomponent_oninput"
+    ],
+    "34": [
+      "quote_block_quote_block_component_quoteblockcomponent",
+      "quote_block_quote_block_component_quoteblockcomponent_oninput",
+      "src_app_features_blocks_quote_block_quote_block_component_ts"
+    ],
+    "35": [
+      "note_insight_block_note_insight_block_component_noteinsightblockcomponent",
+      "note_insight_block_note_insight_block_component_noteinsightblockcomponent_oninput",
+      "src_app_features_blocks_note_insight_block_note_insight_block_component_ts"
+    ],
+    "36": [
+      "shell_shell_component_shellcomponent",
+      "shell_shell_component_shellcomponent_onnavselect",
+      "src_app_features_shell_shell_component_ts"
+    ],
+    "37": [
+      "canvas_background_canvas_background_component_canvasbackgroundcomponent",
+      "canvas_background_canvas_background_component_canvasbackgroundcomponent_getsvgcontent",
+      "src_app_features_editor_canvas_background_canvas_background_component_ts"
+    ],
+    "38": [
+      "src_app_shared_components_theme_toggle_theme_toggle_component_ts",
+      "theme_toggle_theme_toggle_component_themetogglecomponent",
+      "theme_toggle_theme_toggle_component_themetogglecomponent_toggletheme"
+    ],
+    "39": [
+      "guards_auth_guard_authguard",
+      "src_app_core_guards_auth_guard_ts"
+    ],
+    "40": [
+      "guards_unsaved_changes_guard_unsavedchangesguard",
+      "src_app_core_guards_unsaved_changes_guard_ts"
+    ],
+    "41": [
+      "divider_block_divider_block_component_dividerblockcomponent",
+      "src_app_features_blocks_divider_block_divider_block_component_ts"
+    ],
+    "42": [
+      "graph_knowledge_graph_component_knowledgegraphcomponent",
+      "src_app_features_graph_knowledge_graph_component_ts"
+    ],
+    "43": [
+      "html_notes_html_notes_gallery_component_htmlnotesgallerycomponent",
+      "src_app_features_html_notes_html_notes_gallery_component_ts"
+    ],
+    "44": [
+      "editor_placeholder_editor_placeholder_component_editorplaceholdercomponent",
+      "src_app_features_editor_editor_placeholder_editor_placeholder_component_ts"
+    ],
+    "45": [
+      "update_landing_links_js"
+    ],
+    "46": [
+      "post_build_js"
+    ],
+    "47": [
+      "src_main_ts"
+    ],
+    "48": [
+      "src_app_app_routes_ts"
+    ],
+    "49": [
+      "src_app_app_component_spec_ts"
+    ],
+    "50": [
+      "src_app_app_config_ts"
+    ],
+    "51": [
+      "src_app_core_index_ts"
+    ],
+    "52": [
+      "src_app_core_models_nav_item_model_ts"
+    ],
+    "53": [
+      "src_app_core_models_shelf_model_ts"
+    ],
+    "54": [
+      "src_app_features_blocks_shared_block_base_ts"
+    ],
+    "55": [
+      "src_app_features_editor_editor_routes_ts"
+    ]
+  },
+  "cohesion": {
+    "0": 0.05,
+    "1": 0.05,
+    "2": 0.13,
+    "3": 0.17,
+    "4": 0.11,
+    "5": 0.12,
+    "6": 0.14,
+    "7": 0.22,
+    "8": 0.16,
+    "9": 0.15,
+    "10": 0.15,
+    "11": 0.33,
+    "12": 0.31,
+    "13": 0.25,
+    "14": 0.36,
+    "15": 0.32,
+    "16": 0.39,
+    "17": 0.43,
+    "18": 0.43,
+    "19": 0.33,
+    "20": 0.33,
+    "21": 0.4,
+    "22": 0.33,
+    "23": 0.33,
+    "24": 0.4,
+    "25": 0.5,
+    "26": 0.4,
+    "27": 0.4,
+    "28": 0.5,
+    "29": 0.5,
+    "30": 0.67,
+    "31": 0.67,
+    "32": 0.67,
+    "33": 0.67,
+    "34": 0.67,
+    "35": 0.67,
+    "36": 0.67,
+    "37": 0.67,
+    "38": 0.67,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0
+  },
+  "gods": [
+    {
+      "id": "sidebar_sidebar_component_sidebarcomponent",
+      "label": "SidebarComponent",
+      "degree": 56
+    },
+    {
+      "id": "settings_settings_panel_component_settingspanelcomponent",
+      "label": "SettingsPanelComponent",
+      "degree": 36
+    },
+    {
+      "id": "services_shelf_service_shelfservice",
+      "label": "ShelfService",
+      "degree": 25
+    },
+    {
+      "id": "services_storage_sync_service_storagesyncservice",
+      "label": "StorageSyncService",
+      "degree": 22
+    },
+    {
+      "id": "split_editor_split_editor_component_spliteditorcomponent",
+      "label": "SplitEditorComponent",
+      "degree": 22
+    },
+    {
+      "id": "paper_canvas_paper_canvas_component_papercanvascomponent",
+      "label": "PaperCanvasComponent",
+      "degree": 21
+    },
+    {
+      "id": "services_editor_service_editorservice",
+      "label": "EditorService",
+      "degree": 16
+    },
+    {
+      "id": "services_template_service_templateservice",
+      "label": "TemplateService",
+      "degree": 15
+    },
+    {
+      "id": "pane_pane_component_panecomponent",
+      "label": "PaneComponent",
+      "degree": 14
+    },
+    {
+      "id": "notebook_grid_notebook_grid_component_notebookgridcomponent",
+      "label": "NotebookGridComponent",
+      "degree": 13
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `DividerBlockComponent`, `KnowledgeGraphComponent`, `HtmlNotesGalleryComponent` to the rest of the system?",
+      "why": "4 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.13 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 4` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.11 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 5` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.12 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 6` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.14 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

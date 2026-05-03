@@ -1,4 +1,4 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -8,21 +8,30 @@ export type Theme = 'light' | 'dark' | 'system';
 export class ThemeService {
   // Signal to track the current theme preference
   private themePreference = signal<Theme>('light');
-  
-  // Signal to track the actual applied theme (resolves 'system' to 'light' or 'dark')
-  public appliedTheme = signal<'light' | 'dark'>('light');
+
+  // Computed signal that resolves 'system' to the actual theme.
+  // This is reactive — any component reading it will update automatically.
+  public appliedTheme = computed<'light' | 'dark'>(() => {
+    const pref = this.themePreference();
+    if (pref === 'system') {
+      return this.systemThemeIsDark() ? 'dark' : 'light';
+    }
+    return pref;
+  });
+
+  // Tracks the OS-level dark mode preference so appliedTheme recomputes on change
+  private systemThemeIsDark = signal(
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : false
+  );
 
   constructor() {
-    // Load theme preference from localStorage
+    // Load saved preference and apply immediately
     this.loadThemePreference();
-    
-    // Set up effect to apply theme when preference changes
-    effect(() => {
-      const preference = this.themePreference();
-      this.applyTheme(preference);
-    });
-    
-    // Listen for system theme changes
+    this.applyToDom(this.appliedTheme());
+
+    // Listen for OS-level theme changes
     this.setupSystemThemeListener();
   }
 
@@ -39,14 +48,15 @@ export class ThemeService {
   setTheme(theme: Theme): void {
     this.themePreference.set(theme);
     localStorage.setItem('lore-theme', theme);
+    // Eagerly apply to the DOM so it takes effect immediately
+    this.applyToDom(this.appliedTheme());
   }
 
   /**
    * Toggle between light and dark themes
    */
   toggleTheme(): void {
-    const current = this.themePreference();
-    // Always toggle between light and dark (ignore system)
+    const current = this.appliedTheme();
     if (current === 'dark') {
       this.setTheme('light');
     } else {
@@ -62,43 +72,30 @@ export class ThemeService {
     if (stored && ['light', 'dark', 'system'].includes(stored)) {
       this.themePreference.set(stored);
     } else {
-      // Default to light theme
       this.themePreference.set('light');
     }
   }
 
   /**
-   * Apply the theme to the document
+   * Set the data-theme attribute on <html>
    */
-  private applyTheme(theme: Theme): void {
-    const htmlElement = document.documentElement;
-    
-    if (theme === 'system') {
-      // Use system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const resolvedTheme = systemPrefersDark ? 'dark' : 'light';
-      htmlElement.setAttribute('data-theme', resolvedTheme);
-      this.appliedTheme.set(resolvedTheme);
-    } else {
-      // Use explicit theme
-      htmlElement.setAttribute('data-theme', theme);
-      this.appliedTheme.set(theme);
-    }
+  private applyToDom(resolved: 'light' | 'dark'): void {
+    document.documentElement.setAttribute('data-theme', resolved);
   }
 
   /**
    * Listen for system theme changes
    */
   private setupSystemThemeListener(): void {
+    if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
     mediaQuery.addEventListener('change', (e) => {
-      // Only react if current preference is 'system'
+      this.systemThemeIsDark.set(e.matches);
+      // If user chose 'system', re-apply the DOM attribute
       if (this.themePreference() === 'system') {
-        const resolvedTheme = e.matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', resolvedTheme);
-        this.appliedTheme.set(resolvedTheme);
+        this.applyToDom(this.appliedTheme());
       }
     });
   }
 }
+

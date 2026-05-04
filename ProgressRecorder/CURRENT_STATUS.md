@@ -109,25 +109,32 @@ The Lore application is approximately **40% complete** with 5 out of 16 phases f
 ## 🚧 Partially Complete Phases (2/16)
 
 ### Phase 6: AI Integration - Part 1 🚧
-**Status**: 20% Complete
+**Status**: 60% Complete
 
 **What's Working**:
-- AskClaude block component (UI only)
-- Settings panel shell
+- ✅ SettingsService with encrypted API key storage
+- ✅ Crypto utilities for secure key encryption
+- ✅ AIService with Claude and GPT API integration
+- ✅ Streaming response support (SSE)
+- ✅ AI Providers settings tab with full UI
+- ✅ Connection testing for both providers
+- ✅ Model selection for Claude and GPT
+- AskClaude block component (UI only - needs connection)
 
 **Pending**:
-- AI service for API communication
-- Streaming response handling
-- API key management
-- AskGPT block
-- AI Providers settings tab
-- Connection testing
+- Connect AskClaude block to AIService
+- Create AskGPT block
+- Add markdown rendering for AI responses
+- Update slash palette with AI blocks
+- Comprehensive error handling
+- Unit tests
 
 **Next Steps**:
-1. Create AIService with Claude API integration
-2. Implement streaming responses
-3. Add API key storage (encrypted)
-4. Build AI Providers settings tab
+1. Update AskClaude block to use AIService
+2. Create AskGPT block component
+3. Add markdown support for responses
+4. Update slash palette
+5. Testing and polish
 
 ---
 

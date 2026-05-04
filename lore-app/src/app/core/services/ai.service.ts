@@ -1,780 +1,661 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { PROVIDER_MAP } from '../config/provider-registry';
+import { ModelDefinition } from '../config/provider-registry';
+import { AIOptions, AIStreamChunk } from '../models/ai.model';
+import { ApiKeyManagerService } from './api-key-manager.service';
+
+// ============================================================================
+// Internal adapter interface
+// ============================================================================
 
 /**
- * AI Provider Configuration
+ * ProviderAdapter encapsulates the wire-format differences between AI providers.
+ * Each provider has its own concrete adapter; the rest of AIService is
+ * provider-agnostic and dispatches via PROVIDER_MAP.
  */
-export interface AIProvider {
-  id: string;
-  name: string;
-  apiKey: string | null;
-  baseUrl: string;
-  models: AIModel[];
-  enabled: boolean;
-  connected: boolean;
+interface ProviderAdapter {
+  /** Build the HTTP request headers for this provider. */
+  buildHeaders(apiKey: string): Record<string, string>;
+
+  /**
+   * Build the JSON request body for this provider.
+   * Returns `unknown` so callers must JSON.stringify it.
+   */
+  buildRequestBody(prompt: string, model: string, options: AIOptions): unknown;
+
+  /**
+   * Parse a single SSE line and return the incremental text delta,
+   * or `null` if the line carries no content (e.g. event type lines,
+   * empty lines, comment lines).
+   */
+  parseStreamChunk(line: string): string | null;
+
+  /** Return true when the SSE stream signals completion. */
+  isStreamDone(line: string): boolean;
+
+  /**
+   * Build the full request URL for this provider.
+   * Most providers use `apiBaseUrl + path`; Google appends query params.
+   */
+  buildUrl(apiBaseUrl: string, model: string, apiKey: string): string;
 }
 
-/**
- * AI Model Configuration
- */
-export interface AIModel {
-  id: string;
-  name: string;
-  providerId: string;
-  maxTokens: number;
-  supportsStreaming: boolean;
-}
+// ============================================================================
+// Concrete adapters
+// ============================================================================
 
-/**
- * AI Request Configuration
- */
-export interface AIRequest {
-  prompt: string;
-  model: string;
-  providerId: string;
-  systemPrompt?: string;
-  temperature?: number;
-  maxTokens?: number;
-  stream?: boolean;
-  context?: string;
-}
+const anthropicAdapter: ProviderAdapter = {
+  buildHeaders(apiKey: string): Record<string, string> {
+    return {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    };
+  },
 
-/**
- * AI Response
- */
-export interface AIResponse {
-  content: string;
-  model: string;
-  providerId: string;
-  tokensUsed?: number;
-  finishReason?: string;
-  error?: string;
-}
+  buildRequestBody(prompt: string, model: string, options: AIOptions): unknown {
+    return {
+      model,
+      max_tokens: options.maxTokens ?? 1024,
+      messages: [{ role: 'user', content: prompt }],
+      stream: true,
+      ...(options.systemPrompt ? { system: options.systemPrompt } : {}),
+      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+    };
+  },
+
+  parseStreamChunk(line: string): string | null {
+    // Anthropic SSE lines look like:
+    //   data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Hello"}}
+    if (!line.startsWith('data:')) {
+      return null;
+    }
+    const jsonStr = line.slice('data:'.length).trim();
+    if (!jsonStr) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (
+        parsed.type === 'content_block_delta' &&
+        parsed.delta?.type === 'text_delta' &&
+        typeof parsed.delta.text === 'string'
+      ) {
+        return parsed.delta.text;
+      }
+    } catch {
+      // Malformed JSON — ignore
+    }
+    return null;
+  },
+
+  isStreamDone(line: string): boolean {
+    // Anthropic signals completion with:
+    //   event: message_stop
+    return line.trim() === 'event: message_stop' || line.includes('"type":"message_stop"');
+  },
+
+  buildUrl(apiBaseUrl: string, _model: string, _apiKey: string): string {
+    return `${apiBaseUrl}/messages`;
+  },
+};
+
+// ----------------------------------------------------------------------------
+
+const openaiAdapter: ProviderAdapter = {
+  buildHeaders(apiKey: string): Record<string, string> {
+    return {
+      'Authorization': `Bearer ${apiKey}`,
+      'content-type': 'application/json',
+    };
+  },
+
+  buildRequestBody(prompt: string, model: string, options: AIOptions): unknown {
+    const messages: Array<{ role: string; content: string }> = [];
+    if (options.systemPrompt) {
+      messages.push({ role: 'system', content: options.systemPrompt });
+    }
+    messages.push({ role: 'user', content: prompt });
+
+    return {
+      model,
+      messages,
+      stream: true,
+      ...(options.maxTokens !== undefined ? { max_tokens: options.maxTokens } : {}),
+      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+    };
+  },
+
+  parseStreamChunk(line: string): string | null {
+    // OpenAI SSE lines look like:
+    //   data: {"choices":[{"delta":{"content":"Hello"}}]}
+    if (!line.startsWith('data:')) {
+      return null;
+    }
+    const jsonStr = line.slice('data:'.length).trim();
+    if (!jsonStr || jsonStr === '[DONE]') {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(jsonStr);
+      const content = parsed?.choices?.[0]?.delta?.content;
+      if (typeof content === 'string') {
+        return content;
+      }
+    } catch {
+      // Malformed JSON — ignore
+    }
+    return null;
+  },
+
+  isStreamDone(line: string): boolean {
+    return line.trim() === 'data: [DONE]';
+  },
+
+  buildUrl(apiBaseUrl: string, _model: string, _apiKey: string): string {
+    return `${apiBaseUrl}/chat/completions`;
+  },
+};
+
+// ----------------------------------------------------------------------------
+
+const googleAdapter: ProviderAdapter = {
+  buildHeaders(_apiKey: string): Record<string, string> {
+    return {
+      'content-type': 'application/json',
+    };
+  },
+
+  buildRequestBody(prompt: string, _model: string, options: AIOptions): unknown {
+    const body: Record<string, unknown> = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+    if (options.systemPrompt) {
+      body['systemInstruction'] = { parts: [{ text: options.systemPrompt }] };
+    }
+    if (options.temperature !== undefined || options.maxTokens !== undefined) {
+      const generationConfig: Record<string, unknown> = {};
+      if (options.temperature !== undefined) {
+        generationConfig['temperature'] = options.temperature;
+      }
+      if (options.maxTokens !== undefined) {
+        generationConfig['maxOutputTokens'] = options.maxTokens;
+      }
+      body['generationConfig'] = generationConfig;
+    }
+    return body;
+  },
+
+  parseStreamChunk(line: string): string | null {
+    // Google SSE lines look like:
+    //   data: {"candidates":[{"content":{"parts":[{"text":"Hello"}]}}]}
+    if (!line.startsWith('data:')) {
+      return null;
+    }
+    const jsonStr = line.slice('data:'.length).trim();
+    if (!jsonStr) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(jsonStr);
+      const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (typeof text === 'string') {
+        return text;
+      }
+    } catch {
+      // Malformed JSON — ignore
+    }
+    return null;
+  },
+
+  isStreamDone(_line: string): boolean {
+    // Google's SSE stream closes naturally; no explicit done sentinel.
+    return false;
+  },
+
+  buildUrl(apiBaseUrl: string, model: string, apiKey: string): string {
+    return `${apiBaseUrl}/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
+  },
+};
+
+// ----------------------------------------------------------------------------
+// Groq — OpenAI-compatible API, same wire format as OpenAI
+// ----------------------------------------------------------------------------
+
+const groqAdapter: ProviderAdapter = {
+  buildHeaders(apiKey: string): Record<string, string> {
+    return {
+      'Authorization': `Bearer ${apiKey}`,
+      'content-type': 'application/json',
+    };
+  },
+
+  buildRequestBody(prompt: string, model: string, options: AIOptions): unknown {
+    const messages: Array<{ role: string; content: string }> = [];
+    if (options.systemPrompt) {
+      messages.push({ role: 'system', content: options.systemPrompt });
+    }
+    messages.push({ role: 'user', content: prompt });
+
+    return {
+      model,
+      messages,
+      stream: true,
+      ...(options.maxTokens !== undefined ? { max_tokens: options.maxTokens } : {}),
+      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+    };
+  },
+
+  parseStreamChunk(line: string): string | null {
+    // Groq uses the same SSE format as OpenAI
+    if (!line.startsWith('data:')) {
+      return null;
+    }
+    const jsonStr = line.slice('data:'.length).trim();
+    if (!jsonStr || jsonStr === '[DONE]') {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(jsonStr);
+      const content = parsed?.choices?.[0]?.delta?.content;
+      if (typeof content === 'string') {
+        return content;
+      }
+    } catch {
+      // Malformed JSON — ignore
+    }
+    return null;
+  },
+
+  isStreamDone(line: string): boolean {
+    return line.trim() === 'data: [DONE]';
+  },
+
+  buildUrl(apiBaseUrl: string, _model: string, _apiKey: string): string {
+    return `${apiBaseUrl}/chat/completions`;
+  },
+};
+
+// ============================================================================
+// Adapter dispatch map — keyed by provider ID
+// ============================================================================
+
+const ADAPTER_MAP = new Map<string, ProviderAdapter>([
+  ['anthropic', anthropicAdapter],
+  ['openai',    openaiAdapter],
+  ['google',    googleAdapter],
+  ['groq',      groqAdapter],
+]);
+
+// ============================================================================
+// AIService
+// ============================================================================
 
 /**
  * AIService
- * Handles communication with AI providers (Claude, GPT, Gemini, Groq)
+ *
+ * Sends prompts to AI provider APIs and returns streaming observables.
+ * All provider-specific logic is encapsulated in ProviderAdapter instances;
+ * this service is fully provider-agnostic — no `if (provider === 'claude')`
+ * branches exist here.
+ *
+ * Streaming is implemented via the Fetch API + ReadableStream, wrapped in an
+ * Observable. Angular HttpClient does not natively support SSE streaming, so
+ * the Fetch API is used for the actual HTTP call.
+ *
+ * Exponential backoff: delay = Math.min(1000 * 2^attempt, 30000), max 3 retries.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class AIService {
-  private readonly STORAGE_KEY = 'lore-ai-config';
 
-  // Available providers
-  private providersSignal = signal<AIProvider[]>([
-    {
-      id: 'anthropic',
-      name: 'Anthropic (Claude)',
-      apiKey: null,
-      baseUrl: 'https://api.anthropic.com/v1',
-      models: [
-        {
-          id: 'claude-3-5-sonnet-20241022',
-          name: 'Claude 3.5 Sonnet',
-          providerId: 'anthropic',
-          maxTokens: 200000,
-          supportsStreaming: true
-        },
-        {
-          id: 'claude-3-opus-20240229',
-          name: 'Claude 3 Opus',
-          providerId: 'anthropic',
-          maxTokens: 200000,
-          supportsStreaming: true
-        },
-        {
-          id: 'claude-3-haiku-20240307',
-          name: 'Claude 3 Haiku',
-          providerId: 'anthropic',
-          maxTokens: 200000,
-          supportsStreaming: true
-        }
-      ],
-      enabled: true,
-      connected: false
-    },
-    {
-      id: 'openai',
-      name: 'OpenAI (GPT)',
-      apiKey: null,
-      baseUrl: 'https://api.openai.com/v1',
-      models: [
-        {
-          id: 'gpt-4o',
-          name: 'GPT-4o',
-          providerId: 'openai',
-          maxTokens: 128000,
-          supportsStreaming: true
-        },
-        {
-          id: 'gpt-4-turbo',
-          name: 'GPT-4 Turbo',
-          providerId: 'openai',
-          maxTokens: 128000,
-          supportsStreaming: true
-        },
-        {
-          id: 'gpt-3.5-turbo',
-          name: 'GPT-3.5 Turbo',
-          providerId: 'openai',
-          maxTokens: 16385,
-          supportsStreaming: true
-        }
-      ],
-      enabled: true,
-      connected: false
-    },
-    {
-      id: 'google',
-      name: 'Google (Gemini)',
-      apiKey: null,
-      baseUrl: 'https://generativelanguage.googleapis.com/v1',
-      models: [
-        {
-          id: 'gemini-1.5-pro',
-          name: 'Gemini 1.5 Pro',
-          providerId: 'google',
-          maxTokens: 1000000,
-          supportsStreaming: true
-        },
-        {
-          id: 'gemini-1.5-flash',
-          name: 'Gemini 1.5 Flash',
-          providerId: 'google',
-          maxTokens: 1000000,
-          supportsStreaming: true
-        }
-      ],
-      enabled: false,
-      connected: false
-    },
-    {
-      id: 'groq',
-      name: 'Groq (Llama)',
-      apiKey: null,
-      baseUrl: 'https://api.groq.com/openai/v1',
-      models: [
-        {
-          id: 'llama-3.3-70b-versatile',
-          name: 'Llama 3.3 70B',
-          providerId: 'groq',
-          maxTokens: 32768,
-          supportsStreaming: true
-        },
-        {
-          id: 'llama-3.1-8b-instant',
-          name: 'Llama 3.1 8B',
-          providerId: 'groq',
-          maxTokens: 8192,
-          supportsStreaming: true
-        }
-      ],
-      enabled: false,
-      connected: false
+  /** Active AbortControllers keyed by requestId. */
+  private readonly _activeRequests = new Map<string, AbortController>();
+
+  /** Maximum number of retry attempts on network errors. */
+  private readonly MAX_RETRIES = 3;
+
+  constructor(private readonly keyManager: ApiKeyManagerService) {}
+
+  // --------------------------------------------------------------------------
+  // Public API
+  // --------------------------------------------------------------------------
+
+  /**
+   * Send a prompt to the specified provider and return a streaming observable
+   * of `AIStreamChunk` values. The observable completes after emitting a chunk
+   * with `isComplete: true`.
+   *
+   * @param providerId  Registry provider ID (e.g. 'anthropic', 'openai', 'google')
+   * @param prompt      The user prompt text
+   * @param options     Optional model/temperature/maxTokens/systemPrompt overrides
+   */
+  sendPrompt(
+    providerId: string,
+    prompt: string,
+    options: AIOptions = {}
+  ): Observable<AIStreamChunk> {
+    const requestId = crypto.randomUUID();
+
+    return new Observable<AIStreamChunk>(subscriber => {
+      // Kick off the async streaming pipeline.
+      this._streamPrompt(requestId, providerId, prompt, options, subscriber);
+
+      // Teardown: cancel the request if the subscriber unsubscribes.
+      return () => {
+        this.cancelRequest(requestId);
+      };
+    });
+  }
+
+  /**
+   * Cancel an in-flight request by its request ID.
+   * Calls `abort()` on the underlying AbortController.
+   */
+  cancelRequest(requestId: string): void {
+    const controller = this._activeRequests.get(requestId);
+    if (controller) {
+      controller.abort();
+      this._activeRequests.delete(requestId);
     }
-  ]);
-
-  // Default model
-  private defaultModelSignal = signal<string>('claude-3-5-sonnet-20241022');
-
-  // Public signals
-  providers = this.providersSignal.asReadonly();
-  defaultModel = this.defaultModelSignal.asReadonly();
-
-  constructor() {
-    this.loadConfiguration();
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // PROVIDER MANAGEMENT
-  // ═══════════════════════════════════════════════════════════
-
   /**
-   * Set API key for a provider
+   * Return the available models for the given provider from the registry.
+   * Returns an empty array for unknown provider IDs.
    */
-  setApiKey(providerId: string, apiKey: string): void {
-    this.providersSignal.update(providers =>
-      providers.map(p =>
-        p.id === providerId
-          ? { ...p, apiKey, connected: !!apiKey }
-          : p
-      )
-    );
-    this.saveConfiguration();
+  getModels(providerId: string): ModelDefinition[] {
+    return PROVIDER_MAP.get(providerId)?.availableModels ?? [];
   }
 
   /**
-   * Get API key for a provider
-   */
-  getApiKey(providerId: string): string | null {
-    const provider = this.providersSignal().find(p => p.id === providerId);
-    return provider?.apiKey || null;
-  }
-
-  /**
-   * Test connection to a provider
+   * Test the connection for a provider by sending a minimal prompt.
+   * Returns true if the API responds with a 2xx status, false otherwise.
    */
   async testConnection(providerId: string): Promise<boolean> {
-    const provider = this.providersSignal().find(p => p.id === providerId);
-    if (!provider || !provider.apiKey) {
+    const providerDef = PROVIDER_MAP.get(providerId);
+    const adapter = ADAPTER_MAP.get(providerId);
+
+    if (!providerDef || !adapter) {
       return false;
     }
 
+    const apiKey = await this.keyManager.getKey(providerId);
+    if (!apiKey) {
+      return false;
+    }
+
+    const model = providerDef.defaultModel;
+    const url = adapter.buildUrl(providerDef.apiBaseUrl, model, apiKey);
+    const headers = adapter.buildHeaders(apiKey);
+
+    // Send a minimal non-streaming request — just enough to verify auth.
+    // We build the body without stream:true so we get a quick JSON response.
+    const testBody = this._buildTestBody(providerId, model, apiKey);
+
     try {
-      // Send a simple test request
-      const response = await this.sendRequest({
-        prompt: 'Hello',
-        model: provider.models[0].id,
-        providerId: provider.id,
-        maxTokens: 10,
-        stream: false
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10_000); // 10s timeout
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(testBody),
+        signal: controller.signal,
       });
 
-      const success = !response.error;
-      
-      // Update connection status
-      this.providersSignal.update(providers =>
-        providers.map(p =>
-          p.id === providerId
-            ? { ...p, connected: success }
-            : p
-        )
-      );
-      
-      this.saveConfiguration();
-      return success;
-    } catch (error) {
-      console.error(`Connection test failed for ${providerId}:`, error);
+      clearTimeout(timeoutId);
+      return response.ok;
+    } catch {
       return false;
     }
   }
 
   /**
-   * Set default model
+   * Build a minimal non-streaming test request body for each provider.
    */
-  setDefaultModel(modelId: string): void {
-    this.defaultModelSignal.set(modelId);
-    this.saveConfiguration();
-  }
-
-  /**
-   * Get provider by ID
-   */
-  getProvider(providerId: string): AIProvider | undefined {
-    return this.providersSignal().find(p => p.id === providerId);
-  }
-
-  /**
-   * Get model by ID
-   */
-  getModel(modelId: string): AIModel | undefined {
-    for (const provider of this.providersSignal()) {
-      const model = provider.models.find(m => m.id === modelId);
-      if (model) return model;
-    }
-    return undefined;
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // AI REQUESTS
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Send AI request (non-streaming)
-   */
-  async sendRequest(request: AIRequest): Promise<AIResponse> {
-    const provider = this.getProvider(request.providerId);
-    if (!provider) {
-      return {
-        content: '',
-        model: request.model,
-        providerId: request.providerId,
-        error: `Provider ${request.providerId} not found`
-      };
-    }
-
-    if (!provider.apiKey) {
-      return {
-        content: '',
-        model: request.model,
-        providerId: request.providerId,
-        error: `API key not configured for ${provider.name}`
-      };
-    }
-
-    try {
-      switch (request.providerId) {
-        case 'anthropic':
-          return await this.sendAnthropicRequest(request, provider);
-        case 'openai':
-          return await this.sendOpenAIRequest(request, provider);
-        case 'google':
-          return await this.sendGoogleRequest(request, provider);
-        case 'groq':
-          return await this.sendGroqRequest(request, provider);
-        default:
-          return {
-            content: '',
-            model: request.model,
-            providerId: request.providerId,
-            error: `Provider ${request.providerId} not supported`
-          };
-      }
-    } catch (error: any) {
-      return {
-        content: '',
-        model: request.model,
-        providerId: request.providerId,
-        error: error.message || 'Unknown error occurred'
-      };
+  private _buildTestBody(providerId: string, model: string, _apiKey: string): unknown {
+    switch (providerId) {
+      case 'anthropic':
+        return {
+          model,
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'hi' }],
+          stream: false,
+        };
+      case 'google':
+        return {
+          contents: [{ parts: [{ text: 'hi' }] }],
+          generationConfig: { maxOutputTokens: 1 },
+        };
+      // openai + groq share the same format
+      default:
+        return {
+          model,
+          messages: [{ role: 'user', content: 'hi' }],
+          max_tokens: 1,
+          stream: false,
+        };
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Private streaming implementation
+  // --------------------------------------------------------------------------
+
   /**
-   * Send streaming AI request
+   * Core streaming pipeline. Resolves the API key, builds the request,
+   * streams the response, and emits chunks to the subscriber.
+   * Retries on network errors with exponential backoff.
    */
-  async *sendStreamingRequest(request: AIRequest): AsyncGenerator<string, void, unknown> {
-    const provider = this.getProvider(request.providerId);
-    if (!provider || !provider.apiKey) {
-      yield `Error: Provider ${request.providerId} not configured`;
+  private async _streamPrompt(
+    requestId: string,
+    providerId: string,
+    prompt: string,
+    options: AIOptions,
+    subscriber: {
+      next: (chunk: AIStreamChunk) => void;
+      error: (err: unknown) => void;
+      complete: () => void;
+    }
+  ): Promise<void> {
+    // --- Validate provider ---
+    const providerDef = PROVIDER_MAP.get(providerId);
+    if (!providerDef) {
+      subscriber.next({
+        requestId,
+        delta: '',
+        isComplete: true,
+        error: `Unknown provider: "${providerId}"`,
+      });
+      subscriber.complete();
       return;
     }
 
-    try {
-      switch (request.providerId) {
-        case 'anthropic':
-          yield* this.streamAnthropicRequest(request, provider);
-          break;
-        case 'openai':
-          yield* this.streamOpenAIRequest(request, provider);
-          break;
-        case 'google':
-          yield* this.streamGoogleRequest(request, provider);
-          break;
-        case 'groq':
-          yield* this.streamGroqRequest(request, provider);
-          break;
-        default:
-          yield `Error: Provider ${request.providerId} not supported`;
+    const adapter = ADAPTER_MAP.get(providerId);
+    if (!adapter) {
+      subscriber.next({
+        requestId,
+        delta: '',
+        isComplete: true,
+        error: `No adapter registered for provider: "${providerId}"`,
+      });
+      subscriber.complete();
+      return;
+    }
+
+    // --- Resolve API key ---
+    const apiKey = await this.keyManager.getKey(providerId);
+    if (!apiKey) {
+      subscriber.next({
+        requestId,
+        delta: '',
+        isComplete: true,
+        error: `No API key configured for provider "${providerId}"`,
+      });
+      subscriber.complete();
+      return;
+    }
+
+    // --- Determine model ---
+    const model = options.model ?? providerDef.defaultModel;
+
+    // --- Build request ---
+    const url = adapter.buildUrl(providerDef.apiBaseUrl, model, apiKey);
+    const headers = adapter.buildHeaders(apiKey);
+    const body = JSON.stringify(adapter.buildRequestBody(prompt, model, options));
+
+    // --- Retry loop with exponential backoff ---
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
+      if (attempt > 0) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
+        await this._sleep(delay);
       }
-    } catch (error: any) {
-      yield `Error: ${error.message || 'Unknown error occurred'}`;
-    }
-  }
 
-  // ═══════════════════════════════════════════════════════════
-  // ANTHROPIC (CLAUDE) IMPLEMENTATION
-  // ═══════════════════════════════════════════════════════════
+      const controller = new AbortController();
+      this._activeRequests.set(requestId, controller);
 
-  /**
-   * Send request to Anthropic API
-   */
-  private async sendAnthropicRequest(request: AIRequest, provider: AIProvider): Promise<AIResponse> {
-    const response = await fetch(`${provider.baseUrl}/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': provider.apiKey!,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: request.model,
-        max_tokens: request.maxTokens || 4096,
-        temperature: request.temperature || 1.0,
-        system: request.systemPrompt || 'You are a helpful AI assistant.',
-        messages: [
-          {
-            role: 'user',
-            content: request.context
-              ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-              : request.prompt
-          }
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return {
-      content: data.content[0].text,
-      model: request.model,
-      providerId: request.providerId,
-      tokensUsed: data.usage?.total_tokens,
-      finishReason: data.stop_reason
-    };
-  }
-
-  /**
-   * Stream request to Anthropic API
-   */
-  private async *streamAnthropicRequest(request: AIRequest, provider: AIProvider): AsyncGenerator<string, void, unknown> {
-    const response = await fetch(`${provider.baseUrl}/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': provider.apiKey!,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: request.model,
-        max_tokens: request.maxTokens || 4096,
-        temperature: request.temperature || 1.0,
-        system: request.systemPrompt || 'You are a helpful AI assistant.',
-        messages: [
-          {
-            role: 'user',
-            content: request.context
-              ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-              : request.prompt
-          }
-        ],
-        stream: true
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error('Response body is not readable');
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') continue;
-
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-              yield parsed.delta.text;
-            }
-          } catch (e) {
-            // Skip invalid JSON
-          }
-        }
-      }
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // OPENAI (GPT) IMPLEMENTATION
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Send request to OpenAI API
-   */
-  private async sendOpenAIRequest(request: AIRequest, provider: AIProvider): Promise<AIResponse> {
-    const response = await fetch(`${provider.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${provider.apiKey}`
-      },
-      body: JSON.stringify({
-        model: request.model,
-        max_tokens: request.maxTokens || 4096,
-        temperature: request.temperature || 1.0,
-        messages: [
-          {
-            role: 'system',
-            content: request.systemPrompt || 'You are a helpful AI assistant.'
-          },
-          {
-            role: 'user',
-            content: request.context
-              ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-              : request.prompt
-          }
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return {
-      content: data.choices[0].message.content,
-      model: request.model,
-      providerId: request.providerId,
-      tokensUsed: data.usage?.total_tokens,
-      finishReason: data.choices[0].finish_reason
-    };
-  }
-
-  /**
-   * Stream request to OpenAI API
-   */
-  private async *streamOpenAIRequest(request: AIRequest, provider: AIProvider): AsyncGenerator<string, void, unknown> {
-    const response = await fetch(`${provider.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${provider.apiKey}`
-      },
-      body: JSON.stringify({
-        model: request.model,
-        max_tokens: request.maxTokens || 4096,
-        temperature: request.temperature || 1.0,
-        messages: [
-          {
-            role: 'system',
-            content: request.systemPrompt || 'You are a helpful AI assistant.'
-          },
-          {
-            role: 'user',
-            content: request.context
-              ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-              : request.prompt
-          }
-        ],
-        stream: true
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error('Response body is not readable');
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') continue;
-
-          try {
-            const parsed = JSON.parse(data);
-            const content = parsed.choices[0]?.delta?.content;
-            if (content) {
-              yield content;
-            }
-          } catch (e) {
-            // Skip invalid JSON
-          }
-        }
-      }
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // GOOGLE (GEMINI) IMPLEMENTATION
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Send request to Google Gemini API
-   */
-  private async sendGoogleRequest(request: AIRequest, provider: AIProvider): Promise<AIResponse> {
-    const response = await fetch(
-      `${provider.baseUrl}/models/${request.model}:generateContent?key=${provider.apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: request.context
-                    ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-                    : request.prompt
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: request.temperature || 1.0,
-            maxOutputTokens: request.maxTokens || 4096
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return {
-      content: data.candidates[0].content.parts[0].text,
-      model: request.model,
-      providerId: request.providerId,
-      finishReason: data.candidates[0].finishReason
-    };
-  }
-
-  /**
-   * Stream request to Google Gemini API
-   */
-  private async *streamGoogleRequest(request: AIRequest, provider: AIProvider): AsyncGenerator<string, void, unknown> {
-    const response = await fetch(
-      `${provider.baseUrl}/models/${request.model}:streamGenerateContent?key=${provider.apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: request.context
-                    ? `Context:\n${request.context}\n\nQuestion:\n${request.prompt}`
-                    : request.prompt
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: request.temperature || 1.0,
-            maxOutputTokens: request.maxTokens || 4096
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error('Response body is not readable');
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.trim()) {
-          try {
-            const parsed = JSON.parse(line);
-            const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-              yield text;
-            }
-          } catch (e) {
-            // Skip invalid JSON
-          }
-        }
-      }
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // GROQ (LLAMA) IMPLEMENTATION
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Send request to Groq API (OpenAI-compatible)
-   */
-  private async sendGroqRequest(request: AIRequest, provider: AIProvider): Promise<AIResponse> {
-    return this.sendOpenAIRequest(request, provider);
-  }
-
-  /**
-   * Stream request to Groq API (OpenAI-compatible)
-   */
-  private async *streamGroqRequest(request: AIRequest, provider: AIProvider): AsyncGenerator<string, void, unknown> {
-    yield* this.streamOpenAIRequest(request, provider);
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // STORAGE
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Load configuration from localStorage
-   */
-  private loadConfiguration(): void {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    if (stored) {
       try {
-        const config = JSON.parse(stored);
-        
-        // Update providers with stored API keys
-        if (config.providers) {
-          this.providersSignal.update(providers =>
-            providers.map(p => {
-              const stored = config.providers.find((sp: any) => sp.id === p.id);
-              return stored
-                ? { ...p, apiKey: stored.apiKey, connected: stored.connected }
-                : p;
-            })
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body,
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '');
+          throw new Error(
+            `HTTP ${response.status}: ${response.statusText}${errorText ? ` — ${errorText}` : ''}`
           );
         }
 
-        // Update default model
-        if (config.defaultModel) {
-          this.defaultModelSignal.set(config.defaultModel);
+        if (!response.body) {
+          throw new Error('Response body is null — streaming not supported');
         }
-      } catch (error) {
-        console.error('Failed to load AI configuration:', error);
+
+        // --- Stream the response ---
+        await this._readStream(
+          requestId,
+          response.body,
+          adapter,
+          subscriber
+        );
+
+        // Stream completed successfully — clean up and return.
+        this._activeRequests.delete(requestId);
+        return;
+
+      } catch (err: unknown) {
+        this._activeRequests.delete(requestId);
+
+        // If the request was aborted (cancelled by the caller), stop silently.
+        if (err instanceof Error && err.name === 'AbortError') {
+          subscriber.complete();
+          return;
+        }
+
+        lastError = err;
+
+        // On the last attempt, emit an error chunk.
+        if (attempt === this.MAX_RETRIES) {
+          break;
+        }
+        // Otherwise, retry.
       }
     }
+
+    // All retries exhausted — emit error chunk.
+    subscriber.next({
+      requestId,
+      delta: '',
+      isComplete: true,
+      error: `Request failed after ${this.MAX_RETRIES + 1} attempts: ${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }`,
+    });
+    subscriber.complete();
   }
 
   /**
-   * Save configuration to localStorage
+   * Read a `ReadableStream<Uint8Array>` line by line and emit `AIStreamChunk`
+   * values to the subscriber for each content delta.
    */
-  private saveConfiguration(): void {
-    const config = {
-      providers: this.providersSignal().map(p => ({
-        id: p.id,
-        apiKey: p.apiKey,
-        connected: p.connected
-      })),
-      defaultModel: this.defaultModelSignal()
-    };
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
+  private async _readStream(
+    requestId: string,
+    body: ReadableStream<Uint8Array>,
+    adapter: ProviderAdapter,
+    subscriber: {
+      next: (chunk: AIStreamChunk) => void;
+      complete: () => void;
+    }
+  ): Promise<void> {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          // Process any remaining buffered content.
+          if (buffer.trim()) {
+            this._processLine(requestId, buffer.trim(), adapter, subscriber);
+          }
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Split on newlines and process complete lines.
+        const lines = buffer.split('\n');
+        // Keep the last (potentially incomplete) line in the buffer.
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (adapter.isStreamDone(line)) {
+            // Emit the final completion chunk and stop reading.
+            subscriber.next({ requestId, delta: '', isComplete: true });
+            subscriber.complete();
+            reader.cancel();
+            return;
+          }
+          this._processLine(requestId, line, adapter, subscriber);
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    // Stream ended naturally (e.g. Google closes without a done sentinel).
+    subscriber.next({ requestId, delta: '', isComplete: true });
+    subscriber.complete();
+  }
+
+  /**
+   * Parse a single SSE line via the adapter and emit a chunk if it carries
+   * content.
+   */
+  private _processLine(
+    requestId: string,
+    line: string,
+    adapter: ProviderAdapter,
+    subscriber: { next: (chunk: AIStreamChunk) => void }
+  ): void {
+    const delta = adapter.parseStreamChunk(line);
+    if (delta !== null) {
+      subscriber.next({ requestId, delta, isComplete: false });
+    }
+  }
+
+  /** Promise-based sleep helper for retry backoff. */
+  private _sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

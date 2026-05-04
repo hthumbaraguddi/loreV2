@@ -1,0 +1,143 @@
+<div class="s-sec">
+
+  <!-- Section header -->
+  <div class="s-title">AI Providers</div>
+  <div class="s-desc">Configure your AI API keys to enable AI-powered features in your notes.</div>
+
+  <!-- ── Add / Edit Provider form ─────────────────────────────────────────── -->
+  <div class="s-card">
+    <div class="s-title" style="font-size:13px; margin-bottom:12px;">
+      {{ isEditMode() ? 'Edit Provider' : 'Add Provider' }}
+    </div>
+
+    <!-- Provider selector -->
+    <div class="provider-form-row">
+      <label for="provider-select" class="form-label">Provider</label>
+      <select
+        id="provider-select"
+        class="api-input"
+        style="flex:1; min-width:0; font-family:'DM Sans',sans-serif; font-size:13px;"
+        [ngModel]="selectedProviderId()"
+        (ngModelChange)="onProviderSelected($event)"
+      >
+        <option value="">— Select a provider —</option>
+        @for (provider of providerRegistry; track provider.id) {
+          <option [value]="provider.id">{{ provider.displayName }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Key input — shown when a provider is selected -->
+    @if (selectedProvider()) {
+      <div class="provider-form-row" style="margin-top:14px;">
+        <label [for]="'api-key-input-' + selectedProviderId()" class="form-label">API Key</label>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0;">
+
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input
+              [id]="'api-key-input-' + selectedProviderId()"
+              type="password"
+              class="api-input"
+              style="flex:1; min-width:0;"
+              [placeholder]="selectedProvider()!.keyPlaceholder"
+              [ngModel]="apiKeyInput()"
+              (ngModelChange)="apiKeyInput.set($event)"
+              (keydown.enter)="saveProvider()"
+              autocomplete="off"
+            />
+            <button class="tb-btn primary" (click)="saveProvider()">
+              {{ isEditMode() ? 'Update' : 'Save' }}
+            </button>
+          </div>
+
+          <!-- Inline validation error -->
+          @if (validationError()) {
+            <span class="inline-error">{{ validationError() }}</span>
+          }
+
+          <!-- Get API Key link -->
+          <a
+            class="get-api-key-link"
+            [href]="selectedProvider()!.getApiKeyUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Get API Key ↗</a>
+
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ── Configured providers list ────────────────────────────────────────── -->
+  <div role="list">
+
+    @if (configuredProviderIds().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">🤖</span>
+        <div class="empty-title">No AI providers configured</div>
+        <div class="empty-description">
+          Select a provider above and enter your API key to get started.
+        </div>
+      </div>
+    }
+
+    @for (pid of configuredProviderIds(); track pid) {
+      <div class="provider-card s-card" role="listitem">
+
+        <!-- Logo -->
+        <img
+          class="provider-card-logo"
+          [src]="providerDef(pid).logoAsset"
+          [alt]="providerDef(pid).displayName"
+          onerror="this.style.display='none'"
+        />
+
+        <!-- Name + status -->
+        <div class="provider-card-info">
+          <span class="api-name">{{ providerDef(pid).displayName }}</span>
+          <span
+            class="status-badge"
+            [attr.data-status]="statusClass(pid)"
+            aria-live="polite"
+          >{{ statusLabel(pid) }}</span>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="provider-card-actions">
+          <button
+            class="tb-btn"
+            (click)="testConnection(pid)"
+            [disabled]="connectionStatus().get(pid) === 'testing'"
+            title="Test connection"
+          >
+            @if (connectionStatus().get(pid) === 'testing') {
+              <span class="spinner"></span>Testing…
+            } @else {
+              Test
+            }
+          </button>
+          <button class="tb-btn" (click)="editProvider(pid)" title="Edit API key">
+            Edit
+          </button>
+          <button class="tb-btn ghost-danger" (click)="deleteProvider(pid)" title="Remove API key">
+            Delete
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+  <!-- ── Danger Zone ───────────────────────────────────────────────────────── -->
+  @if (configuredProviderIds().length > 0) {
+    <div class="s-card danger-zone-card">
+      <div class="s-title">Danger Zone</div>
+      <div class="s-desc">Permanently remove all API keys from this device.</div>
+      <button class="tb-btn ghost-danger" (click)="clearAllKeys()">
+        Clear All API Keys
+      </button>
+    </div>
+  }
+
+</div>

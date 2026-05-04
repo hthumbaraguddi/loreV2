@@ -96,23 +96,25 @@
             <div class="s-card">
               @for (provider of aiProviders(); track provider.id) {
                 <div class="api-row">
-                  <div class="api-logo" [style.background]="provider.logoBg">{{ provider.logoText }}</div>
+                  <div class="api-logo" [style.background]="getProviderLogoBg(provider.id)">{{ getProviderLogoText(provider.id) }}</div>
                   <div class="api-info">
                     <div class="api-name">{{ provider.name }}</div>
-                    <div class="api-status">{{ provider.model }} · {{ provider.status }}</div>
+                    <div class="api-status">{{ getProviderStatus(provider) }}</div>
                   </div>
                   <input 
                     class="api-input" 
-                    [type]="provider.connected ? 'password' : 'text'" 
-                    [value]="provider.key" 
-                    [placeholder]="provider.id === 'openrouter' ? 'sk-or-••••••••••••' : 'API key'"
+                    [type]="provider.apiKey ? 'password' : 'text'" 
+                    [value]="provider.apiKey ? getMaskedApiKey(provider) : ''" 
+                    [placeholder]="'Enter API key'"
+                    (input)="updateApiKey(provider.id, $any($event.target).value)"
                   />
                   <button 
                     class="api-btn" 
                     [class.on]="provider.connected"
-                    (click)="toggleProviderConnection(provider.id)"
+                    [disabled]="!provider.apiKey"
+                    (click)="testProviderConnection(provider.id)"
                   >
-                    {{ provider.connected ? 'Connected' : 'Connect' }}
+                    {{ provider.connected ? 'Connected ✓' : 'Test Connection' }}
                   </button>
                 </div>
               }
@@ -123,7 +125,7 @@
             <div class="s-title">Default Model</div>
             <div class="s-desc">Used when &#64;ai is invoked without specifying a provider.</div>
             <div class="model-grid">
-              @for (model of models(); track model.id) {
+              @for (model of allModels(); track model.id) {
                 <div 
                   class="model-card" 
                   [class.sel]="model.selected"

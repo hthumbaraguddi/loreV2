@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { TemplateService, Template } from '../../core/services/template.service';
 import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
 import { ThemeService, type Theme } from '../../core/services/theme.service';
+import { AIService, AIProvider } from '../../core/services/ai.service';
 
 export type SettingsPanel = 
   | 'ai-providers' 
@@ -45,6 +46,7 @@ export class SettingsPanelComponent {
   private templateService = inject(TemplateService);
   storageSyncService = inject(StorageSyncService);
   private themeService = inject(ThemeService);
+  aiService = inject(AIService);
   
   // Active panel
   activePanel = signal<SettingsPanel>('ai-providers');
@@ -56,25 +58,14 @@ export class SettingsPanelComponent {
   // Categories
   categories = signal(['All', ...this.templateService.categories()]);
 
-  // AI Providers state
-  aiProviders = signal([
-    { id: 'anthropic', name: 'Anthropic · Claude', status: 'Connected ✓', model: 'claude-sonnet-4', key: 'sk-ant-••••••••••••••••', connected: true, logoBg: '#7C3AED', logoText: 'C' },
-    { id: 'openai', name: 'OpenAI · ChatGPT', status: 'Connected ✓', model: 'gpt-4o', key: 'sk-••••••••••••••••', connected: true, logoBg: '#10A37F', logoText: 'G' },
-    { id: 'google', name: 'Google · Gemini', status: 'Not configured', model: '', key: '', connected: false, logoBg: '#4285F4', logoText: 'G' },
-    { id: 'groq', name: 'Groq · Llama 3', status: 'Not configured', model: '', key: '', connected: false, logoBg: '#F55036', logoText: 'Q' },
-    { id: 'openrouter', name: 'OpenRouter', status: '50+ models via one key', model: '', key: '', connected: false, logoBg: '#1A1A2E', logoText: 'O' }
-  ]);
+  // AI Providers state (from AIService)
+  aiProviders = this.aiService.providers;
 
-  // Default model
-  defaultModel = signal('claude-sonnet-4');
+  // Default model (from AIService)
+  defaultModel = this.aiService.defaultModel;
   
-  // Models for selection
-  models = signal([
-    { id: 'claude-sonnet-4', name: 'Claude Sonnet 4', description: 'Best for research & analysis', selected: true },
-    { id: 'gpt-4o', name: 'GPT-4o', description: 'Writing & code', selected: false },
-    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: '1M token context', selected: false },
-    { id: 'groq-llama-3', name: 'Groq Llama 3', description: 'Fastest inference', selected: false }
-  ]);
+  // All available models (computed from providers)
+  allModels = signal<any[]>([]);
 
   // Profile state
   profile = signal<Profile>({
@@ -127,6 +118,26 @@ export class SettingsPanelComponent {
       const themePreference = this.themeService.getThemePreference();
       this.theme.set(themePreference);
     });
+
+    // Build models list from all providers
+    effect(() => {
+      const providers = this.aiProviders();
+      const models: any[] = [];
+      
+      for (const provider of providers) {
+        for (const model of provider.models) {
+          models.push({
+            id: model.id,
+            name: model.name,
+            description: `${provider.name} · ${model.maxTokens.toLocaleString()} tokens`,
+            selected: model.id === this.defaultModel(),
+            providerId: provider.id
+          });
+        }
+      }
+      
+      this.allModels.set(models);
+    });
   }
 
   // ─── Panel Navigation ──────────────────────────────────────────
@@ -141,27 +152,86 @@ export class SettingsPanelComponent {
   // ─── AI Providers ─────────────────────────────────────────────
 
   /**
-   * Toggle AI provider connection
+   * Update API key for provider
    */
-  toggleProviderConnection(providerId: string): void {
-    this.aiProviders.update(providers => 
-      providers.map(p => 
-        p.id === providerId ? { ...p, connected: !p.connected } : p
-      )
-    );
+  updateApiKey(providerId: string, apiKey: string): void {
+    this.aiService.setApiKey(providerId, apiKey);
+  }
+
+  /**
+   * Test connection to provider
+   */
+  async testProviderConnection(providerId: string): Promise<void> {
+    try {
+      const success = await this.aiService.testConnection(providerId);
+      if (success) {
+        alert(`Successfully connected to ${providerId}!`);
+      } else {
+        alert(`Failed to connect to ${providerId}. Please check your API key.`);
+      }
+    } catch (error: any) {
+      alert(`Connection test failed: ${error.message}`);
+    }
   }
 
   /**
    * Select default model
    */
   selectModel(modelId: string): void {
-    this.defaultModel.set(modelId);
-    this.models.update(models => 
-      models.map(m => ({
-        ...m,
-        selected: m.id === modelId
-      }))
-    );
+    this.aiService.setDefaultModel(modelId);
+  }
+
+  /**
+   * Get masked API key for display
+   */
+  getMaskedApiKey(provider: AIProvider): string {
+    if (!provider.apiKey) {
+      return '';
+    }
+    const key = provider.apiKey;
+    if (key.length <= 8) {
+      return '••••••••';
+    }
+    return key.substring(0, 4) + '••••••••' + key.substring(key.length - 4);
+  }
+
+  /**
+   * Get provider status text
+   */
+  getProviderStatus(provider: AIProvider): string {
+    if (!provider.apiKey) {
+      return 'Not configured';
+    }
+    if (provider.connected) {
+      return 'Connected ✓';
+    }
+    return 'API key set (not tested)';
+  }
+
+  /**
+   * Get provider logo background color
+   */
+  getProviderLogoBg(providerId: string): string {
+    const colors: Record<string, string> = {
+      'anthropic': '#7C3AED',
+      'openai': '#10A37F',
+      'google': '#4285F4',
+      'groq': '#F55036'
+    };
+    return colors[providerId] || '#1A1A2E';
+  }
+
+  /**
+   * Get provider logo text
+   */
+  getProviderLogoText(providerId: string): string {
+    const logos: Record<string, string> = {
+      'anthropic': 'C',
+      'openai': 'G',
+      'google': 'G',
+      'groq': 'Q'
+    };
+    return logos[providerId] || '?';
   }
 
   // ─── Profile ──────────────────────────────────────────────────

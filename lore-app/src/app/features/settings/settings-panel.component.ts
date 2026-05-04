@@ -399,10 +399,15 @@ export class SettingsPanelComponent {
   /**
    * Import notes
    */
-  importNotes(): void {
-    // TODO: Implement actual import logic
-    console.log('Importing notes...');
-    alert('Import notes functionality coming soon');
+  async importNotes(): Promise<void> {
+    try {
+      await this.storageSyncService.importFromFolder();
+      // Success - page will reload automatically
+    } catch (error: any) {
+      if (error.message && !error.message.includes('cancelled')) {
+        alert(`Import failed: ${error.message}`);
+      }
+    }
   }
 
   // ─── Appearance ──────────────────────────────────────────────

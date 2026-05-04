@@ -95,6 +95,9 @@ export class StorageSyncService {
   constructor() {
     // Load settings from localStorage
     this.loadSettings();
+    
+    // Try to restore folder handle on startup
+    this.restoreFolderHandleOnStartup();
   }
 
   // ─── Storage Tier ──────────────────────────────────────────────
@@ -221,14 +224,17 @@ export class StorageSyncService {
         }
       }));
 
-      // TODO: Implement actual sync logic
-      // This would involve:
-      // 1. Get all data from IndexedDB
-      // 2. Write to folder structure
-      // 3. Update progress
+      // Get all data from localStorage
+      const data = this.getAllDataFromLocalStorage();
+      
+      // Update progress
+      this.updateSyncProgress('local', 20);
 
-      // Simulate sync for now
-      await this.simulateSync();
+      // Write to folder structure
+      await this.writeDataToFolder(settings.localSync.folderHandle, data);
+      
+      // Update progress
+      this.updateSyncProgress('local', 100);
 
       // Update success state
       const now = new Date().toISOString();
@@ -254,6 +260,83 @@ export class StorageSyncService {
           syncError: error.message
         }
       }));
+      throw error;
+    }
+  }
+
+  /**
+   * Import from local folder
+   */
+  async importFromFolder(): Promise<void> {
+    if (!this.isFileSystemAccessSupported()) {
+      throw new Error('File System Access API is not supported in this browser');
+    }
+
+    try {
+      // Request folder access
+      const dirHandle = await (window as any).showDirectoryPicker({
+        mode: 'read',
+        startIn: 'documents'
+      });
+
+      // Update syncing state
+      this.syncSettings.update(s => ({
+        ...s,
+        localSync: {
+          ...s.localSync,
+          isSyncing: true,
+          syncProgress: 0,
+          syncError: null
+        }
+      }));
+
+      // Read data from folder
+      const importedData = await this.readDataFromFolder(dirHandle);
+      
+      // Update progress
+      this.updateSyncProgress('local', 50);
+
+      // Merge with existing data
+      await this.mergeImportedData(importedData);
+      
+      // Update progress
+      this.updateSyncProgress('local', 100);
+
+      // Update success state
+      this.syncSettings.update(s => ({
+        ...s,
+        localSync: {
+          ...s.localSync,
+          isSyncing: false,
+          syncProgress: 100
+        }
+      }));
+
+      this.saveSettings();
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        // User cancelled
+        this.syncSettings.update(s => ({
+          ...s,
+          localSync: {
+            ...s.localSync,
+            isSyncing: false,
+            syncProgress: 0
+          }
+        }));
+        return;
+      }
+      
+      // Update error state
+      this.syncSettings.update(s => ({
+        ...s,
+        localSync: {
+          ...s.localSync,
+          isSyncing: false,
+          syncError: error.message
+        }
+      }));
+      throw error;
     }
   }
 
@@ -478,8 +561,586 @@ export class StorageSyncService {
    * Store folder handle in IndexedDB
    */
   private async storeFolderHandle(handle: FileSystemDirectoryHandle): Promise<void> {
-    // TODO: Implement IndexedDB storage
-    // This would store the handle for persistence across sessions
+    try {
+      const db = await this.openIndexedDB();
+      const transaction = db.transaction(['folderHandles'], 'readwrite');
+      const store = transaction.objectStore('folderHandles');
+      
+      return new Promise((resolve, reject) => {
+        const request = store.put({ id: 'main', handle });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to store folder handle:', error);
+    }
+  }
+
+  /**
+   * Restore folder handle from IndexedDB
+   */
+  private async restoreFolderHandle(): Promise<FileSystemDirectoryHandle | null> {
+    try {
+      const db = await this.openIndexedDB();
+      const transaction = db.transaction(['folderHandles'], 'readonly');
+      const store = transaction.objectStore('folderHandles');
+      
+      return new Promise((resolve, reject) => {
+        const request = store.get('main');
+        request.onsuccess = async () => {
+          const result = request.result;
+          if (result && result.handle) {
+            // Verify we still have permission
+            const permission = await result.handle.queryPermission({ mode: 'readwrite' });
+            if (permission === 'granted') {
+              resolve(result.handle);
+            } else {
+              resolve(null);
+            }
+          } else {
+            resolve(null);
+          }
+        };
+        request.onerror = () => {
+          console.error('Failed to restore folder handle:', request.error);
+          resolve(null);
+        };
+      });
+    } catch (error) {
+      console.error('Failed to restore folder handle:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Open IndexedDB
+   */
+  private openIndexedDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('lore-sync', 1);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('folderHandles')) {
+          db.createObjectStore('folderHandles', { keyPath: 'id' });
+        }
+      };
+    });
+  }
+
+  /**
+   * Get all data from localStorage
+   */
+  private getAllDataFromLocalStorage(): any {
+    const data: any = {
+      shelves: [],
+      settings: {},
+      metadata: {
+        exportedAt: new Date().toISOString(),
+        version: '1.0'
+      }
+    };
+
+    // Get shelves data
+    const shelvesData = localStorage.getItem('lore-shelves');
+    if (shelvesData) {
+      try {
+        data.shelves = JSON.parse(shelvesData);
+      } catch (error) {
+        console.error('Failed to parse shelves data:', error);
+      }
+    }
+
+    // Get other settings
+    const syncSettings = localStorage.getItem('lore-sync-settings');
+    if (syncSettings) {
+      try {
+        data.settings.sync = JSON.parse(syncSettings);
+      } catch (error) {
+        console.error('Failed to parse sync settings:', error);
+      }
+    }
+
+    return data;
+  }
+
+  /**
+   * Write data to folder
+   */
+  private async writeDataToFolder(folderHandle: FileSystemDirectoryHandle, data: any): Promise<void> {
+    try {
+      // Create lore-data folder
+      const dataFolder = await folderHandle.getDirectoryHandle('lore-data', { create: true });
+      
+      // Update progress
+      this.updateSyncProgress('local', 40);
+
+      // Write shelves
+      if (data.shelves && Array.isArray(data.shelves)) {
+        for (const shelf of data.shelves) {
+          await this.writeShelfToFolder(dataFolder, shelf);
+        }
+      }
+
+      // Update progress
+      this.updateSyncProgress('local', 80);
+
+      // Write metadata
+      const metadataFile = await dataFolder.getFileHandle('metadata.json', { create: true });
+      const metadataWritable = await metadataFile.createWritable();
+      await metadataWritable.write(JSON.stringify(data.metadata, null, 2));
+      await metadataWritable.close();
+
+      // Update progress
+      this.updateSyncProgress('local', 90);
+    } catch (error: any) {
+      throw new Error(`Failed to write data to folder: ${error.message}`);
+    }
+  }
+
+  /**
+   * Write shelf to folder
+   */
+  private async writeShelfToFolder(dataFolder: FileSystemDirectoryHandle, shelf: any): Promise<void> {
+    try {
+      // Create shelf folder
+      const shelfFolder = await dataFolder.getDirectoryHandle(this.sanitizeFileName(shelf.name), { create: true });
+      
+      // Write shelf metadata
+      const shelfMetaFile = await shelfFolder.getFileHandle('shelf.json', { create: true });
+      const shelfMetaWritable = await shelfMetaFile.createWritable();
+      await shelfMetaWritable.write(JSON.stringify({
+        id: shelf.id,
+        name: shelf.name,
+        color: shelf.color,
+        icon: shelf.icon,
+        createdAt: shelf.createdAt,
+        updatedAt: shelf.updatedAt
+      }, null, 2));
+      await shelfMetaWritable.close();
+
+      // Write notebooks
+      if (shelf.notebooks && Array.isArray(shelf.notebooks)) {
+        for (const notebook of shelf.notebooks) {
+          await this.writeNotebookToFolder(shelfFolder, notebook);
+        }
+      }
+    } catch (error: any) {
+      throw new Error(`Failed to write shelf "${shelf.name}": ${error.message}`);
+    }
+  }
+
+  /**
+   * Write notebook to folder
+   */
+  private async writeNotebookToFolder(shelfFolder: FileSystemDirectoryHandle, notebook: any): Promise<void> {
+    try {
+      // Create notebook folder
+      const notebookFolder = await shelfFolder.getDirectoryHandle(this.sanitizeFileName(notebook.name), { create: true });
+      
+      // Write notebook metadata
+      const notebookMetaFile = await notebookFolder.getFileHandle('notebook.json', { create: true });
+      const notebookMetaWritable = await notebookMetaFile.createWritable();
+      await notebookMetaWritable.write(JSON.stringify({
+        id: notebook.id,
+        name: notebook.name,
+        icon: notebook.icon,
+        createdAt: notebook.createdAt,
+        updatedAt: notebook.updatedAt
+      }, null, 2));
+      await notebookMetaWritable.close();
+
+      // Write notes
+      if (notebook.notes && Array.isArray(notebook.notes)) {
+        for (const note of notebook.notes) {
+          await this.writeNoteToFolder(notebookFolder, note);
+        }
+      }
+    } catch (error: any) {
+      throw new Error(`Failed to write notebook "${notebook.name}": ${error.message}`);
+    }
+  }
+
+  /**
+   * Write note to folder
+   */
+  private async writeNoteToFolder(notebookFolder: FileSystemDirectoryHandle, note: any): Promise<void> {
+    try {
+      // Create note file (markdown format)
+      const noteFileName = `${this.sanitizeFileName(note.title)}.md`;
+      const noteFile = await notebookFolder.getFileHandle(noteFileName, { create: true });
+      const noteWritable = await noteFile.createWritable();
+      
+      // Build markdown content
+      let markdown = `# ${note.title}\n\n`;
+      markdown += `---\n`;
+      markdown += `id: ${note.id}\n`;
+      markdown += `type: ${note.type}\n`;
+      markdown += `status: ${note.status}\n`;
+      markdown += `tags: ${note.tags ? note.tags.join(', ') : ''}\n`;
+      markdown += `created: ${note.createdAt}\n`;
+      markdown += `updated: ${note.updatedAt}\n`;
+      markdown += `---\n\n`;
+      
+      // Add content
+      if (note.content) {
+        markdown += note.content + '\n\n';
+      }
+      
+      // Add blocks
+      if (note.blocks && Array.isArray(note.blocks)) {
+        for (const block of note.blocks) {
+          markdown += this.blockToMarkdown(block) + '\n\n';
+        }
+      }
+      
+      await noteWritable.write(markdown);
+      await noteWritable.close();
+    } catch (error: any) {
+      throw new Error(`Failed to write note "${note.title}": ${error.message}`);
+    }
+  }
+
+  /**
+   * Convert block to markdown
+   */
+  private blockToMarkdown(block: any): string {
+    switch (block.type) {
+      case 'hypothesis':
+        return `> **Hypothesis**: ${block.content}`;
+      case 'conclusion':
+        return `> **Conclusion**: ${block.content}`;
+      case 'note':
+        return `> **Note**: ${block.content}`;
+      case 'warning':
+        return `> ⚠️ **Warning**: ${block.content}`;
+      case 'quote':
+        return `> ${block.content}\n> — ${block.attribution || 'Unknown'}`;
+      case 'code':
+        return `\`\`\`${block.language || ''}\n${block.content}\n\`\`\``;
+      case 'divider':
+        return `---`;
+      default:
+        return block.content || '';
+    }
+  }
+
+  /**
+   * Sanitize file name
+   */
+  private sanitizeFileName(name: string): string {
+    return name
+      .replace(/[<>:"/\\|?*]/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .substring(0, 255);
+  }
+
+  /**
+   * Update sync progress
+   */
+  private updateSyncProgress(tier: 'local' | 'github', progress: number): void {
+    if (tier === 'local') {
+      this.syncSettings.update(s => ({
+        ...s,
+        localSync: {
+          ...s.localSync,
+          syncProgress: progress
+        }
+      }));
+    } else {
+      this.syncSettings.update(s => ({
+        ...s,
+        githubSync: {
+          ...s.githubSync,
+          syncProgress: progress
+        }
+      }));
+    }
+  }
+
+  /**
+   * Restore folder handle on startup
+   */
+  private async restoreFolderHandleOnStartup(): Promise<void> {
+    const handle = await this.restoreFolderHandle();
+    if (handle) {
+      this.syncSettings.update(s => ({
+        ...s,
+        localSync: {
+          ...s.localSync,
+          folderHandle: handle,
+          folderPath: handle.name
+        }
+      }));
+    }
+  }
+
+  /**
+   * Read data from folder
+   */
+  private async readDataFromFolder(folderHandle: FileSystemDirectoryHandle): Promise<any> {
+    try {
+      // Look for lore-data folder
+      const dataFolder = await folderHandle.getDirectoryHandle('lore-data', { create: false });
+      
+      const data: any = {
+        shelves: [],
+        metadata: null
+      };
+
+      // Read metadata
+      try {
+        const metadataFile = await dataFolder.getFileHandle('metadata.json', { create: false });
+        const metadataFileContent = await metadataFile.getFile();
+        const metadataText = await metadataFileContent.text();
+        data.metadata = JSON.parse(metadataText);
+      } catch (error) {
+        console.warn('No metadata.json found, continuing without it');
+      }
+
+      // Read all shelf folders
+      for await (const entry of (dataFolder as any).values()) {
+        if (entry.kind === 'directory' && entry.name !== 'metadata.json') {
+          const shelf = await this.readShelfFromFolder(entry);
+          if (shelf) {
+            data.shelves.push(shelf);
+          }
+        }
+      }
+
+      return data;
+    } catch (error: any) {
+      throw new Error(`Failed to read data from folder: ${error.message}`);
+    }
+  }
+
+  /**
+   * Read shelf from folder
+   */
+  private async readShelfFromFolder(shelfFolder: FileSystemDirectoryHandle): Promise<any | null> {
+    try {
+      // Read shelf metadata
+      let shelfMeta: any = {
+        name: shelfFolder.name,
+        color: '#7C3AED',
+        icon: undefined
+      };
+
+      try {
+        const shelfMetaFile = await shelfFolder.getFileHandle('shelf.json', { create: false });
+        const shelfMetaFileContent = await shelfMetaFile.getFile();
+        const shelfMetaText = await shelfMetaFileContent.text();
+        shelfMeta = JSON.parse(shelfMetaText);
+      } catch (error) {
+        console.warn(`No shelf.json found for ${shelfFolder.name}, using defaults`);
+      }
+
+      const shelf: any = {
+        ...shelfMeta,
+        notebooks: []
+      };
+
+      // Read all notebook folders
+      for await (const entry of (shelfFolder as any).values()) {
+        if (entry.kind === 'directory' && entry.name !== 'shelf.json') {
+          const notebook = await this.readNotebookFromFolder(entry, shelf.id);
+          if (notebook) {
+            shelf.notebooks.push(notebook);
+          }
+        }
+      }
+
+      return shelf;
+    } catch (error: any) {
+      console.error(`Failed to read shelf ${shelfFolder.name}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Read notebook from folder
+   */
+  private async readNotebookFromFolder(notebookFolder: FileSystemDirectoryHandle, shelfId: string): Promise<any | null> {
+    try {
+      // Read notebook metadata
+      let notebookMeta: any = {
+        name: notebookFolder.name,
+        icon: '📔'
+      };
+
+      try {
+        const notebookMetaFile = await notebookFolder.getFileHandle('notebook.json', { create: false });
+        const notebookMetaFileContent = await notebookMetaFile.getFile();
+        const notebookMetaText = await notebookMetaFileContent.text();
+        notebookMeta = JSON.parse(notebookMetaText);
+      } catch (error) {
+        console.warn(`No notebook.json found for ${notebookFolder.name}, using defaults`);
+      }
+
+      const notebook: any = {
+        ...notebookMeta,
+        shelfId,
+        notes: []
+      };
+
+      // Read all note files
+      for await (const entry of (notebookFolder as any).values()) {
+        if (entry.kind === 'file' && entry.name.endsWith('.md')) {
+          const note = await this.readNoteFromFile(entry, notebook.id);
+          if (note) {
+            notebook.notes.push(note);
+          }
+        }
+      }
+
+      return notebook;
+    } catch (error: any) {
+      console.error(`Failed to read notebook ${notebookFolder.name}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Read note from markdown file
+   */
+  private async readNoteFromFile(noteFile: FileSystemFileHandle, notebookId: string): Promise<any | null> {
+    try {
+      const file = await noteFile.getFile();
+      const text = await file.text();
+
+      // Parse markdown with frontmatter
+      const lines = text.split('\n');
+      let inFrontmatter = false;
+      let frontmatterLines: string[] = [];
+      let contentLines: string[] = [];
+      let title = noteFile.name.replace('.md', '');
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        if (line.trim() === '---') {
+          if (i === 0 || (i === 1 && lines[0].startsWith('#'))) {
+            inFrontmatter = true;
+            continue;
+          } else if (inFrontmatter) {
+            inFrontmatter = false;
+            continue;
+          }
+        }
+
+        if (inFrontmatter) {
+          frontmatterLines.push(line);
+        } else {
+          contentLines.push(line);
+        }
+      }
+
+      // Parse frontmatter
+      const metadata: any = {
+        id: undefined,
+        type: 'idea',
+        status: 'draft',
+        tags: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      for (const line of frontmatterLines) {
+        const match = line.match(/^(\w+):\s*(.+)$/);
+        if (match) {
+          const [, key, value] = match;
+          if (key === 'tags') {
+            metadata.tags = value.split(',').map(t => t.trim()).filter(t => t);
+          } else {
+            metadata[key] = value;
+          }
+        }
+      }
+
+      // Extract title from first heading if present
+      const content = contentLines.join('\n').trim();
+      const titleMatch = content.match(/^#\s+(.+)$/m);
+      if (titleMatch) {
+        title = titleMatch[1];
+      }
+
+      // Parse blocks from content (simplified - just store as content for now)
+      const note: any = {
+        ...metadata,
+        notebookId,
+        title,
+        content,
+        preview: content.substring(0, 120),
+        blocks: [],
+        linkedNoteIds: []
+      };
+
+      return note;
+    } catch (error: any) {
+      console.error(`Failed to read note ${noteFile.name}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Merge imported data with existing data
+   */
+  private async mergeImportedData(importedData: any): Promise<void> {
+    try {
+      // Get existing data
+      const existingData = this.getAllDataFromLocalStorage();
+      
+      // Simple merge strategy: add imported shelves with new IDs to avoid conflicts
+      const mergedShelves = [...existingData.shelves];
+      
+      for (const importedShelf of importedData.shelves) {
+        // Generate new IDs for imported items to avoid conflicts
+        const newShelf = {
+          ...importedShelf,
+          id: this.generateId(),
+          notebooks: importedShelf.notebooks.map((nb: any) => ({
+            ...nb,
+            id: this.generateId(),
+            shelfId: importedShelf.id, // Will be updated
+            notes: nb.notes.map((note: any) => ({
+              ...note,
+              id: this.generateId(),
+              notebookId: nb.id // Will be updated
+            }))
+          }))
+        };
+
+        // Update notebook shelfIds
+        newShelf.notebooks.forEach((nb: any) => {
+          nb.shelfId = newShelf.id;
+          // Update note notebookIds
+          nb.notes.forEach((note: any) => {
+            note.notebookId = nb.id;
+          });
+        });
+
+        mergedShelves.push(newShelf);
+      }
+
+      // Save merged data
+      localStorage.setItem('lore-shelves', JSON.stringify(mergedShelves));
+      
+      // Reload the page to refresh the UI with new data
+      window.location.reload();
+    } catch (error: any) {
+      throw new Error(`Failed to merge imported data: ${error.message}`);
+    }
+  }
+
+  /**
+   * Generate unique ID
+   */
+  private generateId(): string {
+    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**

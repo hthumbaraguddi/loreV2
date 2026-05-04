@@ -352,17 +352,23 @@
 
 .api-input {
   flex: 2;
-  border: 1px solid var(--lore-color-border-strong);
+  border: 1.5px solid var(--lore-primitive-purple-300);
   border-radius: var(--lore-radius-md);
   padding: 5px 9px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--lore-color-text-muted);
-  background: var(--lore-primitive-purple-50); /* Light purple background for API inputs */
+  background: var(--lore-primitive-purple-50);
   outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  
+  &:hover {
+    border-color: var(--lore-primitive-purple-400);
+    background: var(--lore-primitive-purple-100);
+  }
   
   &:focus {
-    border-color: var(--lore-primitive-purple-400);
+    border-color: var(--lore-primitive-purple-500);
     background: white;
   }
   

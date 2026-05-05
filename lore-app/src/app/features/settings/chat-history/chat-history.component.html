@@ -1,0 +1,216 @@
+<div class="s-sec">
+
+  <!-- Header row -->
+  <div class="ch-header-row">
+    <div>
+      <div class="s-title">Chat History</div>
+      <div class="s-desc">
+        All AI chat sessions are saved automatically.
+        {{ history.sessions().length }} session{{ history.sessions().length !== 1 ? 's' : '' }}
+        · {{ totalMessages() }} messages
+      </div>
+    </div>
+    <div class="ch-header-actions">
+      <button class="tb-btn" (click)="exportAll()" [disabled]="history.sessions().length === 0" title="Export all as Markdown">
+        ↓ Export All
+      </button>
+      <button
+        class="tb-btn"
+        (click)="saveToFolder()"
+        [disabled]="history.sessions().length === 0 || saveStatus() === 'saving'"
+        [class.success]="saveStatus() === 'done'"
+        [class.error-btn]="saveStatus() === 'error'"
+        title="{{ fsPicker ? 'Pick a folder and save all sessions as Markdown files' : 'Download all sessions as a single Markdown file' }}"
+      >
+        @if (saveStatus() === 'saving') {
+          <span class="ch-spinner"></span> Saving…
+        } @else if (saveStatus() === 'done') {
+          ✓ Saved to "{{ savedFolderPath() }}"
+        } @else if (saveStatus() === 'error') {
+          ✗ Save failed
+        } @else if (fsPicker) {
+          💾 Save to Folder…
+        } @else {
+          ↓ Download All
+        }
+      </button>
+      <button
+        class="tb-btn ghost-danger"
+        (click)="clearAll()"
+        [disabled]="history.sessions().length === 0"
+      >
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="ch-filter-bar">
+    <div class="ch-search-wrap">
+      <span class="ch-search-icon">🔍</span>
+      <input
+        class="ch-search"
+        type="text"
+        placeholder="Search sessions and messages…"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        aria-label="Search chat history"
+      />
+    </div>
+
+    <select
+      class="ch-provider-filter"
+      [ngModel]="providerFilter()"
+      (ngModelChange)="providerFilter.set($event)"
+      aria-label="Filter by provider"
+    >
+      <option value="">All providers</option>
+      @for (p of uniqueProviders(); track p.id) {
+        <option [value]="p.id">{{ p.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Empty state -->
+  @if (history.sessions().length === 0) {
+    <div class="ch-empty">
+      <span class="ch-empty-icon">💬</span>
+      <div class="ch-empty-title">No chat history yet</div>
+      <div class="ch-empty-desc">
+        Open the AI Chat panel and start a conversation — sessions are saved automatically.
+      </div>
+    </div>
+  }
+
+  <!-- No results state -->
+  @if (history.sessions().length > 0 && filteredSessions().length === 0) {
+    <div class="ch-empty">
+      <span class="ch-empty-icon">🔍</span>
+      <div class="ch-empty-title">No sessions match your search</div>
+      <div class="ch-empty-desc">Try a different query or clear the filter.</div>
+    </div>
+  }
+
+  <!-- Session list -->
+  @if (filteredSessions().length > 0) {
+    <div class="ch-list" role="list">
+      @for (session of filteredSessions(); track session.id) {
+        <div
+          class="ch-session-card s-card"
+          role="listitem"
+          [class.expanded]="expandedSessionId() === session.id"
+        >
+
+          <!-- Session header (always visible) -->
+          <div class="ch-session-header" (click)="toggleExpand(session.id)" role="button" [attr.aria-expanded]="expandedSessionId() === session.id">
+
+            <!-- Provider badge -->
+            <div
+              class="ch-provider-badge"
+              [style.background]="providerColor(session.providerId)"
+              [title]="providerName(session.providerId)"
+            >
+              {{ providerInitial(session.providerId) }}
+            </div>
+
+            <!-- Title + meta -->
+            <div class="ch-session-info">
+              <div class="ch-session-title">{{ session.title }}</div>
+              <div class="ch-session-meta">
+                <span>{{ providerName(session.providerId) }}</span>
+                <span class="ch-dot">·</span>
+                <span>{{ messageCount(session) }}</span>
+                <span class="ch-dot">·</span>
+                <span>{{ formatDate(session.updatedAt) }}</span>
+              </div>
+              <!-- Preview of first message -->
+              @if (expandedSessionId() !== session.id) {
+                <div class="ch-session-preview">{{ preview(session) }}</div>
+              }
+            </div>
+
+            <!-- Actions -->
+            <div class="ch-session-actions" (click)="$event.stopPropagation()">
+              @if (fsPicker) {
+                <button
+                  class="tb-btn"
+                  (click)="saveSessionToFolder(session, $event)"
+                  title="Save to folder"
+                >💾</button>
+              }
+              <button
+                class="tb-btn"
+                (click)="exportSession(session, $event)"
+                title="Download as Markdown"
+              >↓ MD</button>
+              <button
+                class="tb-btn ghost-danger"
+                (click)="deleteSession(session.id, $event)"
+                title="Delete session"
+              >Delete</button>
+            </div>
+
+            <!-- Chevron -->
+            <span class="ch-chevron" [class.open]="expandedSessionId() === session.id">
+              ›
+            </span>
+          </div>
+
+          <!-- Expanded message thread -->
+          @if (expandedSessionId() === session.id) {
+            <div class="ch-thread" role="log" aria-label="Chat messages">
+
+              <div class="ch-thread-meta">
+                <span>Started {{ formatDateTime(session.createdAt) }}</span>
+                <span class="ch-dot">·</span>
+                <span>{{ userTurns(session) }} turn{{ userTurns(session) !== 1 ? 's' : '' }}</span>
+                <span class="ch-dot">·</span>
+                <span>Model: {{ firstModel(session) }}</span>
+              </div>
+
+              @for (msg of session.messages; track msg.id) {
+                <div
+                  class="ch-msg"
+                  [class.user]="msg.role === 'user'"
+                  [class.assistant]="msg.role === 'assistant'"
+                  [class.error]="!!msg.error"
+                >
+                  <div class="ch-msg-role">
+                    @if (msg.role === 'user') {
+                      <span class="ch-role-badge user">You</span>
+                    } @else {
+                      <span
+                        class="ch-role-badge assistant"
+                        [style.background]="providerColor(msg.providerId)"
+                      >{{ providerInitial(msg.providerId) }}</span>
+                    }
+                    <span class="ch-msg-time">{{ formatDateTime(msg.timestamp) }}</span>
+                  </div>
+
+                  @if (msg.error) {
+                    <div class="ch-msg-error">⚠ {{ msg.error }}</div>
+                  } @else {
+                    <div class="ch-msg-content">{{ msg.content }}</div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Danger zone -->
+  @if (history.sessions().length > 0) {
+    <div class="s-card danger-zone-card">
+      <div class="s-title">Danger Zone</div>
+      <div class="s-desc">Permanently delete all chat sessions from this device.</div>
+      <button class="tb-btn ghost-danger" (click)="clearAll()">
+        Delete All Chat History
+      </button>
+    </div>
+  }
+
+</div>

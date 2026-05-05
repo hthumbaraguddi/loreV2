@@ -26,6 +26,16 @@
       </button>
       <button
         class="snav-item"
+        [class.active]="activePanel() === 'chat-history'"
+        (click)="setPanel('chat-history')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 3h12a1 1 0 011 1v7a1 1 0 01-1 1H5l-3 2V4a1 1 0 011-1z"/>
+        </svg>
+        Chat History
+      </button>
+      <button
+        class="snav-item"
         [class.active]="activePanel() === 'profile'"
         (click)="setPanel('profile')"
       >
@@ -91,6 +101,13 @@
       @if (activePanel() === 'ai-providers') {
         <div class="s-panel active">
           <app-ai-providers></app-ai-providers>
+        </div>
+      }
+
+      <!-- Chat History Panel -->
+      @if (activePanel() === 'chat-history') {
+        <div class="s-panel active">
+          <app-chat-history></app-chat-history>
         </div>
       }
 

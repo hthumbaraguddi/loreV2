@@ -5,17 +5,18 @@ import { LayoutService } from '../../core/services/layout.service';
 import { NavItem } from '../../core/models/nav-item.model';
 import { NavRailComponent } from './nav-rail/nav-rail.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { AiChatComponent } from '../ai-chat/ai-chat.component';
 
 @Component({
   selector: 'lore-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent],
+  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent, AiChatComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShellComponent {
-  private readonly layoutService = inject(LayoutService);
+  readonly layoutService = inject(LayoutService);
   private readonly router = inject(Router);
 
   // Layout state

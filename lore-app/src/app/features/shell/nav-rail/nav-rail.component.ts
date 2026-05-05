@@ -5,6 +5,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
 import { NavItem } from '../../../core/models/nav-item.model';
 import { NavRailItemComponent } from './nav-rail-item/nav-rail-item.component';
 import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle.component';
+import { LayoutService } from '../../../core/services/layout.service';
 
 @Component({
   selector: 'lore-nav-rail',
@@ -16,6 +17,7 @@ import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/th
 })
 export class NavRailComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  private readonly layoutService = inject(LayoutService);
   private readonly destroy$ = new Subject<void>();
 
   // Inputs
@@ -42,6 +44,14 @@ export class NavRailComponent implements OnInit, OnDestroy {
     return allItems.filter(item => 
       ['notifications', 'settings'].includes(item.id)
     );
+  });
+
+  /** Effective active ID — merges route-based and panel-based active states */
+  readonly effectiveActiveId = computed(() => {
+    const panel = this.layoutService.activeRightPanel();
+    if (panel === 'ai-chat') return 'ai-chat';
+    if (panel === 'notifications') return 'notifications';
+    return this.activeId();
   });
 
   ngOnInit(): void {

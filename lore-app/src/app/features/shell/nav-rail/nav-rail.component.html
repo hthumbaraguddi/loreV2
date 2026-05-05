@@ -6,7 +6,7 @@
   @for (item of mainItems(); track item.id) {
     <lore-nav-rail-item
       [item]="item"
-      [active]="activeId() === item.id"
+      [active]="effectiveActiveId() === item.id"
       (selected)="onItemSelect(item)"
     />
   }
@@ -20,7 +20,7 @@
   @for (item of bottomItems(); track item.id) {
     <lore-nav-rail-item
       [item]="item"
-      [active]="activeId() === item.id"
+      [active]="effectiveActiveId() === item.id"
       (selected)="onItemSelect(item)"
     />
   }

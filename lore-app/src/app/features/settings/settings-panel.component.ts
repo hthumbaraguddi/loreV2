@@ -5,9 +5,11 @@ import { TemplateService, Template } from '../../core/services/template.service'
 import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
 import { ThemeService, type Theme } from '../../core/services/theme.service';
 import { AIProvidersComponent } from './ai-providers/ai-providers.component';
+import { ChatHistoryComponent } from './chat-history/chat-history.component';
 
 export type SettingsPanel = 
   | 'ai-providers' 
+  | 'chat-history'
   | 'profile' 
   | 'ai-behaviour' 
   | 'sync' 
@@ -37,7 +39,7 @@ export interface Profile {
 @Component({
   selector: 'lore-settings-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, AIProvidersComponent],
+  imports: [CommonModule, RouterLink, AIProvidersComponent, ChatHistoryComponent],
   templateUrl: './settings-panel.component.html',
   styleUrl: './settings-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

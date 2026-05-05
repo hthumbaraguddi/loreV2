@@ -1,0 +1,222 @@
+<div class="chat-panel">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <span class="chat-title">AI Chat</span>
+    </div>
+
+    <div class="chat-header-controls">
+      <!-- Provider selector -->
+      <select
+        class="provider-select"
+        [ngModel]="selectedProviderId()"
+        (ngModelChange)="onProviderChange($event)"
+        aria-label="Select AI provider"
+      >
+        @for (p of providerRegistry; track p.id) {
+          <option [value]="p.id" [disabled]="!keyManager.hasKey(p.id)">
+            {{ p.displayName }}{{ !keyManager.hasKey(p.id) ? ' (no key)' : '' }}
+          </option>
+        }
+      </select>
+
+      <!-- New chat button -->
+      <button class="icon-btn" (click)="newSession()" title="New chat" aria-label="New chat">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+
+      <!-- Close button -->
+      <button class="icon-btn" (click)="close()" title="Close panel" aria-label="Close AI chat">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── No key warning ──────────────────────────────────────────────────── -->
+  @if (!hasKey()) {
+    <div class="no-key-banner" role="alert">
+      <span class="material-symbols-outlined">key_off</span>
+      <div>
+        <strong>No API key for {{ selectedProvider()?.displayName }}</strong>
+        <span>Add one in Settings → AI Providers</span>
+      </div>
+    </div>
+  }
+
+  <!-- ── Body: sessions list + messages ─────────────────────────────────── -->
+  <div class="chat-body">
+
+    <!-- Sessions sidebar (shown when there are multiple sessions) -->
+    @if (sessions().length > 1) {
+      <div class="sessions-list" role="list" aria-label="Chat sessions">
+        @for (session of sessions(); track session.id) {
+          <button
+            class="session-item"
+            role="listitem"
+            [class.active]="session.id === activeSessionId()"
+            (click)="selectSession(session.id)"
+          >
+            <span class="session-title">{{ session.title }}</span>
+            <button
+              class="session-delete"
+              (click)="deleteSession(session.id, $event)"
+              title="Delete session"
+              aria-label="Delete this chat session"
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Messages area -->
+    <div class="messages-area" role="log" aria-live="polite" aria-label="Chat messages">
+
+      <!-- Empty state -->
+      @if (messages().length === 0) {
+        <div class="empty-chat">
+          <div
+            class="empty-chat-logo"
+            [style.background]="providerColor(selectedProviderId())"
+          >
+            {{ providerInitial(selectedProviderId()) }}
+          </div>
+          <div class="empty-chat-title">
+            Ask {{ selectedProvider()?.displayName ?? 'AI' }}
+          </div>
+          <div class="empty-chat-hint">
+            Type a message below to start a conversation.<br>
+            <kbd>⌘↵</kbd> to send.
+          </div>
+
+          <!-- Model selector in empty state -->
+          @if (availableModels().length > 1) {
+            <select
+              class="model-select"
+              [ngModel]="effectiveModel()"
+              (ngModelChange)="onModelChange($event)"
+              aria-label="Select model"
+            >
+              @for (m of availableModels(); track m.id) {
+                <option [value]="m.id">{{ m.displayName }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
+
+      <!-- Message list -->
+      @for (msg of messages(); track msg.id) {
+        <div
+          class="message"
+          [class.user]="msg.role === 'user'"
+          [class.assistant]="msg.role === 'assistant'"
+          [class.streaming]="msg.isStreaming"
+          [class.error]="!!msg.error"
+        >
+          <!-- Avatar -->
+          @if (msg.role === 'assistant') {
+            <div
+              class="msg-avatar"
+              [style.background]="providerColor(msg.providerId)"
+              aria-hidden="true"
+            >
+              {{ providerInitial(msg.providerId) }}
+            </div>
+          }
+
+          <!-- Bubble -->
+          <div class="msg-bubble">
+            @if (msg.error) {
+              <div class="msg-error" role="alert">
+                <span class="material-symbols-outlined">error_outline</span>
+                {{ msg.error }}
+              </div>
+            } @else {
+              <div class="msg-content">
+                {{ msg.content }}
+                @if (msg.isStreaming) {
+                  <span class="cursor" aria-hidden="true"></span>
+                }
+              </div>
+            }
+
+            <!-- Message footer -->
+            <div class="msg-footer">
+              <span class="msg-time">{{ formatTime(msg.timestamp) }}</span>
+              @if (msg.role === 'assistant' && !msg.isStreaming && msg.content) {
+                <button
+                  class="msg-copy"
+                  (click)="copyMessage(msg.content)"
+                  title="Copy response"
+                  aria-label="Copy this response"
+                >
+                  <span class="material-symbols-outlined">content_copy</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Scroll anchor -->
+      <div #messagesEnd></div>
+    </div>
+  </div>
+
+  <!-- ── Input area ──────────────────────────────────────────────────────── -->
+  <div class="chat-input-area">
+
+    <!-- Model selector (compact, shown when there's a session) -->
+    @if (messages().length > 0 && availableModels().length > 1) {
+      <div class="model-row">
+        <select
+          class="model-select-compact"
+          [ngModel]="effectiveModel()"
+          (ngModelChange)="onModelChange($event)"
+          aria-label="Select model"
+        >
+          @for (m of availableModels(); track m.id) {
+            <option [value]="m.id">{{ m.displayName }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="input-row">
+      <textarea
+        #promptInput
+        class="chat-textarea"
+        [value]="promptText()"
+        (input)="promptText.set($any($event.target).value)"
+        (keydown)="onKeyDown($event)"
+        [disabled]="isStreaming()"
+        [placeholder]="hasKey() ? 'Ask anything… (⌘↵ to send)' : 'Configure an API key in Settings first'"
+        rows="3"
+        aria-label="Chat message input"
+      ></textarea>
+    </div>
+
+    <div class="action-row">
+      @if (isStreaming()) {
+        <button class="send-btn cancel" (click)="cancelStreaming()">
+          <span class="material-symbols-outlined">stop_circle</span>
+          Stop
+        </button>
+      } @else {
+        <button
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="!canSend()"
+          aria-label="Send message"
+        >
+          <span class="material-symbols-outlined">send</span>
+          Send
+        </button>
+      }
+    </div>
+  </div>
+
+</div>

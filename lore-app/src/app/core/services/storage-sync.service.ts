@@ -343,6 +343,57 @@ export class StorageSyncService {
   // ─── GitHub Sync ───────────────────────────────────────────────
 
   /**
+   * Save chat history sessions as Markdown files to the configured local folder.
+   * Creates a `chat-history/` subfolder inside the sync folder.
+   */
+  async saveChatHistory(sessions: any[]): Promise<void> {
+    const folderHandle = this.syncSettings().localSync.folderHandle;
+    if (!folderHandle) {
+      throw new Error('No folder selected. Configure a local folder in Sync & Export first.');
+    }
+
+    // Create / open the chat-history subfolder
+    const chatFolder = await folderHandle.getDirectoryHandle('chat-history', { create: true });
+
+    for (const session of sessions) {
+      const safeName = this._safeChatFilename(session.title, session.id);
+      const fileHandle = await chatFolder.getFileHandle(`${safeName}.md`, { create: true });
+      const writable   = await fileHandle.createWritable();
+
+      const lines: string[] = [
+        `# ${session.title}`,
+        ``,
+        `**Provider:** ${session.providerId}`,
+        `**Created:** ${new Date(session.createdAt).toLocaleString()}`,
+        `**Updated:** ${new Date(session.updatedAt).toLocaleString()}`,
+        `**Messages:** ${session.messages?.length ?? 0}`,
+        ``,
+        `---`,
+        ``,
+      ];
+
+      for (const msg of (session.messages ?? [])) {
+        const role = msg.role === 'user' ? 'You' : session.providerId;
+        const time = new Date(msg.timestamp).toLocaleString();
+        lines.push(`**${role}** _(${time})_`);
+        lines.push(``);
+        lines.push(msg.error ? `> ⚠ ${msg.error}` : msg.content);
+        lines.push(``);
+        lines.push(`---`);
+        lines.push(``);
+      }
+
+      await writable.write(lines.join('\n'));
+      await writable.close();
+    }
+  }
+
+  private _safeChatFilename(title: string, id: string): string {
+    const slug = title.replace(/[^a-z0-9\-_\s]/gi, '').replace(/\s+/g, '-').toLowerCase();
+    return (slug || 'chat') + '-' + id.slice(0, 8);
+  }
+
+  /**
    * Sign in with GitHub
    */
   async signInWithGitHub(): Promise<void> {

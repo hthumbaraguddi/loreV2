@@ -22,11 +22,7 @@
   [attr.aria-label]="'Right panel'"
   [attr.aria-hidden]="!rightPanelOpen()"
 >
-  <div class="right-panel-placeholder">
-    <div class="right-panel-placeholder-content">
-      <span class="material-symbols-outlined">info</span>
-      <p>Right Panel</p>
-      <small>Future phases</small>
-    </div>
-  </div>
+  @if (layoutService.activeRightPanel() === 'ai-chat') {
+    <lore-ai-chat></lore-ai-chat>
+  }
 </aside>

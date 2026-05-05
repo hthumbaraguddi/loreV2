@@ -98,7 +98,7 @@ export interface Block {
 
 /**
  * Block Type Enum
- * All 14 block types
+ * All 13 block types
  */
 export enum BlockType {
   Hypothesis = 'hypothesis',
@@ -113,8 +113,7 @@ export enum BlockType {
   Code = 'code',
   Image = 'image',
   Divider = 'divider',
-  AskClaude = 'ask-claude',
-  AskGPT = 'ask-gpt'
+  AskAI = 'ask-ai'
 }
 
 /**

@@ -232,7 +232,7 @@ export class TemplateService {
           { id: 'blk_hyp', type: BlockType.Hypothesis, name: 'Performance Hypothesis', description: 'Expected vs actual', icon: '💡', required: true, order: 1 },
           { id: 'blk_kf', type: BlockType.KeyFindings, name: 'Benchmark Results', description: 'Quantitative analysis', icon: '🔑', required: true, order: 2 },
           { id: 'blk_con', type: BlockType.Conclusion, name: 'Recommendation', description: 'Which model to use', icon: '🎯', required: true, order: 3 },
-          { id: 'blk_ai', type: BlockType.AskClaude, name: 'Ask Claude', description: 'Get AI insights', icon: '✦', required: false, order: 4 }
+          { id: 'blk_ai', type: BlockType.AskAI, name: 'Ask AI', description: 'Get AI insights', icon: '✦', required: false, order: 4 }
         ],
         createdAt: new Date('2026-03-01'),
         updatedAt: new Date('2026-03-01')

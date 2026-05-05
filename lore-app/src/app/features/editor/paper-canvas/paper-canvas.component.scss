@@ -85,6 +85,13 @@
   min-height: 10px;
 }
 
+/* ── Trailing write zone ── */
+.trailing-body {
+  margin-top: var(--lore-space-16);
+  margin-bottom: 0;
+  min-height: 120px;
+}
+
 /* ── Insert overlay (sticky at bottom within content) ── */
 .insert-overlay {
   position: sticky;

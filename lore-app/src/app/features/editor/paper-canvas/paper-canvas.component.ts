@@ -20,6 +20,7 @@ export class PaperCanvasComponent implements AfterViewInit {
   private blockService = inject(BlockService);
 
   @ViewChild('noteBodyTextarea') noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('trailingTextarea') trailingTextarea?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('titleElement') titleElement?: ElementRef<HTMLHeadingElement>;
 
   note = input.required<NoteRef>();
@@ -31,6 +32,10 @@ export class PaperCanvasComponent implements AfterViewInit {
   linkPaletteCursorPos = signal(0);
   linkPalettePosition = signal({ x: 0, y: 0 });
 
+  // Trailing textarea — plain text continuation below blocks
+  // Stored separately and appended to note content on input
+  trailingContent = signal('');
+
   constructor() {
     // Sync title element with note title when it changes
     effect(() => {
@@ -39,6 +44,17 @@ export class PaperCanvasComponent implements AfterViewInit {
           this.titleElement.nativeElement.textContent !== title &&
           document.activeElement !== this.titleElement.nativeElement) {
         this.titleElement.nativeElement.textContent = title;
+      }
+    });
+
+    // Reset trailing textarea when the active note changes
+    effect(() => {
+      this.note(); // track note changes
+      this.trailingContent.set('');
+      this._trailingBase = undefined;
+      if (this.trailingTextarea?.nativeElement) {
+        this.trailingTextarea.nativeElement.value = '';
+        this.trailingTextarea.nativeElement.style.height = 'auto';
       }
     });
   }
@@ -96,8 +112,28 @@ export class PaperCanvasComponent implements AfterViewInit {
     this.blockService.createBlock(this.fullNote().id, event.type, event.afterIndex);
   }
 
-  onBlockChanged(block: Block): void {
-    this.blockService.updateBlock(this.fullNote().id, block.id, block);
+  onTrailingInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const typed = textarea.value;
+    this.trailingContent.set(typed);
+    this.autoResizeTextarea(textarea);
+
+    // Append to the note's existing content.
+    // We track the base content at the time the trailing area was first used,
+    // so repeated keystrokes don't keep re-appending.
+    const base = this._trailingBase ?? this.fullNote().content;
+    if (this._trailingBase === undefined) {
+      this._trailingBase = this.fullNote().content;
+    }
+    const separator = base && !base.endsWith('\n') ? '\n\n' : '';
+    const newContent = typed ? base + separator + typed : base;
+    this.shelfService.updateNote(this.fullNote().id, { content: newContent });
+  }
+
+  /** Snapshot of note content taken when the user first types in the trailing area */
+  private _trailingBase: string | undefined = undefined;
+
+  onBlockChanged(block: Block): void {    this.blockService.updateBlock(this.fullNote().id, block.id, block);
   }
 
   onBlockDeleted(blockId: string): void {
@@ -382,8 +418,9 @@ export class PaperCanvasComponent implements AfterViewInit {
       'key-differences': BlockType.KeyDifferences,
       'key-findings': BlockType.KeyFindings,
       'code': BlockType.Code,
-      'ask-claude': BlockType.AskClaude,
-      'ask-gpt': BlockType.AskGPT,
+      'ask-claude': BlockType.AskAI,
+      'ask-gpt': BlockType.AskAI,
+      'ask-ai': BlockType.AskAI,
       'note': BlockType.Note,
       'warning': BlockType.Warning,
       'quote': BlockType.Quote,

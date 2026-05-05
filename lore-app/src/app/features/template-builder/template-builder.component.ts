@@ -33,7 +33,7 @@ export class TemplateBuilderComponent {
     { id: 'pal_kf', type: BlockType.KeyFindings, name: 'Key Findings', description: 'Numbered list', icon: '🔑', required: false, order: 5 },
     { id: 'pal_check', type: BlockType.Checklist, name: 'Checklist', description: 'Interactive tasks', icon: '✅', required: false, order: 6 },
     { id: 'pal_code', type: BlockType.Code, name: 'Code Block', description: 'Syntax highlighted', icon: '💻', required: false, order: 7 },
-    { id: 'pal_ai', type: BlockType.AskClaude, name: 'Ask Claude', description: 'Inline AI prompt', icon: '✦', required: false, order: 8 },
+    { id: 'pal_ai', type: BlockType.AskAI, name: 'Ask AI', description: 'Inline AI prompt', icon: '✦', required: false, order: 8 },
     { id: 'pal_img', type: BlockType.Image, name: 'Image', description: 'Upload or paste', icon: '🖼️', required: false, order: 9 },
     { id: 'pal_div', type: BlockType.Divider, name: 'Divider', description: 'Horizontal rule', icon: '—', required: false, order: 10 }
   ]);

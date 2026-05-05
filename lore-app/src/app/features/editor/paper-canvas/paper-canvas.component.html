@@ -53,6 +53,20 @@
       (blockReordered)="onBlockReordered($event)"
       (duplicateRequested)="onDuplicateBlock($event)"
     />
+
+    <!-- Trailing write zone: plain textarea continuation below blocks -->
+    @if (!readOnly()) {
+      <textarea
+        #trailingTextarea
+        class="note-body trailing-body"
+        [value]="trailingContent()"
+        (input)="onTrailingInput($event)"
+        (keydown)="onNoteBodyKeydown($event)"
+        placeholder="Continue writing… / for blocks, @ for AI"
+        rows="1"
+        aria-label="Continue writing below blocks"
+      ></textarea>
+    }
   </div>
 
   <!-- Insert section (block shortcuts) - Fixed bottom overlay -->

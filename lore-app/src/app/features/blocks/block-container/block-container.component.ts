@@ -18,7 +18,6 @@ import { CodeBlockComponent } from '../code-block/code-block.component';
 import { DividerBlockComponent } from '../divider-block/divider-block.component';
 import { ImageBlockComponent } from '../image-block/image-block.component';
 import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
-import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
 
 @Component({
   selector: 'lore-block-container',
@@ -29,7 +28,7 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
     HypothesisBlockComponent, ConclusionBlockComponent, NoteInsightBlockComponent,
     WarningBlockComponent, QuoteBlockComponent, KeyFindingsBlockComponent,
     KeyDifferencesBlockComponent, ChecklistBlockComponent, CodeBlockComponent,
-    DividerBlockComponent, ImageBlockComponent, AskAiBlockComponent, AskGptBlockComponent
+    DividerBlockComponent, ImageBlockComponent, AskAiBlockComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -97,11 +96,8 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
           @case (BlockType.Divider) {
             <lore-divider-block [block]="block()" [readOnly]="readOnly()" />
           }
-          @case (BlockType.AskClaude) {
-            <lore-ask-ai-block [block]="block()" [readOnly]="readOnly()" [provider]="'anthropic'" (changed)="onChanged($event)" />
-          }
-          @case (BlockType.AskGPT) {
-            <lore-ask-gpt-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+          @case (BlockType.AskAI) {
+            <lore-ask-ai-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
           }
           @default {
             <lore-note-insight-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />

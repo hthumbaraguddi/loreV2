@@ -648,9 +648,9 @@ Two linear layers with a ReLU/GELU in between, applied position-wise. Typically 
                   },
                   {
                     id: 'blk_4',
-                    type: BlockType.AskClaude,
+                    type: BlockType.AskAI,
                     content: 'Explain the tradeoffs between different attention mechanisms for long-context models.',
-                    metadata: { response: 'Flash Attention reduces memory from O(n²) to O(n) by reordering computation. Sparse attention (Longformer) uses local windows + global tokens. Multi-Query Attention shares K/V projections across heads to reduce KV cache size.' },
+                    metadata: { provider: 'anthropic', responses: [] },
                     order: 3,
                     createdAt: new Date('2026-03-16')
                   }

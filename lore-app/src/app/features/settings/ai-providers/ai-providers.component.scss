@@ -95,27 +95,27 @@
 // ── API key input ─────────────────────────────────────────────────────────────
 
 .api-input {
-  border: 1.5px solid var(--lore-primitive-purple-300);
+  border: 1.5px solid var(--lore-color-border-strong);
   border-radius: var(--lore-radius-md);
   padding: 6px 10px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: var(--lore-color-text-muted);
-  background: var(--lore-primitive-purple-50);
+  color: var(--lore-color-text-default);
+  background: var(--lore-color-surface-subtle);
   outline: none;
   transition: border-color 0.15s ease, background 0.15s ease;
   width: 100%;
   box-sizing: border-box;
 
   &:hover {
-    border-color: var(--lore-primitive-purple-400);
-    background: var(--lore-primitive-purple-100);
+    border-color: var(--lore-color-accent-default);
+    background: var(--lore-color-surface-recessed);
   }
 
   &:focus {
-    border-color: var(--lore-primitive-purple-500);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.08);
+    border-color: var(--lore-color-accent-default);
+    background: var(--lore-color-surface-default);
+    box-shadow: 0 0 0 3px var(--lore-color-state-focus-ring);
   }
 
   &::placeholder {
@@ -255,27 +255,27 @@
   line-height: 1.6;
 
   &[data-status='connected'] {
-    background: #F0FDF4;
-    color: #15803D;
-    border: 1px solid #BBF7D0;
+    background: var(--lore-color-feedback-success-bg);
+    color: var(--lore-color-success);
+    border: 1px solid var(--lore-color-success-border);
 
     &::before {
       content: '●';
       font-size: 7px;
-      color: #22C55E;
+      color: var(--lore-color-success);
     }
   }
 
   &[data-status='testing'] {
-    background: #FFFBEB;
-    color: #D97706;
-    border: 1px solid #FDE68A;
+    background: var(--lore-color-feedback-warning-bg);
+    color: var(--lore-color-feedback-warning-text);
+    border: 1px solid var(--lore-color-feedback-warning-border);
   }
 
   &[data-status='error'] {
-    background: #FFF1F2;
-    color: #BE185D;
-    border: 1px solid #FECDD3;
+    background: var(--lore-color-feedback-error-bg);
+    color: var(--lore-color-feedback-error-text);
+    border: 1px solid var(--lore-color-feedback-error-border);
 
     &::before {
       content: '✕';
@@ -285,7 +285,7 @@
 
   &[data-status='unconfigured'],
   &:not([data-status]) {
-    background: var(--lore-primitive-purple-50, #F6F4FF);
+    background: var(--lore-color-surface-subtle);
     color: var(--lore-color-text-faint);
     border: 1px solid var(--lore-color-border);
   }

@@ -8,7 +8,7 @@ export interface ContextMenuTarget {
 }
 
 export interface ContextMenuAction {
-  type: 'open' | 'rename' | 'new-notebook' | 'new-note' | 'change-color' | 'delete';
+  type: 'open' | 'rename' | 'new-notebook' | 'new-note' | 'change-color' | 'delete' | 'version-history';
   target: ContextMenuTarget;
 }
 
@@ -55,6 +55,11 @@ export class ContextMenuComponent {
   // Show "New Notebook" only for shelves
   showNewNotebook(): boolean {
     return this.target()?.type === 'shelf';
+  }
+
+  // Show "Version History" only for notes
+  showVersionHistory(): boolean {
+    return this.target()?.type === 'note';
   }
 
   constructor() {

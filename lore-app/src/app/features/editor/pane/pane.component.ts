@@ -1,7 +1,9 @@
-import { Component, signal, input, output, HostListener } from '@angular/core';
+import { Component, signal, input, output, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NoteRef } from '../../../core/models/shelf.model';
+import { NoteRef, Note } from '../../../core/models/shelf.model';
 import { PaperCanvasComponent } from '../paper-canvas/paper-canvas.component';
+import { ShelfService } from '../../../core/services/shelf.service';
+import { VersionHistoryComponent } from '../../version-history/version-history.component';
 
 /**
  * PaneComponent
@@ -10,11 +12,13 @@ import { PaperCanvasComponent } from '../paper-canvas/paper-canvas.component';
 @Component({
   selector: 'lore-pane',
   standalone: true,
-  imports: [CommonModule, PaperCanvasComponent],
+  imports: [CommonModule, PaperCanvasComponent, VersionHistoryComponent],
   templateUrl: './pane.component.html',
   styleUrl: './pane.component.scss'
 })
 export class PaneComponent {
+  private shelfService = inject(ShelfService);
+  
   // Inputs
   noteRef = input<NoteRef | null>(null);
   active = input<boolean>(false);
@@ -28,6 +32,10 @@ export class PaneComponent {
 
   // Internal state signals
   dragOver = signal<boolean>(false);
+  
+  // Version history state
+  showVersionHistory = signal(false);
+  versionHistoryNote = signal<Note | null>(null);
 
   // ═══════════════════════════════════════════════════════════
   // COMPUTED PROPERTIES
@@ -83,8 +91,38 @@ export class PaneComponent {
    */
   onHistoryClick(event: MouseEvent): void {
     event.stopPropagation();
-    // TODO: Open history for this pane
-    console.log('History for pane', this.index());
+    const ref = this.noteRef();
+    if (!ref) return;
+    
+    const note = this.shelfService.getNote(ref.id);
+    if (note) {
+      this.versionHistoryNote.set(note);
+      this.showVersionHistory.set(true);
+    }
+  }
+
+  /**
+   * Close version history modal
+   */
+  closeVersionHistory(): void {
+    this.showVersionHistory.set(false);
+    this.versionHistoryNote.set(null);
+  }
+
+  /**
+   * Handle version restore
+   */
+  onVersionRestore(versionId: string): void {
+    const note = this.versionHistoryNote();
+    if (!note) return;
+
+    const success = this.shelfService.restoreNoteFromVersion(note.id, versionId);
+    if (success) {
+      console.log('Note restored successfully');
+      this.closeVersionHistory();
+    } else {
+      console.error('Failed to restore note');
+    }
   }
 
   /**

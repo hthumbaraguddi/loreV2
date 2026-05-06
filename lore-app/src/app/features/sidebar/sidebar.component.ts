@@ -7,6 +7,7 @@ import { LayoutService } from '../../core/services/layout.service';
 import { EditorService } from '../../core/services/editor.service';
 import { Shelf, Notebook, Note, NoteType, NoteRef } from '../../core/models/shelf.model';
 import { ContextMenuComponent, ContextMenuTarget, ContextMenuAction } from './components/context-menu/context-menu.component';
+import { VersionHistoryComponent } from '../version-history/version-history.component';
 
 /**
  * SidebarComponent
@@ -16,7 +17,7 @@ import { ContextMenuComponent, ContextMenuTarget, ContextMenuAction } from './co
 @Component({
   selector: 'lore-sidebar',
   standalone: true,
-  imports: [CommonModule, FormsModule, ContextMenuComponent, DragDropModule],
+  imports: [CommonModule, FormsModule, ContextMenuComponent, DragDropModule, VersionHistoryComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -37,6 +38,10 @@ export class SidebarComponent {
   contextMenuOpen = signal(false);
   contextMenuTarget = signal<ContextMenuTarget | null>(null);
   contextMenuPosition = signal<{ x: number; y: number } | null>(null);
+  
+  // Version history state
+  versionHistoryOpen = signal(false);
+  versionHistoryNote = signal<Note | null>(null);
   
   // Inline editing state
   renamingId = signal<string | null>(null);
@@ -348,6 +353,9 @@ export class SidebarComponent {
         break;
       case 'delete':
         this.handleDelete(action.target);
+        break;
+      case 'version-history':
+        this.handleVersionHistory(action.target);
         break;
     }
   }
@@ -844,5 +852,46 @@ export class SidebarComponent {
   setFocus(id: string, type: 'shelf' | 'notebook' | 'note'): void {
     this.focusedItemId.set(id);
     this.focusedItemType.set(type);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // VERSION HISTORY
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Handle version history action
+   */
+  private handleVersionHistory(target: ContextMenuTarget): void {
+    if (target.type !== 'note') return;
+    
+    const note = this.shelfService.getNote(target.id);
+    if (note) {
+      this.versionHistoryNote.set(note);
+      this.versionHistoryOpen.set(true);
+    }
+  }
+
+  /**
+   * Close version history modal
+   */
+  closeVersionHistory(): void {
+    this.versionHistoryOpen.set(false);
+    this.versionHistoryNote.set(null);
+  }
+
+  /**
+   * Handle version restore
+   */
+  onVersionRestore(versionId: string): void {
+    const note = this.versionHistoryNote();
+    if (!note) return;
+
+    const success = this.shelfService.restoreNoteFromVersion(note.id, versionId);
+    if (success) {
+      console.log('Note restored successfully');
+      this.closeVersionHistory();
+    } else {
+      console.error('Failed to restore note');
+    }
   }
 }

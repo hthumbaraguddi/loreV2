@@ -1,11 +1,14 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Shelf, Notebook, Note, NoteType, NoteStatus, BlockType } from '../models/shelf.model';
 import { LocalStorageService } from './local-storage.service';
+import { VersioningService } from './versioning.service';
+import { VersionTrigger } from '../models/version.model';
 
 /**
  * ShelfService
  * Manages the three-tier hierarchy: Shelves → Notebooks → Notes
  * Uses Angular signals for reactive state management
+ * Integrated with versioning system
  */
 @Injectable({
   providedIn: 'root'
@@ -30,6 +33,8 @@ export class ShelfService {
       return total + shelf.notebooks.reduce((nbTotal, nb) => nbTotal + nb.notes.length, 0);
     }, 0);
   });
+
+  private versioningService = inject(VersioningService);
 
   constructor(private localStorage: LocalStorageService) {
     this.loadFromStorage();
@@ -153,6 +158,7 @@ export class ShelfService {
     newShelves[shelfIndex] = updatedShelf;
     this.shelvesSignal.set(newShelves);
     this.saveToStorage();
+    
     return newNotebook;
   }
 
@@ -259,6 +265,29 @@ export class ShelfService {
     return true;
   }
 
+  /**
+   * Restore note from a version
+   */
+  restoreNoteFromVersion(noteId: string, versionId: string): boolean {
+    const note = this.getNote(noteId);
+    if (!note) return false;
+
+    const snapshot = this.versioningService.restoreVersion(note, versionId);
+    if (!snapshot) return false;
+
+    // Update the note with the restored snapshot
+    return this.updateNote(noteId, {
+      title: snapshot.title,
+      type: snapshot.type as NoteType,
+      content: snapshot.content,
+      preview: snapshot.preview,
+      tags: snapshot.tags,
+      status: snapshot.status as NoteStatus,
+      blocks: snapshot.blocks,
+      linkedNoteIds: snapshot.linkedNoteIds
+    });
+  }
+
   // ═══════════════════════════════════════════════════════════
   // NOTE CRUD
   // ═══════════════════════════════════════════════════════════
@@ -317,6 +346,9 @@ export class ShelfService {
     if (created) {
       this.shelvesSignal.set(newShelves);
       this.saveToStorage();
+      
+      // Create initial version for the new note
+      this.versioningService.createInitialVersion(created);
     }
 
     return created;

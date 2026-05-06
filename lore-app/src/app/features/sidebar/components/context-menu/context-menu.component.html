@@ -37,6 +37,18 @@
         <span>New Note</span>
       </div>
 
+      <!-- Version History (only for notebooks) -->
+      @if (showVersionHistory()) {
+        <div class="ctx-item" (click)="onAction('version-history')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 3v5l3 2"/>
+            <circle cx="8" cy="8" r="5"/>
+            <path d="M3 8a5 5 0 015-5"/>
+          </svg>
+          <span>Version History</span>
+        </div>
+      }
+
       <hr class="ctx-divider"/>
 
       <!-- Change Color (only for shelves) -->

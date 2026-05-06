@@ -1,0 +1,436 @@
+<div class="version-history-modal">
+  <div class="modal-overlay" (click)="closeModal()"></div>
+  
+  <div class="modal-content">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <h2>📜 Version History</h2>
+        <span class="notebook-name">{{ note().title }}</span>
+      </div>
+      <div class="header-right">
+        <button class="btn-icon" (click)="closeModal()" title="Close">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        class="tab" 
+        [class.active]="activeTab() === 'timeline'"
+        (click)="setTab('timeline')">
+        Timeline
+      </button>
+      <button 
+        class="tab" 
+        [class.active]="activeTab() === 'compare'"
+        (click)="setTab('compare')">
+        Compare
+      </button>
+      <button 
+        class="tab" 
+        [class.active]="activeTab() === 'analytics'"
+        (click)="setTab('analytics')">
+        Analytics
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-body">
+      
+      <!-- Timeline Tab -->
+      @if (activeTab() === 'timeline') {
+        <div class="timeline-view">
+          
+          <!-- Actions -->
+          <div class="timeline-actions">
+            <button class="btn-primary" (click)="openCreateForm()">
+              ⭐ Create Milestone
+            </button>
+            <button class="btn-secondary" (click)="createQuickSnapshot()">
+              📸 Quick Snapshot
+            </button>
+          </div>
+
+          <!-- Create Form -->
+          @if (showCreateForm()) {
+            <div class="create-form">
+              <h3>Create Milestone Version</h3>
+              <input 
+                type="text" 
+                class="form-input"
+                placeholder="Milestone label (required)"
+                [(ngModel)]="newVersionLabel"
+                (keyup.enter)="createMilestone()">
+              <textarea 
+                class="form-textarea"
+                placeholder="Description (optional)"
+                [(ngModel)]="newVersionDescription"
+                rows="3"></textarea>
+              <div class="form-actions">
+                <button class="btn-primary" (click)="createMilestone()">
+                  Create
+                </button>
+                <button class="btn-secondary" (click)="cancelCreate()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Empty State -->
+          @if (!hasVersions()) {
+            <div class="empty-state">
+              <div class="empty-icon">📜</div>
+              <h3>No Version History</h3>
+              <p>Create your first version snapshot to start tracking changes.</p>
+              <button class="btn-primary" (click)="createQuickSnapshot()">
+                Create First Snapshot
+              </button>
+            </div>
+          }
+
+          <!-- Version List -->
+          @if (hasVersions()) {
+            <div class="version-list">
+              @for (version of versions(); track trackByVersionId($index, version)) {
+                <div 
+                  class="version-card"
+                  [class.selected]="selectedVersion()?.id === version.id"
+                  (click)="selectVersion(version)">
+                  
+                  <div class="version-header">
+                    <div class="version-number">v{{ version.versionNumber }}</div>
+                    <span class="version-badge" [class]="getTriggerBadge(version.trigger)">
+                      {{ getTriggerLabel(version.trigger) }}
+                    </span>
+                    <div class="version-date">{{ formatDate(version.timestamp) }}</div>
+                  </div>
+
+                  <div class="version-body">
+                    @if (version.label) {
+                      <div class="version-label">{{ version.label }}</div>
+                    }
+                    @if (version.description) {
+                      <div class="version-description">{{ version.description }}</div>
+                    }
+                    <div class="version-changes">
+                      <span class="change-summary">{{ getChangeSummary(version) }}</span>
+                      @if (version.changesSummary.significantChanges.length > 0) {
+                        <div class="significant-changes">
+                          @for (change of version.changesSummary.significantChanges; track $index) {
+                            <span class="change-item">{{ change }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="version-actions">
+                    <button 
+                      class="btn-small btn-restore"
+                      (click)="selectVersion(version); previewRestoreVersion(); $event.stopPropagation()">
+                      ↺ Restore
+                    </button>
+                    @if (version.trigger !== 'milestone') {
+                      <button 
+                        class="btn-small btn-delete"
+                        (click)="deleteVersion(version.id, $event)">
+                        🗑️
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Restore Preview Modal -->
+          @if (showRestorePreview() && restorePreview()) {
+            <div class="restore-preview-modal">
+              <div class="preview-overlay" (click)="cancelRestore()"></div>
+              <div class="preview-content">
+                <h3>⚠️ Restore Preview</h3>
+                <p>Restoring to version {{ selectedVersion()?.versionNumber }} will make the following changes:</p>
+                
+                <div class="preview-changes">
+                  @if (restorePreview()!.changes.titleChanged) {
+                    <div class="change-section modify">
+                      <strong>📝 Title Change</strong>
+                      <div class="change-detail">
+                        <div class="old-value">From: {{ restorePreview()!.currentSnapshot.title }}</div>
+                        <div class="new-value">To: {{ restorePreview()!.targetSnapshot.title }}</div>
+                      </div>
+                    </div>
+                  }
+                  
+                  @if (restorePreview()!.changes.contentChanged) {
+                    <div class="change-section modify">
+                      <strong>✏️ Content Changed</strong>
+                      <p>The note content will be replaced with the version's content.</p>
+                    </div>
+                  }
+                  
+                  @if (restorePreview()!.changes.typeChanged) {
+                    <div class="change-section modify">
+                      <strong>🏷️ Type Change</strong>
+                      <div class="change-detail">
+                        <div class="old-value">From: {{ restorePreview()!.currentSnapshot.type }}</div>
+                        <div class="new-value">To: {{ restorePreview()!.targetSnapshot.type }}</div>
+                      </div>
+                    </div>
+                  }
+                  
+                  @if (restorePreview()!.changes.tagsChanged) {
+                    <div class="change-section modify">
+                      <strong>🏷️ Tags Changed</strong>
+                      <div class="change-detail">
+                        <div class="old-value">Current: {{ restorePreview()!.currentSnapshot.tags.join(', ') || 'None' }}</div>
+                        <div class="new-value">New: {{ restorePreview()!.targetSnapshot.tags.join(', ') || 'None' }}</div>
+                      </div>
+                    </div>
+                  }
+                  
+                  @if (restorePreview()!.changes.blocksChanged) {
+                    <div class="change-section modify">
+                      <strong>🧩 Blocks Changed</strong>
+                      <p>The note blocks will be replaced with the version's blocks.</p>
+                    </div>
+                  }
+                  
+                  @if (restorePreview()!.changes.statusChanged) {
+                    <div class="change-section modify">
+                      <strong>📊 Status Change</strong>
+                      <div class="change-detail">
+                        <div class="old-value">From: {{ restorePreview()!.currentSnapshot.status }}</div>
+                        <div class="new-value">To: {{ restorePreview()!.targetSnapshot.status }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                @if (restorePreview()!.warnings.length > 0) {
+                  <div class="warnings">
+                    <strong>⚠️ Warnings:</strong>
+                    <ul>
+                      @for (warning of restorePreview()!.warnings; track $index) {
+                        <li>{{ warning }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
+
+                <div class="preview-actions">
+                  <button class="btn-primary" (click)="confirmRestore()">
+                    ✓ Confirm Restore
+                  </button>
+                  <button class="btn-secondary" (click)="cancelRestore()">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Compare Tab -->
+      @if (activeTab() === 'compare') {
+        <div class="compare-view">
+          <div class="compare-selector">
+            <div class="selector-column">
+              <h3>Version 1</h3>
+              @if (compareVersion1()) {
+                <div class="selected-version">
+                  <strong>v{{ compareVersion1()!.versionNumber }}</strong>
+                  <span>{{ formatDate(compareVersion1()!.timestamp) }}</span>
+                  <button class="btn-small" (click)="compareVersion1.set(null)">Clear</button>
+                </div>
+              } @else {
+                <select class="form-select" (change)="selectCompareVersion1(versions()[$any($event.target).selectedIndex - 1])">
+                  <option value="">Select version...</option>
+                  @for (version of versions(); track version.id) {
+                    <option [value]="version.id">v{{ version.versionNumber }} - {{ formatDate(version.timestamp) }}</option>
+                  }
+                </select>
+              }
+            </div>
+
+            <div class="selector-divider">vs</div>
+
+            <div class="selector-column">
+              <h3>Version 2</h3>
+              @if (compareVersion2()) {
+                <div class="selected-version">
+                  <strong>v{{ compareVersion2()!.versionNumber }}</strong>
+                  <span>{{ formatDate(compareVersion2()!.timestamp) }}</span>
+                  <button class="btn-small" (click)="compareVersion2.set(null)">Clear</button>
+                </div>
+              } @else {
+                <select class="form-select" (change)="selectCompareVersion2(versions()[$any($event.target).selectedIndex - 1])">
+                  <option value="">Select version...</option>
+                  @for (version of versions(); track version.id) {
+                    <option [value]="version.id">v{{ version.versionNumber }} - {{ formatDate(version.timestamp) }}</option>
+                  }
+                </select>
+              }
+            </div>
+          </div>
+
+          @if (versionDiff()) {
+            <div class="diff-results">
+              <h3>Comparison Results</h3>
+              
+              <div class="diff-summary">
+                <div class="diff-stat">
+                  <strong>{{ versionDiff()!.changes.totalChanges }}</strong>
+                  <span>Total Changes</span>
+                </div>
+              </div>
+
+              <div class="diff-section">
+                <h4>Changes Detected</h4>
+                <ul>
+                  @if (versionDiff()!.changes.titleChanged) {
+                    <li>
+                      <strong>Title Changed</strong>
+                      <div class="note-changes">
+                        <span class="change-badge">From: {{ versionDiff()!.version1.snapshot.title }}</span>
+                        <span class="change-badge">To: {{ versionDiff()!.version2.snapshot.title }}</span>
+                      </div>
+                    </li>
+                  }
+                  @if (versionDiff()!.changes.contentChanged) {
+                    <li><strong>Content</strong> was modified</li>
+                  }
+                  @if (versionDiff()!.changes.typeChanged) {
+                    <li>
+                      <strong>Type Changed</strong>
+                      <div class="note-changes">
+                        <span class="change-badge">From: {{ versionDiff()!.version1.snapshot.type }}</span>
+                        <span class="change-badge">To: {{ versionDiff()!.version2.snapshot.type }}</span>
+                      </div>
+                    </li>
+                  }
+                  @if (versionDiff()!.changes.tagsChanged) {
+                    <li><strong>Tags</strong> were modified</li>
+                  }
+                  @if (versionDiff()!.changes.blocksChanged) {
+                    <li><strong>Blocks</strong> were modified</li>
+                  }
+                  @if (versionDiff()!.changes.statusChanged) {
+                    <li>
+                      <strong>Status Changed</strong>
+                      <div class="note-changes">
+                        <span class="change-badge">From: {{ versionDiff()!.version1.snapshot.status }}</span>
+                        <span class="change-badge">To: {{ versionDiff()!.version2.snapshot.status }}</span>
+                      </div>
+                    </li>
+                  }
+                  @if (versionDiff()!.changes.totalChanges === 0) {
+                    <li>No changes detected between these versions</li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Analytics Tab -->
+      @if (activeTab() === 'analytics') {
+        <div class="analytics-view">
+          @if (analytics()) {
+            <div class="analytics-grid">
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.totalVersions }}</div>
+                <div class="stat-label">Total Versions</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.milestoneCount }}</div>
+                <div class="stat-label">Milestones</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.totalChanges }}</div>
+                <div class="stat-label">Total Changes</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.changeFrequency.titleChanges }}</div>
+                <div class="stat-label">Title Changes</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.changeFrequency.contentChanges }}</div>
+                <div class="stat-label">Content Changes</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.changeFrequency.blocksChanges }}</div>
+                <div class="stat-label">Block Changes</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.averageTimeBetweenVersions.toFixed(0) }}m</div>
+                <div class="stat-label">Avg Time Between Versions</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-value">{{ analytics()!.mostActiveDay }}</div>
+                <div class="stat-label">Most Active Day</div>
+              </div>
+            </div>
+
+            <div class="analytics-details">
+              <h3>Version Breakdown</h3>
+              <div class="breakdown-list">
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Manual Snapshots:</span>
+                  <span class="breakdown-value">{{ analytics()!.versionsByTrigger['manual'] }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Auto-saves:</span>
+                  <span class="breakdown-value">{{ analytics()!.versionsByTrigger['auto'] }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Milestones:</span>
+                  <span class="breakdown-value">{{ analytics()!.versionsByTrigger['milestone'] }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Backups:</span>
+                  <span class="breakdown-value">{{ analytics()!.versionsByTrigger['before-restore'] }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="breakdown-label">Session Snapshots:</span>
+                  <span class="breakdown-value">{{ analytics()!.versionsByTrigger['session'] }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="analytics-timeline">
+              <h3>History Timeline</h3>
+              <div class="timeline-info">
+                <div class="timeline-item">
+                  <strong>First Version:</strong>
+                  <span>{{ formatFullDate(analytics()!.oldestVersion) }}</span>
+                </div>
+                <div class="timeline-item">
+                  <strong>Latest Version:</strong>
+                  <span>{{ formatFullDate(analytics()!.newestVersion) }}</span>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="empty-state">
+              <p>No analytics available. Create some versions first!</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

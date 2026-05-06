@@ -1,7 +1,8 @@
-import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewInit, effect } from '@angular/core';
+import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewInit, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShelfService } from '../../../core/services/shelf.service';
 import { BlockService } from '../../../core/services/block.service';
+import { SessionVersioningService } from '../../../core/services/session-versioning.service';
 import { Note, NoteType, NoteRef, Block, BlockType } from '../../../core/models/shelf.model';
 import { CanvasBackgroundComponent } from '../canvas-background/canvas-background.component';
 import { BlockListComponent } from '../../blocks/block-list/block-list.component';
@@ -15,9 +16,10 @@ import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette
   templateUrl: './paper-canvas.component.html',
   styleUrl: './paper-canvas.component.scss'
 })
-export class PaperCanvasComponent implements AfterViewInit {
+export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   private shelfService = inject(ShelfService);
   private blockService = inject(BlockService);
+  private sessionVersioning = inject(SessionVersioningService);
 
   @ViewChild('noteBodyTextarea') noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('trailingTextarea') trailingTextarea?: ElementRef<HTMLTextAreaElement>;
@@ -50,6 +52,16 @@ export class PaperCanvasComponent implements AfterViewInit {
     // Reset trailing textarea when the active note changes
     effect(() => {
       const noteId = this.note().id; // track note changes
+      const fullNote = this.fullNote();
+      
+      // End previous session if exists
+      if (this._previousNoteId && this._previousNoteId !== noteId) {
+        this.sessionVersioning.endSession(this._previousNoteId);
+      }
+      
+      // Start new session for this note
+      this.sessionVersioning.startSession(fullNote);
+      this._previousNoteId = noteId;
       
       // Load any saved trailing content from localStorage
       const saved = localStorage.getItem(`lore-trailing-${noteId}`);
@@ -61,6 +73,15 @@ export class PaperCanvasComponent implements AfterViewInit {
         this.trailingTextarea.nativeElement.style.height = 'auto';
       }
     });
+  }
+
+  private _previousNoteId?: string;
+
+  ngOnDestroy(): void {
+    // End session when component is destroyed
+    if (this._previousNoteId) {
+      this.sessionVersioning.endSession(this._previousNoteId);
+    }
   }
 
   // Resolved full note
@@ -168,6 +189,7 @@ export class PaperCanvasComponent implements AfterViewInit {
     const title = (event.target as HTMLElement).textContent?.trim() || 'Untitled';
     if (title !== this.fullNote().title) {
       this.shelfService.updateNote(this.fullNote().id, { title });
+      this.sessionVersioning.trackChange(this.fullNote().id);
     }
   }
 
@@ -180,6 +202,7 @@ export class PaperCanvasComponent implements AfterViewInit {
     const textarea = event.target as HTMLTextAreaElement;
     const content = textarea.value;
     this.shelfService.updateNote(this.fullNote().id, { content });
+    this.sessionVersioning.trackChange(this.fullNote().id);
     
     // Prevent scroll jumping by saving and restoring scroll position
     const canvas = textarea.closest('.paper-canvas') as HTMLElement | null;

@@ -294,3 +294,12 @@
   (actionSelected)="onContextMenuAction($event)"
   (closed)="onContextMenuClosed()"
 ></lore-context-menu>
+
+<!-- Version History Modal -->
+@if (versionHistoryOpen() && versionHistoryNote()) {
+  <lore-version-history
+    [note]="versionHistoryNote()!"
+    (close)="closeVersionHistory()"
+    (restore)="onVersionRestore($event)"
+  ></lore-version-history>
+}

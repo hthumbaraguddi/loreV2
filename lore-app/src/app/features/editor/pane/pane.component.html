@@ -93,3 +93,12 @@
     }
   </div>
 </div>
+
+<!-- Version History Modal -->
+@if (showVersionHistory() && versionHistoryNote()) {
+  <lore-version-history
+    [note]="versionHistoryNote()!"
+    (close)="closeVersionHistory()"
+    (restore)="onVersionRestore($event)"
+  ></lore-version-history>
+}

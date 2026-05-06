@@ -39,7 +39,7 @@
       (input)="onNoteBodyInput($event)"
       (keydown)="onNoteBodyKeydown($event)"
       [readOnly]="readOnly()"
-      placeholder="Continue writing… / for blocks, @ for AI, [[ to link"
+      placeholder="Start writing… / for blocks, @ for AI, [[ to link"
       rows="1"
     ></textarea>
 
@@ -55,14 +55,14 @@
     />
 
     <!-- Trailing write zone: plain textarea continuation below blocks -->
-    @if (!readOnly()) {
+    @if (!readOnly() && blocks().length > 0) {
       <textarea
         #trailingTextarea
         class="note-body trailing-body"
         [value]="trailingContent()"
         (input)="onTrailingInput($event)"
         (keydown)="onNoteBodyKeydown($event)"
-        placeholder="Continue writing… / for blocks, @ for AI"
+        placeholder="Continue below… / for blocks, @ for AI"
         rows="1"
         aria-label="Continue writing below blocks"
       ></textarea>

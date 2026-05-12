@@ -22,6 +22,7 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
         <div class="block-row" cdkDrag [cdkDragData]="block">
           <lore-block-container
             [block]="block"
+            [noteId]="noteId()"
             [index]="i"
             [readOnly]="readOnly()"
             (blockChanged)="blockChanged.emit($event)"
@@ -77,6 +78,7 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
 })
 export class BlockListComponent {
   blocks = input.required<Block[]>();
+  noteId = input.required<string>();
   readOnly = input(false);
 
   blockChanged = output<Block>();

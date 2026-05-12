@@ -96,7 +96,7 @@ interface DiffRow { left: string; right: string; }
     .kd-inp {
       border: none; background: transparent; outline: none;
       font-family: 'Lora', serif; font-size: 13.5px; color: var(--lore-color-text-muted);
-      width: 100%; line-height: 1.6; min-height: 20px;
+      width: 100%; line-height: 1.6; min-height: 14px;
       &:empty::before { content: attr(data-placeholder); color: var(--lore-color-text-faint); }
     }
     .kd-add {

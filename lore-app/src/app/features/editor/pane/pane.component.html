@@ -48,40 +48,48 @@
   <!-- Pane content -->
   <div class="pane-content">
     @if (noteRef()) {
-      <!-- Floating action buttons - top right corner -->
-      <div class="pane-actions">
-        <!-- Panel button -->
-        <button
-          class="pane-action-btn"
-          (click)="onPanelClick($event)"
-          aria-label="Panel options"
-          title="Panel options"
-        >
-          <span class="material-symbols-outlined">view_sidebar</span>
-        </button>
+      <!-- Show version tree or note based on view mode -->
+      @if (viewMode() === 'version-tree' && versionTreeNote()) {
+        <lore-version-tree
+          [note]="versionTreeNote()!"
+          (close)="closeVersionTree()"
+        ></lore-version-tree>
+      } @else {
+        <!-- Floating action buttons - top right corner -->
+        <div class="pane-actions">
+          <!-- Panel button -->
+          <button
+            class="pane-action-btn"
+            (click)="onPanelClick($event)"
+            aria-label="Panel options"
+            title="Panel options"
+          >
+            <span class="material-symbols-outlined">view_sidebar</span>
+          </button>
+          
+          <!-- History button -->
+          <button
+            class="pane-action-btn"
+            (click)="onHistoryClick($event)"
+            aria-label="History"
+            title="History"
+          >
+            <span class="material-symbols-outlined">history</span>
+          </button>
+          
+          <!-- Canvas button -->
+          <button
+            class="pane-action-btn"
+            (click)="onCanvasClick($event)"
+            aria-label="Canvas background"
+            title="Canvas background"
+          >
+            <span class="material-symbols-outlined">grid_on</span>
+          </button>
+        </div>
         
-        <!-- History button -->
-        <button
-          class="pane-action-btn"
-          (click)="onHistoryClick($event)"
-          aria-label="History"
-          title="History"
-        >
-          <span class="material-symbols-outlined">history</span>
-        </button>
-        
-        <!-- Canvas button -->
-        <button
-          class="pane-action-btn"
-          (click)="onCanvasClick($event)"
-          aria-label="Canvas background"
-          title="Canvas background"
-        >
-          <span class="material-symbols-outlined">grid_on</span>
-        </button>
-      </div>
-      
-      <lore-paper-canvas [note]="noteRef()!" />
+        <lore-paper-canvas [note]="noteRef()!" />
+      }
     } @else {
       <div class="drop-zone">
         <div class="drop-zone-content">
@@ -93,12 +101,3 @@
     }
   </div>
 </div>
-
-<!-- Version History Modal -->
-@if (showVersionHistory() && versionHistoryNote()) {
-  <lore-version-history
-    [note]="versionHistoryNote()!"
-    (close)="closeVersionHistory()"
-    (restore)="onVersionRestore($event)"
-  ></lore-version-history>
-}

@@ -57,7 +57,7 @@ import { Block } from '../../../core/models/shelf.model';
     .fi-inp {
       border: none; background: transparent; outline: none;
       font-family: 'Lora', serif; font-size: 13.5px;
-      color: var(--lore-color-text-muted); width: 100%; min-height: 20px;
+      color: var(--lore-color-text-muted); width: 100%; min-height: 14px;
       &:empty::before { content: attr(data-placeholder); color: var(--lore-color-text-faint); }
     }
     .fi-add {

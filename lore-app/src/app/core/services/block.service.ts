@@ -128,6 +128,8 @@ export class BlockService {
       [BlockType.Code]: '',
       [BlockType.Image]: '',
       [BlockType.Divider]: '',
+      [BlockType.AskClaude]: '',
+      [BlockType.AskGPT]: '',
       [BlockType.AskAI]: ''
     };
     return map[type] ?? '';
@@ -138,6 +140,8 @@ export class BlockService {
     if (type === BlockType.Checklist) return { items: [] };
     if (type === BlockType.Table) return { headers: ['Column 1', 'Column 2'], rows: [['', '']] };
     if (type === BlockType.AskAI) return { provider: 'anthropic' };
+    if (type === BlockType.AskClaude) return { provider: 'anthropic' };
+    if (type === BlockType.AskGPT) return { provider: 'openai' };
     return {};
   }
 }

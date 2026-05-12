@@ -1,18 +1,18 @@
-import { Component, signal, input, output, HostListener, inject } from '@angular/core';
+import { Component, signal, input, output, HostListener, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NoteRef, Note } from '../../../core/models/shelf.model';
 import { PaperCanvasComponent } from '../paper-canvas/paper-canvas.component';
 import { ShelfService } from '../../../core/services/shelf.service';
-import { VersionHistoryComponent } from '../../version-history/version-history.component';
+import { VersionTreeComponent } from '../../version-tree/version-tree.component';
 
 /**
  * PaneComponent
- * Individual editor pane that can host a note
+ * Individual editor pane that can host a note or version tree
  */
 @Component({
   selector: 'lore-pane',
   standalone: true,
-  imports: [CommonModule, PaperCanvasComponent, VersionHistoryComponent],
+  imports: [CommonModule, PaperCanvasComponent, VersionTreeComponent],
   templateUrl: './pane.component.html',
   styleUrl: './pane.component.scss'
 })
@@ -33,9 +33,26 @@ export class PaneComponent {
   // Internal state signals
   dragOver = signal<boolean>(false);
   
-  // Version history state
-  showVersionHistory = signal(false);
-  versionHistoryNote = signal<Note | null>(null);
+  // View mode: 'note' or 'version-tree'
+  viewMode = signal<'note' | 'version-tree'>('note');
+  versionTreeNote = signal<Note | null>(null);
+
+  constructor() {
+    // Watch for note changes - close version tree when switching notes
+    effect(() => {
+      const ref = this.noteRef();
+      const mode = this.viewMode();
+      const currentVersionNote = this.versionTreeNote();
+      
+      // If in version tree mode and note changes to a different note, close version tree
+      if (mode === 'version-tree' && ref && currentVersionNote) {
+        if (ref.id !== currentVersionNote.id) {
+          // Different note selected, close version tree and show the new note
+          this.closeVersionTree();
+        }
+      }
+    });
+  }
 
   // ═══════════════════════════════════════════════════════════
   // COMPUTED PROPERTIES
@@ -96,33 +113,17 @@ export class PaneComponent {
     
     const note = this.shelfService.getNote(ref.id);
     if (note) {
-      this.versionHistoryNote.set(note);
-      this.showVersionHistory.set(true);
+      this.versionTreeNote.set(note);
+      this.viewMode.set('version-tree');
     }
   }
 
   /**
-   * Close version history modal
+   * Close version tree and return to note view
    */
-  closeVersionHistory(): void {
-    this.showVersionHistory.set(false);
-    this.versionHistoryNote.set(null);
-  }
-
-  /**
-   * Handle version restore
-   */
-  onVersionRestore(versionId: string): void {
-    const note = this.versionHistoryNote();
-    if (!note) return;
-
-    const success = this.shelfService.restoreNoteFromVersion(note.id, versionId);
-    if (success) {
-      console.log('Note restored successfully');
-      this.closeVersionHistory();
-    } else {
-      console.error('Failed to restore note');
-    }
+  closeVersionTree(): void {
+    this.viewMode.set('note');
+    this.versionTreeNote.set(null);
   }
 
   /**

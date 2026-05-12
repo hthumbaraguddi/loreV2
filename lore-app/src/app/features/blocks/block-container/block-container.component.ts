@@ -1,10 +1,11 @@
 import {
-  Component, input, output, signal, computed,
+  Component, input, output, signal, computed, inject,
   ChangeDetectionStrategy, HostListener, ViewChild, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Block, BlockType } from '../../../core/models/shelf.model';
+import { CommentService } from '../../../core/services/comment.service';
 import { BlockToolbarComponent } from '../block-toolbar/block-toolbar.component';
 import { HypothesisBlockComponent } from '../hypothesis-block/hypothesis-block.component';
 import { ConclusionBlockComponent } from '../conclusion-block/conclusion-block.component';
@@ -17,18 +18,22 @@ import { ChecklistBlockComponent } from '../checklist-block/checklist-block.comp
 import { CodeBlockComponent } from '../code-block/code-block.component';
 import { DividerBlockComponent } from '../divider-block/divider-block.component';
 import { ImageBlockComponent } from '../image-block/image-block.component';
+import { TableBlockComponent } from '../table-block/table-block.component';
 import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
+import { AskClaudeBlockComponent } from '../ask-claude-block/ask-claude-block.component';
+import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
 
 @Component({
   selector: 'lore-block-container',
   standalone: true,
   imports: [
-    CommonModule, CdkDrag, CdkDragHandle,
+    CommonModule, CdkDragHandle,
     BlockToolbarComponent,
     HypothesisBlockComponent, ConclusionBlockComponent, NoteInsightBlockComponent,
     WarningBlockComponent, QuoteBlockComponent, KeyFindingsBlockComponent,
     KeyDifferencesBlockComponent, ChecklistBlockComponent, CodeBlockComponent,
-    DividerBlockComponent, ImageBlockComponent, AskAiBlockComponent
+    DividerBlockComponent, ImageBlockComponent, TableBlockComponent,
+    AskAiBlockComponent, AskClaudeBlockComponent, AskGptBlockComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -53,6 +58,7 @@ import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
       <!-- Floating toolbar -->
       <lore-block-toolbar
         [blockType]="block().type"
+        [commentCount]="commentCount()"
         [visible]="hovered() || focused()"
         (deleteRequested)="blockDeleted.emit(block().id)"
         (duplicateRequested)="duplicateRequested.emit(block().id)"
@@ -93,8 +99,17 @@ import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
           @case (BlockType.Image) {
             <lore-image-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
           }
+          @case (BlockType.Table) {
+            <lore-table-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+          }
           @case (BlockType.Divider) {
             <lore-divider-block [block]="block()" [readOnly]="readOnly()" />
+          }
+          @case (BlockType.AskClaude) {
+            <lore-ask-claude-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+          }
+          @case (BlockType.AskGPT) {
+            <lore-ask-gpt-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
           }
           @case (BlockType.AskAI) {
             <lore-ask-ai-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
@@ -148,8 +163,11 @@ import { AskAiBlockComponent } from '../ask-ai-block/ask-ai-block.component';
 })
 export class BlockContainerComponent {
   block = input.required<Block>();
+  noteId = input.required<string>();
   index = input.required<number>();
   readOnly = input(false);
+
+  private commentService = inject(CommentService);
 
   blockChanged = output<Block>();
   blockDeleted = output<string>();
@@ -160,6 +178,10 @@ export class BlockContainerComponent {
   BlockType = BlockType;
   hovered = signal(false);
   focused = signal(false);
+
+  commentCount = computed(() => 
+    this.commentService.getBlockCommentCount(this.noteId(), this.block().id)
+  );
 
   @ViewChild('addBelowButton') addBelowButton?: ElementRef<HTMLButtonElement>;
 

@@ -15,7 +15,8 @@ export const BLOCK_TYPE_MENU: { type: BlockType; label: string; icon: string }[]
   { type: BlockType.Table,          label: 'Table',            icon: 'table_chart' },
   { type: BlockType.Image,          label: 'Image',            icon: 'image' },
   { type: BlockType.Divider,        label: 'Divider',          icon: 'horizontal_rule' },
-  { type: BlockType.AskAI,          label: 'Ask AI',           icon: 'auto_awesome' },
+  { type: BlockType.AskClaude,      label: 'Ask Claude',       icon: 'auto_awesome' },
+  { type: BlockType.AskGPT,         label: 'Ask GPT',          icon: 'auto_awesome' },
 ];
 
 @Component({

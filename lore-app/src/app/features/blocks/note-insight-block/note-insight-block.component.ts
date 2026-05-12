@@ -38,7 +38,7 @@ import { Block } from '../../../core/models/shelf.model';
       border: none; background: transparent; outline: none;
       font-family: 'Lora', serif; font-size: 14px; font-style: italic;
       line-height: 1.65; color: var(--lore-color-text-muted); width: 100%;
-      min-height: 20px;
+      min-height: 14px;
       &:empty::before { content: attr(data-placeholder); color: var(--lore-color-text-faint); }
     }
   `]

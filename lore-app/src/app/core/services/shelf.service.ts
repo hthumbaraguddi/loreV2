@@ -455,7 +455,7 @@ export class ShelfService {
   }
 
   /**
-   * Search notes
+   * Search notes and blocks
    */
   searchNotes(query: string): Note[] {
     if (!query.trim()) return [];
@@ -466,12 +466,21 @@ export class ShelfService {
     for (const shelf of this.shelvesSignal()) {
       for (const notebook of shelf.notebooks) {
         for (const note of notebook.notes) {
-          if (
-            note.title.toLowerCase().includes(lowerQuery) ||
-            note.content.toLowerCase().includes(lowerQuery) ||
-            note.preview?.toLowerCase().includes(lowerQuery) ||
-            note.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-          ) {
+          // Check note-level fields
+          const titleMatch = note.title.toLowerCase().includes(lowerQuery);
+          const contentMatch = note.content.toLowerCase().includes(lowerQuery);
+          const previewMatch = note.preview?.toLowerCase().includes(lowerQuery);
+          const tagMatch = note.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+
+          // Check block content
+          const blockMatch = note.blocks?.some(block => {
+            const blockContentMatch = block.content?.toLowerCase().includes(lowerQuery);
+            const blockMetadataMatch = block.metadata &&
+              JSON.stringify(block.metadata).toLowerCase().includes(lowerQuery);
+            return blockContentMatch || blockMetadataMatch;
+          });
+
+          if (titleMatch || contentMatch || previewMatch || tagMatch || blockMatch) {
             results.push(note);
           }
         }

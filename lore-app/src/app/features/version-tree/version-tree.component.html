@@ -1,0 +1,270 @@
+<div class="version-tree-panel">
+  <!-- Header -->
+  <div class="panel-header">
+    <div class="header-left">
+      <span class="material-symbols-outlined">history</span>
+      <h2>Version History</h2>
+      <span class="note-title">{{ note().title }}</span>
+    </div>
+    <div class="header-actions">
+      <button 
+        class="btn-icon" 
+        [class.active]="compareMode()"
+        (click)="toggleCompareMode()"
+        title="Compare versions">
+        <span class="material-symbols-outlined">compare_arrows</span>
+      </button>
+      <button class="btn-icon" (click)="closePanel()" title="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="actions-bar">
+    <button class="btn-primary" (click)="createQuickSnapshot()">
+      <span class="material-symbols-outlined">photo_camera</span>
+      Quick Snapshot
+    </button>
+    <button class="btn-secondary" (click)="openCreateForm()">
+      <span class="material-symbols-outlined">star</span>
+      Create Milestone
+    </button>
+  </div>
+
+  <!-- Create Milestone Form -->
+  @if (showCreateForm()) {
+    <div class="create-form">
+      <h3>Create Milestone</h3>
+      <input 
+        type="text" 
+        class="form-input"
+        placeholder="Milestone label (required)"
+        [(ngModel)]="newVersionLabel"
+        (keyup.enter)="createMilestone()">
+      <textarea 
+        class="form-textarea"
+        placeholder="Description (optional)"
+        [(ngModel)]="newVersionDescription"
+        rows="2"></textarea>
+      <div class="form-actions">
+        <button class="btn-primary" (click)="createMilestone()">Create</button>
+        <button class="btn-secondary" (click)="cancelCreate()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Compare Mode Info -->
+  @if (compareMode()) {
+    <div class="compare-info">
+      <div class="compare-status">
+        <span class="material-symbols-outlined">info</span>
+        <span>Select two versions to compare</span>
+        @if (compareVersion1() && compareVersion2()) {
+          <button class="btn-small" (click)="clearComparison()">Clear</button>
+        }
+      </div>
+      @if (compareVersion1()) {
+        <div class="compare-selection">
+          <span class="compare-badge">1</span>
+          <span>v{{ compareVersion1()!.versionNumber }}</span>
+        </div>
+      }
+      @if (compareVersion2()) {
+        <div class="compare-selection">
+          <span class="compare-badge">2</span>
+          <span>v{{ compareVersion2()!.versionNumber }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Main Content -->
+  <div class="panel-content">
+    
+    <!-- Empty State -->
+    @if (!hasVersions()) {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">history</span>
+        <h3>No Version History</h3>
+        <p>Create your first version snapshot to start tracking changes.</p>
+        <button class="btn-primary" (click)="createQuickSnapshot()">
+          Create First Snapshot
+        </button>
+      </div>
+    }
+
+    <!-- Version Tree -->
+    @if (hasVersions()) {
+      <div class="version-tree">
+        @for (item of versionTree(); track trackByVersionId($index, item.version)) {
+          <div 
+            class="version-node"
+            [class.selected]="isSelected(item.version)"
+            [class.compare-selected]="isSelectedForCompare(item.version)"
+            [class.current]="item.isCurrent"
+            (click)="selectVersion(item.version)">
+            
+            <!-- Git-style branch line -->
+            <div class="branch-container">
+              <div class="branch-line" [class.visible]="item.branchLine"></div>
+              <div class="commit-dot" [class]="getTriggerBadge(item.version.trigger)">
+                <span class="commit-icon">{{ getTriggerIcon(item.version.trigger) }}</span>
+              </div>
+            </div>
+
+            <!-- Version Info -->
+            <div class="version-info">
+              <div class="version-header">
+                <div class="version-meta">
+                  <span class="version-number">v{{ item.version.versionNumber }}</span>
+                  <span class="version-badge" [class]="getTriggerBadge(item.version.trigger)">
+                    {{ item.version.trigger }}
+                  </span>
+                  @if (item.isCurrent) {
+                    <span class="current-badge">CURRENT</span>
+                  }
+                  @if (compareMode() && getCompareNumber(item.version)) {
+                    <span class="compare-number">{{ getCompareNumber(item.version) }}</span>
+                  }
+                </div>
+                <span class="version-date">{{ formatDate(item.version.timestamp) }}</span>
+              </div>
+
+              @if (item.version.label) {
+                <div class="version-label">{{ item.version.label }}</div>
+              }
+
+              @if (item.version.description) {
+                <div class="version-description">{{ item.version.description }}</div>
+              }
+
+              <div class="version-changes">
+                <span class="changes-summary">{{ getChangeSummary(item.version) }}</span>
+              </div>
+
+              @if (item.version.changesSummary.significantChanges.length > 0) {
+                <div class="significant-changes">
+                  @for (change of item.version.changesSummary.significantChanges; track $index) {
+                    <span class="change-tag">{{ change }}</span>
+                  }
+                </div>
+              }
+
+              <!-- Actions -->
+              <div class="version-actions">
+                @if (!item.isCurrent) {
+                  <button 
+                    class="btn-action"
+                    (click)="restoreToVersion(item.version); $event.stopPropagation()"
+                    title="Restore to this version">
+                    <span class="material-symbols-outlined">restore</span>
+                    Restore
+                  </button>
+                }
+                @if (item.version.trigger !== 'milestone') {
+                  <button 
+                    class="btn-action danger"
+                    (click)="deleteVersion(item.version, $event)"
+                    title="Delete version">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Comparison Results -->
+    @if (compareMode() && versionDiff()) {
+      <div class="comparison-panel">
+        <h3>Comparison Results</h3>
+        <div class="comparison-header">
+          <div class="compare-version">
+            <span class="compare-badge">1</span>
+            <span>v{{ versionDiff()!.version1.versionNumber }}</span>
+            <span class="date">{{ formatFullDate(versionDiff()!.version1.timestamp) }}</span>
+          </div>
+          <span class="material-symbols-outlined">arrow_forward</span>
+          <div class="compare-version">
+            <span class="compare-badge">2</span>
+            <span>v{{ versionDiff()!.version2.versionNumber }}</span>
+            <span class="date">{{ formatFullDate(versionDiff()!.version2.timestamp) }}</span>
+          </div>
+        </div>
+
+        <div class="comparison-stats">
+          <div class="stat">
+            <strong>{{ versionDiff()!.changes.totalChanges }}</strong>
+            <span>Total Changes</span>
+          </div>
+        </div>
+
+        <div class="comparison-details">
+          <h4>Changes Detected</h4>
+          <ul>
+            @if (versionDiff()!.changes.titleChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">title</span>
+                <strong>Title changed</strong>
+                <div class="change-detail">
+                  <span class="old">{{ versionDiff()!.version1.snapshot.title }}</span>
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                  <span class="new">{{ versionDiff()!.version2.snapshot.title }}</span>
+                </div>
+              </li>
+            }
+            @if (versionDiff()!.changes.contentChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">edit_note</span>
+                <strong>Content modified</strong>
+              </li>
+            }
+            @if (versionDiff()!.changes.typeChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">category</span>
+                <strong>Type changed</strong>
+                <div class="change-detail">
+                  <span class="old">{{ versionDiff()!.version1.snapshot.type }}</span>
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                  <span class="new">{{ versionDiff()!.version2.snapshot.type }}</span>
+                </div>
+              </li>
+            }
+            @if (versionDiff()!.changes.tagsChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">label</span>
+                <strong>Tags modified</strong>
+              </li>
+            }
+            @if (versionDiff()!.changes.blocksChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">view_module</span>
+                <strong>Blocks modified</strong>
+              </li>
+            }
+            @if (versionDiff()!.changes.statusChanged) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">flag</span>
+                <strong>Status changed</strong>
+                <div class="change-detail">
+                  <span class="old">{{ versionDiff()!.version1.snapshot.status }}</span>
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                  <span class="new">{{ versionDiff()!.version2.snapshot.status }}</span>
+                </div>
+              </li>
+            }
+            @if (versionDiff()!.changes.totalChanges === 0) {
+              <li class="change-item">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>No changes detected</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+  </div>
+</div>

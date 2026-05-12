@@ -36,6 +36,7 @@
       #noteBodyTextarea
       class="note-body"
       [value]="fullNote().content"
+      (focus)="onNoteBodyFocus()"
       (input)="onNoteBodyInput($event)"
       (keydown)="onNoteBodyKeydown($event)"
       [readOnly]="readOnly()"
@@ -46,6 +47,7 @@
     <!-- Block list -->
     <lore-block-list
       [blocks]="blocks()"
+      [noteId]="fullNote().id"
       [readOnly]="readOnly()"
       (blockAdded)="onBlockAdded($event)"
       (blockChanged)="onBlockChanged($event)"
@@ -60,6 +62,7 @@
         #trailingTextarea
         class="note-body trailing-body"
         [value]="trailingContent()"
+        (focus)="onTrailingFocus()"
         (input)="onTrailingInput($event)"
         (keydown)="onNoteBodyKeydown($event)"
         placeholder="Continue below… / for blocks, @ for AI"
@@ -79,6 +82,7 @@
         <span class="shk" (click)="insertBlock('key-differences')"><kbd>K</kbd> Key Diff</span>
         <span class="shk" (click)="insertBlock('key-findings')"><kbd>F</kbd> Findings</span>
         <span class="shk" (click)="insertBlock('code')"><kbd>`</kbd> Code</span>
+        <span class="shk" (click)="insertBlock('table')"><kbd>T</kbd> Table</span>
         <span class="shk" (click)="insertBlock('ask-claude')">✦ AI block</span>
       </div>
     </div>

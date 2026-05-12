@@ -1,9 +1,28 @@
-import { Component, signal, input, output, computed, inject, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewInit, effect, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  input,
+  output,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  effect,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShelfService } from '../../../core/services/shelf.service';
 import { BlockService } from '../../../core/services/block.service';
 import { SessionVersioningService } from '../../../core/services/session-versioning.service';
-import { Note, NoteType, NoteRef, Block, BlockType } from '../../../core/models/shelf.model';
+import {
+  Note,
+  NoteType,
+  NoteRef,
+  Block,
+  BlockType,
+} from '../../../core/models/shelf.model';
 import { CanvasBackgroundComponent } from '../canvas-background/canvas-background.component';
 import { BlockListComponent } from '../../blocks/block-list/block-list.component';
 import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette.component';
@@ -11,18 +30,25 @@ import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette
 @Component({
   selector: 'lore-paper-canvas',
   standalone: true,
-  imports: [CommonModule, CanvasBackgroundComponent, BlockListComponent, FileLinkPaletteComponent],
+  imports: [
+    CommonModule,
+    CanvasBackgroundComponent,
+    BlockListComponent,
+    FileLinkPaletteComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './paper-canvas.component.html',
-  styleUrl: './paper-canvas.component.scss'
+  styleUrl: './paper-canvas.component.scss',
 })
 export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   private shelfService = inject(ShelfService);
   private blockService = inject(BlockService);
   private sessionVersioning = inject(SessionVersioningService);
 
-  @ViewChild('noteBodyTextarea') noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('trailingTextarea') trailingTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('noteBodyTextarea')
+  noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('trailingTextarea')
+  trailingTextarea?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('titleElement') titleElement?: ElementRef<HTMLHeadingElement>;
 
   note = input.required<NoteRef>();
@@ -42,9 +68,11 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     // Sync title element with note title when it changes
     effect(() => {
       const title = this.fullNote().title;
-      if (this.titleElement?.nativeElement && 
-          this.titleElement.nativeElement.textContent !== title &&
-          document.activeElement !== this.titleElement.nativeElement) {
+      if (
+        this.titleElement?.nativeElement &&
+        this.titleElement.nativeElement.textContent !== title &&
+        document.activeElement !== this.titleElement.nativeElement
+      ) {
         this.titleElement.nativeElement.textContent = title;
       }
     });
@@ -53,20 +81,20 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       const noteId = this.note().id; // track note changes
       const fullNote = this.fullNote();
-      
+
       // End previous session if exists
       if (this._previousNoteId && this._previousNoteId !== noteId) {
         this.sessionVersioning.endSession(this._previousNoteId);
       }
-      
+
       // Start new session for this note
       this.sessionVersioning.startSession(fullNote);
       this._previousNoteId = noteId;
-      
+
       // Load any saved trailing content from localStorage
       const saved = localStorage.getItem(`lore-trailing-${noteId}`);
       this.trailingContent.set(saved || '');
-      
+
       this._trailingBase = undefined;
       if (this.trailingTextarea?.nativeElement) {
         this.trailingTextarea.nativeElement.value = saved || '';
@@ -76,6 +104,7 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   private _previousNoteId?: string;
+  private lastFocusedTextarea: 'body' | 'trailing' | null = null;
 
   ngOnDestroy(): void {
     // End session when component is destroyed
@@ -90,8 +119,14 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     const full = this.shelfService.getNote(ref.id);
     if (!full) {
       return {
-        ...ref, content: '', tags: [], status: 'draft' as any,
-        blocks: [], linkedNoteIds: [], createdAt: new Date(), updatedAt: new Date()
+        ...ref,
+        content: '',
+        tags: [],
+        status: 'draft' as any,
+        blocks: [],
+        linkedNoteIds: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as Note;
     }
     return full;
@@ -101,9 +136,12 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
 
   noteTypeIcon = computed(() => {
     const icons: Record<NoteType, string> = {
-      [NoteType.Research]: 'science', [NoteType.Journal]: 'book',
-      [NoteType.Task]: 'check_circle', [NoteType.Idea]: 'lightbulb',
-      [NoteType.Reference]: 'description', [NoteType.HTML]: 'code'
+      [NoteType.Research]: 'science',
+      [NoteType.Journal]: 'book',
+      [NoteType.Task]: 'check_circle',
+      [NoteType.Idea]: 'lightbulb',
+      [NoteType.Reference]: 'description',
+      [NoteType.HTML]: 'code',
     };
     return icons[this.fullNote().type as NoteType] ?? 'description';
   });
@@ -115,9 +153,11 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
       [NoteType.Task]: 'var(--lore-color-note-task)',
       [NoteType.Idea]: 'var(--lore-color-note-idea)',
       [NoteType.Reference]: 'var(--lore-color-note-reference)',
-      [NoteType.HTML]: 'var(--lore-color-note-html)'
+      [NoteType.HTML]: 'var(--lore-color-note-html)',
     };
-    return colors[this.fullNote().type as NoteType] ?? 'var(--lore-color-text-muted)';
+    return (
+      colors[this.fullNote().type as NoteType] ?? 'var(--lore-color-text-muted)'
+    );
   });
 
   // ─── Lifecycle ─────────────────────────────────────────────
@@ -134,20 +174,24 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   // ─── Block handlers ────────────────────────────────────────
 
   onBlockAdded(event: { type: BlockType; afterIndex: number }): void {
-    this.blockService.createBlock(this.fullNote().id, event.type, event.afterIndex);
+    this.blockService.createBlock(
+      this.fullNote().id,
+      event.type,
+      event.afterIndex,
+    );
   }
 
   onTrailingInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     const typed = textarea.value;
     this.trailingContent.set(typed);
-    
+
     // Prevent scroll jumping by saving and restoring scroll position
     const canvas = textarea.closest('.paper-canvas') as HTMLElement | null;
     const scrollTop = canvas?.scrollTop ?? 0;
-    
+
     this.autoResizeTextarea(textarea);
-    
+
     // Ensure scroll position is maintained after Angular change detection
     if (canvas) {
       requestAnimationFrame(() => {
@@ -168,7 +212,8 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   /** Snapshot of note content taken when the user first types in the trailing area */
   private _trailingBase: string | undefined = undefined;
 
-  onBlockChanged(block: Block): void {    this.blockService.updateBlock(this.fullNote().id, block.id, block);
+  onBlockChanged(block: Block): void {
+    this.blockService.updateBlock(this.fullNote().id, block.id, block);
   }
 
   onBlockDeleted(blockId: string): void {
@@ -176,7 +221,11 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   onBlockReordered(event: { fromIndex: number; toIndex: number }): void {
-    this.blockService.reorderBlocks(this.fullNote().id, event.fromIndex, event.toIndex);
+    this.blockService.reorderBlocks(
+      this.fullNote().id,
+      event.fromIndex,
+      event.toIndex,
+    );
   }
 
   onDuplicateBlock(blockId: string): void {
@@ -186,7 +235,8 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   // ─── Note body handler ─────────────────────────────────────
 
   onTitleBlur(event: Event): void {
-    const title = (event.target as HTMLElement).textContent?.trim() || 'Untitled';
+    const title =
+      (event.target as HTMLElement).textContent?.trim() || 'Untitled';
     if (title !== this.fullNote().title) {
       this.shelfService.updateNote(this.fullNote().id, { title });
       this.sessionVersioning.trackChange(this.fullNote().id);
@@ -203,13 +253,13 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     const content = textarea.value;
     this.shelfService.updateNote(this.fullNote().id, { content });
     this.sessionVersioning.trackChange(this.fullNote().id);
-    
+
     // Prevent scroll jumping by saving and restoring scroll position
     const canvas = textarea.closest('.paper-canvas') as HTMLElement | null;
     const scrollTop = canvas?.scrollTop ?? 0;
-    
+
     this.autoResizeTextarea(textarea);
-    
+
     // Ensure scroll position is maintained after Angular change detection
     if (canvas) {
       requestAnimationFrame(() => {
@@ -219,18 +269,33 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   onNoteBodyKeydown(event: KeyboardEvent): void {
+    this.lastFocusedTextarea = 'body';
     const textarea = event.target as HTMLTextAreaElement;
     const content = textarea.value;
     const cursorPos = textarea.selectionStart;
 
     // Check for slash command trigger
-    if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    if (
+      event.key === '/' &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey
+    ) {
       // Check if slash is at start of line or preceded by whitespace
       const beforeCursor = content.substring(0, cursorPos);
-      const lastChar = beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
-      const isStartOfLine = cursorPos === 0 || beforeCursor.endsWith('\n') || beforeCursor.endsWith(' ');
-      
-      if (isStartOfLine || lastChar === ' ' || lastChar === '\n' || lastChar === '') {
+      const lastChar =
+        beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
+      const isStartOfLine =
+        cursorPos === 0 ||
+        beforeCursor.endsWith('\n') ||
+        beforeCursor.endsWith(' ');
+
+      if (
+        isStartOfLine ||
+        lastChar === ' ' ||
+        lastChar === '\n' ||
+        lastChar === ''
+      ) {
         event.preventDefault();
         this.triggerSlashCommand(textarea, cursorPos);
         return;
@@ -238,13 +303,27 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     }
 
     // Check for @ mention trigger
-    if (event.key === '@' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    if (
+      event.key === '@' &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey
+    ) {
       // Check if @ is at start of line or preceded by whitespace
       const beforeCursor = content.substring(0, cursorPos);
-      const lastChar = beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
-      const isStartOfLine = cursorPos === 0 || beforeCursor.endsWith('\n') || beforeCursor.endsWith(' ');
-      
-      if (isStartOfLine || lastChar === ' ' || lastChar === '\n' || lastChar === '') {
+      const lastChar =
+        beforeCursor.length > 0 ? beforeCursor[beforeCursor.length - 1] : '';
+      const isStartOfLine =
+        cursorPos === 0 ||
+        beforeCursor.endsWith('\n') ||
+        beforeCursor.endsWith(' ');
+
+      if (
+        isStartOfLine ||
+        lastChar === ' ' ||
+        lastChar === '\n' ||
+        lastChar === ''
+      ) {
         event.preventDefault();
         this.triggerMention(textarea, cursorPos);
         return;
@@ -252,10 +331,18 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     }
 
     // Check for [[ link trigger
-    if (event.key === '[' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    if (
+      event.key === '[' &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey
+    ) {
       const beforeCursor = content.substring(0, cursorPos);
       // Check if we have a single [ before cursor (would make [[)
-      if (beforeCursor.length > 0 && beforeCursor[beforeCursor.length - 1] === '[') {
+      if (
+        beforeCursor.length > 0 &&
+        beforeCursor[beforeCursor.length - 1] === '['
+      ) {
         event.preventDefault();
         this.triggerLink(textarea, cursorPos);
         return;
@@ -269,13 +356,19 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private triggerSlashCommand(textarea: HTMLTextAreaElement, cursorPos: number): void {
+  private triggerSlashCommand(
+    textarea: HTMLTextAreaElement,
+    cursorPos: number,
+  ): void {
     // Use the existing insertBlock logic which handles line detection
     // We'll insert a default 'note' block
     this.insertBlock('note');
   }
 
-  private triggerMention(textarea: HTMLTextAreaElement, cursorPos: number): void {
+  private triggerMention(
+    textarea: HTMLTextAreaElement,
+    cursorPos: number,
+  ): void {
     // Remove any @ character that was about to be typed (event was prevented)
     // then insert the AI block and focus it
     this.insertBlock('ask-ai');
@@ -286,24 +379,27 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     const content = textarea.value;
     const beforeCursor = content.substring(0, cursorPos - 1); // Remove the first [
     const afterCursor = content.substring(cursorPos);
-    
+
     // Insert [[ placeholder
     const newContent = beforeCursor + '[[]]' + afterCursor;
     this.shelfService.updateNote(this.fullNote().id, { content: newContent });
-    
+
     // Store cursor position and show palette
     this.linkPaletteCursorPos.set(cursorPos + 1); // Position between [[]]
     this.showLinkPalette.set(true);
-    
+
     // Calculate position for palette (near cursor)
     const textareaRect = textarea.getBoundingClientRect();
     const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20;
-    const linesBeforeCursor = (content.substring(0, cursorPos).match(/\n/g) || []).length;
-    const paletteY = textareaRect.top + (linesBeforeCursor * lineHeight) + lineHeight;
+    const linesBeforeCursor = (
+      content.substring(0, cursorPos).match(/\n/g) || []
+    ).length;
+    const paletteY =
+      textareaRect.top + linesBeforeCursor * lineHeight + lineHeight;
     const paletteX = textareaRect.left + 20;
-    
+
     this.linkPalettePosition.set({ x: paletteX, y: paletteY });
-    
+
     // Position cursor between [[ and ]]
     setTimeout(() => {
       if (this.noteBodyTextarea?.nativeElement) {
@@ -318,12 +414,12 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     // Save the current scroll position of the canvas before resizing
     const canvas = textarea.closest('.paper-canvas') as HTMLElement | null;
     const scrollTop = canvas?.scrollTop ?? 0;
-    
+
     // Resize the textarea - use max of scrollHeight and min-height
     textarea.style.height = 'auto';
-    const newHeight = Math.max(textarea.scrollHeight, 300); // 300px is the min-height
+    const newHeight = Math.max(textarea.scrollHeight, 50); // 50px is the min-height
     textarea.style.height = newHeight + 'px';
-    
+
     // Restore the scroll position to prevent the canvas from jumping
     if (canvas) {
       canvas.scrollTop = scrollTop;
@@ -351,13 +447,28 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
 
     // Copy all relevant CSS properties
     const props: (keyof CSSStyleDeclaration)[] = [
-      'boxSizing', 'width', 'paddingTop', 'paddingRight', 'paddingBottom',
-      'paddingLeft', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth',
-      'borderLeftWidth', 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle',
-      'letterSpacing', 'lineHeight', 'textTransform', 'wordBreak', 'overflowWrap',
-      'whiteSpace'
+      'boxSizing',
+      'width',
+      'paddingTop',
+      'paddingRight',
+      'paddingBottom',
+      'paddingLeft',
+      'borderTopWidth',
+      'borderRightWidth',
+      'borderBottomWidth',
+      'borderLeftWidth',
+      'fontFamily',
+      'fontSize',
+      'fontWeight',
+      'fontStyle',
+      'letterSpacing',
+      'lineHeight',
+      'textTransform',
+      'wordBreak',
+      'overflowWrap',
+      'whiteSpace',
     ];
-    props.forEach(p => {
+    props.forEach((p) => {
       (mirror.style as any)[p] = style[p];
     });
 
@@ -391,34 +502,41 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
 
     // Only scroll if caret is outside the middle 40% dead zone
     const caretScreenY = markerRect.top - canvasRect.top;
-    const deadZoneTop = canvasRect.height * 0.30;
-    const deadZoneBottom = canvasRect.height * 0.70;
+    const deadZoneTop = canvasRect.height * 0.3;
+    const deadZoneBottom = canvasRect.height * 0.7;
 
     if (caretScreenY < deadZoneTop || caretScreenY > deadZoneBottom) {
-      canvas.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+      canvas.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth',
+      });
     }
   }
 
   // ─── File link palette handlers ─────────────────────────────
 
-  onLinkPaletteSelect(event: { noteId: string; noteTitle: string; cursorPosition: number }): void {
+  onLinkPaletteSelect(event: {
+    noteId: string;
+    noteTitle: string;
+    cursorPosition: number;
+  }): void {
     const textarea = this.noteBodyTextarea?.nativeElement;
     if (!textarea) return;
 
     const content = textarea.value;
     const cursorPos = event.cursorPosition;
-    
+
     // Find the [[ placeholder
     const beforeCursor = content.substring(0, cursorPos - 2); // Before [[
     const afterCursor = content.substring(cursorPos + 2); // After ]]
-    
+
     // Replace [[ placeholder with [[Note Title]]
     const newContent = beforeCursor + `[[${event.noteTitle}]]` + afterCursor;
     this.shelfService.updateNote(this.fullNote().id, { content: newContent });
-    
+
     // Close palette
     this.showLinkPalette.set(false);
-    
+
     // Update cursor position after the link
     setTimeout(() => {
       if (this.noteBodyTextarea?.nativeElement) {
@@ -433,20 +551,20 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
 
   onLinkPaletteDismiss(): void {
     this.showLinkPalette.set(false);
-    
+
     // If palette is dismissed, remove the [[ placeholder
     const textarea = this.noteBodyTextarea?.nativeElement;
     if (textarea) {
       const content = textarea.value;
       const cursorPos = this.linkPaletteCursorPos();
-      
+
       // Find and remove [[ placeholder
       const beforeCursor = content.substring(0, cursorPos - 2); // Before [[
       const afterCursor = content.substring(cursorPos + 2); // After ]]
-      
+
       const newContent = beforeCursor + afterCursor;
       this.shelfService.updateNote(this.fullNote().id, { content: newContent });
-      
+
       // Restore cursor position
       setTimeout(() => {
         if (this.noteBodyTextarea?.nativeElement) {
@@ -461,15 +579,58 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
 
   // ─── Insert block shortcuts ────────────────────────────────
 
+  onNoteBodyFocus(): void {
+    this.lastFocusedTextarea = 'body';
+  }
+
+  onTrailingFocus(): void {
+    this.lastFocusedTextarea = 'trailing';
+  }
+
+  private isTrailingAreaFocused(): boolean {
+    return this.lastFocusedTextarea === 'trailing';
+  }
+
+  private focusBlockRowAtIndex(index: number): void {
+    const blockRows = document.querySelectorAll('lore-block-list .block-row');
+    if (index < 0 || index >= blockRows.length) return;
+
+    const row = blockRows[index] as HTMLElement;
+    const focusTarget =
+      row.querySelector<HTMLElement>('textarea.blk-ai-prompt') ??
+      row.querySelector<HTMLElement>('[contenteditable="true"]') ??
+      row.querySelector<HTMLElement>('textarea, input, [tabindex]');
+
+    const scrollTarget = (focusTarget ?? row) as HTMLElement;
+
+    if (focusTarget) {
+      focusTarget.focus();
+      if (focusTarget instanceof HTMLTextAreaElement) {
+        focusTarget.selectionStart = focusTarget.selectionEnd =
+          focusTarget.value.length;
+      }
+    }
+
+    scrollTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
+  }
+
   insertBlock(type: string): void {
     const blockType = this.stringToBlockType(type);
     if (!blockType) return;
 
     const textarea = this.noteBodyTextarea?.nativeElement;
+    const isTrailingFocused = this.isTrailingAreaFocused();
+    const afterIndex = isTrailingFocused ? this.blocks().length - 1 : -1;
+    const insertedIndex = isTrailingFocused ? this.blocks().length : 0;
+
     if (!textarea) {
-      // Fallback: add at the end
-      const afterIndex = this.blocks().length - 1;
+      // Fallback: add at the start or end based on last focused textarea
       this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
+      setTimeout(() => this.focusBlockRowAtIndex(insertedIndex));
       return;
     }
 
@@ -479,13 +640,17 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     // Find the current line
     const beforeCursor = content.substring(0, cursorPos);
     const afterCursor = content.substring(cursorPos);
-    
+
     const lastNewlineBeforeCursor = beforeCursor.lastIndexOf('\n');
     const nextNewlineAfterCursor = afterCursor.indexOf('\n');
-    
-    const lineStart = lastNewlineBeforeCursor === -1 ? 0 : lastNewlineBeforeCursor + 1;
-    const lineEnd = nextNewlineAfterCursor === -1 ? content.length : cursorPos + nextNewlineAfterCursor;
-    
+
+    const lineStart =
+      lastNewlineBeforeCursor === -1 ? 0 : lastNewlineBeforeCursor + 1;
+    const lineEnd =
+      nextNewlineAfterCursor === -1
+        ? content.length
+        : cursorPos + nextNewlineAfterCursor;
+
     const currentLine = content.substring(lineStart, lineEnd);
     const isLineEmpty = currentLine.trim().length === 0;
 
@@ -493,7 +658,7 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
       // Current line is empty - insert block here and remove the empty line
       const beforeLine = content.substring(0, lineStart);
       const afterLine = content.substring(lineEnd);
-      
+
       // Remove the empty line
       let newContent = beforeLine;
       if (afterLine.startsWith('\n')) {
@@ -501,38 +666,56 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
       } else {
         newContent += afterLine;
       }
-      
+
       // Update the note content
-      this.shelfService.updateNote(this.fullNote().id, { content: newContent.trimEnd() });
-      
-      // Add block at the end (blocks always go after text content)
-      const afterIndex = this.blocks().length - 1;
+      this.shelfService.updateNote(this.fullNote().id, {
+        content: newContent.trimEnd(),
+      });
+
+      // Insert the block relative to the last-focused textarea.
       this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
-      
-      // Resize textarea and focus the new block — not the textarea
+
+      // Resize textarea and focus the inserted block
       setTimeout(() => {
         if (this.noteBodyTextarea?.nativeElement) {
           this.autoResizeTextarea(this.noteBodyTextarea.nativeElement);
         }
-        this.focusLastBlock();
+        this.focusBlockRowAtIndex(insertedIndex);
       });
     } else {
-      // Current line has content - add newline and insert block on next line
-      const newContent = content.substring(0, lineEnd) + '\n' + content.substring(lineEnd);
-      
-      // Update the note content
-      this.shelfService.updateNote(this.fullNote().id, { content: newContent });
-      
-      // Add block at the end
-      const afterIndex = this.blocks().length - 1;
+      // Current line has content - keep the current line in the top body
+      // and move the remaining text after it into the trailing area.
+      const beforeLine = content.substring(0, lineEnd);
+      const afterLine = content.substring(lineEnd);
+      const newBody = beforeLine.trimEnd();
+      const newTrailing = afterLine.startsWith('\n')
+        ? afterLine.substring(1)
+        : afterLine;
+
+      // Update note body and trailing content so the block appears right after
+      // the cursor line instead of below all remaining body text.
+      this.shelfService.updateNote(this.fullNote().id, { content: newBody });
+      this.trailingContent.set(newTrailing);
+      if (newTrailing) {
+        localStorage.setItem(
+          `lore-trailing-${this.fullNote().id}`,
+          newTrailing,
+        );
+      } else {
+        localStorage.removeItem(`lore-trailing-${this.fullNote().id}`);
+      }
+
       this.blockService.createBlock(this.fullNote().id, blockType, afterIndex);
-      
-      // Resize textarea and focus the new block — not the textarea
+
+      // Resize both textareas and focus the inserted block
       setTimeout(() => {
         if (this.noteBodyTextarea?.nativeElement) {
           this.autoResizeTextarea(this.noteBodyTextarea.nativeElement);
         }
-        this.focusLastBlock();
+        if (this.trailingTextarea?.nativeElement) {
+          this.autoResizeTextarea(this.trailingTextarea.nativeElement);
+        }
+        this.focusBlockRowAtIndex(insertedIndex);
       });
     }
   }
@@ -561,29 +744,36 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
       focusTarget.focus();
       // For textareas, place cursor at the end
       if (focusTarget instanceof HTMLTextAreaElement) {
-        focusTarget.selectionStart = focusTarget.selectionEnd = focusTarget.value.length;
+        focusTarget.selectionStart = focusTarget.selectionEnd =
+          focusTarget.value.length;
       }
     }
 
     // Scroll the block to the center of the scrollable canvas
-    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    scrollTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
   }
 
-  private stringToBlockType(type: string): BlockType | null {    const typeMap: Record<string, BlockType> = {
-      'hypothesis': BlockType.Hypothesis,
-      'conclusion': BlockType.Conclusion,
+  private stringToBlockType(type: string): BlockType | null {
+    const typeMap: Record<string, BlockType> = {
+      hypothesis: BlockType.Hypothesis,
+      conclusion: BlockType.Conclusion,
       'key-differences': BlockType.KeyDifferences,
       'key-findings': BlockType.KeyFindings,
-      'code': BlockType.Code,
-      'ask-claude': BlockType.AskAI,
-      'ask-gpt': BlockType.AskAI,
+      code: BlockType.Code,
+      table: BlockType.Table,
+      'ask-claude': BlockType.AskClaude,
+      'ask-gpt': BlockType.AskGPT,
       'ask-ai': BlockType.AskAI,
-      'note': BlockType.Note,
-      'warning': BlockType.Warning,
-      'quote': BlockType.Quote,
-      'checklist': BlockType.Checklist,
-      'image': BlockType.Image,
-      'divider': BlockType.Divider
+      note: BlockType.Note,
+      warning: BlockType.Warning,
+      quote: BlockType.Quote,
+      checklist: BlockType.Checklist,
+      image: BlockType.Image,
+      divider: BlockType.Divider,
     };
     return typeMap[type] || null;
   }
@@ -591,10 +781,16 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   // ─── Utilities ─────────────────────────────────────────────
 
   getRelativeTime(date: Date): string {
-    const diff = Math.ceil(Math.abs(Date.now() - new Date(date).getTime()) / 86400000);
+    const diff = Math.ceil(
+      Math.abs(Date.now() - new Date(date).getTime()) / 86400000,
+    );
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Yesterday';
     if (diff < 7) return `${diff} days ago`;
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   }
 }

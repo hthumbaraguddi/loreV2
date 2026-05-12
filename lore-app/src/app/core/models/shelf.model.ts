@@ -113,6 +113,8 @@ export enum BlockType {
   Code = 'code',
   Image = 'image',
   Divider = 'divider',
+  AskClaude = 'ask-claude',
+  AskGPT = 'ask-gpt',
   AskAI = 'ask-ai'
 }
 

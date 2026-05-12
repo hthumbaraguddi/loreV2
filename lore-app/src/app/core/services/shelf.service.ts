@@ -1,5 +1,12 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Shelf, Notebook, Note, NoteType, NoteStatus, BlockType } from '../models/shelf.model';
+import {
+  Shelf,
+  Notebook,
+  Note,
+  NoteType,
+  NoteStatus,
+  BlockType,
+} from '../models/shelf.model';
 import { LocalStorageService } from './local-storage.service';
 import { VersioningService } from './versioning.service';
 import { VersionTrigger } from '../models/version.model';
@@ -11,14 +18,14 @@ import { VersionTrigger } from '../models/version.model';
  * Integrated with versioning system
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShelfService {
   private readonly STORAGE_KEY = 'shelves';
-  
+
   // Signals
   private shelvesSignal = signal<Shelf[]>([]);
-  
+
   // Public computed signals
   shelves = this.shelvesSignal.asReadonly();
   notebooks = computed(() => {
@@ -30,7 +37,10 @@ export class ShelfService {
   });
   totalNotes = computed(() => {
     return this.shelvesSignal().reduce((total, shelf) => {
-      return total + shelf.notebooks.reduce((nbTotal, nb) => nbTotal + nb.notes.length, 0);
+      return (
+        total +
+        shelf.notebooks.reduce((nbTotal, nb) => nbTotal + nb.notes.length, 0)
+      );
     }, 0);
   });
 
@@ -57,7 +67,7 @@ export class ShelfService {
       notebooks: [],
       order: shelves.length,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.shelvesSignal.set([...shelves, newShelf]);
@@ -70,14 +80,14 @@ export class ShelfService {
    */
   updateShelf(shelfId: string, updates: Partial<Shelf>): boolean {
     const shelves = this.shelvesSignal();
-    const index = shelves.findIndex(s => s.id === shelfId);
-    
+    const index = shelves.findIndex((s) => s.id === shelfId);
+
     if (index === -1) return false;
 
     const updatedShelf = {
       ...shelves[index],
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const newShelves = [...shelves];
@@ -92,8 +102,8 @@ export class ShelfService {
    */
   deleteShelf(shelfId: string): boolean {
     const shelves = this.shelvesSignal();
-    const filtered = shelves.filter(s => s.id !== shelfId);
-    
+    const filtered = shelves.filter((s) => s.id !== shelfId);
+
     if (filtered.length === shelves.length) return false;
 
     this.shelvesSignal.set(filtered);
@@ -107,7 +117,7 @@ export class ShelfService {
   reorderShelves(shelfIds: string[]): boolean {
     const shelves = this.shelvesSignal();
     const reordered = shelfIds
-      .map(id => shelves.find(s => s.id === id))
+      .map((id) => shelves.find((s) => s.id === id))
       .filter((s): s is Shelf => s !== undefined)
       .map((shelf, index) => ({ ...shelf, order: index }));
 
@@ -120,7 +130,7 @@ export class ShelfService {
    * Get shelf by ID
    */
   getShelf(shelfId: string): Shelf | undefined {
-    return this.shelvesSignal().find(s => s.id === shelfId);
+    return this.shelvesSignal().find((s) => s.id === shelfId);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -130,10 +140,14 @@ export class ShelfService {
   /**
    * Create a new notebook
    */
-  createNotebook(shelfId: string, name: string, icon: string = '📔'): Notebook | null {
+  createNotebook(
+    shelfId: string,
+    name: string,
+    icon: string = '📔',
+  ): Notebook | null {
     const shelves = this.shelvesSignal();
-    const shelfIndex = shelves.findIndex(s => s.id === shelfId);
-    
+    const shelfIndex = shelves.findIndex((s) => s.id === shelfId);
+
     if (shelfIndex === -1) return null;
 
     const shelf = shelves[shelfIndex];
@@ -145,20 +159,20 @@ export class ShelfService {
       notes: [],
       order: shelf.notebooks.length,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const updatedShelf = {
       ...shelf,
       notebooks: [...shelf.notebooks, newNotebook],
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const newShelves = [...shelves];
     newShelves[shelfIndex] = updatedShelf;
     this.shelvesSignal.set(newShelves);
     this.saveToStorage();
-    
+
     return newNotebook;
   }
 
@@ -169,14 +183,14 @@ export class ShelfService {
     const shelves = this.shelvesSignal();
     let updated = false;
 
-    const newShelves = shelves.map(shelf => {
-      const nbIndex = shelf.notebooks.findIndex(nb => nb.id === notebookId);
+    const newShelves = shelves.map((shelf) => {
+      const nbIndex = shelf.notebooks.findIndex((nb) => nb.id === notebookId);
       if (nbIndex === -1) return shelf;
 
       const updatedNotebook = {
         ...shelf.notebooks[nbIndex],
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const newNotebooks = [...shelf.notebooks];
@@ -186,7 +200,7 @@ export class ShelfService {
       return {
         ...shelf,
         notebooks: newNotebooks,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     });
 
@@ -205,14 +219,14 @@ export class ShelfService {
     const shelves = this.shelvesSignal();
     let deleted = false;
 
-    const newShelves = shelves.map(shelf => {
-      const filtered = shelf.notebooks.filter(nb => nb.id !== notebookId);
+    const newShelves = shelves.map((shelf) => {
+      const filtered = shelf.notebooks.filter((nb) => nb.id !== notebookId);
       if (filtered.length < shelf.notebooks.length) {
         deleted = true;
         return {
           ...shelf,
           notebooks: filtered,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       }
       return shelf;
@@ -231,7 +245,7 @@ export class ShelfService {
    */
   getNotebook(notebookId: string): Notebook | undefined {
     for (const shelf of this.shelvesSignal()) {
-      const notebook = shelf.notebooks.find(nb => nb.id === notebookId);
+      const notebook = shelf.notebooks.find((nb) => nb.id === notebookId);
       if (notebook) return notebook;
     }
     return undefined;
@@ -242,20 +256,20 @@ export class ShelfService {
    */
   reorderNotebooks(shelfId: string, notebookIds: string[]): boolean {
     const shelves = this.shelvesSignal();
-    const shelfIndex = shelves.findIndex(s => s.id === shelfId);
-    
+    const shelfIndex = shelves.findIndex((s) => s.id === shelfId);
+
     if (shelfIndex === -1) return false;
 
     const shelf = shelves[shelfIndex];
     const reordered = notebookIds
-      .map(id => shelf.notebooks.find(nb => nb.id === id))
+      .map((id) => shelf.notebooks.find((nb) => nb.id === id))
       .filter((nb): nb is Notebook => nb !== undefined)
       .map((nb, index) => ({ ...nb, order: index }));
 
     const updatedShelf = {
       ...shelf,
       notebooks: reordered,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const newShelves = [...shelves];
@@ -284,7 +298,7 @@ export class ShelfService {
       tags: snapshot.tags,
       status: snapshot.status as NoteStatus,
       blocks: snapshot.blocks,
-      linkedNoteIds: snapshot.linkedNoteIds
+      linkedNoteIds: snapshot.linkedNoteIds,
     });
   }
 
@@ -300,13 +314,13 @@ export class ShelfService {
     title: string,
     type: NoteType = NoteType.Idea,
     content: string = '',
-    blocks: any[] = []
+    blocks: any[] = [],
   ): Note | null {
     const shelves = this.shelvesSignal();
     let created: Note | null = null;
 
-    const newShelves = shelves.map(shelf => {
-      const nbIndex = shelf.notebooks.findIndex(nb => nb.id === notebookId);
+    const newShelves = shelves.map((shelf) => {
+      const nbIndex = shelf.notebooks.findIndex((nb) => nb.id === notebookId);
       if (nbIndex === -1) return shelf;
 
       const notebook = shelf.notebooks[nbIndex];
@@ -322,7 +336,7 @@ export class ShelfService {
         blocks: blocks.length > 0 ? blocks : [],
         linkedNoteIds: [],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       created = newNote;
@@ -330,7 +344,7 @@ export class ShelfService {
       const updatedNotebook = {
         ...notebook,
         notes: [newNote, ...notebook.notes], // Add to top
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const newNotebooks = [...shelf.notebooks];
@@ -339,14 +353,14 @@ export class ShelfService {
       return {
         ...shelf,
         notebooks: newNotebooks,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     });
 
     if (created) {
       this.shelvesSignal.set(newShelves);
       this.saveToStorage();
-      
+
       // Create initial version for the new note
       this.versioningService.createInitialVersion(created);
     }
@@ -361,16 +375,18 @@ export class ShelfService {
     const shelves = this.shelvesSignal();
     let updated = false;
 
-    const newShelves = shelves.map(shelf => {
-      const notebooks = shelf.notebooks.map(notebook => {
-        const noteIndex = notebook.notes.findIndex(n => n.id === noteId);
+    const newShelves = shelves.map((shelf) => {
+      const notebooks = shelf.notebooks.map((notebook) => {
+        const noteIndex = notebook.notes.findIndex((n) => n.id === noteId);
         if (noteIndex === -1) return notebook;
 
         const updatedNote = {
           ...notebook.notes[noteIndex],
           ...updates,
-          preview: updates.content ? this.generatePreview(updates.content) : notebook.notes[noteIndex].preview,
-          updatedAt: new Date()
+          preview: updates.content
+            ? this.generatePreview(updates.content)
+            : notebook.notes[noteIndex].preview,
+          updatedAt: new Date(),
         };
 
         const newNotes = [...notebook.notes];
@@ -380,7 +396,7 @@ export class ShelfService {
         return {
           ...notebook,
           notes: newNotes,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       });
 
@@ -388,7 +404,7 @@ export class ShelfService {
         return {
           ...shelf,
           notebooks,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       }
       return shelf;
@@ -409,15 +425,15 @@ export class ShelfService {
     const shelves = this.shelvesSignal();
     let deleted = false;
 
-    const newShelves = shelves.map(shelf => {
-      const notebooks = shelf.notebooks.map(notebook => {
-        const filtered = notebook.notes.filter(n => n.id !== noteId);
+    const newShelves = shelves.map((shelf) => {
+      const notebooks = shelf.notebooks.map((notebook) => {
+        const filtered = notebook.notes.filter((n) => n.id !== noteId);
         if (filtered.length < notebook.notes.length) {
           deleted = true;
           return {
             ...notebook,
             notes: filtered,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           };
         }
         return notebook;
@@ -427,7 +443,7 @@ export class ShelfService {
         return {
           ...shelf,
           notebooks,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       }
       return shelf;
@@ -447,7 +463,7 @@ export class ShelfService {
   getNote(noteId: string): Note | undefined {
     for (const shelf of this.shelvesSignal()) {
       for (const notebook of shelf.notebooks) {
-        const note = notebook.notes.find(n => n.id === noteId);
+        const note = notebook.notes.find((n) => n.id === noteId);
         if (note) return note;
       }
     }
@@ -470,17 +486,28 @@ export class ShelfService {
           const titleMatch = note.title.toLowerCase().includes(lowerQuery);
           const contentMatch = note.content.toLowerCase().includes(lowerQuery);
           const previewMatch = note.preview?.toLowerCase().includes(lowerQuery);
-          const tagMatch = note.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+          const tagMatch = note.tags.some((tag) =>
+            tag.toLowerCase().includes(lowerQuery),
+          );
 
           // Check block content
-          const blockMatch = note.blocks?.some(block => {
-            const blockContentMatch = block.content?.toLowerCase().includes(lowerQuery);
-            const blockMetadataMatch = block.metadata &&
+          const blockMatch = note.blocks?.some((block) => {
+            const blockContentMatch = block.content
+              ?.toLowerCase()
+              .includes(lowerQuery);
+            const blockMetadataMatch =
+              block.metadata &&
               JSON.stringify(block.metadata).toLowerCase().includes(lowerQuery);
             return blockContentMatch || blockMetadataMatch;
           });
 
-          if (titleMatch || contentMatch || previewMatch || tagMatch || blockMatch) {
+          if (
+            titleMatch ||
+            contentMatch ||
+            previewMatch ||
+            tagMatch ||
+            blockMatch
+          ) {
             results.push(note);
           }
         }
@@ -495,13 +522,13 @@ export class ShelfService {
    */
   getAllNotes(): Note[] {
     const results: Note[] = [];
-    
+
     for (const shelf of this.shelvesSignal()) {
       for (const notebook of shelf.notebooks) {
         results.push(...notebook.notes);
       }
     }
-    
+
     return results;
   }
 
@@ -512,19 +539,19 @@ export class ShelfService {
     const shelves = this.shelvesSignal();
     let updated = false;
 
-    const newShelves = shelves.map(shelf => {
-      const nbIndex = shelf.notebooks.findIndex(nb => nb.id === notebookId);
+    const newShelves = shelves.map((shelf) => {
+      const nbIndex = shelf.notebooks.findIndex((nb) => nb.id === notebookId);
       if (nbIndex === -1) return shelf;
 
       const notebook = shelf.notebooks[nbIndex];
       const reordered = noteIds
-        .map(id => notebook.notes.find(n => n.id === id))
+        .map((id) => notebook.notes.find((n) => n.id === id))
         .filter((n): n is Note => n !== undefined);
 
       const updatedNotebook = {
         ...notebook,
         notes: reordered,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const newNotebooks = [...shelf.notebooks];
@@ -534,7 +561,7 @@ export class ShelfService {
       return {
         ...shelf,
         notebooks: newNotebooks,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     });
 
@@ -555,23 +582,23 @@ export class ShelfService {
    */
   private loadFromStorage(): void {
     const stored = this.localStorage.getItem<Shelf[]>(this.STORAGE_KEY);
-    
+
     if (stored && stored.length > 0) {
       // Convert date strings back to Date objects
-      const shelves = stored.map(shelf => ({
+      const shelves = stored.map((shelf) => ({
         ...shelf,
         createdAt: new Date(shelf.createdAt),
         updatedAt: new Date(shelf.updatedAt),
-        notebooks: shelf.notebooks.map(nb => ({
+        notebooks: shelf.notebooks.map((nb) => ({
           ...nb,
           createdAt: new Date(nb.createdAt),
           updatedAt: new Date(nb.updatedAt),
-          notes: nb.notes.map(note => ({
+          notes: nb.notes.map((note) => ({
             ...note,
             createdAt: new Date(note.createdAt),
-            updatedAt: new Date(note.updatedAt)
-          }))
-        }))
+            updatedAt: new Date(note.updatedAt),
+          })),
+        })),
       }));
       this.shelvesSignal.set(shelves);
     } else {
@@ -598,7 +625,10 @@ export class ShelfService {
    * Generate preview text from content
    */
   private generatePreview(content: string, maxLength: number = 120): string {
-    const stripped = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    const stripped = content
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
     return stripped.length > maxLength
       ? stripped.substring(0, maxLength) + '…'
       : stripped;
@@ -653,16 +683,18 @@ Two linear layers with a ReLU/GELU in between, applied position-wise. Typically 
 ## Open Questions
 - Flash Attention reduces memory from O(n²) to O(n) — worth adopting for all new work?
 - RoPE vs ALiBi vs learned positional embeddings for long-context models?`,
-                preview: 'The Transformer architecture replaced recurrence with self-attention, enabling full parallelisation. Core components: multi-head attention, positional encoding, feed-forward sublayer.',
+                preview:
+                  'The Transformer architecture replaced recurrence with self-attention, enabling full parallelisation. Core components: multi-head attention, positional encoding, feed-forward sublayer.',
                 tags: ['transformers', 'attention', 'architecture'],
                 status: NoteStatus.InProgress,
                 blocks: [
                   {
                     id: 'blk_1',
                     type: BlockType.Hypothesis,
-                    content: 'We hypothesise that Flash Attention + GQA will become the standard for all production LLMs by 2027.',
+                    content:
+                      'We hypothesise that Flash Attention + GQA will become the standard for all production LLMs by 2027.',
                     order: 0,
-                    createdAt: new Date('2026-03-16')
+                    createdAt: new Date('2026-03-16'),
                   },
                   {
                     id: 'blk_2',
@@ -673,32 +705,34 @@ Two linear layers with a ReLU/GELU in between, applied position-wise. Typically 
                       rows: [
                         ['Full parallelism', 'Sequential'],
                         ['O(1) path length', 'O(n) path length'],
-                        ['O(n²) memory', 'O(n) hidden state']
-                      ]
+                        ['O(n²) memory', 'O(n) hidden state'],
+                      ],
                     },
                     order: 1,
-                    createdAt: new Date('2026-03-16')
+                    createdAt: new Date('2026-03-16'),
                   },
                   {
                     id: 'blk_3',
                     type: BlockType.Code,
-                    content: 'def scaled_dot_product_attention(Q, K, V, mask=None):\n    d_k = K.shape[-1]\n    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)\n    if mask is not None:\n        scores = scores.masked_fill(mask == 0, -1e9)\n    attention = torch.softmax(scores, dim=-1)\n    return torch.matmul(attention, V)',
+                    content:
+                      'def scaled_dot_product_attention(Q, K, V, mask=None):\n    d_k = K.shape[-1]\n    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)\n    if mask is not None:\n        scores = scores.masked_fill(mask == 0, -1e9)\n    attention = torch.softmax(scores, dim=-1)\n    return torch.matmul(attention, V)',
                     metadata: { language: 'python' },
                     order: 2,
-                    createdAt: new Date('2026-03-16')
+                    createdAt: new Date('2026-03-16'),
                   },
                   {
                     id: 'blk_4',
                     type: BlockType.AskAI,
-                    content: 'Explain the tradeoffs between different attention mechanisms for long-context models.',
+                    content:
+                      'Explain the tradeoffs between different attention mechanisms for long-context models.',
                     metadata: { provider: 'anthropic', responses: [] },
                     order: 3,
-                    createdAt: new Date('2026-03-16')
-                  }
+                    createdAt: new Date('2026-03-16'),
+                  },
                 ],
                 linkedNoteIds: ['note_2'],
                 createdAt: new Date('2026-03-16'),
-                updatedAt: new Date('2026-03-16')
+                updatedAt: new Date('2026-03-16'),
               },
               {
                 id: 'note_2',
@@ -726,13 +760,14 @@ Compromise between MHA and MQA: groups of heads share K/V. Used in Llama 2/3, Mi
 
 ## Recommendation
 For new projects: Flash Attention + GQA is the current best practice. MHA is only worth it for small research models where interpretability matters.`,
-                preview: 'Survey of attention variants: scaled dot-product, sparse (Longformer), Flash Attention, Multi-Query, and Grouped-Query. Flash Attention + GQA is current best practice.',
+                preview:
+                  'Survey of attention variants: scaled dot-product, sparse (Longformer), Flash Attention, Multi-Query, and Grouped-Query. Flash Attention + GQA is current best practice.',
                 tags: ['attention', 'survey', 'flash-attention'],
                 status: NoteStatus.InProgress,
                 blocks: [],
                 linkedNoteIds: ['note_1'],
                 createdAt: new Date('2026-03-18'),
-                updatedAt: new Date('2026-03-18')
+                updatedAt: new Date('2026-03-18'),
               },
               {
                 id: 'note_3',
@@ -762,18 +797,19 @@ Most enterprise pipelines need both:
 - A GPT-family model for generation (GPT-4o, Claude 3.5, Llama 3)
 
 The "BERT vs GPT" framing is mostly academic now — production systems use both.`,
-                preview: 'BERT (bidirectional encoder) vs GPT (autoregressive decoder). Most enterprise pipelines need both: BERT for retrieval/embeddings, GPT for generation.',
+                preview:
+                  'BERT (bidirectional encoder) vs GPT (autoregressive decoder). Most enterprise pipelines need both: BERT for retrieval/embeddings, GPT for generation.',
                 tags: ['bert', 'gpt', 'enterprise'],
                 status: NoteStatus.Draft,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-03-22'),
-                updatedAt: new Date('2026-03-22')
-              }
+                updatedAt: new Date('2026-03-22'),
+              },
             ],
             order: 0,
             createdAt: new Date('2026-03-01'),
-            updatedAt: new Date('2026-03-22')
+            updatedAt: new Date('2026-03-22'),
           },
           {
             id: 'nb_2',
@@ -807,13 +843,14 @@ After retrieving top-k candidates (e.g. 50), run a cross-encoder to re-score:
 ## Recommended Pipeline
 
 Query → [BM25 top-50 + Dense top-50] → RRF merge → Cross-encoder re-rank top-10 → LLM`,
-                preview: 'Hybrid retrieval combines BM25 (sparse) and dense vectors, merged via Reciprocal Rank Fusion. Cross-encoder re-ranking on top-50 candidates before passing to LLM.',
+                preview:
+                  'Hybrid retrieval combines BM25 (sparse) and dense vectors, merged via Reciprocal Rank Fusion. Cross-encoder re-ranking on top-50 candidates before passing to LLM.',
                 tags: ['rag', 'retrieval', 'hybrid', 'reranking'],
                 status: NoteStatus.InProgress,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-03-20'),
-                updatedAt: new Date('2026-03-20')
+                updatedAt: new Date('2026-03-20'),
               },
               {
                 id: 'note_5',
@@ -851,23 +888,24 @@ Index documents at multiple granularities (sentence, paragraph, section). Retrie
 - [ ] Benchmark sliding window vs retrieval on our Q&A eval set
 - [ ] Implement token counting middleware in the API layer
 - [ ] Set up cost alerts when context > 50k tokens per request`,
-                preview: 'Token budgeting framework for 128k context models. Strategies: sliding window, summarisation, selective retrieval, hierarchical chunking.',
+                preview:
+                  'Token budgeting framework for 128k context models. Strategies: sliding window, summarisation, selective retrieval, hierarchical chunking.',
                 tags: ['context', 'llm', 'tokens', 'cost'],
                 status: NoteStatus.Draft,
                 blocks: [],
                 linkedNoteIds: ['note_4'],
                 createdAt: new Date('2026-03-25'),
-                updatedAt: new Date('2026-03-25')
-              }
+                updatedAt: new Date('2026-03-25'),
+              },
             ],
             order: 1,
             createdAt: new Date('2026-03-01'),
-            updatedAt: new Date('2026-03-25')
-          }
+            updatedAt: new Date('2026-03-25'),
+          },
         ],
         order: 0,
         createdAt: new Date('2026-03-01'),
-        updatedAt: new Date('2026-03-25')
+        updatedAt: new Date('2026-03-25'),
       },
       {
         id: 'shelf_2',
@@ -912,13 +950,14 @@ Lost 45 minutes debugging a TypeScript strict-mode error that turned out to be a
 - Start Phase 4 block system
 - Write the Hypothesis and Conclusion block components
 - Set up the slash command palette skeleton`,
-                preview: 'Shipped Lore sidebar drag-and-drop. Deployed to Azure. Reviewed Phase 3 component spec. Lost 45 min on a missing import.',
+                preview:
+                  'Shipped Lore sidebar drag-and-drop. Deployed to Azure. Reviewed Phase 3 component spec. Lost 45 min on a missing import.',
                 tags: ['work', 'productivity', 'lore'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-04-28'),
-                updatedAt: new Date('2026-04-28')
+                updatedAt: new Date('2026-04-28'),
               },
               {
                 id: 'note_7',
@@ -950,18 +989,19 @@ Lost 45 minutes debugging a TypeScript strict-mode error that turned out to be a
 
 ### One thing I'd tell past-me
 The CDK drag conflict would have been obvious if you'd read the Angular docs first. RTFM.`,
-                preview: 'Week 17 review. Completed Phase 2 & 3 of Lore. Gym 6/6. Deadlift PR 140kg. Blog post drafted. Theme: depth over breadth.',
+                preview:
+                  'Week 17 review. Completed Phase 2 & 3 of Lore. Gym 6/6. Deadlift PR 140kg. Blog post drafted. Theme: depth over breadth.',
                 tags: ['review', 'weekly', 'reflection'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-04-27'),
-                updatedAt: new Date('2026-04-27')
-              }
+                updatedAt: new Date('2026-04-27'),
+              },
             ],
             order: 0,
             createdAt: new Date('2026-03-01'),
-            updatedAt: new Date('2026-03-22')
+            updatedAt: new Date('2026-03-22'),
           },
           {
             id: 'nb_4',
@@ -1009,23 +1049,24 @@ A linear algebra book that teaches through story, then formalises with math, the
 - [ ] Write Chapter 1 draft
 - [ ] Set up Manim environment
 - [ ] Find a technical reviewer`,
-                preview: 'Linear algebra book: story → math → Python → Manim. 3B1B-style. 12 chapters covering vectors through SVD and applications in PCA, least squares, PageRank, neural nets.',
+                preview:
+                  'Linear algebra book: story → math → Python → Manim. 3B1B-style. 12 chapters covering vectors through SVD and applications in PCA, least squares, PageRank, neural nets.',
                 tags: ['book', 'linear-algebra', 'manim', 'education'],
                 status: NoteStatus.Draft,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-04-05'),
-                updatedAt: new Date('2026-04-05')
-              }
+                updatedAt: new Date('2026-04-05'),
+              },
             ],
             order: 1,
             createdAt: new Date('2026-04-01'),
-            updatedAt: new Date('2026-04-05')
-          }
+            updatedAt: new Date('2026-04-05'),
+          },
         ],
         order: 1,
         createdAt: new Date('2026-03-01'),
-        updatedAt: new Date('2026-04-05')
+        updatedAt: new Date('2026-04-05'),
       },
       {
         id: 'shelf_3',
@@ -1085,24 +1126,25 @@ Key variables:
 3. Promoter holding > 50% (skin in the game)
 4. Free cash flow yield > 3%
 5. No related-party transaction red flags`,
-                preview: 'Indian equity framework: SEBI LODR, BRSR compliance, quality filters (ROIC > WACC), Beneish M-Score fraud detection, valuation via P/E, EV/EBITDA, DCF.',
+                preview:
+                  'Indian equity framework: SEBI LODR, BRSR compliance, quality filters (ROIC > WACC), Beneish M-Score fraud detection, valuation via P/E, EV/EBITDA, DCF.',
                 tags: ['equity', 'framework', 'sebi', 'valuation', 'india'],
                 status: NoteStatus.Done,
                 blocks: [],
                 linkedNoteIds: [],
                 createdAt: new Date('2026-02-10'),
-                updatedAt: new Date('2026-02-10')
-              }
+                updatedAt: new Date('2026-02-10'),
+              },
             ],
             order: 0,
             createdAt: new Date('2026-02-01'),
-            updatedAt: new Date('2026-02-10')
-          }
+            updatedAt: new Date('2026-02-10'),
+          },
         ],
         order: 2,
         createdAt: new Date('2026-02-01'),
-        updatedAt: new Date('2026-02-10')
-      }
+        updatedAt: new Date('2026-02-10'),
+      },
     ];
 
     this.shelvesSignal.set(seedShelves);

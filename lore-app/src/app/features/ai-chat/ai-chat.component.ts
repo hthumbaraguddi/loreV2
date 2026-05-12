@@ -10,6 +10,10 @@ import { ApiKeyManagerService } from '../../core/services/api-key-manager.servic
 import { LayoutService } from '../../core/services/layout.service';
 import { ChatHistoryService } from '../../core/services/chat-history.service';
 import { PROVIDER_REGISTRY, PROVIDER_MAP } from '../../core/config/provider-registry';
+import { BlockService } from '../../core/services/block.service';
+import { EditorService } from '../../core/services/editor.service';
+import { ShelfService } from '../../core/services/shelf.service';
+import { BlockType } from '../../core/models/shelf.model';
 
 // ── Types (exported so ChatHistoryService can import them) ────────────────────
 
@@ -50,6 +54,9 @@ export class AiChatComponent implements AfterViewChecked {
   readonly keyManager      = inject(ApiKeyManagerService);
   readonly layoutService   = inject(LayoutService);
   readonly history         = inject(ChatHistoryService);
+  readonly blockService    = inject(BlockService);
+  readonly editorService   = inject(EditorService);
+  readonly shelfService    = inject(ShelfService);
   private readonly destroyRef = inject(DestroyRef);
 
   // ── View refs ─────────────────────────────────────────────────────────────
@@ -295,6 +302,25 @@ export class AiChatComponent implements AfterViewChecked {
 
   close(): void {
     this.layoutService.closeRightPanel();
+  }
+
+  saveAsBlock(content: string): void {
+    const activeNote = this.editorService.getActiveNote();
+    if (!activeNote) {
+      console.warn('No active note open — open a note first to save AI responses as blocks.');
+      return;
+    }
+
+    const noteId = activeNote.id;
+    const note = this.shelfService.getNote(noteId);
+    const afterIndex = note?.blocks?.length ? note.blocks.length - 1 : -1;
+
+    this.blockService.createBlock(
+      noteId,
+      BlockType.Note,
+      afterIndex,
+      content
+    );
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────

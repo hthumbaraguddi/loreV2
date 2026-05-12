@@ -216,8 +216,105 @@
       <!-- AI Behaviour Panel -->
       @if (activePanel() === 'ai-behaviour') {
         <div class="s-panel active">
+          <!-- Model Parameters -->
           <div class="s-sec">
-            <div class="s-title">AI Behaviour</div>
+            <div class="s-title">Model Parameters</div>
+            <div class="s-desc">Fine-tune how AI models generate responses. These defaults apply to all AI blocks, chat, and &#64;mention queries.</div>
+            <div class="s-card">
+              <!-- Temperature -->
+              <div class="param-row">
+                <div class="param-header">
+                  <label class="form-label">Temperature</label>
+                  <span class="param-value">{{ aiTemperature() }}</span>
+                </div>
+                <div class="param-desc">Lower values produce focused, deterministic output. Higher values increase creativity and randomness.</div>
+                <div class="slider-row">
+                  <span class="slider-label">Precise</span>
+                  <input
+                    type="range"
+                    class="param-slider"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    [value]="aiTemperature()"
+                    (input)="updateTemperature(+$any($event.target).value)"
+                  />
+                  <span class="slider-label">Creative</span>
+                </div>
+              </div>
+
+              <!-- Max Tokens -->
+              <div class="param-row">
+                <div class="param-header">
+                  <label class="form-label">Max Tokens</label>
+                  <span class="param-value">{{ aiMaxTokens() }}</span>
+                </div>
+                <div class="param-desc">Maximum number of tokens in the AI response. Higher values allow longer responses but cost more.</div>
+                <div class="token-presets">
+                  <button class="token-preset" [class.active]="aiMaxTokens() === 1024" (click)="updateMaxTokens(1024)">1K</button>
+                  <button class="token-preset" [class.active]="aiMaxTokens() === 2048" (click)="updateMaxTokens(2048)">2K</button>
+                  <button class="token-preset" [class.active]="aiMaxTokens() === 4096" (click)="updateMaxTokens(4096)">4K</button>
+                  <button class="token-preset" [class.active]="aiMaxTokens() === 8192" (click)="updateMaxTokens(8192)">8K</button>
+                  <button class="token-preset" [class.active]="aiMaxTokens() === 16384" (click)="updateMaxTokens(16384)">16K</button>
+                  <input
+                    type="number"
+                    class="form-input token-input"
+                    [value]="aiMaxTokens()"
+                    min="256"
+                    max="128000"
+                    step="256"
+                    (change)="updateMaxTokens(+$any($event.target).value)"
+                    placeholder="Custom"
+                  />
+                </div>
+              </div>
+
+              <!-- Response Language -->
+              <div class="param-row">
+                <label class="form-label">Response Language</label>
+                <div class="param-desc">Language preference for AI responses. The model will attempt to reply in this language.</div>
+                <select
+                  class="form-input form-select"
+                  [value]="aiResponseLanguage()"
+                  (change)="updateResponseLanguage($any($event.target).value)"
+                >
+                  <option>English</option>
+                  <option>Hindi</option>
+                  <option>Spanish</option>
+                  <option>French</option>
+                  <option>German</option>
+                  <option>Japanese</option>
+                  <option>Chinese</option>
+                  <option>Korean</option>
+                  <option>Portuguese</option>
+                  <option>Arabic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Prompt -->
+          <div class="s-sec">
+            <div class="s-title">Default System Prompt</div>
+            <div class="s-desc">Custom instructions prepended to every AI request. Use this to define the model's persona, format, or domain expertise.</div>
+            <div class="s-card">
+              <textarea
+                class="form-input form-textarea system-prompt"
+                rows="5"
+                [value]="aiSystemPrompt()"
+                (input)="updateSystemPrompt($any($event.target).value)"
+                placeholder="e.g. You are a senior research analyst. Always cite sources. Respond in markdown with headers and bullet points."
+              ></textarea>
+              <div class="system-prompt-hint">
+                <span class="material-symbols-outlined" style="font-size:13px;">info</span>
+                Leave empty to use each provider's default behaviour. This is combined with your Profile bio context when enabled.
+              </div>
+            </div>
+          </div>
+
+          <!-- Behaviour Toggles -->
+          <div class="s-sec">
+            <div class="s-title">AI Integration</div>
             <div class="s-desc">Control how AI integrates with your notes, blocks, and knowledge graph.</div>
             <div class="s-card">
               @for (toggle of aiBehaviourToggles(); track toggle.id) {
@@ -235,6 +332,8 @@
               }
             </div>
           </div>
+
+          <!-- HTML Note Generation -->
           <div class="s-sec">
             <div class="s-title">HTML Note Generation</div>
             <div class="s-desc">Control how AI-generated HTML files are handled and stored.</div>

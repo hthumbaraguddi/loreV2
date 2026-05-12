@@ -1,6 +1,14 @@
 import {
-  Component, input, output, signal, computed, inject,
-  ChangeDetectionStrategy, HostListener, ViewChild, ElementRef
+  Component,
+  input,
+  output,
+  signal,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+  HostListener,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -27,13 +35,24 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
   selector: 'lore-block-container',
   standalone: true,
   imports: [
-    CommonModule, CdkDragHandle,
+    CommonModule,
+    CdkDragHandle,
     BlockToolbarComponent,
-    HypothesisBlockComponent, ConclusionBlockComponent, NoteInsightBlockComponent,
-    WarningBlockComponent, QuoteBlockComponent, KeyFindingsBlockComponent,
-    KeyDifferencesBlockComponent, ChecklistBlockComponent, CodeBlockComponent,
-    DividerBlockComponent, ImageBlockComponent, TableBlockComponent,
-    AskAiBlockComponent, AskClaudeBlockComponent, AskGptBlockComponent
+    HypothesisBlockComponent,
+    ConclusionBlockComponent,
+    NoteInsightBlockComponent,
+    WarningBlockComponent,
+    QuoteBlockComponent,
+    KeyFindingsBlockComponent,
+    KeyDifferencesBlockComponent,
+    ChecklistBlockComponent,
+    CodeBlockComponent,
+    DividerBlockComponent,
+    ImageBlockComponent,
+    TableBlockComponent,
+    AskAiBlockComponent,
+    AskClaudeBlockComponent,
+    AskGptBlockComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -48,10 +67,21 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
       (focusout)="focused.set(false)"
     >
       <!-- Drag handle -->
-      <div class="block-handle" cdkDragHandle [class.visible]="hovered() || focused()" aria-label="Drag to reorder block">
+      <div
+        class="block-handle"
+        cdkDragHandle
+        [class.visible]="hovered() || focused()"
+        aria-label="Drag to reorder block"
+      >
         <svg viewBox="0 0 10 16" fill="currentColor" width="10" height="16">
-          <circle cx="2" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="2" cy="14" r="1.2"/>
-          <circle cx="7" cy="2" r="1.2"/><circle cx="7" cy="6" r="1.2"/><circle cx="7" cy="10" r="1.2"/><circle cx="7" cy="14" r="1.2"/>
+          <circle cx="2" cy="2" r="1.2" />
+          <circle cx="2" cy="6" r="1.2" />
+          <circle cx="2" cy="10" r="1.2" />
+          <circle cx="2" cy="14" r="1.2" />
+          <circle cx="7" cy="2" r="1.2" />
+          <circle cx="7" cy="6" r="1.2" />
+          <circle cx="7" cy="10" r="1.2" />
+          <circle cx="7" cy="14" r="1.2" />
         </svg>
       </div>
 
@@ -70,62 +100,122 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
       <div class="block-inner">
         @switch (block().type) {
           @case (BlockType.Hypothesis) {
-            <lore-hypothesis-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-hypothesis-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Conclusion) {
-            <lore-conclusion-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-conclusion-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Note) {
-            <lore-note-insight-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-note-insight-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Warning) {
-            <lore-warning-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-warning-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Quote) {
-            <lore-quote-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-quote-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.KeyFindings) {
-            <lore-key-findings-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-key-findings-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.KeyDifferences) {
-            <lore-key-differences-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-key-differences-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Checklist) {
-            <lore-checklist-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-checklist-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Code) {
-            <lore-code-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-code-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Image) {
-            <lore-image-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-image-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Table) {
-            <lore-table-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-table-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.Divider) {
             <lore-divider-block [block]="block()" [readOnly]="readOnly()" />
           }
           @case (BlockType.AskClaude) {
-            <lore-ask-claude-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-ask-claude-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.AskGPT) {
-            <lore-ask-gpt-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-ask-gpt-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @case (BlockType.AskAI) {
-            <lore-ask-ai-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-ask-ai-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
           @default {
-            <lore-note-insight-block [block]="block()" [readOnly]="readOnly()" (changed)="onChanged($event)" />
+            <lore-note-insight-block
+              [block]="block()"
+              [readOnly]="readOnly()"
+              (changed)="onChanged($event)"
+            />
           }
         }
       </div>
 
       <!-- Add block below button (shows on hover) -->
       @if (!readOnly() && (hovered() || focused())) {
-        <button 
+        <button
           #addBelowButton
-          class="add-below" 
-          (click)="onAddBelowClick($event)" 
+          class="add-below"
+          (click)="onAddBelowClick($event)"
           title="Add block below (⌘Enter)"
         >
           <span class="material-symbols-outlined">add</span>
@@ -133,33 +223,71 @@ import { AskGptBlockComponent } from '../ask-gpt-block/ask-gpt-block.component';
       }
     </div>
   `,
-  styles: [`
-    :host { display: block; position: relative; }
-    .block-container {
-      display: flex; align-items: flex-start; gap: var(--lore-space-8);
-      padding: var(--lore-space-4) 0; position: relative;
-      border-radius: var(--lore-radius-md);
-      transition: background 80ms;
-      &.focused { background: var(--lore-color-accent-subtle); }
-    }
-    .block-handle {
-      width: 20px; flex-shrink: 0; display: flex; align-items: flex-start;
-      padding-top: 6px; cursor: grab; color: var(--lore-color-text-muted);
-      opacity: 0; transition: opacity 120ms;
-      &.visible { opacity: 1; }
-      &:active { cursor: grabbing; }
-    }
-    .block-inner { flex: 1; min-width: 0; }
-    .add-below {
-      position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
-      width: 24px; height: 24px; border-radius: 50%;
-      background: var(--lore-color-accent); color: var(--lore-color-on-accent);
-      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--lore-shadow-sm); z-index: 5;
-      .material-symbols-outlined { font-size: 16px; }
-      &:hover { transform: translateX(-50%) scale(1.1); }
-    }
-  `]
+  styles: [
+    `
+      :host {
+        display: block;
+        position: relative;
+      }
+      .block-container {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--lore-space-8);
+        padding: var(--lore-space-4) 0;
+        position: relative;
+        border-radius: var(--lore-radius-md);
+        transition: background 80ms;
+        &.focused {
+          background: var(--lore-color-accent-subtle);
+        }
+      }
+      .block-handle {
+        width: 20px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-start;
+        padding-top: 6px;
+        cursor: grab;
+        color: var(--lore-color-text-muted);
+        opacity: 0;
+        transition: opacity 120ms;
+        &.visible {
+          opacity: 1;
+        }
+        &:active {
+          cursor: grabbing;
+        }
+      }
+      .block-inner {
+        flex: 1;
+        min-width: 0;
+      }
+      .add-below {
+        position: absolute;
+        bottom: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--lore-color-accent);
+        color: var(--lore-color-on-accent);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--lore-shadow-sm);
+        z-index: 5;
+        .material-symbols-outlined {
+          font-size: 16px;
+        }
+        &:hover {
+          transform: translateX(-50%) scale(1.1);
+        }
+      }
+    `,
+  ],
 })
 export class BlockContainerComponent {
   block = input.required<Block>();
@@ -171,7 +299,11 @@ export class BlockContainerComponent {
 
   blockChanged = output<Block>();
   blockDeleted = output<string>();
-  addBlockAfter = output<{ afterIndex: number; type?: BlockType; clickPosition?: { x: number; y: number } }>();
+  addBlockAfter = output<{
+    afterIndex: number;
+    type?: BlockType;
+    clickPosition?: { x: number; y: number };
+  }>();
   duplicateRequested = output<string>();
   focusedBlock = output<string>();
 
@@ -179,17 +311,21 @@ export class BlockContainerComponent {
   hovered = signal(false);
   focused = signal(false);
 
-  commentCount = computed(() => 
-    this.commentService.getBlockCommentCount(this.noteId(), this.block().id)
+  commentCount = computed(() =>
+    this.commentService.getBlockCommentCount(this.noteId(), this.block().id),
   );
 
   @ViewChild('addBelowButton') addBelowButton?: ElementRef<HTMLButtonElement>;
 
-  onChanged(event: { blockId: string; content?: string; metadata?: Record<string, any> }): void {
+  onChanged(event: {
+    blockId: string;
+    content?: string;
+    metadata?: Record<string, any>;
+  }): void {
     this.blockChanged.emit({
       ...this.block(),
       content: event.content ?? this.block().content,
-      metadata: event.metadata ?? this.block().metadata
+      metadata: event.metadata ?? this.block().metadata,
     });
   }
 
@@ -202,11 +338,11 @@ export class BlockContainerComponent {
       const rect = this.addBelowButton.nativeElement.getBoundingClientRect();
       const clickPosition = {
         x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
+        y: rect.top + rect.height / 2,
       };
-      this.addBlockAfter.emit({ 
-        afterIndex: this.index(), 
-        clickPosition 
+      this.addBlockAfter.emit({
+        afterIndex: this.index(),
+        clickPosition,
       });
     } else {
       // Fallback to just emitting the index
@@ -214,12 +350,12 @@ export class BlockContainerComponent {
     }
   }
 
-  onAddAboveFromToolbar(event: { clickPosition: { x: number; y: number } }): void {
-    this.addBlockAfter.emit({ 
+  onAddAboveFromToolbar(event: {
+    clickPosition: { x: number; y: number };
+  }): void {
+    this.addBlockAfter.emit({
       afterIndex: this.index() - 1,
-      clickPosition: event.clickPosition
+      clickPosition: event.clickPosition,
     });
   }
-
-
 }

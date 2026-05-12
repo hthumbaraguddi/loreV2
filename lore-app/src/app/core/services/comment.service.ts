@@ -22,8 +22,8 @@ export class CommentService {
   private loadAllComments(): void {
     const map = new Map<string, BlockComment[]>();
     const keys = Object.keys(localStorage);
-    
-    keys.forEach(key => {
+
+    keys.forEach((key) => {
       if (key.startsWith('lore-comments-')) {
         const noteId = key.replace('lore-comments-', '');
         try {
@@ -43,7 +43,7 @@ export class CommentService {
    */
   getBlockComments(noteId: string, blockId: string): BlockComment[] {
     const noteComments = this.commentsMap().get(noteId) || [];
-    return noteComments.filter(c => c.blockId === blockId && !c.parentId);
+    return noteComments.filter((c) => c.blockId === blockId && !c.parentId);
   }
 
   /**
@@ -51,18 +51,21 @@ export class CommentService {
    */
   getCommentThread(noteId: string, commentId: string): CommentThread | null {
     const noteComments = this.commentsMap().get(noteId) || [];
-    const rootComment = noteComments.find(c => c.id === commentId);
-    
+    const rootComment = noteComments.find((c) => c.id === commentId);
+
     if (!rootComment) return null;
 
-    const replies = noteComments.filter(c => c.parentId === commentId);
+    const replies = noteComments.filter((c) => c.parentId === commentId);
     rootComment.replies = replies;
 
     const replyCount = replies.length;
     const isResolved = rootComment.resolved;
-    const lastUpdated = replies.length > 0
-      ? new Date(Math.max(...replies.map(r => new Date(r.updatedAt).getTime())))
-      : rootComment.updatedAt;
+    const lastUpdated =
+      replies.length > 0
+        ? new Date(
+            Math.max(...replies.map((r) => new Date(r.updatedAt).getTime())),
+          )
+        : rootComment.updatedAt;
 
     return {
       id: rootComment.id,
@@ -71,7 +74,7 @@ export class CommentService {
       rootComment,
       replyCount,
       isResolved,
-      lastUpdated
+      lastUpdated,
     };
   }
 
@@ -80,15 +83,21 @@ export class CommentService {
    */
   getBlockCommentCount(noteId: string, blockId: string): number {
     const noteComments = this.commentsMap().get(noteId) || [];
-    return noteComments.filter(c => c.blockId === blockId && !c.parentId).length;
+    return noteComments.filter((c) => c.blockId === blockId && !c.parentId)
+      .length;
   }
 
   /**
    * Add a new comment to a block
    */
-  addComment(noteId: string, blockId: string, text: string, author = 'User'): BlockComment {
+  addComment(
+    noteId: string,
+    blockId: string,
+    text: string,
+    author = 'User',
+  ): BlockComment {
     const noteComments = this.commentsMap().get(noteId) || [];
-    
+
     const comment: BlockComment = {
       id: `cmt_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       blockId,
@@ -98,7 +107,7 @@ export class CommentService {
       createdAt: new Date(),
       updatedAt: new Date(),
       resolved: false,
-      replies: []
+      replies: [],
     };
 
     const updated = [...noteComments, comment];
@@ -113,9 +122,14 @@ export class CommentService {
   /**
    * Reply to a comment
    */
-  addReply(noteId: string, parentCommentId: string, text: string, author = 'User'): BlockComment | null {
+  addReply(
+    noteId: string,
+    parentCommentId: string,
+    text: string,
+    author = 'User',
+  ): BlockComment | null {
     const noteComments = this.commentsMap().get(noteId) || [];
-    const parentComment = noteComments.find(c => c.id === parentCommentId);
+    const parentComment = noteComments.find((c) => c.id === parentCommentId);
 
     if (!parentComment) return null;
 
@@ -129,7 +143,7 @@ export class CommentService {
       updatedAt: new Date(),
       resolved: false,
       replies: [],
-      parentId: parentCommentId
+      parentId: parentCommentId,
     };
 
     const updated = [...noteComments, reply];
@@ -146,7 +160,7 @@ export class CommentService {
    */
   editComment(noteId: string, commentId: string, newText: string): boolean {
     const noteComments = this.commentsMap().get(noteId) || [];
-    const idx = noteComments.findIndex(c => c.id === commentId);
+    const idx = noteComments.findIndex((c) => c.id === commentId);
 
     if (idx === -1) return false;
 
@@ -166,9 +180,11 @@ export class CommentService {
    */
   deleteComment(noteId: string, commentId: string): boolean {
     const noteComments = this.commentsMap().get(noteId) || [];
-    
+
     // Remove the comment and all its replies
-    const updated = noteComments.filter(c => c.id !== commentId && c.parentId !== commentId);
+    const updated = noteComments.filter(
+      (c) => c.id !== commentId && c.parentId !== commentId,
+    );
 
     if (updated.length === noteComments.length) return false; // Not found
 
@@ -185,7 +201,7 @@ export class CommentService {
    */
   toggleResolved(noteId: string, commentId: string): boolean {
     const noteComments = this.commentsMap().get(noteId) || [];
-    const comment = noteComments.find(c => c.id === commentId);
+    const comment = noteComments.find((c) => c.id === commentId);
 
     if (!comment) return false;
 
@@ -205,7 +221,7 @@ export class CommentService {
    */
   deleteBlockComments(noteId: string, blockId: string): void {
     const noteComments = this.commentsMap().get(noteId) || [];
-    const updated = noteComments.filter(c => c.blockId !== blockId);
+    const updated = noteComments.filter((c) => c.blockId !== blockId);
 
     const map = new Map(this.commentsMap());
     map.set(noteId, updated);

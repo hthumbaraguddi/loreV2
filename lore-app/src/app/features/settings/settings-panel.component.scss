@@ -651,6 +651,168 @@
   }
 }
 
+/* Select Chips (original - see below for full definition) */
+
+/* ── AI Behaviour Parameters ─────────────────────────────── */
+
+.param-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--lore-color-border);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.param-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.param-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lore-color-accent);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--lore-color-accent-subtle);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.param-desc {
+  font-size: 11px;
+  color: var(--lore-color-text-faint);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-label {
+  font-size: 10px;
+  color: var(--lore-color-text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  min-width: 42px;
+
+  &:last-child {
+    text-align: right;
+  }
+}
+
+.param-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    var(--lore-primitive-purple-200),
+    var(--lore-primitive-purple-400)
+  );
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--lore-color-accent);
+    box-shadow: 0 2px 6px rgba(109, 40, 217, 0.25);
+    cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    box-shadow: 0 2px 10px rgba(109, 40, 217, 0.4);
+    transform: scale(1.12);
+  }
+
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--lore-color-accent);
+    box-shadow: 0 2px 6px rgba(109, 40, 217, 0.25);
+    cursor: pointer;
+  }
+}
+
+.token-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.token-preset {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--lore-color-border-strong);
+  background: var(--lore-color-surface-default);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--lore-color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(.active) {
+    border-color: var(--lore-primitive-purple-300);
+    background: var(--lore-color-accent-subtle);
+    color: var(--lore-color-accent);
+  }
+
+  &.active {
+    background: var(--lore-color-accent);
+    border-color: var(--lore-color-accent);
+    color: white;
+    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.2);
+  }
+}
+
+.token-input {
+  width: 90px !important;
+  padding: 5px 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  text-align: center;
+  border-radius: 6px !important;
+}
+
+.system-prompt {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  min-height: 100px;
+}
+
+.system-prompt-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--lore-color-text-faint);
+  font-family: 'DM Sans', sans-serif;
+}
+
 /* Select Chips */
 .select-chips {
   display: flex;

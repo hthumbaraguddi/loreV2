@@ -148,12 +148,20 @@
               <span class="msg-time">{{ formatTime(msg.timestamp) }}</span>
               @if (msg.role === 'assistant' && !msg.isStreaming && msg.content) {
                 <button
-                  class="msg-copy"
+                  class="msg-action"
                   (click)="copyMessage(msg.content)"
                   title="Copy response"
                   aria-label="Copy this response"
                 >
                   <span class="material-symbols-outlined">content_copy</span>
+                </button>
+                <button
+                  class="msg-action"
+                  (click)="saveAsBlock(msg.content)"
+                  title="Save as Note block"
+                  aria-label="Save as a Note block in the editor"
+                >
+                  <span class="material-symbols-outlined">note_add</span>
                 </button>
               }
             </div>

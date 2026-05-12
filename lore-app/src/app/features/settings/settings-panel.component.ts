@@ -1,9 +1,11 @@
-import { Component, signal, inject, ChangeDetectionStrategy, effect } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TemplateService, Template } from '../../core/services/template.service';
 import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
 import { ThemeService, type Theme } from '../../core/services/theme.service';
+import { SettingsService } from '../../core/services/settings.service';
 import { AIProvidersComponent } from './ai-providers/ai-providers.component';
 import { ChatHistoryComponent } from './chat-history/chat-history.component';
 
@@ -39,7 +41,7 @@ export interface Profile {
 @Component({
   selector: 'lore-settings-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, AIProvidersComponent, ChatHistoryComponent],
+  imports: [CommonModule, RouterLink, FormsModule, AIProvidersComponent, ChatHistoryComponent],
   templateUrl: './settings-panel.component.html',
   styleUrl: './settings-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -48,6 +50,7 @@ export class SettingsPanelComponent {
   private templateService = inject(TemplateService);
   storageSyncService = inject(StorageSyncService);
   private themeService = inject(ThemeService);
+  private settingsService = inject(SettingsService);
   
   // Active panel
   activePanel = signal<SettingsPanel>('ai-providers');
@@ -70,16 +73,12 @@ export class SettingsPanelComponent {
     responseStyles: ['Concise', 'Technical depth', 'Use bullet points']
   });
 
-  // AI Behaviour toggles
-  aiBehaviourToggles = signal([
-    { id: 'auto-link', name: 'Auto-link AI responses to Knowledge Graph', description: 'AI replies are parsed for concepts and linked as graph nodes automatically', enabled: true },
-    { id: 'note-context', name: 'Include note context in every AI prompt', description: 'The full current note content is sent as context with each @mention query', enabled: true },
-    { id: 'bio-context', name: 'Include personal bio context', description: 'Inject your profile persona into AI system prompts for better responses', enabled: true },
-    { id: 'save-exchanges', name: 'Save AI exchanges as sub-notes', description: 'Each @mention conversation is saved as a linked child note in the same notebook', enabled: true },
-    { id: 'token-usage', name: 'Show token usage and estimated cost', description: 'Display token count and approximate cost per AI call in block footer', enabled: false },
-    { id: 'auto-summary', name: 'Auto-generate note summary on save', description: 'Generates a 2-sentence summary for sidebar preview using the default model', enabled: false },
-    { id: 'scheduled-prompts', name: 'Scheduled AI prompts (Cron Jobs)', description: 'Allow prompts from the Prompt Library to run on a schedule and save output as notes', enabled: true }
-  ]);
+  // AI Behaviour - powered by SettingsService for persistence
+  aiBehaviourToggles = computed(() => this.settingsService.aiSettings().behaviourToggles);
+  aiTemperature = computed(() => this.settingsService.aiSettings().temperature);
+  aiMaxTokens = computed(() => this.settingsService.aiSettings().maxTokens);
+  aiSystemPrompt = computed(() => this.settingsService.aiSettings().systemPrompt);
+  aiResponseLanguage = computed(() => this.settingsService.aiSettings().responseLanguage);
 
   // HTML Note Generation toggles
   htmlNoteToggles = signal([
@@ -151,14 +150,42 @@ export class SettingsPanelComponent {
   // ─── AI Behaviour ─────────────────────────────────────────────
 
   /**
-   * Toggle AI behaviour setting
+   * Toggle AI behaviour setting (persisted via SettingsService)
    */
   toggleAIBehaviour(settingId: string): void {
-    this.aiBehaviourToggles.update(toggles =>
-      toggles.map(toggle =>
-        toggle.id === settingId ? { ...toggle, enabled: !toggle.enabled } : toggle
-      )
+    const current = this.settingsService.aiSettings().behaviourToggles;
+    const updated = current.map(toggle =>
+      toggle.id === settingId ? { ...toggle, enabled: !toggle.enabled } : toggle
     );
+    this.settingsService.updateAISettings({ behaviourToggles: updated });
+  }
+
+  /**
+   * Update AI temperature (persisted)
+   */
+  updateTemperature(value: number): void {
+    this.settingsService.updateAISettings({ temperature: Math.round(value * 100) / 100 });
+  }
+
+  /**
+   * Update AI max tokens (persisted)
+   */
+  updateMaxTokens(value: number): void {
+    this.settingsService.updateAISettings({ maxTokens: value });
+  }
+
+  /**
+   * Update AI system prompt (persisted)
+   */
+  updateSystemPrompt(value: string): void {
+    this.settingsService.updateAISettings({ systemPrompt: value });
+  }
+
+  /**
+   * Update AI response language (persisted)
+   */
+  updateResponseLanguage(value: string): void {
+    this.settingsService.updateAISettings({ responseLanguage: value });
   }
 
   /**

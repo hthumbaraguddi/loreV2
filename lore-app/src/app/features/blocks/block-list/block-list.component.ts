@@ -1,6 +1,17 @@
-import { Component, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CdkDropList, CdkDrag, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { Block, BlockType } from '../../../core/models/shelf.model';
 import { BlockContainerComponent } from '../block-container/block-container.component';
 import { SlashPaletteComponent } from '../slash-palette/slash-palette.component';
@@ -8,7 +19,13 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
 @Component({
   selector: 'lore-block-list',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag, BlockContainerComponent, SlashPaletteComponent],
+  imports: [
+    CommonModule,
+    CdkDropList,
+    CdkDrag,
+    BlockContainerComponent,
+    SlashPaletteComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -37,8 +54,8 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
     <!-- Slash palette -->
     @if (paletteOpen()) {
       <div class="palette-overlay" (click)="closePalette()">
-        <div 
-          class="palette-anchor" 
+        <div
+          class="palette-anchor"
           (click)="$event.stopPropagation()"
           [style.position]="'fixed'"
           [style.left.px]="palettePosition().x"
@@ -53,28 +70,42 @@ import { SlashPaletteComponent } from '../slash-palette/slash-palette.component'
       </div>
     }
   `,
-  styles: [`
-    .block-list { display: flex; flex-direction: column; gap: var(--lore-space-4); }
-    .block-row { position: relative; }
-    .palette-overlay {
-      position: fixed; inset: 0; z-index: 100;
-    }
-    .palette-anchor {
-      position: absolute;
-    }
-    /* CDK drag styles */
-    .cdk-drag-preview {
-      opacity: 0.85;
-      box-shadow: var(--lore-shadow-lg);
-      border-radius: var(--lore-radius-md);
-      background: var(--lore-color-bg-surface);
-    }
-    .cdk-drag-placeholder { opacity: 0.3; }
-    .cdk-drag-animating { transition: transform 200ms cubic-bezier(0,0,0.2,1); }
-    .block-list.cdk-drop-list-dragging .block-row:not(.cdk-drag-placeholder) {
-      transition: transform 200ms cubic-bezier(0,0,0.2,1);
-    }
-  `]
+  styles: [
+    `
+      .block-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--lore-space-4);
+      }
+      .block-row {
+        position: relative;
+      }
+      .palette-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+      }
+      .palette-anchor {
+        position: absolute;
+      }
+      /* CDK drag styles */
+      .cdk-drag-preview {
+        opacity: 0.85;
+        box-shadow: var(--lore-shadow-lg);
+        border-radius: var(--lore-radius-md);
+        background: var(--lore-color-bg-surface);
+      }
+      .cdk-drag-placeholder {
+        opacity: 0.3;
+      }
+      .cdk-drag-animating {
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+      }
+      .block-list.cdk-drop-list-dragging .block-row:not(.cdk-drag-placeholder) {
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+      }
+    `,
+  ],
 })
 export class BlockListComponent {
   blocks = input.required<Block[]>();
@@ -93,10 +124,17 @@ export class BlockListComponent {
 
   onDrop(event: CdkDragDrop<Block[]>): void {
     if (event.previousIndex === event.currentIndex) return;
-    this.blockReordered.emit({ fromIndex: event.previousIndex, toIndex: event.currentIndex });
+    this.blockReordered.emit({
+      fromIndex: event.previousIndex,
+      toIndex: event.currentIndex,
+    });
   }
 
-  onAddBlock(event: { afterIndex: number; type?: BlockType; clickPosition?: { x: number; y: number } }): void {
+  onAddBlock(event: {
+    afterIndex: number;
+    type?: BlockType;
+    clickPosition?: { x: number; y: number };
+  }): void {
     if (event.type) {
       this.blockAdded.emit({ type: event.type, afterIndex: event.afterIndex });
     } else {

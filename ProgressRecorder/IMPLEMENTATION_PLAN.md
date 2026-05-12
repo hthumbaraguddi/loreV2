@@ -1,22 +1,25 @@
 # Lore Application - Phased Implementation Plan
 
+> **📌 FOR AI AGENTS:** This is a PRIMARY file that MUST be updated after completing any task.  
+> See `README_FOR_AI_AGENTS.md` and `UPDATE_CHECKLIST.md` for update instructions.
+
 ## 📊 Overall Progress Summary
 
-**Last Updated**: May 3, 2026
+**Last Updated**: May 13, 2026
 
 ### Phase Completion Status
 - ✅ **Phase 1**: Foundation & Shell - **COMPLETE**
 - ✅ **Phase 2**: Sidebar & Navigation - **COMPLETE**
 - ✅ **Phase 3**: Editor Foundation - **COMPLETE**
 - ✅ **Phase 4**: Block System Part 1 - **COMPLETE**
-- ✅ **Phase 5**: Block System Part 2 - **COMPLETE** (11/12 blocks, Table pending)
-- 🚧 **Phase 6**: AI Integration Part 1 - **IN PROGRESS** (UI created, API integration pending)
-- ⏳ **Phase 7**: AI Features Part 2 - **NOT STARTED**
+- ✅ **Phase 5**: Block System Part 2 - **COMPLETE** (12/12 blocks including Table)
+- ✅ **Phase 6**: AI Integration Part 1 - **COMPLETE** (98%, only tests pending)
+- 🚧 **Phase 7**: AI Features Part 2 - **IN PROGRESS** (60%, chat sidebar done)
 - ⏳ **Phase 8**: Prompt Library & Scheduling - **NOT STARTED**
 - ⏳ **Phase 9**: Linking & Search - **NOT STARTED**
 - ⏳ **Phase 10**: Knowledge Graph - **NOT STARTED**
 - ⏳ **Phase 11**: HTML Notes - **NOT STARTED**
-- 🚧 **Phase 12**: Dark Mode & Zen Mode - **PARTIAL** (Dark mode complete, Zen mode partial)
+- 🚧 **Phase 12**: Dark Mode & Zen Mode - **IN PROGRESS** (75%, dark mode complete)
 - ⏳ **Phase 13**: Notifications & Quick Capture - **NOT STARTED**
 - ⏳ **Phase 14**: Sharing & Export - **NOT STARTED**
 - ⏳ **Phase 15**: Templates & Onboarding - **NOT STARTED**
@@ -27,18 +30,29 @@
 - ✅ Fully functional sidebar with drag-drop, search, and keyboard navigation
 - ✅ Split-pane editor (1/2/3 panes) with resizable dividers
 - ✅ 4 canvas background types (plain, dot, square, lined)
-- ✅ 11 block types implemented (Hypothesis, Conclusion, Note, Warning, Quote, Divider, Key Differences, Key Findings, Checklist, Code, Image)
+- ✅ 12 standard block types + 3 AI block types (15 total)
 - ✅ Slash command palette for block insertion
 - ✅ Note linking with [[ syntax and file link palette
 - ✅ Notebook grid view for browsing notes with filters and tabs
 - ✅ Theme toggle with dark mode support
-- ✅ Settings panel structure
+- ✅ Settings panel with AI Providers tab
 - ✅ Template builder structure
 - ✅ Landing page with animated gradient
 - ✅ Storage sync service for data persistence
 - ✅ Floating pane action buttons (Panel, History, Canvas)
 - ✅ Breadcrumb navigation in editor header
 - ✅ Focus mode (Zen mode) toggle
+- ✅ **AI Integration with 4 providers (Claude, GPT, Gemini, Groq)**
+- ✅ **AI Chat sidebar with streaming responses**
+- ✅ **Complete versioning system (git-style)**
+- ✅ **Session-based automatic versioning**
+- ✅ **Comment service infrastructure**
+
+### Bonus Features Implemented
+- ✅ **Note Versioning System** - Complete version control with git-style tree view
+- ✅ **Comment Service** - Infrastructure for block and note comments
+- ✅ **Chat History Service** - Persistent AI conversation history
+- ✅ **Table Block** - Editable grid block type
 
 ### Additional Components Implemented
 - ✅ `NotebookGridComponent` - Grid view for browsing notes
@@ -48,9 +62,15 @@
 - ✅ `TemplateBuilderComponent` - Template creation UI
 - ✅ `KnowledgeGraphComponent` - Graph visualization placeholder
 - ✅ `HTMLNotesGalleryComponent` - HTML notes viewer placeholder
+- ✅ `AIChatComponent` - AI chat sidebar with multi-turn conversations
+- ✅ `VersionHistoryComponent` - Version timeline modal
+- ✅ `VersionTreeComponent` - Git-style version tree view
+- ✅ `AskClaudeBlockComponent` - Claude AI block
+- ✅ `AskGPTBlockComponent` - GPT AI block
+- ✅ `TableBlockComponent` - Editable table block
 
-### Next Priority: Phase 6 - AI Integration
-Focus on completing AI service integration with Claude API for functional AI blocks.
+### Next Priority: Phase 7 - Complete AI Features
+Focus on inline AI mentions and AI behaviour settings.
 
 ---
 
@@ -222,7 +242,7 @@ This document outlines the phased approach to rebuilding the Lore application fr
    - [x] Create `KeyDifferencesBlockComponent` (two-column)
    - [x] Create `KeyFindingsBlockComponent` (numbered list)
    - [x] Create `ChecklistBlockComponent` (interactive checkboxes)
-   - [ ] Create `TableBlockComponent` (editable grid)
+   - [x] Create `TableBlockComponent` (editable grid) ✅ **COMPLETED**
    - [x] Create `CodeBlockComponent` (syntax highlighting)
 
 2. **Media Block Types** (1 block)
@@ -231,53 +251,63 @@ This document outlines the phased approach to rebuilding the Lore application fr
    - [ ] Add image size validation (10MB limit)
 
 3. **Block Features**
-   - [ ] Add block comments (inline threading)
+   - [ ] Add block comments (inline threading) - Service exists, UI pending
    - [ ] Implement comment resolution
    - [x] Add block metadata (created, updated timestamps)
    - [ ] Implement block search within note
 
-**Deliverable**: ✅ Complete block system with 11 of 12 non-AI block types (Table pending)
+**Deliverable**: ✅ Complete block system with 12 of 12 non-AI block types + 3 AI blocks
 
 ---
 
-## Phase 6: AI Integration - Part 1 (Week 6) 🚧 IN PROGRESS
-**Goal**: Implement Claude API integration and AI blocks
+## Phase 6: AI Integration - Part 1 (Week 6) ✅ COMPLETE
+**Goal**: Implement AI API integration and AI blocks
 
 ### Tasks:
 1. **AI Infrastructure**
-   - [ ] Create `AIService` for API communication
-   - [ ] Implement streaming response handling
-   - [ ] Add API key management (encrypted localStorage)
-   - [ ] Create error handling for API failures
+   - [x] Create `AIService` for API communication (661 lines)
+   - [x] Create `ApiKeyManagerService` for secure key storage
+   - [x] Implement streaming response handling (SSE)
+   - [x] Add API key management (encrypted localStorage)
+   - [x] Create error handling for API failures
+   - [x] Support 4 providers (Anthropic, OpenAI, Google, Groq)
 
-2. **AI Block Types** (2 blocks)
-   - [x] Create `AskClaudeBlockComponent` (UI created)
-   - [ ] Create `AskGPTBlockComponent`
-   - [ ] Implement streaming response display
-   - [ ] Add prompt editing and re-run
-   - [ ] Store prompt and response in block
+2. **AI Block Types** (3 blocks)
+   - [x] Create `AskClaudeBlockComponent` (fully functional)
+   - [x] Create `AskGPTBlockComponent` (fully functional)
+   - [x] Create generic `AskAIBlockComponent`
+   - [x] Implement streaming response display
+   - [x] Add prompt editing and re-run
+   - [x] Store prompt and response in block
+   - [x] Add markdown rendering for responses
 
 3. **Settings - AI Providers Tab**
-   - [x] Create `SettingsPanelComponent` (shell)
-   - [ ] Create `AIProvidersTabComponent`
-   - [ ] Add API key input fields (Anthropic, OpenAI, Gemini, Groq)
-   - [ ] Implement connection testing
-   - [ ] Add default model selection
+   - [x] Create `SettingsPanelComponent` (complete)
+   - [x] Create `AIProvidersTabComponent`
+   - [x] Add API key input fields (Anthropic, OpenAI, Gemini, Groq)
+   - [x] Implement connection testing
+   - [x] Add default model selection
+   - [x] Add masked API key display
 
-**Deliverable**: Working AI blocks with Claude API integration and settings panel
+**Deliverable**: ✅ Working AI blocks with multi-provider API integration and settings panel
+
+**Pending**: Unit tests (ai.service.spec.ts)
 
 ---
 
-## Phase 7: AI Features - Part 2 (Week 7)
+## Phase 7: AI Features - Part 2 (Week 7) 🚧 IN PROGRESS
 **Goal**: Add AI chat sidebar and inline AI mentions
 
 ### Tasks:
 1. **AI Chat Sidebar**
-   - [ ] Create `AIChatComponent` (right panel)
-   - [ ] Implement multi-turn conversation
-   - [ ] Add model switcher (Claude, GPT, Gemini, Groq)
-   - [ ] Create "Save as Block" functionality
-   - [ ] Add chat history persistence
+   - [x] Create `AIChatComponent` (right panel) ✅ **COMPLETED**
+   - [x] Create `ChatHistoryService` for persistence ✅ **COMPLETED**
+   - [x] Implement multi-turn conversation ✅ **COMPLETED**
+   - [x] Add model switcher (Claude, GPT, Gemini, Groq) ✅ **COMPLETED**
+   - [x] Create "Save as Block" functionality ✅ **COMPLETED**
+   - [x] Add chat history persistence ✅ **COMPLETED**
+   - [x] Implement streaming responses ✅ **COMPLETED**
+   - [ ] Add context passing (note content)
 
 2. **Inline AI Mentions**
    - [ ] Implement `@mention` trigger detection
@@ -293,6 +323,8 @@ This document outlines the phased approach to rebuilding the Lore application fr
    - [ ] Add response language setting
 
 **Deliverable**: Complete AI interaction layer with chat and inline mentions
+
+**Current Status**: 60% complete (chat sidebar done, mentions and settings pending)
 
 ---
 

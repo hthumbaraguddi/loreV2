@@ -2,6 +2,16 @@
   <!-- Logo -->
   <div class="nav-logo" title="Lore">L</div>
   
+  <!-- Search button -->
+  <button 
+    class="nav-search-btn" 
+    (click)="onSearchClick()"
+    title="Search (⌘K)"
+    aria-label="Open search"
+  >
+    <span class="material-symbols-outlined">search</span>
+  </button>
+  
   <!-- Main navigation items -->
   @for (item of mainItems(); track item.id) {
     <lore-nav-rail-item

@@ -26,3 +26,8 @@
     <lore-ai-chat></lore-ai-chat>
   }
 </aside>
+
+<!-- Global Search Overlay -->
+@if (searchService.isOpen()) {
+  <lore-global-search (close)="searchService.closeSearch()" />
+}

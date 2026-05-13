@@ -6,6 +6,7 @@ import { NavItem } from '../../../core/models/nav-item.model';
 import { NavRailItemComponent } from './nav-rail-item/nav-rail-item.component';
 import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle.component';
 import { LayoutService } from '../../../core/services/layout.service';
+import { SearchService } from '../../../core/services/search.service';
 
 @Component({
   selector: 'lore-nav-rail',
@@ -18,6 +19,7 @@ import { LayoutService } from '../../../core/services/layout.service';
 export class NavRailComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly layoutService = inject(LayoutService);
+  private readonly searchService = inject(SearchService);
   private readonly destroy$ = new Subject<void>();
 
   // Inputs
@@ -32,9 +34,9 @@ export class NavRailComponent implements OnInit, OnDestroy {
   // Computed: Split items into main and bottom groups
   readonly mainItems = computed(() => {
     const allItems = this.items();
-    // Main items: notes, graph, html-notes, template-builder, ai-chat, prompts
+    // Main items: notes, graph, html-notes, template-builder, ai-chat, prompts, tags
     return allItems.filter(item => 
-      ['notes', 'graph', 'html-notes', 'template-builder', 'ai-chat', 'prompts'].includes(item.id)
+      ['notes', 'graph', 'html-notes', 'template-builder', 'ai-chat', 'prompts', 'tags'].includes(item.id)
     );
   });
 
@@ -87,6 +89,7 @@ export class NavRailComponent implements OnInit, OnDestroy {
       'html-notes': 'html-notes',
       'template-builder': 'template-builder',
       'prompts': 'prompts',
+      'tags': 'tags',
       'settings': 'settings'
     };
 
@@ -104,5 +107,12 @@ export class NavRailComponent implements OnInit, OnDestroy {
     if (item.route) {
       this.activeId.set(item.id);
     }
+  }
+
+  /**
+   * Handle search button click
+   */
+  onSearchClick(): void {
+    this.searchService.openSearch();
   }
 }

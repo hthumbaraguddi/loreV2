@@ -34,6 +34,14 @@ export const routes: Routes = [
       {
         path: 'prompts',
         loadComponent: () => import('./features/prompt-library/prompt-library.component').then(m => m.PromptLibraryComponent)
+      },
+      {
+        path: 'tags',
+        loadComponent: () => import('./features/tags/tags-browser/tags-browser.component').then(m => m.TagsBrowserComponent)
+      },
+      {
+        path: 'tags/:tagName',
+        loadComponent: () => import('./features/tags/tag-filter/tag-filter.component').then(m => m.TagFilterComponent)
       }
     ]
   },

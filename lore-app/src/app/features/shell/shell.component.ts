@@ -1,22 +1,25 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { LayoutService } from '../../core/services/layout.service';
+import { SearchService } from '../../core/services/search.service';
 import { NavItem } from '../../core/models/nav-item.model';
 import { NavRailComponent } from './nav-rail/nav-rail.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AiChatComponent } from '../ai-chat/ai-chat.component';
+import { GlobalSearchComponent } from '../search/global-search/global-search.component';
 
 @Component({
   selector: 'lore-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent, AiChatComponent],
+  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent, AiChatComponent, GlobalSearchComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShellComponent {
   readonly layoutService = inject(LayoutService);
+  readonly searchService = inject(SearchService);
   private readonly router = inject(Router);
 
   // Layout state
@@ -32,6 +35,7 @@ export class ShellComponent {
     { id: 'template-builder', icon: 'dashboard_customize', label: 'Template Builder', route: '/template-builder' },
     { id: 'ai-chat', icon: 'smart_toy', label: 'AI Chat', route: '' },
     { id: 'prompts', icon: 'library_books', label: 'Prompt Library', route: '/prompts' },
+    { id: 'tags', icon: 'label', label: 'Tags', route: '/tags' },
     { id: 'notifications', icon: 'notifications', label: 'Notifications', route: '' },
     { id: 'settings', icon: 'settings', label: 'Settings', route: '/settings' },
   ];
@@ -58,5 +62,15 @@ export class ShellComponent {
           break;
       }
     }
+  }
+
+  /**
+   * Global keyboard shortcuts
+   */
+  @HostListener('document:keydown.meta.k', ['$event'])
+  @HostListener('document:keydown.ctrl.k', ['$event'])
+  onGlobalSearch(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.searchService.toggleSearch();
   }
 }

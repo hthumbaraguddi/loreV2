@@ -6,6 +6,7 @@ import { TemplateService, Template } from '../../core/services/template.service'
 import { StorageSyncService, StorageTier, SyncInterval } from '../../core/services/storage-sync.service';
 import { ThemeService, type Theme } from '../../core/services/theme.service';
 import { SettingsService } from '../../core/services/settings.service';
+import { AiBehaviourService, RESPONSE_STYLES, RESPONSE_LANGUAGES } from '../../core/services/ai-behaviour.service';
 import { AIProvidersComponent } from './ai-providers/ai-providers.component';
 import { ChatHistoryComponent } from './chat-history/chat-history.component';
 
@@ -51,6 +52,7 @@ export class SettingsPanelComponent {
   storageSyncService = inject(StorageSyncService);
   private themeService = inject(ThemeService);
   private settingsService = inject(SettingsService);
+  aiBehaviourService = inject(AiBehaviourService);
   
   // Active panel
   activePanel = signal<SettingsPanel>('ai-providers');
@@ -73,12 +75,62 @@ export class SettingsPanelComponent {
     responseStyles: ['Concise', 'Technical depth', 'Use bullet points']
   });
 
-  // AI Behaviour - powered by SettingsService for persistence
-  aiBehaviourToggles = computed(() => this.settingsService.aiSettings().behaviourToggles);
-  aiTemperature = computed(() => this.settingsService.aiSettings().temperature);
-  aiMaxTokens = computed(() => this.settingsService.aiSettings().maxTokens);
-  aiSystemPrompt = computed(() => this.settingsService.aiSettings().systemPrompt);
-  aiResponseLanguage = computed(() => this.settingsService.aiSettings().responseLanguage);
+  // AI Behaviour - powered by AiBehaviourService
+  aiSettings = this.aiBehaviourService.settings;
+  aiTemperature = this.aiBehaviourService.temperature;
+  aiMaxTokens = this.aiBehaviourService.maxTokens;
+  aiSystemPrompt = this.aiBehaviourService.systemPrompt;
+  aiResponseLanguage = this.aiBehaviourService.responseLanguage;
+  
+  // Response style options
+  responseStyleOptions = RESPONSE_STYLES;
+  responseLanguageOptions = RESPONSE_LANGUAGES;
+  
+  // AI Behaviour toggles (legacy - kept for compatibility)
+  aiBehaviourToggles = computed(() => [
+    { 
+      id: 'auto-link', 
+      name: 'Auto-link references', 
+      description: 'Automatically detect and link note references in AI responses', 
+      enabled: this.aiSettings().autoLinkReferences 
+    },
+    { 
+      id: 'note-context', 
+      name: 'Include note context', 
+      description: 'Send current note content as context with every AI prompt', 
+      enabled: this.aiSettings().includeNoteContext 
+    },
+    { 
+      id: 'bio-context', 
+      name: 'Include bio context', 
+      description: 'Inject your professional context from profile into system prompt', 
+      enabled: this.aiSettings().includeBioContext 
+    },
+    { 
+      id: 'save-exchanges', 
+      name: 'Save AI exchanges', 
+      description: 'Store all AI conversations in chat history for later reference', 
+      enabled: this.aiSettings().saveExchanges 
+    },
+    { 
+      id: 'token-usage', 
+      name: 'Show token usage', 
+      description: 'Display token count and estimated cost for each AI response', 
+      enabled: this.aiSettings().showTokenUsage 
+    },
+    { 
+      id: 'auto-summary', 
+      name: 'Auto-generate summaries', 
+      description: 'Automatically create note summaries when saving long notes', 
+      enabled: this.aiSettings().autoSummary 
+    },
+    { 
+      id: 'scheduled-prompts', 
+      name: 'Enable scheduled prompts', 
+      description: 'Allow prompts to run on a schedule (cron jobs)', 
+      enabled: this.aiSettings().enableScheduledPrompts 
+    }
+  ]);
 
   // HTML Note Generation toggles
   htmlNoteToggles = signal([
@@ -150,42 +202,60 @@ export class SettingsPanelComponent {
   // ─── AI Behaviour ─────────────────────────────────────────────
 
   /**
-   * Toggle AI behaviour setting (persisted via SettingsService)
+   * Toggle AI behaviour setting (persisted via AiBehaviourService)
    */
   toggleAIBehaviour(settingId: string): void {
-    const current = this.settingsService.aiSettings().behaviourToggles;
-    const updated = current.map(toggle =>
-      toggle.id === settingId ? { ...toggle, enabled: !toggle.enabled } : toggle
-    );
-    this.settingsService.updateAISettings({ behaviourToggles: updated });
+    switch (settingId) {
+      case 'auto-link':
+        this.aiBehaviourService.toggleAutoLinkReferences();
+        break;
+      case 'note-context':
+        this.aiBehaviourService.toggleNoteContext();
+        break;
+      case 'bio-context':
+        this.aiBehaviourService.toggleBioContext();
+        break;
+      case 'save-exchanges':
+        this.aiBehaviourService.toggleSaveExchanges();
+        break;
+      case 'token-usage':
+        this.aiBehaviourService.toggleShowTokenUsage();
+        break;
+      case 'auto-summary':
+        this.aiBehaviourService.toggleAutoSummary();
+        break;
+      case 'scheduled-prompts':
+        this.aiBehaviourService.toggleScheduledPrompts();
+        break;
+    }
   }
 
   /**
    * Update AI temperature (persisted)
    */
   updateTemperature(value: number): void {
-    this.settingsService.updateAISettings({ temperature: Math.round(value * 100) / 100 });
+    this.aiBehaviourService.setTemperature(value);
   }
 
   /**
    * Update AI max tokens (persisted)
    */
   updateMaxTokens(value: number): void {
-    this.settingsService.updateAISettings({ maxTokens: value });
+    this.aiBehaviourService.setMaxTokens(value);
   }
 
   /**
    * Update AI system prompt (persisted)
    */
   updateSystemPrompt(value: string): void {
-    this.settingsService.updateAISettings({ systemPrompt: value });
+    this.aiBehaviourService.setSystemPrompt(value || undefined);
   }
 
   /**
    * Update AI response language (persisted)
    */
   updateResponseLanguage(value: string): void {
-    this.settingsService.updateAISettings({ responseLanguage: value });
+    this.aiBehaviourService.setResponseLanguage(value);
   }
 
   /**

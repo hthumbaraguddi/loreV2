@@ -1,0 +1,173 @@
+<div class="pl-layout">
+  <div class="pl-main">
+    <!-- Toolbar -->
+    <div class="pl-toolbar">
+      <div class="pl-search">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6.5" cy="6.5" r="4"/>
+          <path d="M9.5 9.5l3 3"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search prompts…" 
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <!-- Filter Row -->
+    <div class="pl-f-row">
+      <div 
+        class="pl-f"
+        [class.active]="selectedTag() === null"
+        (click)="selectTag(null)"
+      >
+        All
+      </div>
+      <div 
+        class="pl-f"
+        *ngFor="let tag of allTags()"
+        [class.active]="selectedTag() === tag"
+        (click)="selectTag(tag)"
+      >
+        {{ tag }}
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="pl-body">
+      <!-- Scheduled Prompts Section -->
+      <div class="pl-section-title" *ngIf="hasScheduledPrompts()">
+        Scheduled Prompts (Cron Jobs)
+      </div>
+      <div class="pl-grid" *ngIf="hasScheduledPrompts()">
+        <div 
+          class="pc"
+          *ngFor="let prompt of scheduledPrompts()"
+          (click)="editPrompt(prompt)"
+        >
+          <div class="pc-top">
+            <div class="pc-ico" [style.background]="'var(--amber-bg)'">📈</div>
+            <div>
+              <div class="pc-name">{{ prompt.title }}</div>
+              <div class="pc-cat">{{ prompt.tags.join(' · ') }}</div>
+            </div>
+          </div>
+          <div class="pc-desc">{{ prompt.description }}</div>
+          <div class="pc-preview">{{ prompt.template.substring(0, 100) }}{{ prompt.template.length > 100 ? '...' : '' }}</div>
+          <div class="pc-footer">
+            <span class="pc-cron-badge" *ngIf="prompt.schedule">
+              ⏱ {{ getNextRunDescription(prompt) }}
+            </span>
+            <div style="display:flex;gap:3px;margin-left:auto;">
+              <div 
+                class="pc-badge" 
+                [style.background]="getProviderColor(prompt.provider)"
+                [title]="prompt.provider"
+              >
+                {{ prompt.provider.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            <button 
+              class="pc-use" 
+              (click)="runPrompt(prompt); $event.stopPropagation()"
+            >
+              ▶ Run
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Prompts Section -->
+      <div class="pl-section-title" [style.margin-top]="hasScheduledPrompts() ? '8px' : '0'">
+        All Prompts
+      </div>
+      <div class="pl-grid">
+        <!-- New Prompt Card (Dashed) -->
+        <div 
+          class="pc pc-new"
+          (click)="createPrompt()"
+        >
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--p100);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px;">+</div>
+          <div style="font-size:13px;font-weight:600;color:var(--p700);">New Prompt</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px;">Create a new prompt template</div>
+        </div>
+
+        <!-- Existing Prompts -->
+        <div 
+          class="pc"
+          *ngFor="let prompt of regularPrompts()"
+          (click)="editPrompt(prompt)"
+        >
+          <div class="pc-top">
+            <div class="pc-ico" [style.background]="'var(--teal-bg)'">🔬</div>
+            <div>
+              <div class="pc-name">{{ prompt.title }}</div>
+              <div class="pc-cat">{{ prompt.tags.join(' · ') }}</div>
+            </div>
+          </div>
+          <div class="pc-desc">{{ prompt.description }}</div>
+          <div class="pc-preview">{{ prompt.template.substring(0, 100) }}{{ prompt.template.length > 100 ? '...' : '' }}</div>
+          <div class="pc-footer">
+            <span style="font-size:10.5px;color:var(--t3);" *ngIf="prompt.useCount > 0">
+              {{ prompt.useCount }} uses
+            </span>
+            <div style="display:flex;gap:3px;margin-left:auto;">
+              <div 
+                class="pc-badge" 
+                [style.background]="getProviderColor(prompt.provider)"
+                [title]="prompt.provider"
+              >
+                {{ prompt.provider.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            <button 
+              class="pc-use" 
+              (click)="runPrompt(prompt); $event.stopPropagation()"
+            >
+              Use
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredPrompts().length === 0">
+        <div class="empty-icon">📝</div>
+        <h3>No prompts found</h3>
+        <p *ngIf="searchQuery() || selectedTag()">
+          Try adjusting your filters or search query
+        </p>
+        <p *ngIf="!searchQuery() && !selectedTag()">
+          Create your first prompt template to get started
+        </p>
+        <button class="btn-primary" (click)="createPrompt()">
+          Create Prompt
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prompt Editor Modal -->
+<div class="modal-overlay" *ngIf="showEditor()" (click)="closeEditor()">
+  <div class="modal-content editor-modal" (click)="$event.stopPropagation()">
+    <lore-prompt-editor
+      [prompt]="selectedPrompt()"
+      (save)="onEditorSave($event)"
+      (cancel)="onEditorCancel()"
+    ></lore-prompt-editor>
+  </div>
+</div>
+
+<!-- Prompt Runner Modal -->
+<div class="modal-overlay" *ngIf="showRunModal()" (click)="closeRunModal()">
+  <div class="modal-content runner-modal" (click)="$event.stopPropagation()">
+    <lore-prompt-runner
+      [prompt]="selectedPrompt()"
+      (close)="closeRunModal()"
+      (complete)="closeRunModal()"
+    ></lore-prompt-runner>
+  </div>
+</div>

@@ -30,6 +30,10 @@ export const routes: Routes = [
       {
         path: 'template-builder',
         loadComponent: () => import('./features/template-builder/template-builder.component').then(m => m.TemplateBuilderComponent)
+      },
+      {
+        path: 'prompts',
+        loadComponent: () => import('./features/prompt-library/prompt-library.component').then(m => m.PromptLibraryComponent)
       }
     ]
   },

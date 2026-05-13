@@ -14,8 +14,8 @@
 - ✅ **Phase 4**: Block System Part 1 - **COMPLETE**
 - ✅ **Phase 5**: Block System Part 2 - **COMPLETE** (12/12 blocks including Table)
 - ✅ **Phase 6**: AI Integration Part 1 - **COMPLETE** (98%, only tests pending)
-- 🚧 **Phase 7**: AI Features Part 2 - **IN PROGRESS** (60%, chat sidebar done)
-- ⏳ **Phase 8**: Prompt Library & Scheduling - **NOT STARTED**
+- ✅ **Phase 7**: AI Features Part 2 - **COMPLETE** (100%)
+- 🚧 **Phase 8**: Prompt Library & Scheduling - **IN PROGRESS** (60%)
 - ⏳ **Phase 9**: Linking & Search - **NOT STARTED**
 - ⏳ **Phase 10**: Knowledge Graph - **NOT STARTED**
 - ⏳ **Phase 11**: HTML Notes - **NOT STARTED**
@@ -328,24 +328,33 @@ This document outlines the phased approach to rebuilding the Lore application fr
 
 ---
 
-## Phase 8: Prompt Library & Scheduling (Week 8)
+## Phase 8: Prompt Library & Scheduling (Week 8) 🚧 IN PROGRESS
 **Goal**: Implement prompt management and scheduled runs
+
+**Status**: 60% Complete
 
 ### Tasks:
 1. **Prompt Library**
-   - [ ] Create `PromptLibraryComponent`
-   - [ ] Create `PromptService` for CRUD operations
-   - [ ] Create `PromptEditorComponent` (modal)
-   - [ ] Implement `{{variable}}` syntax
-   - [ ] Add variable type definitions
-   - [ ] Create prompt card list view
+   - [x] Create `PromptLibraryComponent`
+   - [x] Create `PromptService` for CRUD operations
+   - [x] Create `Prompt` model with variables
+   - [x] Implement search and filtering
+   - [x] Add grid and list views
+   - [x] Implement import/export
+   - [x] Create `PromptEditorComponent` (modal) ✅ NEW
+   - [x] Implement variable management UI ✅ NEW
+   - [x] Add variable type definitions ✅ NEW
+   - [x] Create prompt card list view
 
 2. **Prompt Scheduling**
-   - [ ] Create `SchedulerService` with Web Worker
-   - [ ] Implement cron expression parser
-   - [ ] Create `PromptSchedulerComponent` (cron editor)
+   - [x] Create `SchedulerService` with interval checking
+   - [x] Implement cron expression parser
+   - [x] Add schedule validation
+   - [x] Calculate next run times
+   - [x] Create cron editor UI ✅ NEW
+   - [x] Add cron presets ✅ NEW
    - [ ] Add countdown timer display
-   - [ ] Implement run history tracking
+   - [ ] Implement run history tracking UI
 
 3. **Scheduled Runs Dashboard**
    - [ ] Create `SchedulerComponent` (full page)
@@ -356,12 +365,14 @@ This document outlines the phased approach to rebuilding the Lore application fr
 
 4. **Prompt Execution**
    - [ ] Create `PromptSlideoverComponent`
-   - [ ] Implement variable substitution
+   - [ ] Implement variable substitution UI
    - [ ] Add AI provider selection per prompt
    - [ ] Create run progress modal (4-step animation)
    - [ ] Store run outputs
 
 **Deliverable**: Complete prompt library with scheduling and execution
+
+**Current Status**: Core infrastructure and editor complete. Execution and dashboard components pending.
 
 ---
 

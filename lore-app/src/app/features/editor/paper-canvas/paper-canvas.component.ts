@@ -11,11 +11,15 @@ import {
   AfterViewInit,
   effect,
   OnDestroy,
+  DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ShelfService } from '../../../core/services/shelf.service';
 import { BlockService } from '../../../core/services/block.service';
 import { SessionVersioningService } from '../../../core/services/session-versioning.service';
+import { AIService } from '../../../core/services/ai.service';
+import { AiBehaviourService } from '../../../core/services/ai-behaviour.service';
 import {
   Note,
   NoteType,
@@ -26,6 +30,8 @@ import {
 import { CanvasBackgroundComponent } from '../canvas-background/canvas-background.component';
 import { BlockListComponent } from '../../blocks/block-list/block-list.component';
 import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette.component';
+import { AiMentionPickerComponent, type ProviderSelection } from '../ai-mention-picker/ai-mention-picker.component';
+import { AiMentionPromptComponent, type PromptSubmission } from '../ai-mention-prompt/ai-mention-prompt.component';
 
 @Component({
   selector: 'lore-paper-canvas',
@@ -35,6 +41,8 @@ import { FileLinkPaletteComponent } from '../file-link-palette/file-link-palette
     CanvasBackgroundComponent,
     BlockListComponent,
     FileLinkPaletteComponent,
+    AiMentionPickerComponent,
+    AiMentionPromptComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './paper-canvas.component.html',
@@ -44,6 +52,9 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   private shelfService = inject(ShelfService);
   private blockService = inject(BlockService);
   private sessionVersioning = inject(SessionVersioningService);
+  private aiService = inject(AIService);
+  private aiBehaviour = inject(AiBehaviourService);
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('noteBodyTextarea')
   noteBodyTextarea?: ElementRef<HTMLTextAreaElement>;
@@ -59,6 +70,14 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
   showLinkPalette = signal(false);
   linkPaletteCursorPos = signal(0);
   linkPalettePosition = signal({ x: 0, y: 0 });
+
+  // AI Mention state
+  showMentionPicker = signal(false);
+  showMentionPrompt = signal(false);
+  mentionPosition = signal({ x: 0, y: 0 });
+  mentionCursorPos = signal(0);
+  selectedProvider = signal<{ id: string; name: string } | null>(null);
+  mentionLoading = signal(false);
 
   // Trailing textarea — plain text continuation below blocks
   // Stored separately and appended to note content on input
@@ -369,9 +388,20 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
     textarea: HTMLTextAreaElement,
     cursorPos: number,
   ): void {
-    // Remove any @ character that was about to be typed (event was prevented)
-    // then insert the AI block and focus it
-    this.insertBlock('ask-ai');
+    // Show AI mention picker at cursor position
+    const textareaRect = textarea.getBoundingClientRect();
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20;
+    const content = textarea.value;
+    const linesBeforeCursor = (
+      content.substring(0, cursorPos).match(/\n/g) || []
+    ).length;
+    const pickerY =
+      textareaRect.top + linesBeforeCursor * lineHeight + lineHeight;
+    const pickerX = textareaRect.left + 20;
+
+    this.mentionPosition.set({ x: pickerX, y: pickerY });
+    this.mentionCursorPos.set(cursorPos);
+    this.showMentionPicker.set(true);
   }
 
   private triggerLink(textarea: HTMLTextAreaElement, cursorPos: number): void {
@@ -575,6 +605,121 @@ export class PaperCanvasComponent implements AfterViewInit, OnDestroy {
         }
       });
     }
+  }
+
+  // ─── AI Mention handlers ──────────────────────────────────────────────────
+
+  onMentionProviderSelected(event: ProviderSelection): void {
+    this.selectedProvider.set({ id: event.providerId, name: event.providerName });
+    this.showMentionPicker.set(false);
+    this.showMentionPrompt.set(true);
+  }
+
+  onMentionPickerDismissed(): void {
+    this.showMentionPicker.set(false);
+  }
+
+  onMentionPromptSubmitted(event: PromptSubmission): void {
+    const textarea = this.noteBodyTextarea?.nativeElement;
+    if (!textarea || !this.selectedProvider()) return;
+
+    const provider = this.selectedProvider()!;
+    const cursorPos = this.mentionCursorPos();
+    
+    this.mentionLoading.set(true);
+
+    // Build system prompt with context
+    const fullNote = this.fullNote();
+    let noteContext = '';
+    
+    if (this.aiBehaviour.includeNoteContext()) {
+      noteContext = `# ${fullNote.title}\n\n${fullNote.content}`;
+      if (fullNote.blocks && fullNote.blocks.length > 0) {
+        const blockContent = fullNote.blocks
+          .map(block => block.content)
+          .filter(Boolean)
+          .join('\n\n');
+        if (blockContent) {
+          noteContext += `\n\n${blockContent}`;
+        }
+      }
+    }
+
+    const bioContext = 'Enterprise AI consultant. Working across SAP BTP, ServiceNow Now Assist, Salesforce Einstein. Focus on RAG, LLM fine-tuning, prompt engineering for enterprise workflows.';
+    
+    const systemPrompt = this.aiBehaviour.buildSystemPrompt(
+      this.aiBehaviour.includeBioContext() ? bioContext : undefined,
+      noteContext || undefined
+    );
+
+    const options = {
+      ...this.aiBehaviour.getRequestOptions(),
+      systemPrompt: systemPrompt || undefined,
+    };
+
+    // Stream the response
+    let accumulatedResponse = '';
+    
+    this.aiService
+      .sendPrompt(provider.id, event.prompt, options)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: chunk => {
+          if (chunk.error) {
+            console.error('AI mention error:', chunk.error);
+            this.mentionLoading.set(false);
+            this.showMentionPrompt.set(false);
+            this.selectedProvider.set(null);
+            return;
+          }
+
+          if (chunk.delta) {
+            accumulatedResponse += chunk.delta;
+          }
+
+          if (chunk.isComplete) {
+            // Insert the response at cursor position
+            const content = textarea.value;
+            const beforeCursor = content.substring(0, cursorPos);
+            const afterCursor = content.substring(cursorPos);
+            
+            const newContent = beforeCursor + accumulatedResponse + afterCursor;
+            this.shelfService.updateNote(fullNote.id, { content: newContent });
+            
+            // Close prompt and reset state
+            this.mentionLoading.set(false);
+            this.showMentionPrompt.set(false);
+            this.selectedProvider.set(null);
+            
+            // Position cursor after inserted text
+            setTimeout(() => {
+              if (this.noteBodyTextarea?.nativeElement) {
+                const ta = this.noteBodyTextarea.nativeElement;
+                const newCursorPos = cursorPos + accumulatedResponse.length;
+                ta.selectionStart = ta.selectionEnd = newCursorPos;
+                ta.focus();
+                this.autoResizeTextarea(ta);
+              }
+            });
+          }
+        },
+        error: err => {
+          console.error('AI mention error:', err);
+          this.mentionLoading.set(false);
+          this.showMentionPrompt.set(false);
+          this.selectedProvider.set(null);
+        },
+      });
+  }
+
+  onMentionPromptCancelled(): void {
+    this.showMentionPrompt.set(false);
+    this.selectedProvider.set(null);
+    
+    // Restore focus to textarea
+    setTimeout(() => {
+      this.noteBodyTextarea?.nativeElement?.focus();
+    });
   }
 
   // ─── Insert block shortcuts ────────────────────────────────

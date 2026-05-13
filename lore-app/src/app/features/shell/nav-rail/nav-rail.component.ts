@@ -32,9 +32,9 @@ export class NavRailComponent implements OnInit, OnDestroy {
   // Computed: Split items into main and bottom groups
   readonly mainItems = computed(() => {
     const allItems = this.items();
-    // Main items: notes, graph, html-notes, ai-chat, prompt-library
+    // Main items: notes, graph, html-notes, template-builder, ai-chat, prompts
     return allItems.filter(item => 
-      ['notes', 'graph', 'html-notes', 'ai-chat', 'prompt-library'].includes(item.id)
+      ['notes', 'graph', 'html-notes', 'template-builder', 'ai-chat', 'prompts'].includes(item.id)
     );
   });
 
@@ -85,6 +85,8 @@ export class NavRailComponent implements OnInit, OnDestroy {
       'notes': 'notes',
       'graph': 'graph',
       'html-notes': 'html-notes',
+      'template-builder': 'template-builder',
+      'prompts': 'prompts',
       'settings': 'settings'
     };
 

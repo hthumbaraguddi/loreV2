@@ -1,0 +1,333 @@
+<div class="prompt-editor-modal">
+  <!-- Header -->
+  <div class="modal-header">
+    <div class="modal-title">{{ prompt ? 'Edit Prompt' : 'New Prompt' }}</div>
+    <button class="modal-close" (click)="onCancel()">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M1 1l10 10M11 1L1 11"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Body: Two-column layout -->
+  <div class="modal-body">
+    <!-- Left Column -->
+    <div class="left-col">
+      <!-- Prompt Name -->
+      <div class="field-group">
+        <label class="field-label">Prompt name</label>
+        <input 
+          class="field-input" 
+          [value]="title()"
+          (input)="title.set($any($event.target).value)"
+          placeholder="e.g. Equity Performance Monitor"
+        />
+      </div>
+
+      <!-- Category -->
+      <div class="field-group">
+        <label class="field-label">Category</label>
+        <div class="category-chips">
+          <div 
+            class="sel-chip"
+            [class.active]="categories().includes('Research')"
+            (click)="toggleCategory('Research')"
+          >
+            Research
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="categories().includes('Finance')"
+            (click)="toggleCategory('Finance')"
+          >
+            Finance
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="categories().includes('Journal')"
+            (click)="toggleCategory('Journal')"
+          >
+            Journal
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="categories().includes('HTML Reports')"
+            (click)="toggleCategory('HTML Reports')"
+          >
+            HTML Reports
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="categories().includes('Engineering')"
+            (click)="toggleCategory('Engineering')"
+          >
+            Engineering
+          </div>
+        </div>
+      </div>
+
+      <!-- Prompt Body -->
+      <div class="field-group">
+        <label class="field-label">
+          Prompt body
+          <span class="field-hint">Use {{'{{'}}variable{{'}}'}} for dynamic values</span>
+        </label>
+        <textarea 
+          class="field-textarea" 
+          [value]="template()"
+          (input)="template.set($any($event.target).value)"
+          placeholder="Write your prompt here…&#10;&#10;Use {{'{{'}}company_list{{'}}'}} for a list of companies&#10;Use {{'{{'}}date{{'}}'}} for today's date&#10;Use {{'{{'}}note_content{{'}}'}} to include current note&#10;Use {{'{{'}}topic{{'}}'}} for a dynamic topic"
+          rows="8"
+        ></textarea>
+      </div>
+
+      <!-- Variable Values Table -->
+      <div class="field-group">
+        <label class="field-label">Variable values table</label>
+        <div class="var-table-wrap">
+          <table class="var-table">
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Default / Source</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let variable of variables(); let i = index">
+                <td class="var-name">{{'{{'}}{{ variable.name }}{{'}}'}}</td>
+                <td>
+                  <input 
+                    type="text" 
+                    [value]="variable.defaultValue || ''"
+                    (input)="variable.defaultValue = $any($event.target).value"
+                  />
+                </td>
+                <td>
+                  <select [value]="variable.type">
+                    <option value="text">Static</option>
+                    <option value="date">Auto date</option>
+                    <option value="select">From note</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td class="var-name">
+                  <input 
+                    type="text" 
+                    [value]="varName()"
+                    (input)="varName.set($any($event.target).value)"
+                    placeholder="{{'{{'}}variable{{'}}'}}"
+                  />
+                </td>
+                <td>
+                  <input 
+                    type="text" 
+                    [value]="varDefaultValue()"
+                    (input)="varDefaultValue.set($any($event.target).value)"
+                    placeholder="Default value…"
+                  />
+                </td>
+                <td>
+                  <select 
+                    [value]="varType()"
+                    (change)="varType.set($any($event.target).value)"
+                  >
+                    <option value="text">Static</option>
+                    <option value="date">Auto date</option>
+                    <option value="select">From note</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="add-var-row" (click)="saveVariable()">
+            + Add variable row
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column (Sidebar) -->
+    <div class="right-col">
+      <!-- AI Provider -->
+      <div class="field-group">
+        <label class="field-label">AI Provider</label>
+        <div class="prov-pills">
+          <div 
+            class="prov-pill"
+            [class.sel]="provider() === 'anthropic'"
+            (click)="provider.set('anthropic'); onProviderChange()"
+          >
+            <div class="prov-ico" style="background:#7C3AED;">C</div>
+            Claude
+          </div>
+          <div 
+            class="prov-pill"
+            [class.sel]="provider() === 'openai'"
+            (click)="provider.set('openai'); onProviderChange()"
+          >
+            <div class="prov-ico" style="background:#10A37F;">G</div>
+            GPT-4o
+          </div>
+          <div 
+            class="prov-pill"
+            [class.sel]="provider() === 'google'"
+            (click)="provider.set('google'); onProviderChange()"
+          >
+            <div class="prov-ico" style="background:#4285F4;">G</div>
+            Gemini
+          </div>
+          <div 
+            class="prov-pill"
+            [class.sel]="provider() === 'groq'"
+            (click)="provider.set('groq'); onProviderChange()"
+          >
+            <div class="prov-ico" style="background:#F55036;">Q</div>
+            Groq
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Type -->
+      <div class="field-group">
+        <label class="field-label">Output type</label>
+        <div class="output-chips">
+          <div 
+            class="sel-chip"
+            [class.active]="outputType() === 'note'"
+            (click)="outputType.set('note')"
+          >
+            📝 Save as note
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="outputType() === 'html'"
+            (click)="outputType.set('html')"
+          >
+            📄 Generate HTML report
+          </div>
+          <div 
+            class="sel-chip"
+            [class.active]="outputType() === 'notification'"
+            (click)="outputType.set('notification')"
+          >
+            🔔 Send notification
+          </div>
+        </div>
+      </div>
+
+      <!-- Save to Notebook -->
+      <div class="field-group">
+        <label class="field-label">Save to notebook</label>
+        <select 
+          class="field-input"
+          [value]="saveToNotebook()"
+          (change)="saveToNotebook.set($any($event.target).value)"
+        >
+          <option value="equity">Equity Research</option>
+          <option value="transformers">Transformers</option>
+          <option value="journal">Daily Journal</option>
+        </select>
+      </div>
+
+      <!-- Cron Schedule -->
+      <div class="cron-section">
+        <div class="cron-header">
+          <label class="field-label">Cron Schedule</label>
+          <div 
+            class="sw"
+            [class.on]="scheduleEnabled()"
+            (click)="scheduleEnabled.set(!scheduleEnabled())"
+          ></div>
+        </div>
+
+        <div *ngIf="scheduleEnabled()">
+          <!-- Frequency -->
+          <div class="field-group">
+            <label class="field-label-sm">Frequency</label>
+            <select 
+              class="field-input-sm"
+              [value]="cronFrequency()"
+              (change)="cronFrequency.set($any($event.target).value); onFrequencyChange()"
+            >
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <!-- Time -->
+          <div class="field-group">
+            <label class="field-label-sm">Time (IST)</label>
+            <select 
+              class="field-input-sm"
+              [value]="cronTime()"
+              (change)="cronTime.set($any($event.target).value); onTimeChange()"
+            >
+              <option value="07:00">07:00</option>
+              <option value="08:00">08:00</option>
+              <option value="09:00">09:00</option>
+              <option value="18:00">18:00</option>
+            </select>
+          </div>
+
+          <!-- Days -->
+          <div class="field-group" *ngIf="cronFrequency() === 'weekly'">
+            <label class="field-label-sm">Days</label>
+            <div class="day-buttons">
+              <button 
+                class="day-btn"
+                [class.active]="cronDays()[0]"
+                (click)="toggleCronDay(0)"
+              >
+                Mo
+              </button>
+              <button 
+                class="day-btn"
+                [class.active]="cronDays()[1]"
+                (click)="toggleCronDay(1)"
+              >
+                Tu
+              </button>
+              <button 
+                class="day-btn"
+                [class.active]="cronDays()[2]"
+                (click)="toggleCronDay(2)"
+              >
+                We
+              </button>
+              <button 
+                class="day-btn"
+                [class.active]="cronDays()[3]"
+                (click)="toggleCronDay(3)"
+              >
+                Th
+              </button>
+              <button 
+                class="day-btn"
+                [class.active]="cronDays()[4]"
+                (click)="toggleCronDay(4)"
+              >
+                Fr
+              </button>
+            </div>
+          </div>
+
+          <!-- Schedule Summary -->
+          <div class="schedule-summary">
+            <strong>{{ cronDescription() }}</strong>
+            <div class="next-run">Next: {{ cronValidation().valid ? 'Calculated on save' : 'Invalid schedule' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="modal-footer">
+    <button class="tb-btn primary" (click)="onSave()">💾 Save Prompt</button>
+    <button class="tb-btn" (click)="onSave()">▶ Test Run</button>
+    <button class="tb-btn" (click)="onCancel()">Cancel</button>
+  </div>
+</div>

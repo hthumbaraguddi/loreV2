@@ -1,0 +1,135 @@
+<div class="prompt-runner-modal">
+  <!-- Header -->
+  <div class="modal-header">
+    <div class="modal-title">▶ Run Prompt Now</div>
+    <button class="modal-close" (click)="onClose()">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M1 1l10 10M11 1L1 11"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="modal-body">
+    <!-- State 1: Confirm Variables -->
+    <div class="gen-state" *ngIf="runState() === 'confirm'">
+      <div class="run-info">
+        Running <strong>{{ prompt?.title }}</strong> with {{ prompt?.provider }} {{ prompt?.model }}.
+      </div>
+
+      <!-- Variable Values Table -->
+      <div class="var-table-wrap" *ngIf="prompt && prompt.variables.length > 0">
+        <table class="var-table-sm">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Value for this run</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let variable of prompt.variables">
+              <td class="var-name">{{'{{'}}{{ variable.name }}{{'}}'}}</td>
+              <td>
+                <input 
+                  type="text" 
+                  [value]="variableValues()[variable.name]"
+                  (input)="updateVariable(variable.name, $any($event.target).value)"
+                  [placeholder]="variable.placeholder || variable.label"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Output Info -->
+      <div class="output-info">
+        Output will be saved as 
+        <strong *ngIf="prompt && prompt.tags && prompt.tags.includes('HTML Reports')">an HTML Note</strong>
+        <strong *ngIf="!prompt || !prompt.tags || !prompt.tags.includes('HTML Reports')">a Note</strong>
+        in the selected notebook.
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="error()">
+        ⚠️ {{ error() }}
+      </div>
+    </div>
+
+    <!-- State 2: Generating -->
+    <div class="gen-state" *ngIf="runState() === 'generating'">
+      <div class="gen-title">Generating output…</div>
+      
+      <!-- Progress Bar -->
+      <div class="gen-progress-bar">
+        <div class="gen-progress-fill" [style.width.%]="progress()"></div>
+      </div>
+
+      <!-- Steps -->
+      <div class="gen-steps">
+        <div 
+          class="gen-step"
+          *ngFor="let step of steps; let i = index"
+          [class.done]="getStepStatus(i) === 'done'"
+          [class.active]="getStepStatus(i) === 'active'"
+          [class.pending]="getStepStatus(i) === 'pending'"
+        >
+          <div 
+            class="gen-step-icon"
+            [class.done]="getStepStatus(i) === 'done'"
+            [class.active]="getStepStatus(i) === 'active'"
+            [class.pending]="getStepStatus(i) === 'pending'"
+          >
+            {{ getStepIcon(i) }}
+          </div>
+          <div 
+            class="gen-step-text"
+            [class.done]="getStepStatus(i) === 'done'"
+            [class.pending]="getStepStatus(i) === 'pending'"
+          >
+            {{ step.label }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State 3: Done -->
+    <div class="gen-state" *ngIf="runState() === 'done'">
+      <div class="success-container">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">Output Generated!</div>
+        <div class="success-subtitle">
+          Saved as <strong>{{ prompt?.title }}-{{ getCurrentTimestamp() }}.{{ getFileExtension() }}</strong>
+        </div>
+      </div>
+
+      <!-- Output Preview -->
+      <div class="output-preview">
+        <div class="output-preview-label">Output Preview:</div>
+        <div class="output-preview-content">
+          {{ generatedOutput().substring(0, 300) }}{{ generatedOutput().length > 300 ? '...' : '' }}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="done-actions">
+        <button class="tb-btn primary" (click)="onClose()">
+          🔍 Open Note
+        </button>
+        <button class="tb-btn" (click)="onClose()">
+          📤 Export
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="modal-footer" *ngIf="runState() === 'confirm'">
+    <button class="tb-btn primary" (click)="runPrompt()">
+      ▶ Run Now
+    </button>
+    <button class="tb-btn" (click)="onClose()">
+      Cancel
+    </button>
+  </div>
+</div>

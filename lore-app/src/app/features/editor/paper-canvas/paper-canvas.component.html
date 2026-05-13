@@ -100,4 +100,33 @@
       </div>
     </div>
   }
+
+  <!-- AI Mention picker overlay -->
+  @if (showMentionPicker()) {
+    <div class="palette-overlay" (click)="onMentionPickerDismissed()">
+      <div class="palette-anchor" (click)="$event.stopPropagation()">
+        <lore-ai-mention-picker
+          [position]="mentionPosition()"
+          (providerSelected)="onMentionProviderSelected($event)"
+          (dismissed)="onMentionPickerDismissed()"
+        />
+      </div>
+    </div>
+  }
+
+  <!-- AI Mention prompt overlay -->
+  @if (showMentionPrompt() && selectedProvider()) {
+    <div class="palette-overlay" (click)="onMentionPromptCancelled()">
+      <div class="palette-anchor" (click)="$event.stopPropagation()">
+        <lore-ai-mention-prompt
+          [position]="mentionPosition()"
+          [providerName]="selectedProvider()!.name"
+          [providerId]="selectedProvider()!.id"
+          [isLoading]="mentionLoading()"
+          (promptSubmitted)="onMentionPromptSubmitted($event)"
+          (cancelled)="onMentionPromptCancelled()"
+        />
+      </div>
+    </div>
+  }
 </div>

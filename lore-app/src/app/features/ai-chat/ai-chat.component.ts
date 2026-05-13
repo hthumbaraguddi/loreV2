@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AIService } from '../../core/services/ai.service';
 import { ApiKeyManagerService } from '../../core/services/api-key-manager.service';
+import { AiBehaviourService } from '../../core/services/ai-behaviour.service';
 import { LayoutService } from '../../core/services/layout.service';
 import { ChatHistoryService } from '../../core/services/chat-history.service';
 import { PROVIDER_REGISTRY, PROVIDER_MAP } from '../../core/config/provider-registry';
@@ -52,6 +53,7 @@ export class AiChatComponent implements AfterViewChecked {
   // ── DI ───────────────────────────────────────────────────────────────────
   readonly aiService       = inject(AIService);
   readonly keyManager      = inject(ApiKeyManagerService);
+  readonly aiBehaviour     = inject(AiBehaviourService);
   readonly layoutService   = inject(LayoutService);
   readonly history         = inject(ChatHistoryService);
   readonly blockService    = inject(BlockService);
@@ -68,9 +70,9 @@ export class AiChatComponent implements AfterViewChecked {
 
   // ── Local UI signals (not persisted) ─────────────────────────────────────
 
-  /** Currently selected provider ID */
+  /** Currently selected provider ID (initialized from AiBehaviourService) */
   readonly selectedProviderId = signal<string>(
-    PROVIDER_REGISTRY[0]?.id ?? 'anthropic'
+    this.aiBehaviour.defaultProvider() || PROVIDER_REGISTRY[0]?.id || 'anthropic'
   );
 
   /** Currently selected model ID (defaults to provider default) */
@@ -224,9 +226,47 @@ export class AiChatComponent implements AfterViewChecked {
     // Update session title from first user message
     this._maybeUpdateTitle(sessionId, text);
 
+    // Build system prompt with context from AI Behaviour settings
+    const activeNoteRef = this.editorService.getActiveNote();
+    let noteContext = '';
+    
+    if (activeNoteRef && this.aiBehaviour.includeNoteContext()) {
+      const fullNote = this.shelfService.getNote(activeNoteRef.id);
+      if (fullNote) {
+        // Combine note title, content, and blocks
+        noteContext = `# ${fullNote.title}\n\n${fullNote.content}`;
+        
+        // Add block content if any
+        if (fullNote.blocks && fullNote.blocks.length > 0) {
+          const blockContent = fullNote.blocks
+            .map(block => block.content)
+            .filter(Boolean)
+            .join('\n\n');
+          if (blockContent) {
+            noteContext += `\n\n${blockContent}`;
+          }
+        }
+      }
+    }
+    
+    // Get profile bio context (would come from profile service in real implementation)
+    const bioContext = 'Enterprise AI consultant. Working across SAP BTP, ServiceNow Now Assist, Salesforce Einstein. Focus on RAG, LLM fine-tuning, prompt engineering for enterprise workflows.';
+    
+    const systemPrompt = this.aiBehaviour.buildSystemPrompt(
+      this.aiBehaviour.includeBioContext() ? bioContext : undefined,
+      noteContext || undefined
+    );
+
+    // Get request options from AI Behaviour settings
+    const options = {
+      model,
+      ...this.aiBehaviour.getRequestOptions(),
+      systemPrompt: systemPrompt || undefined,
+    };
+
     // Stream the response
     this.aiService
-      .sendPrompt(providerId, text, { model })
+      .sendPrompt(providerId, text, options)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: chunk => {

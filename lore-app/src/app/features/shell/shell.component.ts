@@ -3,16 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { LayoutService } from '../../core/services/layout.service';
 import { SearchService } from '../../core/services/search.service';
+import { EditorService } from '../../core/services/editor.service';
+import { TagService } from '../../core/services/tag.service';
 import { NavItem } from '../../core/models/nav-item.model';
 import { NavRailComponent } from './nav-rail/nav-rail.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AiChatComponent } from '../ai-chat/ai-chat.component';
 import { GlobalSearchComponent } from '../search/global-search/global-search.component';
+import { ContextPanelComponent } from '../editor/context-panel/context-panel.component';
 
 @Component({
   selector: 'lore-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent, AiChatComponent, GlobalSearchComponent],
+  imports: [CommonModule, RouterOutlet, NavRailComponent, SidebarComponent, AiChatComponent, GlobalSearchComponent, ContextPanelComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,6 +23,8 @@ import { GlobalSearchComponent } from '../search/global-search/global-search.com
 export class ShellComponent {
   readonly layoutService = inject(LayoutService);
   readonly searchService = inject(SearchService);
+  readonly editorService = inject(EditorService);
+  private readonly tagService = inject(TagService);
   private readonly router = inject(Router);
 
   // Layout state
@@ -73,4 +78,49 @@ export class ShellComponent {
     event.preventDefault();
     this.searchService.toggleSearch();
   }
+
+  /**
+   * Toggle context panel (⌘I / Ctrl+I)
+   */
+  @HostListener('document:keydown.meta.i', ['$event'])
+  @HostListener('document:keydown.ctrl.i', ['$event'])
+  onToggleContextPanel(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.layoutService.toggleRightPanel('context-panel');
+  }
+
+  /**
+   * Handle context panel close
+   */
+  onContextPanelClose(): void {
+    this.layoutService.closeRightPanel();
+  }
+
+  /**
+   * Handle tag added from context panel
+   */
+  onContextTagAdded(tag: string): void {
+    const note = this.editorService.activeNoteObject();
+    if (note) {
+      this.tagService.addTagToNote(note, tag);
+    }
+  }
+
+  /**
+   * Handle tag removed from context panel
+   */
+  onContextTagRemoved(tag: string): void {
+    const note = this.editorService.activeNoteObject();
+    if (note) {
+      this.tagService.removeTagFromNote(note, tag);
+    }
+  }
+
+  /**
+   * Handle navigation to a linked note
+   */
+  onNavigateToNote(noteId: string): void {
+    this.editorService.openNoteInPane(noteId, this.editorService.activePane());
+  }
 }
+

@@ -24,13 +24,13 @@ export class BacklinksService {
     const backlinks: BacklinkInfo[] = [];
 
     allNotes.forEach(note => {
-      if (note.id !== noteId && note.links?.includes(noteId)) {
+      if (note.id !== noteId && note.linkedNoteIds?.includes(noteId)) {
         backlinks.push({
           noteId: note.id,
           noteTitle: note.title || 'Untitled',
           notePath: this.getNotePath(note),
           noteType: note.type,
-          linkCount: note.links.length
+          linkCount: note.linkedNoteIds.length
         });
       }
     });
@@ -43,12 +43,12 @@ export class BacklinksService {
    */
   getForwardLinks(noteId: string): BacklinkInfo[] {
     const note = this.shelfService.getAllNotes().find(n => n.id === noteId);
-    if (!note || !note.links) return [];
+    if (!note || !note.linkedNoteIds || note.linkedNoteIds.length === 0) return [];
 
     const allNotes = this.shelfService.getAllNotes();
     const forwardLinks: BacklinkInfo[] = [];
 
-    note.links.forEach(linkedId => {
+    note.linkedNoteIds.forEach(linkedId => {
       const linkedNote = allNotes.find(n => n.id === linkedId);
       if (linkedNote) {
         forwardLinks.push({
@@ -56,7 +56,7 @@ export class BacklinksService {
           noteTitle: linkedNote.title || 'Untitled',
           notePath: this.getNotePath(linkedNote),
           noteType: linkedNote.type,
-          linkCount: linkedNote.links?.length || 0
+          linkCount: linkedNote.linkedNoteIds?.length || 0
         });
       }
     });
@@ -80,12 +80,10 @@ export class BacklinksService {
   addLink(fromNoteId: string, toNoteId: string): void {
     const fromNote = this.shelfService.getAllNotes().find(n => n.id === fromNoteId);
     if (fromNote) {
-      if (!fromNote.links) {
-        fromNote.links = [];
-      }
-      if (!fromNote.links.includes(toNoteId)) {
-        fromNote.links.push(toNoteId);
-        this.shelfService.updateNote(fromNote.id, { links: fromNote.links });
+      const currentLinks = fromNote.linkedNoteIds || [];
+      if (!currentLinks.includes(toNoteId)) {
+        const updatedLinks = [...currentLinks, toNoteId];
+        this.shelfService.updateNote(fromNote.id, { linkedNoteIds: updatedLinks });
       }
     }
   }
@@ -95,12 +93,9 @@ export class BacklinksService {
    */
   removeLink(fromNoteId: string, toNoteId: string): void {
     const fromNote = this.shelfService.getAllNotes().find(n => n.id === fromNoteId);
-    if (fromNote && fromNote.links) {
-      const index = fromNote.links.indexOf(toNoteId);
-      if (index > -1) {
-        fromNote.links.splice(index, 1);
-        this.shelfService.updateNote(fromNote.id, { links: fromNote.links });
-      }
+    if (fromNote && fromNote.linkedNoteIds) {
+      const updatedLinks = fromNote.linkedNoteIds.filter(id => id !== toNoteId);
+      this.shelfService.updateNote(fromNote.id, { linkedNoteIds: updatedLinks });
     }
   }
 
@@ -120,8 +115,8 @@ export class BacklinksService {
 
     const edges: Array<{ source: string; target: string }> = [];
     allNotes.forEach(note => {
-      if (note.links) {
-        note.links.forEach(linkedId => {
+      if (note.linkedNoteIds) {
+        note.linkedNoteIds.forEach(linkedId => {
           edges.push({
             source: note.id,
             target: linkedId
@@ -145,13 +140,13 @@ export class BacklinksService {
     const allNotes = this.shelfService.getAllNotes();
     let totalLinks = 0;
     const linkCounts = new Map<string, number>();
-    const linkedNoteIds = new Set<string>();
+    const linkedIds = new Set<string>();
 
     allNotes.forEach(note => {
-      if (note.links) {
-        totalLinks += note.links.length;
-        note.links.forEach(linkedId => {
-          linkedNoteIds.add(linkedId);
+      if (note.linkedNoteIds) {
+        totalLinks += note.linkedNoteIds.length;
+        note.linkedNoteIds.forEach(linkedId => {
+          linkedIds.add(linkedId);
           linkCounts.set(linkedId, (linkCounts.get(linkedId) || 0) + 1);
         });
       }
@@ -177,8 +172,8 @@ export class BacklinksService {
     // Find orphaned notes (no links in or out)
     const orphanedNotes = allNotes
       .filter(note => {
-        const hasOutgoing = note.links && note.links.length > 0;
-        const hasIncoming = linkedNoteIds.has(note.id);
+        const hasOutgoing = note.linkedNoteIds && note.linkedNoteIds.length > 0;
+        const hasIncoming = linkedIds.has(note.id);
         return !hasOutgoing && !hasIncoming;
       })
       .map(n => n.id);
@@ -187,7 +182,7 @@ export class BacklinksService {
       totalLinks,
       mostLinked,
       orphanedNotes,
-      linkedNotes: Array.from(linkedNoteIds)
+      linkedNotes: Array.from(linkedIds)
     };
   }
 
@@ -200,8 +195,8 @@ export class BacklinksService {
     const brokenLinks: Array<{ fromNoteId: string; brokenLinkId: string }> = [];
 
     allNotes.forEach(note => {
-      if (note.links) {
-        note.links.forEach(linkedId => {
+      if (note.linkedNoteIds) {
+        note.linkedNoteIds.forEach(linkedId => {
           if (!noteIds.has(linkedId)) {
             brokenLinks.push({
               fromNoteId: note.id,
@@ -224,6 +219,39 @@ export class BacklinksService {
       this.removeLink(fromNoteId, brokenLinkId);
     });
     return brokenLinks.length;
+  }
+
+  /**
+   * Finds unlinked mentions - notes whose titles appear in this note's content but aren't formally linked
+   */
+  findUnlinkedMentions(noteId: string): BacklinkInfo[] {
+    const allNotes = this.shelfService.getAllNotes();
+    const note = allNotes.find(n => n.id === noteId);
+    if (!note || !note.content) return [];
+
+    const content = note.content.toLowerCase();
+    const existingLinks = new Set(note.linkedNoteIds || []);
+    const mentions: BacklinkInfo[] = [];
+
+    allNotes.forEach(otherNote => {
+      if (otherNote.id === noteId) return;
+      if (existingLinks.has(otherNote.id)) return;
+
+      const title = (otherNote.title || '').toLowerCase().trim();
+      if (title.length < 3) return; // Skip very short titles to avoid noise
+
+      if (content.includes(title)) {
+        mentions.push({
+          noteId: otherNote.id,
+          noteTitle: otherNote.title || 'Untitled',
+          notePath: this.getNotePath(otherNote),
+          noteType: otherNote.type,
+          linkCount: otherNote.linkedNoteIds?.length || 0
+        });
+      }
+    });
+
+    return mentions;
   }
 
   /**

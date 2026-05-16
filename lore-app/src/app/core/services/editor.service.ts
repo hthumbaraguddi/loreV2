@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Note, NoteRef } from '../models/shelf.model';
 import { ShelfService } from './shelf.service';
 
@@ -24,6 +24,15 @@ export class EditorService {
   hasActiveNotes = computed(() => this.activeNotes().some(note => note !== null));
   shelfFilter = this.shelfFilterSignal.asReadonly();
   notebookFilter = this.notebookFilterSignal.asReadonly();
+
+  /**
+   * Computed: full Note object for the currently active pane
+   */
+  activeNoteObject = computed<Note | null>(() => {
+    const noteRef = this.activeNotes()[this.activePane()];
+    if (!noteRef) return null;
+    return this.shelfService.getNote(noteRef.id) || null;
+  });
 
   constructor(private shelfService: ShelfService) {}
 

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type RightPanelType = 'ai-chat' | 'backlinks' | 'notifications' | null;
+export type RightPanelType = 'ai-chat' | 'backlinks' | 'context-panel' | 'notifications' | null;
 
 @Injectable({
   providedIn: 'root'

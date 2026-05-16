@@ -25,9 +25,19 @@
   @if (layoutService.activeRightPanel() === 'ai-chat') {
     <lore-ai-chat></lore-ai-chat>
   }
+  @if (layoutService.activeRightPanel() === 'context-panel') {
+    <lore-context-panel
+      [note]="editorService.activeNoteObject()"
+      (close)="onContextPanelClose()"
+      (tagAdded)="onContextTagAdded($event)"
+      (tagRemoved)="onContextTagRemoved($event)"
+      (navigateToNote)="onNavigateToNote($event)"
+    />
+  }
 </aside>
 
 <!-- Global Search Overlay -->
 @if (searchService.isOpen()) {
   <lore-global-search (close)="searchService.closeSearch()" />
 }
+

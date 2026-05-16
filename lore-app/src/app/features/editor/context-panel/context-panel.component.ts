@@ -2,6 +2,7 @@ import { Component, input, signal, computed, ChangeDetectionStrategy, inject, ou
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ShelfService } from '../../../core/services/shelf.service';
+import { BacklinksService } from '../../../core/services/backlinks.service';
 import { Note } from '../../../core/models/shelf.model';
 
 @Component({
@@ -137,6 +138,74 @@ import { Note } from '../../../core/models/shelf.model';
               }
             </div>
           </div>
+
+          <!-- Mini Graph -->
+          @if (graphNodes().length > 1) {
+            <div class="panel-section">
+              <div class="section-header">
+                <span class="material-symbols-outlined">hub</span>
+                <span class="section-title">Local Graph</span>
+              </div>
+              <div class="mini-graph-container">
+                <svg [attr.viewBox]="'0 0 260 180'" class="mini-graph-svg">
+                  <!-- Edges -->
+                  @for (edge of graphEdges(); track $index) {
+                    <line
+                      [attr.x1]="edge.x1"
+                      [attr.y1]="edge.y1"
+                      [attr.x2]="edge.x2"
+                      [attr.y2]="edge.y2"
+                      class="graph-edge"
+                      [class.edge-backlink]="edge.isBacklink"
+                    />
+                  }
+                  <!-- Nodes -->
+                  @for (node of graphNodes(); track node.id) {
+                    <g class="graph-node-group" (click)="onGraphNodeClick(node.id)" [class.center-node]="node.isCenter">
+                      <circle
+                        [attr.cx]="node.x"
+                        [attr.cy]="node.y"
+                        [attr.r]="node.isCenter ? 8 : 6"
+                        [class]="'graph-node node-' + node.type"
+                      />
+                      <text
+                        [attr.x]="node.x"
+                        [attr.y]="node.y + (node.isCenter ? 18 : 15)"
+                        class="graph-label"
+                        [class.center-label]="node.isCenter"
+                        text-anchor="middle"
+                      >{{ node.label }}</text>
+                    </g>
+                  }
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- Unlinked Mentions -->
+          @if (unlinkedMentions().length > 0) {
+            <div class="panel-section">
+              <div class="section-header">
+                <span class="material-symbols-outlined">link</span>
+                <span class="section-title">Unlinked Mentions</span>
+                <span class="section-count">{{ unlinkedMentions().length }}</span>
+              </div>
+              <div class="linked-list">
+                @for (mention of unlinkedMentions(); track mention.noteId) {
+                  <div class="linked-item mention-item">
+                    <span class="material-symbols-outlined">description</span>
+                    <div class="linked-content">
+                      <div class="linked-title">{{ mention.noteTitle }}</div>
+                      <div class="linked-path">{{ mention.notePath }}</div>
+                    </div>
+                    <button class="link-btn" (click)="linkMention(mention.noteId)" title="Create link" aria-label="Link this mention">
+                      <span class="material-symbols-outlined">add_link</span>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
 
           <!-- Note Metadata -->
           <div class="panel-section">
@@ -487,10 +556,113 @@ import { Note } from '../../../core/models/shelf.model';
       font-size: var(--lore-font-size-sm);
       color: var(--lore-color-text-muted);
     }
+
+    .mention-item {
+      position: relative;
+    }
+
+    .mention-item .link-btn {
+      width: 26px;
+      height: 26px;
+      border: none;
+      background: var(--lore-color-accent-subtle);
+      border-radius: var(--lore-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--lore-color-accent);
+      flex-shrink: 0;
+      transition: all 0.15s;
+      opacity: 0;
+    }
+
+    .mention-item:hover .link-btn {
+      opacity: 1;
+    }
+
+    .link-btn:hover {
+      background: var(--lore-color-accent);
+      color: white;
+    }
+
+    .link-btn .material-symbols-outlined {
+      font-size: 16px;
+    }
+
+    /* Mini Graph Styles */
+    .mini-graph-container {
+      background: var(--lore-color-bg-surface);
+      border: 1px solid var(--lore-color-border);
+      border-radius: var(--lore-radius-md);
+      padding: var(--lore-space-8);
+      overflow: hidden;
+    }
+
+    .mini-graph-svg {
+      width: 100%;
+      height: 180px;
+      display: block;
+    }
+
+    .graph-edge {
+      stroke: var(--lore-color-border);
+      stroke-width: 1.5;
+      opacity: 0.5;
+    }
+
+    .graph-edge.edge-backlink {
+      stroke-dasharray: 4 3;
+      stroke: var(--lore-color-text-muted);
+      opacity: 0.35;
+    }
+
+    .graph-node {
+      fill: var(--lore-color-accent);
+      stroke: var(--lore-color-bg-surface);
+      stroke-width: 2;
+      transition: r 0.15s, fill 0.15s;
+    }
+
+    .graph-node.node-backlink {
+      fill: var(--lore-color-text-muted);
+    }
+
+    .graph-node-group {
+      cursor: pointer;
+    }
+
+    .graph-node-group:hover .graph-node {
+      r: 9;
+      fill: var(--lore-color-accent-dark, var(--lore-color-accent));
+    }
+
+    .center-node .graph-node {
+      fill: var(--lore-color-accent);
+      stroke-width: 3;
+    }
+
+    .center-node {
+      cursor: default;
+    }
+
+    .graph-label {
+      font-size: 9px;
+      fill: var(--lore-color-text-muted);
+      font-family: 'DM Sans', sans-serif;
+      pointer-events: none;
+    }
+
+    .center-label {
+      font-weight: 600;
+      fill: var(--lore-color-text-default);
+      font-size: 10px;
+    }
   `]
 })
 export class ContextPanelComponent {
   private shelfService = inject(ShelfService);
+  private backlinksService = inject(BacklinksService);
 
   note = input<Note | null>(null);
 
@@ -533,12 +705,12 @@ export class ContextPanelComponent {
 
   linkedNotes = computed(() => {
     const n = this.note();
-    if (!n || !n.links || n.links.length === 0) return [];
+    if (!n || !n.linkedNoteIds || n.linkedNoteIds.length === 0) return [];
 
     // Get linked notes from ShelfService
     const allNotes = this.shelfService.getAllNotes();
-    return n.links
-      .map(linkId => {
+    return n.linkedNoteIds
+      .map((linkId: string) => {
         const linked = allNotes.find(note => note.id === linkId);
         if (!linked) return null;
         return {
@@ -548,7 +720,7 @@ export class ContextPanelComponent {
           icon: this.getNoteIcon(linked.type)
         };
       })
-      .filter((item): item is NonNullable<typeof item> => item !== null);
+      .filter((item: { id: string; title: string; path: string; icon: string } | null): item is { id: string; title: string; path: string; icon: string } => item !== null);
   });
 
   backlinks = computed(() => {
@@ -560,7 +732,7 @@ export class ContextPanelComponent {
     return allNotes
       .filter(otherNote => {
         if (otherNote.id === n.id) return false;
-        return otherNote.links?.includes(n.id);
+        return otherNote.linkedNoteIds?.includes(n.id);
       })
       .map(linked => ({
         id: linked.id,
@@ -568,6 +740,83 @@ export class ContextPanelComponent {
         path: this.getNotePath(linked),
         icon: this.getNoteIcon(linked.type)
       }));
+  });
+
+  unlinkedMentions = computed(() => {
+    const n = this.note();
+    if (!n) return [];
+    return this.backlinksService.findUnlinkedMentions(n.id);
+  });
+
+  // Mini graph computed signals
+  graphNodes = computed<Array<{ id: string; label: string; type: string; x: number; y: number; isCenter: boolean }>>(() => {
+    const linked = this.linkedNotes();
+    const backs = this.backlinks();
+    const n = this.note();
+    if (!n) return [];
+
+    const centerX = 130;
+    const centerY = 80;
+    const radius = 60;
+    const nodes: Array<{ id: string; label: string; type: string; x: number; y: number; isCenter: boolean }> = [];
+
+    // Center node
+    nodes.push({
+      id: n.id,
+      label: this.truncateLabel(n.title || 'Untitled', 14),
+      type: n.type,
+      x: centerX,
+      y: centerY,
+      isCenter: true
+    });
+
+    // Collect unique neighbor IDs
+    const seenIds = new Set<string>([n.id]);
+    const neighbors: Array<{ id: string; title: string; type: string; isBacklink: boolean }> = [];
+
+    linked.forEach(l => {
+      if (!seenIds.has(l.id)) {
+        seenIds.add(l.id);
+        neighbors.push({ id: l.id, title: l.title, type: 'link', isBacklink: false });
+      }
+    });
+
+    backs.forEach(b => {
+      if (!seenIds.has(b.id)) {
+        seenIds.add(b.id);
+        neighbors.push({ id: b.id, title: b.title, type: 'backlink', isBacklink: true });
+      }
+    });
+
+    // Position neighbors radially
+    const total = neighbors.length;
+    neighbors.forEach((neighbor, i) => {
+      const angle = (2 * Math.PI * i) / total - Math.PI / 2;
+      nodes.push({
+        id: neighbor.id,
+        label: this.truncateLabel(neighbor.title, 12),
+        type: neighbor.type,
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle),
+        isCenter: false
+      });
+    });
+
+    return nodes;
+  });
+
+  graphEdges = computed<Array<{ x1: number; y1: number; x2: number; y2: number; isBacklink: boolean }>>(() => {
+    const nodes = this.graphNodes();
+    if (nodes.length < 2) return [];
+
+    const center = nodes[0];
+    return nodes.slice(1).map(node => ({
+      x1: center.x,
+      y1: center.y,
+      x2: node.x,
+      y2: node.y,
+      isBacklink: node.type === 'backlink'
+    }));
   });
 
   startAddTag(): void {
@@ -596,6 +845,25 @@ export class ContextPanelComponent {
 
   removeTag(tag: string): void {
     this.tagRemoved.emit(tag);
+  }
+
+  linkMention(targetNoteId: string): void {
+    const n = this.note();
+    if (n) {
+      this.backlinksService.addLink(n.id, targetNoteId);
+    }
+  }
+
+  onGraphNodeClick(nodeId: string): void {
+    const n = this.note();
+    if (n && nodeId !== n.id) {
+      this.navigateToNote.emit(nodeId);
+    }
+  }
+
+  private truncateLabel(text: string, maxLen: number): string {
+    if (text.length <= maxLen) return text;
+    return text.substring(0, maxLen - 1) + '…';
   }
 
   private getNotePath(note: Note): string {

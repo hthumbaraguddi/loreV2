@@ -16,7 +16,7 @@
 - ✅ **Phase 6**: AI Integration Part 1 - **COMPLETE** (98%, only tests pending)
 - ✅ **Phase 7**: AI Features Part 2 - **COMPLETE** (100%)
 - 🚧 **Phase 8**: Prompt Library & Scheduling - **IN PROGRESS** (60%)
-- ⏳ **Phase 9**: Linking & Search - **NOT STARTED**
+- 🚧 **Phase 9**: Linking & Search - **IN PROGRESS** (85%)
 - ⏳ **Phase 10**: Knowledge Graph - **NOT STARTED**
 - ⏳ **Phase 11**: HTML Notes - **NOT STARTED**
 - 🚧 **Phase 12**: Dark Mode & Zen Mode - **IN PROGRESS** (75%, dark mode complete)
@@ -376,7 +376,7 @@ This document outlines the phased approach to rebuilding the Lore application fr
 
 ---
 
-## Phase 9: Linking & Search (Week 9)
+## Phase 9: Linking & Search (Week 9) 🚧 IN PROGRESS (85%)
 **Goal**: Implement note linking, backlinks, and global search
 
 ### Tasks:
@@ -388,26 +388,31 @@ This document outlines the phased approach to rebuilding the Lore application fr
    - [ ] Implement backlink tracking in NoteService
 
 2. **Context Panel**
-   - [ ] Create `ContextPanelComponent` (right panel)
-   - [ ] Create `NoteStatsComponent` (word count, blocks, etc.)
-   - [ ] Create `TagsPanelComponent` (add/remove tags)
-   - [ ] Create `LinkedNotesComponent` (backlinks list)
+   - [x] Create `ContextPanelComponent` (right panel) ✅
+   - [x] Create `NoteStatsComponent` (word count, blocks, etc.) ✅
+   - [x] Create `TagsPanelComponent` (add/remove tags) ✅
+   - [x] Create `LinkedNotesComponent` (backlinks list) ✅
+   - [x] **Integrate with editor via right panel** ✅ NEW
+   - [x] **Add ⌘I keyboard shortcut** ✅ NEW
+   - [x] **Implement unlinked mentions detection** ✅ NEW
    - [ ] Create `MiniGraphComponent` (local graph view)
 
 3. **Global Search**
-   - [ ] Create `SearchService` with full-text indexing
-   - [ ] Create `SearchOverlayComponent` (⌘K)
-   - [ ] Implement search filters (type, shelf, date range)
-   - [ ] Add keyboard navigation (arrow keys)
+   - [x] Create `SearchService` with full-text indexing ✅
+   - [x] Create `SearchOverlayComponent` (⌘K) ✅
+   - [x] Implement search filters (type, shelf, date range) ✅
+   - [x] Add keyboard navigation (arrow keys) ✅
    - [ ] Highlight search results in note content
 
 4. **Tags System**
-   - [ ] Implement tag creation and management
-   - [ ] Create tags browser view
-   - [ ] Add tag-based filtering
-   - [ ] Implement tag autocomplete
+   - [x] Implement tag creation and management ✅
+   - [x] Create tags browser view ✅
+   - [x] Add tag-based filtering ✅
+   - [x] Implement tag autocomplete ✅
 
 **Deliverable**: Complete linking and search functionality
+
+**Current Status**: 85% complete. Context panel fully integrated with editor, unlinked mentions working. Mini graph and link preview pending.
 
 ---
 

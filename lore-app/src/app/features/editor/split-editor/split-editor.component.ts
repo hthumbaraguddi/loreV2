@@ -336,4 +336,11 @@ export class SplitEditorComponent {
     // TODO: Implement templates modal
     console.log('Opening templates modal...');
   }
+
+  /**
+   * Toggle context panel
+   */
+  toggleContextPanel(): void {
+    this.layoutService.toggleRightPanel('context-panel');
+  }
 }

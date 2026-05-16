@@ -7,7 +7,7 @@
 
 ## 📊 Executive Summary
 
-The Lore application is approximately **70% complete** with 8 out of 16 phases fully implemented. The core foundation, navigation, editor, block system, AI integration, and prompt library are functional. Additional features like versioning, comments, chat history, prompt library with execution, table blocks, and comprehensive search/linking system with full navigation have been implemented beyond the original plan. Phase 9 (Linking & Search) is currently in progress at 65%.
+The Lore application is approximately **75% complete** with 8 out of 16 phases fully implemented. The core foundation, navigation, editor, block system, AI integration, and prompt library are functional. Additional features like versioning, comments, chat history, prompt library with execution, table blocks, and comprehensive search/linking system with full navigation have been implemented beyond the original plan. Phase 9 (Linking & Search) is currently in progress at 95%.
 
 ---
 
@@ -280,32 +280,42 @@ The Lore application is approximately **70% complete** with 8 out of 16 phases f
 ## ⏳ Not Started Phases (8/16)
 
 ### Phase 9: Linking & Search 🚧
-**Status**: 65% Complete
+**Status**: 95% Complete
 
 **What's Working**:
 - ✅ Global search component (⌘K)
 - ✅ Search service with scoring
 - ✅ Context panel component
+- ✅ **Context panel integrated with editor** ✅ NEW
+- ✅ **Context panel toggle via ⌘I keyboard shortcut** ✅ NEW
+- ✅ **Context panel in right panel region** ✅ NEW
 - ✅ Tag management service
 - ✅ Tags browser component (grid/list view)
 - ✅ Tag filter component
 - ✅ Backlinks service with link tracking
+- ✅ **Unlinked mentions detection** ✅ NEW
+- ✅ **Link creation from unlinked mentions** ✅ NEW
+- ✅ **Mini graph view (local SVG graph)** ✅ NEW
+- ✅ **Backlinks service bug fix (linkedNoteIds)** ✅ NEW
 - ✅ Routing & navigation integration
 
 **Pending**:
-- Context panel integration with editor
-- Mini graph view
-- Link preview on hover
-- Unlinked mentions detection
+- Link preview on hover (nice-to-have)
 
-**Files Created**:
+**Files Created/Modified**:
 - global-search.component.ts (~480 lines)
 - search.service.ts (~200 lines)
-- context-panel.component.ts (~350 lines)
+- context-panel.component.ts (~700 lines) - ENHANCED
 - tag.service.ts (~180 lines)
 - tags-browser.component.ts (~400 lines)
 - tag-filter.component.ts (~250 lines)
-- backlinks.service.ts (~200 lines)
+- backlinks.service.ts (~260 lines) - FIXED & ENHANCED
+- shell.component.ts - MODIFIED (context panel integration)
+- shell.component.html - MODIFIED (context panel rendering)
+- split-editor.component.ts - MODIFIED (context button)
+- split-editor.component.html - MODIFIED (context button)
+- layout.service.ts - MODIFIED (context-panel type)
+- editor.service.ts - MODIFIED (activeNoteObject computed)
 
 **Routes Added**:
 - `/tags` - Tags browser
@@ -611,6 +621,23 @@ lore-app/src/app/
 ---
 
 ## 📝 Change Log
+
+### May 14, 2026 (Session 12)
+- Integrated Context Panel with editor (shell right panel)
+- Added context panel toggle button to editor toolbar
+- Added ⌘I / Ctrl+I keyboard shortcut for context panel
+- Added `activeNoteObject` computed signal to EditorService
+- Added `context-panel` type to LayoutService
+- Implemented unlinked mentions detection in BacklinksService
+- Added link creation from unlinked mentions UI
+- **Implemented Mini Graph View** (SVG-based local graph in context panel)
+- Radial layout with center note and connected nodes
+- Interactive: click node to navigate to that note
+- Fixed BacklinksService to use `linkedNoteIds` (was using non-existent `links` property)
+- Fixed Context Panel to use `linkedNoteIds` instead of `links`
+- Updated Phase 9 from 65% to 95%
+- Updated overall completion from 70% to 75%
+- Build successful (0.823 seconds rebuild, 0 errors)
 
 ### May 13, 2026 (Session 5 - Continued)
 - Implemented Prompt Editor component (~350 lines)
